@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Quote, Shield, Users, Sparkles } from 'lucide-react';
+import { ArrowRight, Quote, Shield, Users, Sparkles, LucideIcon } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import AnimatedSection from '@/components/AnimatedSection';
 import StepCard from '@/components/cards/StepCard';
@@ -8,83 +8,49 @@ import FeatureCard from '@/components/cards/FeatureCard';
 import CTASection from '@/components/CTASection';
 import { Button } from '@/components/ui/button';
 import breadcrumbsMascot from '@/assets/breadcrumbs-mascot.jpg';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const whatBreadcrumbsAre = [
-  'Short notes and photos left at quest locations',
-  'Real tips from explorers who\'ve been there',
-  'Anonymous and privacy-first by design',
-  'Community signal, not personal branding',
-  'A way to help the next visitor',
-];
-
-const whatBreadcrumbsAreNot = [
-  'No followers, no feeds, no algorithm',
-  'No likes, comments, or engagement metrics',
-  'No personal profiles or social graphs',
-  'No influencer culture or clout chasing',
-  'No data harvesting or targeted ads',
-];
-
-const howItWorks = [
-  {
-    icon: <Sparkles className="w-7 h-7" />,
-    title: 'Complete a Quest',
-    description: 'Visit a location and check in to complete your quest. The experience is yours.',
-  },
-  {
-    icon: <Quote className="w-7 h-7" />,
-    title: 'Leave Your Note',
-    description: 'Share a quick tip, observation, or photo. What would help the next explorer?',
-  },
-  {
-    icon: <Shield className="w-7 h-7" />,
-    title: 'Stay Anonymous',
-    description: 'Your breadcrumb is attached to the location, not your identity. Privacy by design.',
-  },
-  {
-    icon: <Users className="w-7 h-7" />,
-    title: 'Help Others Discover',
-    description: 'Future visitors see your breadcrumb and benefit from your experience.',
-  },
-];
-
-const sampleBreadcrumbs = [
-  {
-    author: 'Explorer',
-    location: 'Ritual Coffee Roasters',
-    message: 'The back patio is the real gem here. Ask about their single-origin Ethiopian — life changing.',
-    image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=200&fit=crop',
-  },
-  {
-    author: 'Wanderer',
-    location: 'Clarion Alley',
-    message: 'Come early morning for the best photos. The light hits the murals perfectly around 8am.',
-    image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=200&fit=crop',
-  },
-  {
-    author: 'Seeker',
-    location: 'Lands End Trail',
-    message: 'Take the left fork at the second junction. There\'s a hidden bench with the best view.',
-    image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=200&fit=crop',
-  },
-  {
-    author: 'Discoverer',
-    location: 'Blue Bottle Coffee',
-    message: 'The Gibraltar is their secret menu item. Trust me on this one.',
-  },
-  {
-    author: 'Navigator',
-    location: 'Palace of Fine Arts',
-    message: 'Bring breadcrumbs (real ones) for the ducks. They\'re very friendly in the morning.',
-  },
-  {
-    author: 'Pathfinder',
-    location: 'Dolores Park',
-    message: 'The southwest corner has the best city views. Arrive 30 min before sunset.',
-  },
-];
+const stepIcons: LucideIcon[] = [Sparkles, Quote, Shield, Users];
 
 const Breadcrumbs = () => {
+  const { t } = useLanguage();
+
+  const sampleBreadcrumbs = [
+    {
+      author: 'Explorer',
+      location: 'Ritual Coffee Roasters',
+      message: t.breadcrumbsPage.examples.items[0],
+      image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=200&fit=crop',
+    },
+    {
+      author: 'Wanderer',
+      location: 'Clarion Alley',
+      message: t.breadcrumbsPage.examples.items[1],
+      image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=200&fit=crop',
+    },
+    {
+      author: 'Seeker',
+      location: 'Lands End Trail',
+      message: t.breadcrumbsPage.examples.items[2],
+      image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=200&fit=crop',
+    },
+    {
+      author: 'Discoverer',
+      location: 'Blue Bottle Coffee',
+      message: t.breadcrumbsPage.examples.items[3] || t.breadcrumbsPage.examples.items[0],
+    },
+    {
+      author: 'Navigator',
+      location: 'Palace of Fine Arts',
+      message: t.breadcrumbsPage.examples.items[4] || t.breadcrumbsPage.examples.items[1],
+    },
+    {
+      author: 'Pathfinder',
+      location: 'Dolores Park',
+      message: t.breadcrumbsPage.examples.items[5] || t.breadcrumbsPage.examples.items[2],
+    },
+  ];
+
   return (
     <Layout>
       {/* Hero with Mascot */}
@@ -96,15 +62,14 @@ const Breadcrumbs = () => {
             <AnimatedSection direction="left">
               <div>
                 <span className="text-turquoise font-semibold text-sm uppercase tracking-wide mb-4 block">
-                  The Heart of SideQuests
+                  {t.breadcrumbsPage.badge}
                 </span>
                 <h1 className="font-poppins font-bold text-4xl md:text-5xl lg:text-6xl text-foreground mb-6 leading-tight">
-                  Leave a Trail,{' '}
-                  <span className="text-gradient-turquoise">Help Others Find</span>
+                  {t.breadcrumbsPage.title}{' '}
+                  <span className="text-gradient-turquoise">{t.breadcrumbsPage.titleHighlight}</span>
                 </h1>
                 <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                  Breadcrumbs are short notes and photos left by explorers at quest locations.
-                  They're anonymous, helpful, and completely free from social media dynamics.
+                  {t.breadcrumbsPage.description}
                 </p>
                 <Button
                   asChild
@@ -112,7 +77,7 @@ const Breadcrumbs = () => {
                   className="bg-turquoise hover:bg-turquoise/90 text-primary-foreground font-semibold"
                 >
                   <Link to="/quests">
-                    Start Exploring
+                    {t.home.hero.cta}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                 </Button>
@@ -140,24 +105,24 @@ const Breadcrumbs = () => {
           <AnimatedSection>
             <div className="text-center mb-16">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-4">
-                Community Without the Noise
+                {t.breadcrumbsPage.sectionTitle}
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                We built breadcrumbs as an antidote to social media. Here's what makes them different.
+                {t.breadcrumbsPage.sectionDescription}
               </p>
             </div>
           </AnimatedSection>
 
           <div className="grid md:grid-cols-2 gap-6">
             <FeatureCard
-              title="What Breadcrumbs ARE"
-              items={whatBreadcrumbsAre}
+              title={t.breadcrumbsPage.whatTitle}
+              items={t.breadcrumbsPage.whatItems}
               type="positive"
               delay={0}
             />
             <FeatureCard
-              title="What Breadcrumbs are NOT"
-              items={whatBreadcrumbsAreNot}
+              title={t.breadcrumbsPage.whatNotTitle}
+              items={t.breadcrumbsPage.whatNotItems}
               type="negative"
               delay={100}
             />
@@ -171,25 +136,28 @@ const Breadcrumbs = () => {
           <AnimatedSection>
             <div className="text-center mb-16">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-4">
-                How Breadcrumbs Work
+                {t.breadcrumbsPage.howItWorks.title}
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Simple, anonymous, and focused on helping others
+                {t.breadcrumbsPage.howItWorks.subtitle}
               </p>
             </div>
           </AnimatedSection>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {howItWorks.map((step, index) => (
-              <StepCard
-                key={step.title}
-                step={index + 1}
-                title={step.title}
-                description={step.description}
-                icon={step.icon}
-                delay={index * 100}
-              />
-            ))}
+            {t.breadcrumbsPage.howItWorks.steps.map((step, index) => {
+              const Icon = stepIcons[index] || Sparkles;
+              return (
+                <StepCard
+                  key={step.title}
+                  step={index + 1}
+                  title={step.title}
+                  description={step.description}
+                  icon={<Icon className="w-7 h-7" />}
+                  delay={index * 100}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
@@ -200,10 +168,10 @@ const Breadcrumbs = () => {
           <AnimatedSection>
             <div className="text-center mb-12">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-4">
-                Real Breadcrumbs from the Community
+                {t.breadcrumbsPage.examples.title}
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                These are the kinds of notes explorers leave for each other
+                {t.breadcrumbsPage.examples.subtitle}
               </p>
             </div>
           </AnimatedSection>
@@ -218,9 +186,9 @@ const Breadcrumbs = () => {
 
       {/* CTA */}
       <CTASection
-        title="Start Leaving Breadcrumbs"
-        description="Complete your first quest and leave a note for the next explorer. Your insights help build a community of discovery."
-        primaryAction={{ label: 'Find a Quest', href: '/quests' }}
+        title={t.breadcrumbsPage.cta.title}
+        description={t.breadcrumbsPage.cta.description}
+        primaryAction={{ label: t.breadcrumbsPage.cta.button, href: '/quests' }}
         variant="turquoise"
       />
     </Layout>

@@ -85,6 +85,7 @@ export const zh: Translations = {
       art: '艺术',
       music: '音乐',
       outdoors: '户外',
+      everyday: '日常',
       events: '活动',
     },
     noResults: '未找到任务。请尝试调整搜索。',

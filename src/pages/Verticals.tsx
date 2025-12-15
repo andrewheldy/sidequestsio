@@ -2,53 +2,37 @@ import Layout from '@/components/layout/Layout';
 import AnimatedSection from '@/components/AnimatedSection';
 import VerticalCard from '@/components/cards/VerticalCard';
 import CTASection from '@/components/CTASection';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const verticals = [
-  {
-    title: 'Coffee & Cafés',
-    icon: '☕',
-    description: 'Discover the best local coffee spots, hidden rooftops, and cozy corners perfect for your next caffeine adventure.',
-    href: '/verticals/coffee',
-    color: 'coral' as const,
-  },
-  {
-    title: 'Art & Galleries',
-    icon: '🎨',
-    description: 'Explore street art, underground galleries, public installations, and creative spaces that inspire.',
-    href: '/verticals/art',
-    color: 'turquoise' as const,
-  },
-  {
-    title: 'Music & Nightlife',
-    icon: '🎵',
-    description: 'Find live music venues, jazz clubs, underground scenes, and the best spots for an unforgettable night.',
-    href: '/verticals/music',
-    color: 'sandstone' as const,
-  },
-  {
-    title: 'Beaches & Outdoors',
-    icon: '🏖️',
-    description: 'Adventure awaits at hidden beaches, scenic trails, secret viewpoints, and natural wonders.',
-    href: '/verticals/outdoors',
-    color: 'coral' as const,
-  },
-  {
-    title: 'Everyday Exploration',
-    icon: '🚶',
-    description: 'Turn your daily routine into an adventure. Discover gems in your neighborhood you never knew existed.',
-    href: '/verticals/everyday',
-    color: 'turquoise' as const,
-  },
-  {
-    title: 'Events & Festivals',
-    icon: '🎪',
-    description: 'Pop-up experiences, community gatherings, conferences, and festivals that bring people together.',
-    href: '/verticals/events',
-    color: 'sandstone' as const,
-  },
-];
+const verticalKeys = ['coffee', 'art', 'music', 'outdoors', 'everyday', 'events'] as const;
+const verticalIcons: Record<string, string> = {
+  coffee: '☕',
+  art: '🎨',
+  music: '🎵',
+  outdoors: '🏖️',
+  everyday: '🚶',
+  events: '🎪',
+};
+const verticalColors: Record<string, 'coral' | 'turquoise' | 'sandstone'> = {
+  coffee: 'coral',
+  art: 'turquoise',
+  music: 'sandstone',
+  outdoors: 'coral',
+  everyday: 'turquoise',
+  events: 'sandstone',
+};
 
 const Verticals = () => {
+  const { t } = useLanguage();
+
+  const verticals = verticalKeys.map((key) => ({
+    title: t.verticals.categories[key].title,
+    icon: verticalIcons[key],
+    description: t.verticals.categories[key].description,
+    href: `/verticals/${key}`,
+    color: verticalColors[key],
+  }));
+
   return (
     <Layout>
       {/* Hero */}
@@ -57,12 +41,11 @@ const Verticals = () => {
           <AnimatedSection>
             <div className="text-center max-w-3xl mx-auto">
               <h1 className="font-poppins font-bold text-4xl md:text-5xl text-foreground mb-6">
-                One Platform.{' '}
-                <span className="text-gradient-coral">Infinite Worlds.</span>
+                {t.verticals.title}{' '}
+                <span className="text-gradient-coral">{t.verticals.titleHighlight}</span>
               </h1>
               <p className="text-lg text-muted-foreground">
-                Explore quests across different categories tailored to your interests.
-                Each vertical is a gateway to unique experiences.
+                {t.verticals.description}
               </p>
             </div>
           </AnimatedSection>
@@ -74,7 +57,7 @@ const Verticals = () => {
         <div className="container">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {verticals.map((vertical, index) => (
-              <VerticalCard key={vertical.title} {...vertical} delay={index * 100} />
+              <VerticalCard key={vertical.href} {...vertical} delay={index * 100} />
             ))}
           </div>
         </div>
@@ -82,9 +65,9 @@ const Verticals = () => {
 
       {/* CTA */}
       <CTASection
-        title="Can't Find Your Niche?"
-        description="We're always expanding. Have a vertical in mind that doesn't exist yet? Let us know and help shape the future of SideQuests."
-        primaryAction={{ label: 'Contact Us', href: '/partnerships' }}
+        title={t.verticals.cta.title}
+        description={t.verticals.cta.description}
+        primaryAction={{ label: t.verticals.cta.button, href: '/partnerships' }}
         variant="coral"
       />
     </Layout>
