@@ -40,8 +40,8 @@ export function Header() {
         <div className="container flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <img src={dotlingLogo} alt="SideQuests.io" className="w-10 h-10 rounded-lg object-cover transition-transform duration-300 group-hover:scale-110" />
-            <span className="font-poppins font-bold text-xl text-foreground hidden sm:block">
-              SideQuests<span className="text-primary">.io</span>
+            <span className="font-poppins font-bold text-xl hidden sm:block">
+              <span className="bg-gradient-to-r from-coral via-primary to-turquoise bg-clip-text text-transparent">SideQuests</span><span className="text-primary">.io</span>
             </span>
           </Link>
 

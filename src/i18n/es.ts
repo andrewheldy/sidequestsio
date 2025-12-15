@@ -85,6 +85,7 @@ export const es: Translations = {
       art: 'Arte',
       music: 'Música',
       outdoors: 'Aire Libre',
+      everyday: 'Cotidiano',
       events: 'Eventos',
     },
     noResults: 'No se encontraron misiones. Intenta ajustar tu búsqueda.',
@@ -130,6 +131,14 @@ export const es: Translations = {
     examples: {
       title: 'Migas Reales de la Comunidad',
       subtitle: 'Estos son los tipos de notas que los exploradores dejan entre sí',
+      items: [
+        'El patio trasero es la verdadera joya. Pregunta por su café etíope de origen único.',
+        'Ven temprano por la mañana para las mejores fotos. La luz da en los murales perfectamente.',
+        'Toma el camino de la izquierda en la segunda bifurcación. Hay un banco escondido con la mejor vista.',
+        'Los martes tienen música en vivo. El barista Ricardo hace increíble latte art.',
+        'Estacionamiento gratuito después de las 6pm en la calle lateral. ¡No se lo digas a nadie!',
+        'El menú secreto tiene un sándwich de desayuno increíble. Solo pregunta.',
+      ],
     },
     cta: {
       title: 'Empieza a Dejar Migas',

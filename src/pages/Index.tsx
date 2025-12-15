@@ -103,8 +103,8 @@ const Index = () => {
             {/* Rotating Headline */}
             <AnimatedSection delay={100}>
               <div className="min-h-[120px] md:min-h-[160px] flex items-center justify-center mb-6">
-                <h1 
-                  className={`font-poppins font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight ${
+              <h1 
+                  className={`font-poppins font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight bg-gradient-to-r from-coral via-foreground to-turquoise bg-clip-text text-transparent ${
                     prefersReducedMotion ? '' : isExiting ? 'tagline-exit' : 'tagline-enter'
                   }`}
                 >
