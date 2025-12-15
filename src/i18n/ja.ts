@@ -85,6 +85,7 @@ export const ja: Translations = {
       art: 'アート',
       music: '音楽',
       outdoors: 'アウトドア',
+      everyday: '日常',
       events: 'イベント',
     },
     noResults: 'クエストが見つかりません。検索を調整してみてください。',
