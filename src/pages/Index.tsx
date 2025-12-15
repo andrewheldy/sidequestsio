@@ -9,31 +9,10 @@ import BreadcrumbCard from '@/components/cards/BreadcrumbCard';
 import VerticalCard from '@/components/cards/VerticalCard';
 import FeatureCard from '@/components/cards/FeatureCard';
 import CTASection from '@/components/CTASection';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useRotatingTagline } from '@/hooks/useRotatingTagline';
 import dotlingLogo from '@/assets/dotling-logo.jpg';
 import breadcrumbsMascot from '@/assets/breadcrumbs-mascot.jpg';
-
-const howItWorksSteps = [
-  {
-    icon: <Search className="w-7 h-7" />,
-    title: 'Find a Quest',
-    description: 'Browse curated quests in your area — coffee shops, art spots, hidden gems, and more.',
-  },
-  {
-    icon: <MapPin className="w-7 h-7" />,
-    title: 'Check In',
-    description: 'Visit the location and check in. No GPS tracking, just a simple confirmation.',
-  },
-  {
-    icon: <Compass className="w-7 h-7" />,
-    title: 'Complete & Discover',
-    description: 'Unlock achievements, discover nearby quests, and build your explorer profile.',
-  },
-  {
-    icon: <BookOpen className="w-7 h-7" />,
-    title: 'Leave a Breadcrumb',
-    description: 'Share a quick note or photo for the next explorer. No likes, no followers — just community.',
-  },
-];
 
 const featuredQuests = [
   {
@@ -81,42 +60,39 @@ const sampleBreadcrumbs = [
   },
 ];
 
-const verticals = [
-  { title: 'Coffee & Cafés', icon: '☕', description: 'Discover the best local coffee spots and hidden gems.', href: '/verticals/coffee', color: 'coral' as const },
-  { title: 'Art & Galleries', icon: '🎨', description: 'Explore street art, galleries, and creative spaces.', href: '/verticals/art', color: 'turquoise' as const },
-  { title: 'Music & Nightlife', icon: '🎵', description: 'Find live music venues and underground scenes.', href: '/verticals/music', color: 'sandstone' as const },
-  { title: 'Beaches & Outdoors', icon: '🏖️', description: 'Adventure awaits in nature and coastal spots.', href: '/verticals/outdoors', color: 'coral' as const },
-  { title: 'Everyday Exploration', icon: '🚶', description: 'Turn your daily routine into an adventure.', href: '/verticals/everyday', color: 'turquoise' as const },
-  { title: 'Events & Festivals', icon: '🎪', description: 'Pop-up experiences and community gatherings.', href: '/verticals/events', color: 'sandstone' as const },
-];
-
-const breadcrumbsPositive = [
-  'Short notes and photos left at quest locations',
-  'Anonymous and privacy-first by design',
-  'Helpful tips from real explorers',
-  'Community signal, not personal branding',
-];
-
-const breadcrumbsNegative = [
-  'No followers, no feeds, no algorithm',
-  'No likes, comments, or engagement metrics',
-  'No personal profiles or social graphs',
-  'No data harvesting or targeted ads',
-];
-
 const Index = () => {
+  const { t } = useLanguage();
+  
+  const { heroRef, currentTagline, isExiting, ctaPulse, prefersReducedMotion } = useRotatingTagline(
+    t.home.hero.taglines
+  );
+
+  const howItWorksSteps = [
+    { icon: <Search className="w-7 h-7" />, ...t.home.howItWorks.steps[0] },
+    { icon: <MapPin className="w-7 h-7" />, ...t.home.howItWorks.steps[1] },
+    { icon: <Compass className="w-7 h-7" />, ...t.home.howItWorks.steps[2] },
+    { icon: <BookOpen className="w-7 h-7" />, ...t.home.howItWorks.steps[3] },
+  ];
+
+  const verticals = [
+    { title: t.verticals.categories.coffee.title, icon: '☕', description: t.verticals.categories.coffee.description, href: '/verticals/coffee', color: 'coral' as const },
+    { title: t.verticals.categories.art.title, icon: '🎨', description: t.verticals.categories.art.description, href: '/verticals/art', color: 'turquoise' as const },
+    { title: t.verticals.categories.music.title, icon: '🎵', description: t.verticals.categories.music.description, href: '/verticals/music', color: 'sandstone' as const },
+    { title: t.verticals.categories.outdoors.title, icon: '🏖️', description: t.verticals.categories.outdoors.description, href: '/verticals/outdoors', color: 'coral' as const },
+    { title: t.verticals.categories.everyday.title, icon: '🚶', description: t.verticals.categories.everyday.description, href: '/verticals/everyday', color: 'turquoise' as const },
+    { title: t.verticals.categories.events.title, icon: '🎪', description: t.verticals.categories.events.description, href: '/verticals/events', color: 'sandstone' as const },
+  ];
+
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Background gradient */}
+      <section ref={heroRef} className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo via-indigo-light to-background" />
         <div className="absolute top-1/4 -right-32 w-96 h-96 bg-coral/20 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 -left-32 w-96 h-96 bg-turquoise/10 rounded-full blur-3xl" />
 
         <div className="container relative z-10 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Dotling accent */}
             <AnimatedSection delay={0}>
               <div className="inline-flex items-center gap-3 bg-muted/30 backdrop-blur-sm border border-border/50 rounded-full px-4 py-2 mb-8">
                 <img src={dotlingLogo} alt="Dotling" className="w-8 h-8 rounded-full object-cover" />
@@ -124,21 +100,30 @@ const Index = () => {
               </div>
             </AnimatedSection>
 
-            {/* Headline */}
+            {/* Rotating Headline */}
             <AnimatedSection delay={100}>
-              <h1 className="font-poppins font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground mb-6 leading-tight">
-                There's Always a{' '}
-                <span className="text-gradient-coral">Side Quest</span>{' '}
-                to Explore
-              </h1>
+              <div className="min-h-[120px] md:min-h-[160px] flex items-center justify-center mb-6">
+                <h1 
+                  className={`font-poppins font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight ${
+                    prefersReducedMotion ? '' : isExiting ? 'tagline-exit' : 'tagline-enter'
+                  }`}
+                >
+                  {currentTagline.main}
+                </h1>
+              </div>
             </AnimatedSection>
 
-            {/* Subheadline */}
+            {/* Rotating Subheadline */}
             <AnimatedSection delay={200}>
-              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-                Discover hidden gems in your city. Leave breadcrumbs for fellow explorers.
-                No followers, no feeds, no algorithm — just real-world adventure.
-              </p>
+              <div className="min-h-[60px] md:min-h-[80px] flex items-center justify-center mb-10">
+                <p 
+                  className={`text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed ${
+                    prefersReducedMotion ? '' : isExiting ? 'subheadline-exit' : 'subheadline-enter'
+                  }`}
+                >
+                  {currentTagline.sub}
+                </p>
+              </div>
             </AnimatedSection>
 
             {/* CTAs */}
@@ -147,27 +132,21 @@ const Index = () => {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 group animate-pulse-glow"
+                  className={`bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 group ${ctaPulse ? 'cta-pulse' : ''}`}
                 >
                   <Link to="/quests">
-                    Explore Quests
+                    {t.home.hero.cta}
                     <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="lg"
-                  className="border-border hover:bg-muted"
-                >
-                  <Link to="/breadcrumbs">Learn About Breadcrumbs</Link>
+                <Button asChild variant="outline" size="lg" className="border-border hover:bg-muted">
+                  <Link to="/breadcrumbs">{t.home.hero.secondaryCta}</Link>
                 </Button>
               </div>
             </AnimatedSection>
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex justify-center pt-2">
             <div className="w-1 h-3 bg-muted-foreground/50 rounded-full" />
@@ -181,24 +160,17 @@ const Index = () => {
           <AnimatedSection>
             <div className="text-center mb-16">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-4">
-                How It Works
+                {t.home.howItWorks.title}
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Four simple steps to start your adventure
+                {t.home.howItWorks.subtitle}
               </p>
             </div>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {howItWorksSteps.map((step, index) => (
-              <StepCard
-                key={step.title}
-                step={index + 1}
-                title={step.title}
-                description={step.description}
-                icon={step.icon}
-                delay={index * 100}
-              />
+              <StepCard key={index} step={index + 1} title={step.title} description={step.description} icon={step.icon} delay={index * 100} />
             ))}
           </div>
         </div>
@@ -211,18 +183,17 @@ const Index = () => {
             <AnimatedSection direction="left">
               <div>
                 <span className="text-primary font-semibold text-sm uppercase tracking-wide mb-4 block">
-                  What Makes Us Different
+                  {t.home.breadcrumbs.badge}
                 </span>
                 <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-6">
-                  Community Without Clout
+                  {t.home.breadcrumbs.title}
                 </h2>
                 <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                  Breadcrumbs are the heart of SideQuests. They're short notes and photos
-                  left by explorers for future visitors — real tips without the social media noise.
+                  {t.home.breadcrumbs.description}
                 </p>
                 <Button asChild className="bg-turquoise hover:bg-turquoise/90 text-primary-foreground">
                   <Link to="/breadcrumbs">
-                    Discover Breadcrumbs
+                    {t.common.learnMore}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
@@ -231,30 +202,15 @@ const Index = () => {
 
             <AnimatedSection direction="right">
               <div className="relative">
-                <img
-                  src={breadcrumbsMascot}
-                  alt="Breadcrumbs Mascot"
-                  className="w-full max-w-md mx-auto rounded-2xl shadow-2xl"
-                />
+                <img src={breadcrumbsMascot} alt="Breadcrumbs Mascot" className="w-full max-w-md mx-auto rounded-2xl shadow-2xl" />
                 <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-turquoise/20 rounded-full blur-2xl" />
               </div>
             </AnimatedSection>
           </div>
 
-          {/* DO / NOT comparison */}
           <div className="grid md:grid-cols-2 gap-6">
-            <FeatureCard
-              title="What Breadcrumbs ARE"
-              items={breadcrumbsPositive}
-              type="positive"
-              delay={0}
-            />
-            <FeatureCard
-              title="What Breadcrumbs are NOT"
-              items={breadcrumbsNegative}
-              type="negative"
-              delay={100}
-            />
+            <FeatureCard title={t.home.breadcrumbs.whatTheyAre} items={t.home.breadcrumbs.areList} type="positive" delay={0} />
+            <FeatureCard title={t.home.breadcrumbs.whatTheyAreNot} items={t.home.breadcrumbs.areNotList} type="negative" delay={100} />
           </div>
         </div>
       </section>
@@ -265,18 +221,14 @@ const Index = () => {
           <AnimatedSection>
             <div className="text-center mb-12">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-4">
-                Real Breadcrumbs from Explorers
+                {t.breadcrumbsPage.examples.title}
               </h2>
             </div>
           </AnimatedSection>
 
           <div className="grid md:grid-cols-3 gap-6">
             {sampleBreadcrumbs.map((breadcrumb, index) => (
-              <BreadcrumbCard
-                key={breadcrumb.author}
-                {...breadcrumb}
-                delay={index * 100}
-              />
+              <BreadcrumbCard key={breadcrumb.author} {...breadcrumb} delay={index * 100} />
             ))}
           </div>
         </div>
@@ -289,13 +241,13 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-12">
               <div>
                 <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-2">
-                  Featured Quests
+                  {t.home.quests.title}
                 </h2>
-                <p className="text-muted-foreground">Handpicked adventures for you</p>
+                <p className="text-muted-foreground">{t.home.quests.badge}</p>
               </div>
               <Button asChild variant="outline" className="border-border hover:bg-muted">
                 <Link to="/quests">
-                  View All Quests
+                  {t.home.quests.viewAll}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
@@ -316,10 +268,10 @@ const Index = () => {
           <AnimatedSection>
             <div className="text-center mb-12">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-4">
-                One Platform. Infinite Worlds.
+                {t.verticals.title} <span className="text-gradient-coral">{t.verticals.titleHighlight}</span>
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Explore quests across different categories tailored to your interests
+                {t.verticals.description}
               </p>
             </div>
           </AnimatedSection>
@@ -334,10 +286,10 @@ const Index = () => {
 
       {/* For Hosts CTA */}
       <CTASection
-        title="Become a Quest Host"
-        description="Have a hidden gem you want to share? Create a quest and guide fellow explorers to discover something amazing."
-        primaryAction={{ label: 'Get Started', href: '/hosts' }}
-        secondaryAction={{ label: 'Learn More', href: '/partnerships' }}
+        title={t.home.hosts.title}
+        description={t.home.hosts.description}
+        primaryAction={{ label: t.home.hosts.cta, href: '/hosts' }}
+        secondaryAction={{ label: t.common.learnMore, href: '/partnerships' }}
         variant="coral"
       />
     </Layout>
