@@ -85,6 +85,7 @@ export const de: Translations = {
       art: 'Kunst',
       music: 'Musik',
       outdoors: 'Outdoor',
+      everyday: 'Alltag',
       events: 'Events',
     },
     noResults: 'Keine Quests gefunden. Versuche deine Suche anzupassen.',
@@ -130,6 +131,14 @@ export const de: Translations = {
     examples: {
       title: 'Echte Brotkrumen aus der Community',
       subtitle: 'Das sind die Arten von Notizen, die Entdecker füreinander hinterlassen',
+      items: [
+        'Die Hinterterrasse ist das wahre Juwel. Frag nach ihrem Single-Origin Äthiopier.',
+        'Komm früh morgens für die besten Fotos. Das Licht trifft die Wandbilder perfekt.',
+        'Nimm den linken Weg an der zweiten Gabelung. Es gibt eine versteckte Bank mit der besten Aussicht.',
+        'Dienstags gibt es Live-Musik. Barista Ricardo macht unglaubliche Latte Art.',
+        'Kostenloses Parken nach 18 Uhr in der Seitenstraße. Sag es niemandem!',
+        'Das Geheimmenü hat ein unglaubliches Frühstückssandwich. Einfach fragen.',
+      ],
     },
     cta: {
       title: 'Fang an, Brotkrumen zu Hinterlassen',

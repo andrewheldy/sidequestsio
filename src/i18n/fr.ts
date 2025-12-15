@@ -85,6 +85,7 @@ export const fr: Translations = {
       art: 'Art',
       music: 'Musique',
       outdoors: 'Plein Air',
+      everyday: 'Quotidien',
       events: 'Événements',
     },
     noResults: 'Aucune quête trouvée. Essayez d\'ajuster votre recherche.',
@@ -130,6 +131,14 @@ export const fr: Translations = {
     examples: {
       title: 'Vraies Miettes de la Communauté',
       subtitle: 'Voici le genre de notes que les explorateurs se laissent',
+      items: [
+        'La terrasse arrière est le vrai bijou. Demandez leur café éthiopien d\'origine unique.',
+        'Venez tôt le matin pour les meilleures photos. La lumière frappe parfaitement les fresques.',
+        'Prenez le chemin de gauche à la deuxième jonction. Il y a un banc caché avec la meilleure vue.',
+        'Les mardis ont de la musique live. Le barista Ricardo fait un art latte incroyable.',
+        'Parking gratuit après 18h dans la rue latérale. Ne le dites à personne!',
+        'Le menu secret a un incroyable sandwich petit-déjeuner. Il suffit de demander.',
+      ],
     },
     cta: {
       title: 'Commencez à Laisser des Miettes',

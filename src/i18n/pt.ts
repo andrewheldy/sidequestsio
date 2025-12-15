@@ -85,6 +85,7 @@ export const pt: Translations = {
       art: 'Arte',
       music: 'Música',
       outdoors: 'Ar Livre',
+      everyday: 'Cotidiano',
       events: 'Eventos',
     },
     noResults: 'Nenhuma missão encontrada. Tente ajustar sua busca.',
@@ -130,6 +131,14 @@ export const pt: Translations = {
     examples: {
       title: 'Migalhas Reais da Comunidade',
       subtitle: 'Estes são os tipos de notas que exploradores deixam uns para os outros',
+      items: [
+        'O pátio dos fundos é a verdadeira joia. Pergunte sobre o café etíope de origem única.',
+        'Venha cedo de manhã para as melhores fotos. A luz atinge os murais perfeitamente.',
+        'Pegue o caminho da esquerda na segunda bifurcação. Há um banco escondido com a melhor vista.',
+        'Às terças tem música ao vivo. O barista Ricardo faz latte art incrível.',
+        'Estacionamento gratuito depois das 18h na rua lateral. Não conte para ninguém!',
+        'O menu secreto tem um sanduíche de café da manhã incrível. É só perguntar.',
+      ],
     },
     cta: {
       title: 'Comece a Deixar Migalhas',
