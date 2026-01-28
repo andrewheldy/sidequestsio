@@ -21,11 +21,11 @@ const allQuests = [
   },
   {
     title: 'Street Art Walking Tour',
-    location: 'Mission District',
+    location: 'Wynwood Walls',
     categoryKey: 'art' as const,
     duration: '2 hours',
     participants: 89,
-    image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1569700296499-d5671c74cb3d?w=400&h=300&fit=crop',
   },
   {
     title: 'Sunset Beach Meditation',
