@@ -16,8 +16,8 @@ import breadcrumbsMascot from '@/assets/breadcrumbs-mascot.jpg';
 
 const featuredQuests = [
   {
-    title: 'Hidden Rooftop Coffee',
-    location: 'Downtown Arts District',
+    title: 'Oceanfront Espresso Bar',
+    location: 'South Beach',
     category: 'Coffee',
     duration: '30 min',
     participants: 127,
@@ -25,15 +25,15 @@ const featuredQuests = [
   },
   {
     title: 'Street Art Walking Tour',
-    location: 'Mission District',
+    location: 'Wynwood Walls',
     category: 'Art',
     duration: '2 hours',
     participants: 89,
-    image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=400&h=300&fit=crop',
   },
   {
-    title: 'Sunset Beach Meditation',
-    location: 'Ocean Beach',
+    title: 'Sunrise Beach Yoga',
+    location: 'Miami Beach',
     category: 'Outdoors',
     duration: '1 hour',
     participants: 203,
@@ -44,19 +44,19 @@ const featuredQuests = [
 const sampleBreadcrumbs = [
   {
     author: 'Maya',
-    location: 'Ritual Coffee Roasters',
+    location: 'Panther Coffee Wynwood',
     message: 'The back patio is the real gem here. Ask about their single-origin Ethiopian — life changing.',
     image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=200&fit=crop',
   },
   {
     author: 'James',
-    location: 'Clarion Alley',
+    location: 'Wynwood Walls',
     message: 'Come early morning for the best photos. The light hits the murals perfectly around 8am.',
   },
   {
     author: 'Sofia',
-    location: 'Lands End Trail',
-    message: 'Take the left fork at the second junction. There\'s a hidden bench with the best view.',
+    location: 'South Pointe Park',
+    message: 'Take the path along the jetty. There\'s a hidden bench with the best view of the skyline.',
   },
 ];
 

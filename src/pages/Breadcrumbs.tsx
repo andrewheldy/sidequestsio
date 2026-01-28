@@ -18,35 +18,35 @@ const Breadcrumbs = () => {
   const sampleBreadcrumbs = [
     {
       author: 'Explorer',
-      location: 'Ritual Coffee Roasters',
+      location: 'Panther Coffee Wynwood',
       message: t.breadcrumbsPage.examples.items[0],
       image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=200&fit=crop',
     },
     {
       author: 'Wanderer',
-      location: 'Clarion Alley',
+      location: 'Wynwood Walls',
       message: t.breadcrumbsPage.examples.items[1],
-      image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=200&fit=crop',
+      image: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=400&h=200&fit=crop',
     },
     {
       author: 'Seeker',
-      location: 'Lands End Trail',
+      location: 'Bill Baggs Cape Florida',
       message: t.breadcrumbsPage.examples.items[2],
       image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=200&fit=crop',
     },
     {
       author: 'Discoverer',
-      location: 'Blue Bottle Coffee',
+      location: 'All Day Coffee',
       message: t.breadcrumbsPage.examples.items[3] || t.breadcrumbsPage.examples.items[0],
     },
     {
       author: 'Navigator',
-      location: 'Palace of Fine Arts',
+      location: 'Vizcaya Museum',
       message: t.breadcrumbsPage.examples.items[4] || t.breadcrumbsPage.examples.items[1],
     },
     {
       author: 'Pathfinder',
-      location: 'Dolores Park',
+      location: 'Bayfront Park',
       message: t.breadcrumbsPage.examples.items[5] || t.breadcrumbsPage.examples.items[2],
     },
   ];
