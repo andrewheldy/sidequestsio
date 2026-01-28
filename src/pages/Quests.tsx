@@ -49,7 +49,7 @@ const allQuests = [
     categoryKey: 'everyday' as const,
     duration: '2 hours',
     participants: 142,
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=300&fit=crop',
   },
   {
     title: 'Food Truck Festival',
