@@ -3,7 +3,7 @@ import { ArrowRight, Quote, Shield, Users, Sparkles, LucideIcon } from 'lucide-r
 import Layout from '@/components/layout/Layout';
 import AnimatedSection from '@/components/AnimatedSection';
 import StepCard from '@/components/cards/StepCard';
-import CommunityNoteCard from '@/components/cards/Community NoteCard';
+import CommunityNoteCard from '@/components/cards/CommunityNoteCard';
 import FeatureCard from '@/components/cards/FeatureCard';
 import CTASection from '@/components/CTASection';
 import { Button } from '@/components/ui/button';

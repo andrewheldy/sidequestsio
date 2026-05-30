@@ -5,7 +5,7 @@ import Layout from '@/components/layout/Layout';
 import AnimatedSection from '@/components/AnimatedSection';
 import StepCard from '@/components/cards/StepCard';
 import QuestCard from '@/components/cards/QuestCard';
-import CommunityNoteCard from '@/components/cards/Community NoteCard';
+import CommunityNoteCard from '@/components/cards/CommunityNoteCard';
 import VerticalCard from '@/components/cards/VerticalCard';
 import FeatureCard from '@/components/cards/FeatureCard';
 import CTASection from '@/components/CTASection';
