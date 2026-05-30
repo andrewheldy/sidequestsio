@@ -199,7 +199,7 @@ const VerticalDetail = () => {
 
           <div className="grid md:grid-cols-2 gap-6">
             {data.communityNotes.map((communityNote, index) => (
-              <CommunityNoteCard key={`${community note.author}-${index}`} {...communityNote} delay={index * 100} />
+              <CommunityNoteCard key={`${communityNote.author}-${index}`} {...communityNote} delay={index * 100} />
             ))}
           </div>
         </div>

@@ -178,7 +178,7 @@ const CommunityNotes = () => {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {sampleCommunityNotes.map((communityNote, index) => (
-              <CommunityNoteCard key={`${community note.author}-${index}`} {...communityNote} delay={index * 80} />
+              <CommunityNoteCard key={`${communityNote.author}-${index}`} {...communityNote} delay={index * 80} />
             ))}
           </div>
         </div>
