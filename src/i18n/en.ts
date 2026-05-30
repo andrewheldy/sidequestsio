@@ -189,7 +189,7 @@ export const en = {
         "Come early morning for the best photos. The light hits the murals perfectly around 8am.",
         "Take the left fork at the second junction. There's a hidden bench with the best view.",
         "The Gibraltar is their secret menu item. Trust me on this one.",
-        "Bring community notes (real ones) for the ducks. They're very friendly in the morning.",
+        "The pier benches near the south end are the quietest spot. Perfect for an early-morning coffee.",
         "The southwest corner has the best city views. Arrive 30 min before sunset.",
       ],
     },
