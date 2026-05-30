@@ -3,7 +3,7 @@ import type { Translations } from './en';
 export const fr: Translations = {
   nav: {
     quests: 'Quêtes',
-    breadcrumbs: 'Miettes',
+    communityNotes: 'Miettes',
     verticals: 'Catégories',
     partnerships: 'Partenariats',
     hosts: 'Pour Hôtes',
@@ -49,7 +49,7 @@ export const fr: Translations = {
         { title: 'Laissez une Miette', description: "Partagez une note sincère pour le prochain explorateur. Aidez les autres à trouver la magie." },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: 'Ce Qui Nous Rend Différents',
       title: 'Des Miettes, Pas des Avis',
       description: "Les miettes sont des notes personnelles laissées par de vrais explorateurs—pas des notes, pas des avis, pas de contenu sponsorisé. Ce sont des moments honnêtes partagés pour aider les autres à découvrir quelque chose de spécial.",
@@ -95,7 +95,7 @@ export const fr: Translations = {
       button: 'Devenir Hôte',
     },
   },
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: 'Le Cœur de SideQuests',
     title: 'Laissez une Trace,',
     titleHighlight: 'Aidez les Autres à Trouver',
@@ -223,7 +223,7 @@ export const fr: Translations = {
       features: ['Stats de complétion', 'Flux de miettes', 'Tendances d\'engagement', 'Outils d\'édition simples'],
       stats: {
         completions: 'Complétions',
-        breadcrumbs: 'Miettes',
+        communityNotes: 'Miettes',
         views: 'Vues',
       },
       yourQuests: 'Vos Quêtes',
@@ -272,7 +272,7 @@ export const fr: Translations = {
     legal: 'Légal',
     links: {
       quests: 'Quêtes',
-      breadcrumbs: 'Miettes',
+      communityNotes: 'Miettes',
       verticals: 'Catégories',
       partnerships: 'Partenariats',
       about: 'À Propos',

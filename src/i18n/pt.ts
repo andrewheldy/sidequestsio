@@ -3,7 +3,7 @@ import type { Translations } from './en';
 export const pt: Translations = {
   nav: {
     quests: 'Missões',
-    breadcrumbs: 'Migalhas',
+    communityNotes: 'Migalhas',
     verticals: 'Categorias',
     partnerships: 'Parcerias',
     hosts: 'Para Anfitriões',
@@ -49,7 +49,7 @@ export const pt: Translations = {
         { title: 'Deixe uma Migalha', description: 'Compartilhe uma nota genuína para o próximo explorador.' },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: 'O Que Nos Diferencia',
       title: 'Migalhas, Não Avaliações',
       description: 'Migalhas são notas pessoais deixadas por exploradores reais—não classificações, não avaliações, não conteúdo patrocinado. São momentos honestos compartilhados para ajudar outros.',
@@ -95,7 +95,7 @@ export const pt: Translations = {
       button: 'Seja um Anfitrião',
     },
   },
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: 'O Coração do SideQuests',
     title: 'Deixe um Rastro,',
     titleHighlight: 'Ajude Outros a Encontrar',
@@ -223,7 +223,7 @@ export const pt: Translations = {
       features: ['Stats de conclusão', 'Feed de migalhas', 'Tendências de engajamento', 'Ferramentas de edição simples'],
       stats: {
         completions: 'Conclusões',
-        breadcrumbs: 'Migalhas',
+        communityNotes: 'Migalhas',
         views: 'Visualizações',
       },
       yourQuests: 'Suas Missões',
@@ -272,7 +272,7 @@ export const pt: Translations = {
     legal: 'Legal',
     links: {
       quests: 'Missões',
-      breadcrumbs: 'Migalhas',
+      communityNotes: 'Migalhas',
       verticals: 'Categorias',
       partnerships: 'Parcerias',
       about: 'Sobre',

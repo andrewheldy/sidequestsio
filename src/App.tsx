@@ -2,12 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Quests from "./pages/Quests";
-import Breadcrumbs from "./pages/Breadcrumbs";
+import CommunityNotes from "./pages/CommunityNotes";
 import Verticals from "./pages/Verticals";
 import VerticalDetail from "./pages/VerticalDetail";
 import Partnerships from "./pages/Partnerships";
@@ -27,7 +27,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/quests" element={<Quests />} />
-            <Route path="/breadcrumbs" element={<Breadcrumbs />} />
+            <Route path="/community-notes" element={<CommunityNotes />} />
+            <Route path="/breadcrumbs" element={<Navigate to="/community-notes" replace />} />
             <Route path="/verticals" element={<Verticals />} />
             <Route path="/verticals/:slug" element={<VerticalDetail />} />
             <Route path="/partnerships" element={<Partnerships />} />

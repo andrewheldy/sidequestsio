@@ -3,7 +3,7 @@ import type { Translations } from './en';
 export const es: Translations = {
   nav: {
     quests: 'Misiones',
-    breadcrumbs: 'Migas de Pan',
+    communityNotes: 'Migas de Pan',
     verticals: 'Categorías',
     partnerships: 'Alianzas',
     hosts: 'Para Anfitriones',
@@ -49,7 +49,7 @@ export const es: Translations = {
         { title: 'Deja una Miga', description: 'Comparte una nota genuina para el próximo explorador. Ayuda a otros a encontrar la magia.' },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: 'Lo Que Nos Hace Diferentes',
       title: 'Migas de Pan, No Reseñas',
       description: 'Las migas de pan son notas personales dejadas por exploradores reales—no calificaciones, no reseñas, no contenido patrocinado. Son momentos honestos compartidos para ayudar a otros a descubrir algo especial.',
@@ -95,7 +95,7 @@ export const es: Translations = {
       button: 'Conviértete en Anfitrión',
     },
   },
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: 'El Corazón de SideQuests',
     title: 'Deja un Rastro,',
     titleHighlight: 'Ayuda a Otros a Encontrar',
@@ -223,7 +223,7 @@ export const es: Translations = {
       features: ['Estadísticas de completación', 'Feed de migas', 'Tendencias de engagement', 'Herramientas de edición simples'],
       stats: {
         completions: 'Completaciones',
-        breadcrumbs: 'Migas',
+        communityNotes: 'Migas',
         views: 'Vistas',
       },
       yourQuests: 'Tus Misiones',
@@ -272,7 +272,7 @@ export const es: Translations = {
     legal: 'Legal',
     links: {
       quests: 'Misiones',
-      breadcrumbs: 'Migas de Pan',
+      communityNotes: 'Migas de Pan',
       verticals: 'Categorías',
       partnerships: 'Alianzas',
       about: 'Nosotros',
