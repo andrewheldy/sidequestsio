@@ -403,7 +403,7 @@ export const en = {
 
   // Footer
   footer: {
-    description: "Real-world adventures. Authentic discovery. Community community notes.",
+    description: "Real-world adventures. Authentic discovery. Community Notes.",
     explore: "Explore",
     company: "Company",
     legal: "Legal",
