@@ -188,12 +188,12 @@ const VerticalDetail = () => {
         </div>
       </section>
 
-      {/* Breadcrumbs */}
+      {/* Community Notes */}
       <section className="py-16 md:py-24 bg-muted/20">
         <div className="container">
           <AnimatedSection>
             <h2 className="font-poppins font-bold text-2xl md:text-3xl text-foreground mb-8">
-              Breadcrumbs from {data.title} Explorers
+              Community Notes from {data.title} Explorers
             </h2>
           </AnimatedSection>
 

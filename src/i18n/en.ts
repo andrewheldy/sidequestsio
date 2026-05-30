@@ -134,7 +134,7 @@ export const en = {
     },
   },
 
-  // Breadcrumbs page
+  // Community Notes page
   communityNotesPage: {
     badge: "The Heart of SideQuests",
     title: "Leave a Trail,",

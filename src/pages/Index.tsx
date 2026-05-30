@@ -176,7 +176,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Breadcrumbs Differentiator */}
+      {/* Community Notes Differentiator */}
       <section className="py-20 md:py-28 bg-muted/20">
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
@@ -215,7 +215,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Sample Breadcrumbs */}
+      {/* Sample Community Notes */}
       <section className="py-20 md:py-28">
         <div className="container">
           <AnimatedSection>

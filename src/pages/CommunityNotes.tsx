@@ -12,7 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const stepIcons: LucideIcon[] = [Sparkles, Quote, Shield, Users];
 
-const Breadcrumbs = () => {
+const CommunityNotes = () => {
   const { t } = useLanguage();
 
   const sampleCommunityNotes = [
@@ -99,7 +99,7 @@ const Breadcrumbs = () => {
         </div>
       </section>
 
-      {/* What Breadcrumbs Are / Are Not */}
+      {/* What Community Notes Are / Are Not */}
       <section className="py-20 md:py-28 bg-muted/20">
         <div className="container">
           <AnimatedSection>
@@ -162,7 +162,7 @@ const Breadcrumbs = () => {
         </div>
       </section>
 
-      {/* Sample Breadcrumbs */}
+      {/* Sample Community Notes */}
       <section className="py-20 md:py-28 bg-muted/20">
         <div className="container">
           <AnimatedSection>
@@ -195,4 +195,4 @@ const Breadcrumbs = () => {
   );
 };
 
-export default Breadcrumbs;
+export default CommunityNotes;

@@ -2,7 +2,7 @@ import { Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AnimatedSection from '@/components/AnimatedSection';
 
-interface BreadcrumbCardProps {
+interface CommunityNoteCardProps {
   author: string;
   location: string;
   message: string;
@@ -18,7 +18,7 @@ export function CommunityNoteCard({
   image,
   delay = 0,
   className,
-}: BreadcrumbCardProps) {
+}: CommunityNoteCardProps) {
   return (
     <AnimatedSection direction="up" delay={delay}>
       <div
