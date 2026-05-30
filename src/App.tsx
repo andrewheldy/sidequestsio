@@ -7,7 +7,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Quests from "./pages/Quests";
-import Breadcrumbs from "./pages/Breadcrumbs";
+import Breadcrumbs from "./pages/Community Notes";
 import Verticals from "./pages/Verticals";
 import VerticalDetail from "./pages/VerticalDetail";
 import Partnerships from "./pages/Partnerships";
@@ -27,7 +27,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/quests" element={<Quests />} />
-            <Route path="/breadcrumbs" element={<Breadcrumbs />} />
+            <Route path="/community-notes" element={<Breadcrumbs />} />
             <Route path="/verticals" element={<Verticals />} />
             <Route path="/verticals/:slug" element={<VerticalDetail />} />
             <Route path="/partnerships" element={<Partnerships />} />

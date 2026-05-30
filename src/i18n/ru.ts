@@ -3,7 +3,7 @@ import type { Translations } from './en';
 export const ru: Translations = {
   nav: {
     quests: 'Квесты',
-    breadcrumbs: 'Хлебные Крошки',
+    communityNotes: 'Хлебные Крошки',
     verticals: 'Категории',
     partnerships: 'Партнёрство',
     hosts: 'Для Хостов',
@@ -49,7 +49,7 @@ export const ru: Translations = {
         { title: 'Оставьте Крошку', description: 'Поделитесь искренней заметкой для следующего исследователя.' },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: 'Что Нас Отличает',
       title: 'Крошки, а Не Отзывы',
       description: 'Хлебные крошки — это личные заметки от реальных исследователей. Не оценки, не отзывы, не спонсорский контент. Это честные моменты, которыми делятся, чтобы помочь другим.',
@@ -95,7 +95,7 @@ export const ru: Translations = {
       button: 'Стать Хостом',
     },
   },
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: 'Сердце SideQuests',
     title: 'Оставьте След,',
     titleHighlight: 'Помогите Другим Найти',
@@ -223,7 +223,7 @@ export const ru: Translations = {
       features: ['Статистика выполнений', 'Лента крошек', 'Тренды вовлечения', 'Простые инструменты редактирования'],
       stats: {
         completions: 'Выполнений',
-        breadcrumbs: 'Крошек',
+        communityNotes: 'Крошек',
         views: 'Просмотров',
       },
       yourQuests: 'Ваши Квесты',
@@ -272,7 +272,7 @@ export const ru: Translations = {
     legal: 'Правовая Информация',
     links: {
       quests: 'Квесты',
-      breadcrumbs: 'Крошки',
+      communityNotes: 'Крошки',
       verticals: 'Категории',
       partnerships: 'Партнёрство',
       about: 'О Нас',

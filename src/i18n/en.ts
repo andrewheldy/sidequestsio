@@ -2,7 +2,7 @@ export const en = {
   // Navigation
   nav: {
     quests: "Quests",
-    breadcrumbs: "Breadcrumbs",
+    communityNotes: "Community Notes",
     verticals: "Verticals",
     partnerships: "Partnerships",
     hosts: "For Hosts",
@@ -34,7 +34,7 @@ export const en = {
         },
         {
           main: "Discover places through people, not feeds",
-          sub: "Breadcrumbs are short notes left by real visitors — no followers, no noise.",
+          sub: "Community Notes are short notes left by real visitors — no followers, no noise.",
         },
         {
           main: "Community without clout",
@@ -42,7 +42,7 @@ export const en = {
         },
         {
           main: "Leave a trail. Help the next explorer.",
-          sub: "Drop a Breadcrumb after each quest — a tip, a moment, a memory.",
+          sub: "Drop a Community Note after each quest — a tip, a moment, a memory.",
         },
         { main: "Explore more. Scroll less.", sub: "SideQuests rewards curiosity in the real world, not screen time." },
         {
@@ -52,7 +52,7 @@ export const en = {
         { main: "Not a feed. A trail.", sub: "Every quest has its own living message board — shaped by explorers." },
         {
           main: "The best places aren't trending",
-          sub: "They're discovered, shared quietly, and passed along through Breadcrumbs.",
+          sub: "They're discovered, shared quietly, and passed along through Community Notes.",
         },
         {
           main: "Look up. There's a quest nearby.",
@@ -77,17 +77,17 @@ export const en = {
           description: "Follow the quest objectives and discover something new about your city.",
         },
         {
-          title: "Leave a Breadcrumb",
+          title: "Leave a Community Note",
           description: "Share a genuine note for the next explorer. Help others find the magic.",
         },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: "What Makes Us Different",
-      title: "Breadcrumbs, Not Reviews",
+      title: "Community Notes, Not Reviews",
       description:
-        "Breadcrumbs are personal notes left by real explorers; not ratings, not reviews, not sponsored content. They're honest moments shared to help others discover something special.",
-      whatTheyAre: "What Breadcrumbs Are",
+        "Community Notes are personal notes left by real explorers; not ratings, not reviews, not sponsored content. They're honest moments shared to help others discover something special.",
+      whatTheyAre: "What Community Notes Are",
       whatTheyAreNot: "What They're NOT",
       areList: ["Personal recommendations", "Authentic moments", "Community-driven", "Privacy-first"],
       areNotList: ["Star ratings", "Paid reviews", "Influencer content", "Algorithm bait"],
@@ -135,16 +135,16 @@ export const en = {
   },
 
   // Breadcrumbs page
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: "The Heart of SideQuests",
     title: "Leave a Trail,",
     titleHighlight: "Help Others Find",
     description:
-      "Breadcrumbs are short notes and photos left by explorers at quest locations. They're anonymous, helpful, and completely free from social media dynamics.",
+      "Community Notes are short notes and photos left by explorers at quest locations. They're anonymous, helpful, and completely free from social media dynamics.",
     sectionTitle: "Community Without the Noise",
-    sectionDescription: "We built breadcrumbs as an antidote to social media. Here's what makes them different.",
-    whatTitle: "What Breadcrumbs ARE",
-    whatNotTitle: "What Breadcrumbs are NOT",
+    sectionDescription: "We built community notes as an antidote to social media. Here's what makes them different.",
+    whatTitle: "What Community Notes ARE",
+    whatNotTitle: "What Community Notes are NOT",
     whatItems: [
       "Short notes and photos left at quest locations",
       "Real tips from explorers who've been there",
@@ -160,7 +160,7 @@ export const en = {
       "No data harvesting or targeted ads",
     ],
     howItWorks: {
-      title: "How Breadcrumbs Work",
+      title: "How Community Notes Work",
       subtitle: "Simple, anonymous, and focused on helping others",
       steps: [
         {
@@ -173,28 +173,28 @@ export const en = {
         },
         {
           title: "Stay Anonymous",
-          description: "Your breadcrumb is attached to the location, not your identity. Privacy by design.",
+          description: "Your community note is attached to the location, not your identity. Privacy by design.",
         },
         {
           title: "Help Others Discover",
-          description: "Future visitors see your breadcrumb and benefit from your experience.",
+          description: "Future visitors see your community note and benefit from your experience.",
         },
       ],
     },
     examples: {
-      title: "Real Breadcrumbs from the Community",
+      title: "Real Community Notes from the Community",
       subtitle: "These are the kinds of notes explorers leave for each other",
       items: [
         "The back patio is the real gem here. Ask about their single-origin Ethiopian — life changing.",
         "Come early morning for the best photos. The light hits the murals perfectly around 8am.",
         "Take the left fork at the second junction. There's a hidden bench with the best view.",
         "The Gibraltar is their secret menu item. Trust me on this one.",
-        "Bring breadcrumbs (real ones) for the ducks. They're very friendly in the morning.",
+        "Bring community notes (real ones) for the ducks. They're very friendly in the morning.",
         "The southwest corner has the best city views. Arrive 30 min before sunset.",
       ],
     },
     cta: {
-      title: "Start Leaving Breadcrumbs",
+      title: "Start Leaving Community Notes",
       description:
         "Complete your first quest and leave a note for the next explorer. Your insights help build a community of discovery.",
       button: "Find a Quest",
@@ -300,7 +300,7 @@ export const en = {
         {
           step: "03",
           title: "Launch & Grow",
-          description: "Your quest goes live. Explorers discover you organically and leave breadcrumbs for others.",
+          description: "Your quest goes live. Explorers discover you organically and leave community notes for others.",
         },
         {
           step: "04",
@@ -343,7 +343,7 @@ export const en = {
         {
           icon: "chart",
           title: "Track Engagement",
-          description: "See how many people complete your quest and what breadcrumbs they leave.",
+          description: "See how many people complete your quest and what community notes they leave.",
         },
       ],
     },
@@ -351,11 +351,11 @@ export const en = {
       title: "Your Dashboard",
       subtitle: "Everything You Need, Nothing You Don't",
       description:
-        "Our host dashboard is designed to be simple and actionable. See your quest performance at a glance, read breadcrumbs left by visitors, and understand what resonates.",
-      features: ["Quest completion stats", "Breadcrumb feed", "Engagement trends", "Simple editing tools"],
+        "Our host dashboard is designed to be simple and actionable. See your quest performance at a glance, read community notes left by visitors, and understand what resonates.",
+      features: ["Quest completion stats", "Community Note feed", "Engagement trends", "Simple editing tools"],
       stats: {
         completions: "Completions",
-        breadcrumbs: "Breadcrumbs",
+        communityNotes: "Community Notes",
         views: "Views",
       },
       yourQuests: "Your Quests",
@@ -366,7 +366,7 @@ export const en = {
       title: "Why Host on SideQuests",
       items: [
         { title: "Free to Start", description: "Creating and hosting quests is completely free. No hidden costs." },
-        { title: "Simple Dashboard", description: "Track completions, breadcrumbs, and engagement at a glance." },
+        { title: "Simple Dashboard", description: "Track completions, community notes, and engagement at a glance." },
         { title: "Privacy-First", description: "You see aggregate data, never individual user information." },
       ],
     },
@@ -403,13 +403,13 @@ export const en = {
 
   // Footer
   footer: {
-    description: "Real-world adventures. Authentic discovery. Community breadcrumbs.",
+    description: "Real-world adventures. Authentic discovery. Community community notes.",
     explore: "Explore",
     company: "Company",
     legal: "Legal",
     links: {
       quests: "Quests",
-      breadcrumbs: "Breadcrumbs",
+      communityNotes: "Community Notes",
       verticals: "Verticals",
       partnerships: "Partnerships",
       about: "About",

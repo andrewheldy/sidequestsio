@@ -41,7 +41,7 @@ export function Footer() {
               <h4 className="font-poppins font-semibold text-foreground mb-4">{t.footer.explore}</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link to="/quests" className="text-muted-foreground hover:text-primary">{t.footer.links.quests}</Link></li>
-                <li><Link to="/breadcrumbs" className="text-muted-foreground hover:text-primary">{t.footer.links.breadcrumbs}</Link></li>
+                <li><Link to="/community-notes" className="text-muted-foreground hover:text-primary">{t.footer.links.communityNotes}</Link></li>
                 <li><Link to="/verticals" className="text-muted-foreground hover:text-primary">{t.footer.links.verticals}</Link></li>
               </ul>
             </div>

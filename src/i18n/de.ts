@@ -3,7 +3,7 @@ import type { Translations } from './en';
 export const de: Translations = {
   nav: {
     quests: 'Quests',
-    breadcrumbs: 'Brotkrumen',
+    communityNotes: 'Brotkrumen',
     verticals: 'Kategorien',
     partnerships: 'Partnerschaften',
     hosts: 'Für Gastgeber',
@@ -49,7 +49,7 @@ export const de: Translations = {
         { title: 'Brotkrumen Hinterlassen', description: 'Teile eine ehrliche Notiz für den nächsten Entdecker.' },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: 'Was Uns Unterscheidet',
       title: 'Brotkrumen, Keine Bewertungen',
       description: 'Brotkrumen sind persönliche Notizen von echten Entdeckern—keine Bewertungen, keine Reviews, kein gesponserter Inhalt. Es sind ehrliche Momente, um anderen zu helfen.',
@@ -95,7 +95,7 @@ export const de: Translations = {
       button: 'Gastgeber Werden',
     },
   },
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: 'Das Herz von SideQuests',
     title: 'Hinterlasse eine Spur,',
     titleHighlight: 'Hilf Anderen zu Finden',
@@ -223,7 +223,7 @@ export const de: Translations = {
       features: ['Quest-Abschluss-Stats', 'Brotkrumen-Feed', 'Engagement-Trends', 'Einfache Bearbeitungstools'],
       stats: {
         completions: 'Abschlüsse',
-        breadcrumbs: 'Brotkrumen',
+        communityNotes: 'Brotkrumen',
         views: 'Aufrufe',
       },
       yourQuests: 'Deine Quests',
@@ -272,7 +272,7 @@ export const de: Translations = {
     legal: 'Rechtliches',
     links: {
       quests: 'Quests',
-      breadcrumbs: 'Brotkrumen',
+      communityNotes: 'Brotkrumen',
       verticals: 'Kategorien',
       partnerships: 'Partnerschaften',
       about: 'Über Uns',

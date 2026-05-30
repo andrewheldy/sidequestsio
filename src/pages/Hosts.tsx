@@ -97,7 +97,7 @@ const Hosts = () => {
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   {[
                     { label: t.hosts.dashboard.stats.completions, value: '127' },
-                    { label: t.hosts.dashboard.stats.breadcrumbs, value: '43' },
+                    { label: t.hosts.dashboard.stats.communityNotes, value: '43' },
                     { label: t.hosts.dashboard.stats.views, value: '892' },
                   ].map((stat) => (
                     <div key={stat.label} className="text-center p-4 bg-muted/30 rounded-xl">

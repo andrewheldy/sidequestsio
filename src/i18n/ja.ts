@@ -3,7 +3,7 @@ import type { Translations } from './en';
 export const ja: Translations = {
   nav: {
     quests: 'クエスト',
-    breadcrumbs: 'パンくず',
+    communityNotes: 'パンくず',
     verticals: 'カテゴリー',
     partnerships: 'パートナーシップ',
     hosts: 'ホスト向け',
@@ -49,7 +49,7 @@ export const ja: Translations = {
         { title: 'パンくずを残す', description: '次の探検家のために、心からのメモを共有。' },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: '私たちの違い',
       title: 'レビューではなく、パンくず',
       description: 'パンくずは本物の探検家が残した個人的なメモ—評価でも、レビューでも、スポンサー付きコンテンツでもありません。他の人が特別なものを発見するのを助けるために共有された、誠実な瞬間です。',
@@ -95,7 +95,7 @@ export const ja: Translations = {
       button: 'ホストになる',
     },
   },
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: 'SideQuestsの心臓部',
     title: '足跡を残す、',
     titleHighlight: '他の人が見つけるのを助ける',
@@ -223,7 +223,7 @@ export const ja: Translations = {
       features: ['完了統計', 'パンくずフィード', 'エンゲージメントトレンド', 'シンプルな編集ツール'],
       stats: {
         completions: '完了',
-        breadcrumbs: 'パンくず',
+        communityNotes: 'パンくず',
         views: '閲覧',
       },
       yourQuests: 'あなたのクエスト',
@@ -272,7 +272,7 @@ export const ja: Translations = {
     legal: '法的事項',
     links: {
       quests: 'クエスト',
-      breadcrumbs: 'パンくず',
+      communityNotes: 'パンくず',
       verticals: 'カテゴリー',
       partnerships: 'パートナーシップ',
       about: '会社概要',

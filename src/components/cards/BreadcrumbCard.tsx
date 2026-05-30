@@ -11,7 +11,7 @@ interface BreadcrumbCardProps {
   className?: string;
 }
 
-export function BreadcrumbCard({
+export function CommunityNoteCard({
   author,
   location,
   message,
@@ -64,4 +64,4 @@ export function BreadcrumbCard({
   );
 }
 
-export default BreadcrumbCard;
+export default CommunityNoteCard;

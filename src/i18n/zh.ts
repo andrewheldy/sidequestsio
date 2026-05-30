@@ -3,7 +3,7 @@ import type { Translations } from './en';
 export const zh: Translations = {
   nav: {
     quests: '任务',
-    breadcrumbs: '面包屑',
+    communityNotes: '面包屑',
     verticals: '分类',
     partnerships: '合作伙伴',
     hosts: '成为主办方',
@@ -49,7 +49,7 @@ export const zh: Translations = {
         { title: '留下面包屑', description: '为下一位探索者分享一条真诚的留言。' },
       ],
     },
-    breadcrumbs: {
+    communityNotes: {
       badge: '我们的不同之处',
       title: '面包屑，不是评论',
       description: '面包屑是真实探索者留下的个人笔记——不是评分，不是评论，不是赞助内容。这些是分享的真诚时刻，帮助他人发现特别的事物。',
@@ -95,7 +95,7 @@ export const zh: Translations = {
       button: '成为主办方',
     },
   },
-  breadcrumbsPage: {
+  communityNotesPage: {
     badge: 'SideQuests 的核心',
     title: '留下痕迹，',
     titleHighlight: '帮助他人发现',
@@ -223,7 +223,7 @@ export const zh: Translations = {
       features: ['完成统计', '面包屑动态', '参与趋势', '简单编辑工具'],
       stats: {
         completions: '完成数',
-        breadcrumbs: '面包屑',
+        communityNotes: '面包屑',
         views: '浏览量',
       },
       yourQuests: '你的任务',
@@ -272,7 +272,7 @@ export const zh: Translations = {
     legal: '法律',
     links: {
       quests: '任务',
-      breadcrumbs: '面包屑',
+      communityNotes: '面包屑',
       verticals: '分类',
       partnerships: '合作伙伴',
       about: '关于我们',

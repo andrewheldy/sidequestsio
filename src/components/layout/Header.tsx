@@ -15,7 +15,7 @@ export function Header() {
 
   const navLinks = [
     { href: '/quests', label: t.nav.quests },
-    { href: '/breadcrumbs', label: t.nav.breadcrumbs },
+    { href: '/community-notes', label: t.nav.communityNotes },
     { href: '/verticals', label: t.nav.verticals },
     { href: '/partnerships', label: t.nav.partnerships },
     { href: '/hosts', label: t.nav.hosts },

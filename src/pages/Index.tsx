@@ -5,14 +5,14 @@ import Layout from '@/components/layout/Layout';
 import AnimatedSection from '@/components/AnimatedSection';
 import StepCard from '@/components/cards/StepCard';
 import QuestCard from '@/components/cards/QuestCard';
-import BreadcrumbCard from '@/components/cards/BreadcrumbCard';
+import CommunityNoteCard from '@/components/cards/Community NoteCard';
 import VerticalCard from '@/components/cards/VerticalCard';
 import FeatureCard from '@/components/cards/FeatureCard';
 import CTASection from '@/components/CTASection';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRotatingTagline } from '@/hooks/useRotatingTagline';
 import dotlingLogo from '@/assets/dotling-logo.jpg';
-import breadcrumbsMascot from '@/assets/breadcrumbs-mascot.jpg';
+import communityNotesMascot from '@/assets/community-notes-mascot.jpg';
 
 const featuredQuests = [
   {
@@ -41,7 +41,7 @@ const featuredQuests = [
   },
 ];
 
-const sampleBreadcrumbs = [
+const sampleCommunityNotes = [
   {
     author: 'Maya',
     location: 'Panther Coffee Wynwood',
@@ -140,7 +140,7 @@ const Index = () => {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="border-border hover:bg-muted">
-                  <Link to="/breadcrumbs">{t.home.hero.secondaryCta}</Link>
+                  <Link to="/community-notes">{t.home.hero.secondaryCta}</Link>
                 </Button>
               </div>
             </AnimatedSection>
@@ -183,16 +183,16 @@ const Index = () => {
             <AnimatedSection direction="left">
               <div>
                 <span className="text-primary font-semibold text-sm uppercase tracking-wide mb-4 block">
-                  {t.home.breadcrumbs.badge}
+                  {t.home.communityNotes.badge}
                 </span>
                 <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-6">
-                  {t.home.breadcrumbs.title}
+                  {t.home.communityNotes.title}
                 </h2>
                 <p className="text-muted-foreground text-lg leading-relaxed mb-8">
-                  {t.home.breadcrumbs.description}
+                  {t.home.communityNotes.description}
                 </p>
                 <Button asChild className="bg-turquoise hover:bg-turquoise/90 text-primary-foreground">
-                  <Link to="/breadcrumbs">
+                  <Link to="/community-notes">
                     {t.common.learnMore}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
@@ -202,15 +202,15 @@ const Index = () => {
 
             <AnimatedSection direction="right">
               <div className="relative">
-                <img src={breadcrumbsMascot} alt="Breadcrumbs Mascot" className="w-full max-w-md mx-auto rounded-2xl shadow-2xl" />
+                <img src={communityNotesMascot} alt="Community Notes Mascot" className="w-full max-w-md mx-auto rounded-2xl shadow-2xl" />
                 <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-turquoise/20 rounded-full blur-2xl" />
               </div>
             </AnimatedSection>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <FeatureCard title={t.home.breadcrumbs.whatTheyAre} items={t.home.breadcrumbs.areList} type="positive" delay={0} />
-            <FeatureCard title={t.home.breadcrumbs.whatTheyAreNot} items={t.home.breadcrumbs.areNotList} type="negative" delay={100} />
+            <FeatureCard title={t.home.communityNotes.whatTheyAre} items={t.home.communityNotes.areList} type="positive" delay={0} />
+            <FeatureCard title={t.home.communityNotes.whatTheyAreNot} items={t.home.communityNotes.areNotList} type="negative" delay={100} />
           </div>
         </div>
       </section>
@@ -221,14 +221,14 @@ const Index = () => {
           <AnimatedSection>
             <div className="text-center mb-12">
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-foreground mb-4">
-                {t.breadcrumbsPage.examples.title}
+                {t.communityNotesPage.examples.title}
               </h2>
             </div>
           </AnimatedSection>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {sampleBreadcrumbs.map((breadcrumb, index) => (
-              <BreadcrumbCard key={breadcrumb.author} {...breadcrumb} delay={index * 100} />
+            {sampleCommunityNotes.map((communityNote, index) => (
+              <CommunityNoteCard key={communityNote.author} {...communityNote} delay={index * 100} />
             ))}
           </div>
         </div>
