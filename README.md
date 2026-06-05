@@ -59,6 +59,37 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (auth + profiles)
+
+## Authentication & onboarding (Supabase)
+
+Email/password auth, the new-user onboarding flow and the in-app
+Explore/Map/Favorites/Profile tabs are powered by Supabase. The app is built so
+it still runs (in guest/preview mode) even before Supabase is configured.
+
+### 1. Environment variables
+
+Copy `.env.example` to `.env` (local) and set the same values in your host
+(e.g. Vercel → Project Settings → Environment Variables):
+
+| Variable | Description |
+| --- | --- |
+| `VITE_SUPABASE_URL` | Your Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | The project's public **anon** key (safe for the browser) |
+
+> Never put a `service_role` key in a `VITE_*` variable — it would be shipped to the browser.
+
+### 2. Database
+
+Run the migration in `supabase/migrations/0001_profiles.sql` against your
+Supabase project (SQL editor or `supabase db push`). It creates the `profiles`
+table, RLS policies (owner-only read/update/insert), an `updated_at` trigger and
+an auto-create-profile trigger on sign-up.
+
+### 3. Auth settings
+
+In Supabase → Authentication, enable Email provider. For the smoothest local
+testing you can disable "Confirm email"; in production leave it on.
 
 ## How can I deploy this project?
 

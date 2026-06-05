@@ -4,9 +4,13 @@ import dotlingLogo from '@/assets/dotling-logo.jpg';
 import AnimatedSection from '@/components/AnimatedSection';
 import ContactForm from '@/components/ContactForm';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { toast } from '@/hooks/use-toast';
 
 export function Footer() {
   const { t } = useLanguage();
+
+  const handleSocial = (network: string) => () =>
+    toast({ title: `${network} coming soon`, description: 'Follow us at launch.' });
 
   return (
     <AnimatedSection>
@@ -31,9 +35,9 @@ export function Footer() {
               </Link>
               <p className="text-sm text-muted-foreground mb-4">{t.footer.description}</p>
               <div className="flex gap-3">
-                <a href="#" className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Instagram className="w-4 h-4" /></a>
-                <a href="#" className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Twitter className="w-4 h-4" /></a>
-                <a href="#" className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Mail className="w-4 h-4" /></a>
+                <button type="button" aria-label="Instagram" onClick={handleSocial('Instagram')} className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Instagram className="w-4 h-4" /></button>
+                <button type="button" aria-label="Twitter" onClick={handleSocial('Twitter')} className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Twitter className="w-4 h-4" /></button>
+                <a href="mailto:hello@sidequests.io" aria-label="Email" className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Mail className="w-4 h-4" /></a>
               </div>
             </div>
 
@@ -51,15 +55,15 @@ export function Footer() {
               <ul className="space-y-2 text-sm">
                 <li><Link to="/partnerships" className="text-muted-foreground hover:text-primary">{t.footer.links.partnerships}</Link></li>
                 <li><Link to="/hosts" className="text-muted-foreground hover:text-primary">{t.footer.links.about}</Link></li>
-                <li><Link to="#" className="text-muted-foreground hover:text-primary">{t.footer.links.contact}</Link></li>
+                <li><Link to="/partnerships" className="text-muted-foreground hover:text-primary">{t.footer.links.contact}</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-poppins font-semibold text-foreground mb-4">{t.footer.legal}</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link to="#" className="text-muted-foreground hover:text-primary">{t.footer.links.privacy}</Link></li>
-                <li><Link to="#" className="text-muted-foreground hover:text-primary">{t.footer.links.terms}</Link></li>
+                <li><Link to="/privacy" className="text-muted-foreground hover:text-primary">{t.footer.links.privacy}</Link></li>
+                <li><Link to="/terms" className="text-muted-foreground hover:text-primary">{t.footer.links.terms}</Link></li>
               </ul>
             </div>
           </div>
