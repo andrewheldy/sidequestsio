@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AnimatedSection from '@/components/AnimatedSection';
@@ -24,9 +25,16 @@ export function QuestCard({
   delay = 0,
   className,
 }: QuestCardProps) {
+  const navigate = useNavigate();
   return (
     <AnimatedSection direction="up" delay={delay}>
       <div
+        role="button"
+        tabIndex={0}
+        onClick={() => navigate('/app/explore')}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') navigate('/app/explore');
+        }}
         className={cn(
           'glass-card overflow-hidden hover-lift group cursor-pointer',
           className
