@@ -6,6 +6,16 @@
 
 export const MAPBOX_TOKEN = (import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN as string) || '';
 
+if (!MAPBOX_TOKEN) {
+  console.error(
+    '[SideQuests] VITE_MAPBOX_PUBLIC_TOKEN is not set — the map will not render.\n' +
+    '  • Local dev:   add it to your .env file\n' +
+    '  • Lovable:     open Settings → Secrets, add VITE_MAPBOX_PUBLIC_TOKEN\n' +
+    '  • Vercel:      Project Settings → Environment Variables, then redeploy\n' +
+    '  Docs: https://account.mapbox.com/access-tokens/'
+  );
+}
+
 /** Category → hex color, aligned to the SideQuests design palette. */
 export const CATEGORY_COLORS: Record<string, string> = {
   Foodie: '#F65A44',       // brand coral
