@@ -129,18 +129,21 @@ create policy "hosts manage rewards" on public.rewards
   for all using (public.owns_organization(organization_id))
   with check (public.owns_organization(organization_id));
 
--- reward_redemptions: a user reads & creates their own; the issuing host/admin
--- reads and fulfills them.
+-- reward_redemptions: a user reads their own; the issuing host/admin reads &
+-- fulfills them. There is intentionally NO client insert policy and users
+-- cannot update their own rows — redeeming spends points and must be atomic, so
+-- it goes exclusively through public.redeem_reward() (migration 0006), which
+-- validates balance / inventory / limits / validity window. This prevents users
+-- from self-issuing or self-fulfilling rewards.
 drop policy if exists "users read their redemptions" on public.reward_redemptions;
 create policy "users read their redemptions" on public.reward_redemptions
   for select using (user_id = auth.uid() or public.owns_reward(reward_id));
 drop policy if exists "users create redemptions" on public.reward_redemptions;
-create policy "users create redemptions" on public.reward_redemptions
-  for insert with check (user_id = auth.uid());
 drop policy if exists "users or hosts update redemptions" on public.reward_redemptions;
-create policy "users or hosts update redemptions" on public.reward_redemptions
-  for update using (user_id = auth.uid() or public.owns_reward(reward_id))
-  with check (user_id = auth.uid() or public.owns_reward(reward_id));
+drop policy if exists "hosts update redemptions" on public.reward_redemptions;
+create policy "hosts update redemptions" on public.reward_redemptions
+  for update using (public.owns_reward(reward_id))
+  with check (public.owns_reward(reward_id));
 drop policy if exists "hosts delete redemptions" on public.reward_redemptions;
 create policy "hosts delete redemptions" on public.reward_redemptions
   for delete using (public.owns_reward(reward_id));
@@ -172,6 +175,8 @@ create index if not exists rewards_active_idx           on public.rewards (is_ac
 create index if not exists reward_redemptions_reward_idx on public.reward_redemptions (reward_id);
 create index if not exists reward_redemptions_user_idx   on public.reward_redemptions (user_id);
 create index if not exists reward_redemptions_status_idx on public.reward_redemptions (status);
+-- per-user-limit / inventory counting in redeem_reward()
+create index if not exists reward_redemptions_reward_user_idx on public.reward_redemptions (reward_id, user_id);
 create index if not exists points_ledger_user_idx       on public.points_ledger (user_id, created_at desc);
 create index if not exists xp_events_user_idx           on public.xp_events (user_id, created_at desc);
 create index if not exists leaderboard_lookup_idx

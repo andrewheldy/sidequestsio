@@ -221,11 +221,11 @@ drop policy if exists "hosts delete their quests" on public.quests;
 create policy "hosts delete their quests" on public.quests
   for delete using (public.owns_organization(organization_id));
 
--- qr_codes: active codes are readable by authenticated users (to verify a
--- scan); only the owning host/admin manages them.
+-- qr_codes: codes are verification secrets — NOT readable by players. Only the
+-- owning host/admin can read/manage them. Players verify a scanned code via the
+-- SECURITY DEFINER RPC public.complete_quest_by_qr() (migration 0006), which
+-- runs as owner and bypasses this policy.
 drop policy if exists "active qr codes readable" on public.qr_codes;
-create policy "active qr codes readable" on public.qr_codes
-  for select using (is_active or public.owns_quest(quest_id));
 drop policy if exists "hosts manage qr codes" on public.qr_codes;
 create policy "hosts manage qr codes" on public.qr_codes
   for all using (public.owns_quest(quest_id))
@@ -258,13 +258,19 @@ create index if not exists quests_org_idx               on public.quests (organi
 create index if not exists quests_venue_idx             on public.quests (venue_id);
 create index if not exists quests_category_idx          on public.quests (category_id);
 create index if not exists quests_status_idx            on public.quests (status);
+-- Discovery feed: published quests newest-first (partial index keeps it small).
+create index if not exists quests_discovery_idx         on public.quests (status, created_at desc) where status = 'published';
+-- Coarse "nearby" filtering used by the mobile app (true geo needs PostGIS — see notes).
+create index if not exists venues_neighborhood_idx      on public.venues (city, neighborhood);
 create unique index if not exists quests_org_slug_uidx  on public.quests (organization_id, slug) where slug is not null;
 create index if not exists qr_codes_quest_idx           on public.qr_codes (quest_id);
 create index if not exists qr_scans_quest_idx           on public.qr_scans (quest_id);
 create index if not exists qr_scans_qr_idx              on public.qr_scans (qr_code_id);
 create index if not exists qr_scans_user_idx            on public.qr_scans (user_id);
+create index if not exists qr_scans_quest_time_idx      on public.qr_scans (quest_id, scanned_at desc);
 create index if not exists quest_views_quest_idx        on public.quest_views (quest_id);
 create index if not exists quest_views_user_idx         on public.quest_views (user_id);
+create index if not exists quest_views_quest_time_idx   on public.quest_views (quest_id, viewed_at desc);
 
 -- =============================================================================
 -- updated_at triggers (reuses public.set_updated_at() from 0001)

@@ -104,9 +104,19 @@ alter table public.note_reports      enable row level security;
 drop policy if exists "users read their completions" on public.quest_completions;
 create policy "users read their completions" on public.quest_completions
   for select using (user_id = auth.uid() or public.owns_quest(quest_id));
+-- Players may only file an *unverified, zero-award* completion (e.g. a manual
+-- "I did this" pending host review). Verified QR completions and all XP/points
+-- awards go exclusively through SECURITY DEFINER RPCs (migration 0006), so a
+-- user cannot self-verify or self-award.
 drop policy if exists "users create their completions" on public.quest_completions;
 create policy "users create their completions" on public.quest_completions
-  for insert with check (user_id = auth.uid());
+  for insert with check (
+    user_id = auth.uid()
+    and status = 'pending'
+    and xp_awarded = 0
+    and points_awarded = 0
+    and verification_method in ('none', 'manual', 'geo')
+  );
 drop policy if exists "hosts verify completions" on public.quest_completions;
 create policy "hosts verify completions" on public.quest_completions
   for update using (public.owns_quest(quest_id))
@@ -125,9 +135,23 @@ create policy "visible notes are public" on public.community_notes
     or public.is_admin()
     or public.owns_quest(quest_id)
   );
+-- A note about a quest requires a VERIFIED completion of that quest by the
+-- author (anti-spam / proof-of-visit). Venue-only notes (no quest_id) are
+-- allowed without a completion.
 drop policy if exists "users create their notes" on public.community_notes;
 create policy "users create their notes" on public.community_notes
-  for insert with check (user_id = auth.uid());
+  for insert with check (
+    user_id = auth.uid()
+    and (
+      community_notes.quest_id is null
+      or exists (
+        select 1 from public.quest_completions c
+        where c.quest_id = community_notes.quest_id
+          and c.user_id = auth.uid()
+          and c.status = 'verified'
+      )
+    )
+  );
 drop policy if exists "authors or moderators update notes" on public.community_notes;
 create policy "authors or moderators update notes" on public.community_notes
   for update using (user_id = auth.uid() or public.is_admin() or public.owns_quest(quest_id))
@@ -153,10 +177,14 @@ create policy "admins resolve reports" on public.note_reports
 create index if not exists quest_completions_quest_idx  on public.quest_completions (quest_id);
 create index if not exists quest_completions_user_idx   on public.quest_completions (user_id);
 create index if not exists quest_completions_status_idx on public.quest_completions (status);
+create index if not exists quest_completions_user_status_idx on public.quest_completions (user_id, status);
 create index if not exists community_notes_quest_idx    on public.community_notes (quest_id);
 create index if not exists community_notes_venue_idx    on public.community_notes (venue_id);
 create index if not exists community_notes_user_idx     on public.community_notes (user_id);
 create index if not exists community_notes_status_idx   on public.community_notes (status);
+-- Quest note feed: visible notes for a quest, newest first.
+create index if not exists community_notes_quest_feed_idx
+  on public.community_notes (quest_id, created_at desc) where status = 'visible';
 create index if not exists note_reports_note_idx        on public.note_reports (note_id);
 create index if not exists note_reports_reporter_idx    on public.note_reports (reporter_id);
 create index if not exists note_reports_status_idx      on public.note_reports (status);
