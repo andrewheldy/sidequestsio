@@ -40,6 +40,7 @@ const QuestMap = ({
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -68,6 +69,13 @@ const QuestMap = ({
     map.on('load', () => {
       mapRef.current = map;
       setMapReady(true);
+    });
+
+    map.on('error', (e) => {
+      const status = (e.error as any)?.status;
+      if (status === 401 || status === 403) {
+        setMapError('Map token is not authorized for this domain. Update the token allowlist at account.mapbox.com.');
+      }
     });
 
     return () => {
@@ -198,17 +206,21 @@ const QuestMap = ({
     [toast],
   );
 
-  // ── No-token fallback ──────────────────────────────────────────────────────
-  if (!MAPBOX_TOKEN) {
+  // ── Token / auth error fallbacks ───────────────────────────────────────────
+  if (!MAPBOX_TOKEN || mapError) {
     return (
       <div
         className="flex items-center justify-center rounded-2xl bg-card/50 text-center text-sm text-muted-foreground"
         style={{ height }}
       >
         <p className="px-6">
-          Map unavailable.
-          <br />
-          Add <code className="text-xs">VITE_MAPBOX_PUBLIC_TOKEN</code> to your <code className="text-xs">.env</code> file.
+          {mapError ?? (
+            <>
+              Map unavailable — add{' '}
+              <code className="text-xs">VITE_MAPBOX_PUBLIC_TOKEN</code> to your{' '}
+              <code className="text-xs">.env</code> file.
+            </>
+          )}
         </p>
       </div>
     );

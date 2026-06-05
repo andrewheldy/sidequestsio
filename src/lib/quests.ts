@@ -21,6 +21,8 @@ export interface Quest {
   /** Real-world GPS coordinates used by the Mapbox map. */
   lat: number;
   lng: number;
+  /** Street address — populated for CRM-backed quests. */
+  address?: string;
 }
 
 export const QUESTS: Quest[] = [
