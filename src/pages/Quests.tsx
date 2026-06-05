@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import CTASection from '@/components/CTASection';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { NearbyQuestsMapSection } from '@/components/map';
+import { QUESTS } from '@/lib/quests';
 
 const categoryKeys = ['all', 'coffee', 'art', 'music', 'outdoors', 'events', 'everyday'] as const;
 
@@ -94,7 +96,8 @@ const Quests = () => {
 
   const filteredQuests = allQuests.filter((quest) => {
     const matchesCategory = activeCategory === 'all' || quest.categoryKey === activeCategory;
-    const matchesSearch = quest.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      quest.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       quest.location.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -102,29 +105,43 @@ const Quests = () => {
   return (
     <Layout>
       {/* Hero */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/30 to-transparent">
+      <section className="bg-gradient-to-b from-muted/30 to-transparent py-16 md:py-24">
         <div className="container">
           <AnimatedSection>
-            <div className="text-center max-w-3xl mx-auto">
-              <h1 className="font-poppins font-bold text-4xl md:text-5xl text-foreground mb-6">
+            <div className="mx-auto max-w-3xl text-center">
+              <h1 className="mb-6 font-poppins font-bold text-4xl md:text-5xl text-foreground">
                 {t.quests.title}
               </h1>
-              <p className="text-lg text-muted-foreground mb-10">
+              <p className="mb-10 text-lg text-muted-foreground">
                 {t.quests.subtitle}
               </p>
 
               {/* Search */}
-              <div className="relative max-w-xl mx-auto">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <div className="relative mx-auto max-w-xl">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder={t.quests.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 bg-card border-border text-foreground placeholder:text-muted-foreground rounded-xl"
+                  className="h-14 rounded-xl border-border bg-card pl-12 text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Interactive Map */}
+      <section className="py-12">
+        <div className="container">
+          <AnimatedSection>
+            <NearbyQuestsMapSection
+              quests={QUESTS}
+              title="Explore the Map"
+              subtitle="Quests are live across Miami. Tap any pin to preview — use ⊕ to find ones near you."
+              height="420px"
+            />
           </AnimatedSection>
         </div>
       </section>
@@ -134,8 +151,8 @@ const Quests = () => {
         <div className="container">
           {/* Category Filters */}
           <AnimatedSection>
-            <div className="flex items-center gap-3 mb-8 overflow-x-auto pb-4 scrollbar-hide">
-              <Filter className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+            <div className="mb-8 flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide">
+              <Filter className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
               {categoryKeys.map((key) => (
                 <Button
                   key={key}
@@ -145,7 +162,7 @@ const Quests = () => {
                   className={
                     activeCategory === key
                       ? 'bg-primary text-primary-foreground'
-                      : 'border-border hover:bg-muted text-muted-foreground'
+                      : 'border-border text-muted-foreground hover:bg-muted'
                   }
                 >
                   {categoryLabels[key]}
@@ -155,7 +172,7 @@ const Quests = () => {
           </AnimatedSection>
 
           {/* Quest Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredQuests.map((quest, index) => (
               <QuestCard
                 key={quest.title}
@@ -171,8 +188,8 @@ const Quests = () => {
           </div>
 
           {filteredQuests.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg">{t.quests.noResults}</p>
+            <div className="py-20 text-center">
+              <p className="text-lg text-muted-foreground">{t.quests.noResults}</p>
             </div>
           )}
         </div>
