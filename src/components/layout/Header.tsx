@@ -58,8 +58,8 @@ export function Header() {
 
           <div className="hidden lg:flex items-center gap-3">
             <LanguageSwitcher />
-            <Button variant="ghost" size="sm">{t.nav.signIn}</Button>
-            <Button size="sm">{t.nav.getStarted}</Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/auth">{t.nav.signIn}</Link></Button>
+            <Button asChild size="sm"><Link to="/app">{t.nav.getStarted}</Link></Button>
           </div>
 
           <div className="lg:hidden flex items-center gap-2">
@@ -83,8 +83,8 @@ export function Header() {
             </Link>
           ))}
           <div className="flex flex-col gap-4 mt-8 w-full max-w-xs">
-            <Button variant="outline" size="lg" className="w-full">{t.nav.signIn}</Button>
-            <Button size="lg" className="w-full">{t.nav.getStarted}</Button>
+            <Button asChild variant="outline" size="lg" className="w-full"><Link to="/auth">{t.nav.signIn}</Link></Button>
+            <Button asChild size="lg" className="w-full"><Link to="/app">{t.nav.getStarted}</Link></Button>
           </div>
         </nav>
       </div>
