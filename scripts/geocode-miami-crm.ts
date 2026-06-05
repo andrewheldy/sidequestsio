@@ -38,19 +38,15 @@ interface GeocodedRow extends CRMRow {
   };
 }
 
-interface MapboxFeature {
-  geometry?: { coordinates?: [number, number] };
-  properties?: {
-    mapbox_id?: string;
-    feature_type?: string;
-    name?: string;
-    full_address?: string;
-    place_formatted?: string;
-  };
-}
-
-interface MapboxResponse {
-  features?: MapboxFeature[];
+interface NominatimResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+  /** e.g. "amenity", "shop", "tourism", "leisure" */
+  class: string;
+  /** e.g. "cafe", "restaurant", "museum", "neighbourhood" */
+  type: string;
+  place_id: number;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────
@@ -90,7 +86,8 @@ const STOP_WORDS = new Set([
   'east', 'west',
 ]);
 
-const DELAY_MS = 300;
+// Nominatim policy: max 1 request/second
+const DELAY_MS = 1100;
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -106,48 +103,42 @@ function significantWords(text: string): string[] {
     .filter(w => w.length > 3 && !STOP_WORDS.has(w));
 }
 
+const BROAD_OSM_TYPES = new Set([
+  'neighbourhood', 'suburb', 'quarter', 'city', 'town',
+  'village', 'county', 'state', 'country', 'administrative',
+]);
+
 function determineConfidence(
-  feature: MapboxFeature,
+  result: NominatimResult,
   businessName: string,
   address: string,
 ): 'high' | 'medium' | 'low' {
-  const featureType = feature.properties?.feature_type ?? '';
-  const name = feature.properties?.name ?? '';
-  const fullAddress =
-    feature.properties?.full_address ??
-    feature.properties?.place_formatted ??
-    '';
+  const displayName = result.display_name.toLowerCase();
+  const osmType = result.type;
 
   // Broad/generic result → low
-  if (BROAD_FEATURE_TYPES.has(featureType)) return 'low';
-
-  const fullAddressLower = fullAddress.toLowerCase();
+  if (BROAD_OSM_TYPES.has(osmType) || BROAD_FEATURE_TYPES.has(osmType)) return 'low';
 
   // Not in Miami metro → low
-  const isInMiami = MIAMI_AREA_CITIES.some(city =>
-    fullAddressLower.includes(city),
-  );
+  const isInMiami = MIAMI_AREA_CITIES.some(city => displayName.includes(city));
   if (!isInMiami) return 'low';
 
-  // Business name or address words appear in result → high
-  const nameLower = name.toLowerCase();
+  // Business name or address words appear in display name → high
   const bizWords = significantWords(businessName);
   const addrWords = significantWords(address);
 
-  const nameHit = bizWords.some(
-    w => nameLower.includes(w) || fullAddressLower.includes(w),
-  );
-  const addrHit = addrWords.some(w => fullAddressLower.includes(w));
+  const nameHit = bizWords.some(w => displayName.includes(w));
+  const addrHit = addrWords.some(w => displayName.includes(w));
 
   return nameHit || addrHit ? 'high' : 'medium';
 }
 
-// ── Geocode one location ──────────────────────────────────────────────────
+// ── Geocode one location via Nominatim (OpenStreetMap) ───────────────────
 
 async function geocodeOne(
   businessName: string,
   address: string,
-  accessToken: string,
+  _accessToken: string,
 ): Promise<{
   lat: number | null;
   lng: number | null;
@@ -158,26 +149,29 @@ async function geocodeOne(
 }> {
   const q = `${businessName}, ${address}, Miami, FL, USA`;
 
+  // Nominatim (OpenStreetMap) — no token required, no URL restrictions.
+  // viewbox: left(minLon),top(maxLat),right(maxLon),bottom(minLat)
   const params = new URLSearchParams({
     q,
-    country: 'us',
+    format: 'json',
     limit: '1',
-    access_token: accessToken,
-    proximity: '-80.1918,25.7617',
-    bbox: '-80.35,25.65,-80.10,25.90',
+    countrycodes: 'us',
+    bounded: '1',
+    viewbox: '-80.35,25.90,-80.10,25.65',
   });
 
-  const url = `https://api.mapbox.com/search/geocode/v6/forward?${params}`;
-  const response = await fetch(url);
+  const url = `https://nominatim.openstreetmap.org/search?${params}`;
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'SideQuests-geocoder/1.0' },
+  });
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
 
-  const data = (await response.json()) as MapboxResponse;
-  const features = data.features ?? [];
+  const results = (await response.json()) as NominatimResult[];
 
-  if (features.length === 0) {
+  if (results.length === 0) {
     return {
       lat: null,
       lng: null,
@@ -188,27 +182,22 @@ async function geocodeOne(
     };
   }
 
-  const feature = features[0];
-  const [lng, lat] = feature.geometry?.coordinates ?? [null, null];
-  const placeName =
-    feature.properties?.full_address ??
-    feature.properties?.name ??
-    null;
-  const featureType = feature.properties?.feature_type ?? null;
-  const mapboxId = feature.properties?.mapbox_id ?? null;
-  const confidence = determineConfidence(feature, businessName, address);
+  const result = results[0];
+  const lat = parseFloat(result.lat);
+  const lng = parseFloat(result.lon);
+  const placeName = result.display_name;
+  const featureType = `${result.class}/${result.type}`;
+  const mapboxId = String(result.place_id);
+  const confidence = determineConfidence(result, businessName, address);
 
-  return { lat: lat ?? null, lng: lng ?? null, placeName, featureType, mapboxId, confidence };
+  return { lat, lng, placeName, featureType, mapboxId, confidence };
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  const accessToken = process.env.MAPBOX_ACCESS_TOKEN;
-  if (!accessToken) {
-    console.error('Error: MAPBOX_ACCESS_TOKEN environment variable is not set.');
-    process.exit(1);
-  }
+  // Token kept for future Mapbox usage; geocoding currently uses Nominatim.
+  const accessToken = process.env.MAPBOX_ACCESS_TOKEN ?? '';
 
   const inputPath = path.join(ROOT, 'src/data/miami/miamiQuestLocations.json');
   const outputPath = path.join(ROOT, 'src/data/miami/miamiQuestLocations.geocoded.json');
