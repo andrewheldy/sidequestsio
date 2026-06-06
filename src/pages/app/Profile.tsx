@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Award,
+  Camera,
   Compass,
   Flame,
   Heart,
@@ -18,8 +19,8 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { MIAMI_QUESTS } from '@/data/miami/toQuest';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { SocialLinks } from '@/components/app/profile/SocialLinks';
 import { ProfileEditDialog } from '@/components/app/profile/ProfileEditDialog';
+import { SocialLinksEditor } from '@/components/app/profile/SocialLinksEditor';
 import {
   ActivitySection,
   ProfileSkeleton,
@@ -43,7 +44,6 @@ const Profile = () => {
 
   const name = profile.display_name || user?.email?.split('@')[0] || 'Explorer';
   const joined = formatJoined(profile.created_at);
-  const hasSocial = Boolean(profile.instagram_url || profile.tiktok_url || profile.x_url);
 
   const setPrivacy = async (
     key:
@@ -58,25 +58,51 @@ const Profile = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header className="glass-card flex flex-col items-center gap-3 p-5 text-center">
-        <div className="h-24 w-24 overflow-hidden rounded-3xl ring-2 ring-primary/40">
-          {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt={name} className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
-              {name.charAt(0).toUpperCase()}
-            </div>
-          )}
-        </div>
+    <div className="space-y-5 pb-8">
+      {/* ── Profile header ────────────────────────────────────────────── */}
+      <header className="glass-card overflow-hidden">
+        {/* Decorative gradient banner */}
+        <div
+          aria-hidden
+          className="h-16 bg-gradient-to-br from-coral/30 via-primary/10 to-turquoise/20"
+        />
 
-        <div>
-          <h1 className="font-poppins text-2xl font-bold">{name}</h1>
+        <div className="flex flex-col items-center px-5 pb-6">
+          {/* Avatar with edit affordance, overlapping the banner */}
+          <div className="relative -mt-12 mb-3">
+            <div className="h-24 w-24 overflow-hidden rounded-[22px] ring-2 ring-primary/40">
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
+                  {name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+
+            {/* Camera edit badge */}
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              aria-label="Edit profile photo"
+              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary shadow-md ring-2 ring-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <Camera className="h-3.5 w-3.5 text-primary-foreground" />
+            </button>
+          </div>
+
+          {/* Name & username */}
+          <h1 className="font-poppins text-xl font-bold">{name}</h1>
           {profile.username && (
             <p className="text-sm text-muted-foreground">@{profile.username}</p>
           )}
-          <p className="mt-1 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+
+          {/* Level · city · joined */}
+          <p className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Trophy className="h-3.5 w-3.5 text-coral" /> Level {profile.level}
             </span>
@@ -86,28 +112,27 @@ const Profile = () => {
             </span>
           </p>
           {joined && <p className="mt-0.5 text-xs text-muted-foreground">{joined}</p>}
+
+          {/* Bio */}
+          {profile.bio && (
+            <p className="mx-auto mt-3 max-w-[300px] text-center text-sm text-foreground/90">
+              {profile.bio}
+            </p>
+          )}
+
+          {/* Edit Profile */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4 min-h-[44px] px-6"
+            onClick={() => setEditOpen(true)}
+          >
+            <Pencil className="mr-2 h-4 w-4" /> Edit Profile
+          </Button>
         </div>
-
-        {profile.bio && <p className="max-w-prose text-sm text-foreground/90">{profile.bio}</p>}
-
-        {hasSocial && (
-          <SocialLinks
-            instagram={profile.instagram_url}
-            tiktok={profile.tiktok_url}
-            x={profile.x_url}
-          />
-        )}
-
-        <Button
-          variant="outline"
-          className="mt-1 min-h-[44px] w-full sm:w-auto"
-          onClick={() => setEditOpen(true)}
-        >
-          <Pencil className="mr-2 h-4 w-4" /> Edit Profile
-        </Button>
       </header>
 
-      {/* ── Stats ──────────────────────────────────────────────────────── */}
+      {/* ── Stats ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-3">
         <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${profile.xp}`} label="XP" />
         <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${profile.level}`} label="Level" />
@@ -116,7 +141,14 @@ const Profile = () => {
 
       <XpMeter xp={profile.xp} level={profile.level} />
 
-      {/* ── Quest activity ─────────────────────────────────────────────── */}
+      {/* ── Social links ─────────────────────────────────────────────── */}
+      <SocialLinksEditor
+        instagram={profile.instagram_url}
+        tiktok={profile.tiktok_url}
+        x={profile.x_url}
+      />
+
+      {/* ── Quest activity ───────────────────────────────────────────── */}
       <ActivitySection
         icon={<Compass className="h-4 w-4" />}
         title="Completed Quests"
@@ -168,7 +200,7 @@ const Profile = () => {
         )}
       </ActivitySection>
 
-      {/* ── Privacy ────────────────────────────────────────────────────── */}
+      {/* ── Privacy controls ─────────────────────────────────────────── */}
       <section className="glass-card divide-y divide-border/50">
         <div className="p-5 pb-3">
           <h2 className="font-poppins font-semibold">Public Profile</h2>
