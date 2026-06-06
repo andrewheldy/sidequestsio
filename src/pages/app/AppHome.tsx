@@ -38,7 +38,7 @@ export default function AppHome() {
               SIDEQUESTS
             </span>
             <h1 className="mt-3 font-poppins text-2xl font-bold text-foreground">
-              Hey {profile?.display_name ?? (user?.user_metadata?.display_name as string | undefined) ?? "Quester"}! 👋
+              Hey {user?.display_name ?? "Quester"}! 👋
             </h1>
             <p className="text-sm text-muted-foreground">
               There's always a side quest to explore.

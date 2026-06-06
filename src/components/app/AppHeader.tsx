@@ -9,8 +9,8 @@ interface AppHeaderProps {
 }
 
 export default function AppHeader({ title, subtitle }: AppHeaderProps) {
-  const { user, profile } = useAuth();
-  const initials = (profile?.display_name ?? (user?.user_metadata?.display_name as string | undefined) ?? "Q").slice(0, 1).toUpperCase();
+  const { user } = useAuth();
+  const initials = (user?.display_name ?? "Q").slice(0, 1).toUpperCase();
 
   return (
     <header className="flex items-center justify-between gap-3 pt-2">
