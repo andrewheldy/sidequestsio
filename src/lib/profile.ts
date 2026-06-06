@@ -99,6 +99,22 @@ export function handleFromUrl(url: string | null | undefined): string | null {
   }
 }
 
+/**
+ * Clean a raw user input into a bare handle for direct storage.
+ * Accepts @handle, bare handle, or a full URL — returns just the handle string.
+ * Returns `null` when the input is empty or unresolvable.
+ */
+export function cleanHandle(raw: string, platform: SocialPlatform): string | null {
+  const handle = extractHandle(raw, platform);
+  return handle || null;
+}
+
+/** Generate the canonical profile URL from a stored bare handle. */
+export function handleToUrl(handle: string | null | undefined, platform: SocialPlatform): string | null {
+  if (!handle) return null;
+  return SOCIAL_CONFIG[platform].base(handle);
+}
+
 // ── Phone number ────────────────────────────────────────────────────────────
 
 /** Strip everything except digits and a leading +. */

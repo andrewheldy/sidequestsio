@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Loader2, RefreshCw } from "lucide-react";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import AppLayout from "@/components/app/AppLayout";
 import { SectionHeader } from "@/components/app/ui";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRepository } from "@/lib/db";
+import { SocialLinksEditor } from "@/components/app/profile/SocialLinksEditor";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
 
@@ -22,9 +23,6 @@ export default function Settings() {
     display_name: profile?.display_name ?? "",
     username: profile?.username ?? "",
     phone_number: profile?.phone_number ?? "",
-    instagram_url: profile?.instagram_url ?? "",
-    tiktok_url: profile?.tiktok_url ?? "",
-    x_url: profile?.x_url ?? "",
   });
 
   const [saving, setSaving] = useState(false);
@@ -33,7 +31,6 @@ export default function Settings() {
     data: privacy,
     isLoading: privacyLoading,
     isError: privacyError,
-    refetch: refetchPrivacy,
   } = useQuery({
     queryKey: ["privacy", user?.id],
     queryFn: async () => (await getRepository()).getPrivacy(user!.id),
@@ -49,9 +46,6 @@ export default function Settings() {
       display_name: form.display_name || null,
       username: form.username || null,
       phone_number: form.phone_number || null,
-      instagram_url: form.instagram_url || null,
-      tiktok_url: form.tiktok_url || null,
-      x_url: form.x_url || null,
     });
     setSaving(false);
     if (error) {
@@ -114,34 +108,6 @@ export default function Settings() {
           </div>
         </section>
 
-        {/* Social links */}
-        <section>
-          <SectionHeader title="Social Links" />
-          <div className="glass-card space-y-4 p-4">
-            <FieldRow
-              label="Instagram"
-              value={form.instagram_url}
-              onChange={set("instagram_url")}
-              placeholder="https://instagram.com/you"
-              type="url"
-            />
-            <FieldRow
-              label="TikTok"
-              value={form.tiktok_url}
-              onChange={set("tiktok_url")}
-              placeholder="https://tiktok.com/@you"
-              type="url"
-            />
-            <FieldRow
-              label="X / Twitter"
-              value={form.x_url}
-              onChange={set("x_url")}
-              placeholder="https://x.com/you"
-              type="url"
-            />
-          </div>
-        </section>
-
         {/* Save / Cancel */}
         <div className="flex gap-3">
           <Button
@@ -165,59 +131,57 @@ export default function Settings() {
           </Button>
         </div>
 
-        {/* Privacy & Consent */}
+        {/* Social Identity */}
         <section>
-          <SectionHeader title="Privacy & Consent" />
-          {privacyLoading ? (
-            <div className="glass-card flex items-center justify-center gap-3 p-6 text-sm text-muted-foreground">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              Loading…
-            </div>
-          ) : privacyError || !privacy ? (
-            <div className="glass-card flex flex-col items-center gap-3 p-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Couldn't load privacy settings.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetchPrivacy()}
-                className="gap-2"
-              >
-                <RefreshCw className="h-4 w-4" /> Retry
-              </Button>
-            </div>
-          ) : (
-            <div className="glass-card divide-y divide-border/50">
-              <PrivacyRow
-                label="Show me on leaderboards"
-                desc="Display name only — never your email."
-                checked={privacy.leaderboard_visibility === "public"}
-                onChange={(v) =>
-                  updatePrivacy({ leaderboard_visibility: v ? "public" : "private" })
-                }
-              />
-              <PrivacyRow
-                label="Analytics"
-                desc="Help partners measure aggregate, privacy-safe traffic."
-                checked={privacy.analytics_consent}
-                onChange={(v) => updatePrivacy({ analytics_consent: v })}
-              />
-              <PrivacyRow
-                label="Location for verification"
-                desc="Used only to verify GPS check-ins. Coordinates are never stored."
-                checked={privacy.location_consent}
-                onChange={(v) => updatePrivacy({ location_consent: v })}
-              />
-              <PrivacyRow
-                label="Marketing emails"
-                desc="Occasional updates about new quests & rewards."
-                checked={privacy.marketing_consent}
-                onChange={(v) => updatePrivacy({ marketing_consent: v })}
-              />
-            </div>
-          )}
+          <SectionHeader title="Social Identity" />
+          <SocialLinksEditor
+            instagram_handle={profile?.instagram_handle}
+            tiktok_handle={profile?.tiktok_handle}
+            x_handle={profile?.x_handle}
+          />
         </section>
+
+        {/* Privacy & Consent — hidden when unavailable */}
+        {!privacyError && (
+          <section>
+            <SectionHeader title="Privacy & Consent" />
+            {privacyLoading ? (
+              <div className="glass-card flex items-center justify-center gap-3 p-6 text-sm text-muted-foreground">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                Loading…
+              </div>
+            ) : privacy ? (
+              <div className="glass-card divide-y divide-border/50">
+                <PrivacyRow
+                  label="Show me on leaderboards"
+                  desc="Display name only — never your email."
+                  checked={privacy.leaderboard_visibility === "public"}
+                  onChange={(v) =>
+                    updatePrivacy({ leaderboard_visibility: v ? "public" : "private" })
+                  }
+                />
+                <PrivacyRow
+                  label="Analytics"
+                  desc="Help partners measure aggregate, privacy-safe traffic."
+                  checked={privacy.analytics_consent}
+                  onChange={(v) => updatePrivacy({ analytics_consent: v })}
+                />
+                <PrivacyRow
+                  label="Location for verification"
+                  desc="Used only to verify GPS check-ins. Coordinates are never stored."
+                  checked={privacy.location_consent}
+                  onChange={(v) => updatePrivacy({ location_consent: v })}
+                />
+                <PrivacyRow
+                  label="Marketing emails"
+                  desc="Occasional updates about new quests & rewards."
+                  checked={privacy.marketing_consent}
+                  onChange={(v) => updatePrivacy({ marketing_consent: v })}
+                />
+              </div>
+            ) : null}
+          </section>
+        )}
 
         <p className="text-center text-xs text-muted-foreground">
           You control your data.{" "}

@@ -1,15 +1,16 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, Shield, BarChart3, Settings, Settings2, RefreshCw } from "lucide-react";
+import { LogOut, Shield, BarChart3, Settings, Settings2 } from "lucide-react";
 import AppLayout from "@/components/app/AppLayout";
 import { StatTile, SectionHeader, Loading } from "@/components/app/ui";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { getRepository } from "@/lib/db";
 import { levelProgress } from "@/lib/app/leveling";
+import { SocialLinksEditor } from "@/components/app/profile/SocialLinksEditor";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
 
@@ -18,7 +19,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const { data: privacy, isLoading, isError, refetch } = useQuery({
+  const { data: privacy, isLoading, isError } = useQuery({
     queryKey: ["privacy", user?.id],
     queryFn: async () => (await getRepository()).getPrivacy(user!.id),
     enabled: !!user,
@@ -56,6 +57,9 @@ export default function Profile() {
           aria-label="Edit profile"
         >
           <Avatar className="h-16 w-16 ring-2 ring-primary/50">
+            {profile?.avatar_url && (
+              <AvatarImage src={profile.avatar_url} alt={displayName} />
+            )}
             <AvatarFallback className="bg-muted text-xl">{initials}</AvatarFallback>
           </Avatar>
           <span className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
@@ -100,6 +104,15 @@ export default function Profile() {
         </div>
       </div>
 
+      {/* Social identity */}
+      <div className="mt-4">
+        <SocialLinksEditor
+          instagram_handle={profile?.instagram_handle}
+          tiktok_handle={profile?.tiktok_handle}
+          x_handle={profile?.x_handle}
+        />
+      </div>
+
       {/* Role-based shortcuts (RBAC) */}
       {(role === "partner" || role === "admin") && (
         <div className="mt-4 grid grid-cols-2 gap-3">
@@ -120,56 +133,44 @@ export default function Profile() {
         </div>
       )}
 
-      {/* Privacy */}
-      <div className="mt-6">
-        <SectionHeader title="Privacy & Consent" />
-        {isLoading ? (
-          <Loading />
-        ) : isError || !privacy ? (
-          <div className="glass-card flex flex-col items-center gap-3 p-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Couldn't load privacy settings.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              className="gap-2"
-            >
-              <RefreshCw className="h-4 w-4" /> Retry
-            </Button>
-          </div>
-        ) : (
-          <div className="glass-card divide-y divide-border/50">
-            <Row
-              label="Show me on leaderboards"
-              desc="Display name only — never your email."
-              checked={privacy.leaderboard_visibility === "public"}
-              onChange={(v) =>
-                update({ leaderboard_visibility: v ? "public" : "private" })
-              }
-            />
-            <Row
-              label="Analytics"
-              desc="Help partners measure aggregate, privacy-safe traffic."
-              checked={privacy.analytics_consent}
-              onChange={(v) => update({ analytics_consent: v })}
-            />
-            <Row
-              label="Location for verification"
-              desc="Used only to verify GPS check-ins. Coordinates are never stored."
-              checked={privacy.location_consent}
-              onChange={(v) => update({ location_consent: v })}
-            />
-            <Row
-              label="Marketing emails"
-              desc="Occasional updates about new quests & rewards."
-              checked={privacy.marketing_consent}
-              onChange={(v) => update({ marketing_consent: v })}
-            />
-          </div>
-        )}
-      </div>
+      {/* Privacy — hidden entirely if the feature isn't available */}
+      {!isError && (
+        <div className="mt-6">
+          <SectionHeader title="Privacy & Consent" />
+          {isLoading ? (
+            <Loading />
+          ) : privacy ? (
+            <div className="glass-card divide-y divide-border/50">
+              <Row
+                label="Show me on leaderboards"
+                desc="Display name only — never your email."
+                checked={privacy.leaderboard_visibility === "public"}
+                onChange={(v) =>
+                  update({ leaderboard_visibility: v ? "public" : "private" })
+                }
+              />
+              <Row
+                label="Analytics"
+                desc="Help partners measure aggregate, privacy-safe traffic."
+                checked={privacy.analytics_consent}
+                onChange={(v) => update({ analytics_consent: v })}
+              />
+              <Row
+                label="Location for verification"
+                desc="Used only to verify GPS check-ins. Coordinates are never stored."
+                checked={privacy.location_consent}
+                onChange={(v) => update({ location_consent: v })}
+              />
+              <Row
+                label="Marketing emails"
+                desc="Occasional updates about new quests & rewards."
+                checked={privacy.marketing_consent}
+                onChange={(v) => update({ marketing_consent: v })}
+              />
+            </div>
+          ) : null}
+        </div>
+      )}
 
       {/* Account settings */}
       <Button asChild variant="outline" className="mt-4 w-full h-11 gap-2">

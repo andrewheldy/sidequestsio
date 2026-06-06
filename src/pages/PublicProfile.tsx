@@ -21,9 +21,9 @@ interface PublicProfileRow {
   level: number;
   xp: number;
   created_at: string | null;
-  instagram_url: string | null;
-  tiktok_url: string | null;
-  x_url: string | null;
+  instagram_handle: string | null;
+  tiktok_handle: string | null;
+  x_handle: string | null;
   youtube_url: string | null;
   snapchat_url: string | null;
   show_completed_quests: boolean;
@@ -78,7 +78,10 @@ const PublicProfile = () => {
 function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
   const name = profile.display_name || profile.username || 'Explorer';
   const joined = formatJoined(profile.created_at);
-  const hasSocial = Boolean(profile.instagram_url || profile.tiktok_url || profile.x_url);
+  const hasSocial = Boolean(
+    profile.instagram_handle || profile.tiktok_handle || profile.x_handle ||
+    profile.youtube_url || profile.snapchat_url,
+  );
 
   return (
     <div className="space-y-5">
@@ -135,21 +138,15 @@ function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
           {hasSocial && (
             <div className="mt-4">
               <SocialLinks
-                instagram={profile.instagram_url}
-                tiktok={profile.tiktok_url}
-                x={profile.x_url}
+                instagram_handle={profile.instagram_handle}
+                tiktok_handle={profile.tiktok_handle}
+                x_handle={profile.x_handle}
+                youtube_url={profile.youtube_url}
+                snapchat_url={profile.snapchat_url}
               />
             </div>
           )}
         </div>
-        {profile.bio && <p className="max-w-prose text-sm text-foreground/90">{profile.bio}</p>}
-        <SocialLinks
-          instagram={profile.instagram_url}
-          tiktok={profile.tiktok_url}
-          x={profile.x_url}
-          youtube={profile.youtube_url}
-          snapchat={profile.snapchat_url}
-        />
       </header>
 
       {/* ── Stats ───────────────────────────────────────────────────── */}

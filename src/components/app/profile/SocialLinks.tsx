@@ -1,63 +1,71 @@
 import type { ReactNode } from 'react';
-import { handleFromUrl } from '@/lib/profile';
 import { cn } from '@/lib/utils';
 
 interface SocialLinksProps {
-  instagram?: string | null;
-  tiktok?: string | null;
-  x?: string | null;
-  youtube?: string | null;
-  snapchat?: string | null;
+  instagram_handle?: string | null;
+  tiktok_handle?: string | null;
+  x_handle?: string | null;
+  youtube_url?: string | null;
+  snapchat_url?: string | null;
   className?: string;
 }
 
 /**
- * Clean, subtle social buttons — identity context, not clout. Only renders the
- * links a user actually added; each opens in a new tab with an accessible
- * label and a 44×44 tap target.
+ * Read-only social identity icons. Accepts bare handles for the three main
+ * platforms (Instagram, TikTok, X) and generates URLs dynamically — users
+ * never see raw URLs. YouTube and Snapchat remain URL-based for now.
+ * Only renders platforms the user has actually connected.
  */
-export function SocialLinks({ instagram, tiktok, x, youtube, snapchat, className }: SocialLinksProps) {
-  const allLinks: { url: string | null | undefined; label: string; icon: ReactNode }[] = [
-    { url: instagram, label: 'Instagram', icon: <InstagramGlyph /> },
-    { url: tiktok,    label: 'TikTok',    icon: <TikTokGlyph /> },
-    { url: x,         label: 'X',         icon: <XGlyph /> },
-    { url: youtube,   label: 'YouTube',   icon: <YouTubeGlyph /> },
-    { url: snapchat,  label: 'Snapchat',  icon: <SnapchatGlyph /> },
+export function SocialLinks({
+  instagram_handle,
+  tiktok_handle,
+  x_handle,
+  youtube_url,
+  snapchat_url,
+  className,
+}: SocialLinksProps) {
+  const instagramUrl = instagram_handle ? `https://instagram.com/${instagram_handle}` : null;
+  const tiktokUrl = tiktok_handle ? `https://tiktok.com/@${tiktok_handle}` : null;
+  const xUrl = x_handle ? `https://x.com/${x_handle}` : null;
+
+  const allLinks: { url: string | null | undefined; label: string; handle?: string; icon: ReactNode }[] = [
+    { url: instagramUrl, label: 'Instagram', handle: instagram_handle ?? undefined, icon: <InstagramGlyph /> },
+    { url: tiktokUrl,    label: 'TikTok',    handle: tiktok_handle ?? undefined,    icon: <TikTokGlyph /> },
+    { url: xUrl,         label: 'X',         handle: x_handle ?? undefined,         icon: <XGlyph /> },
+    { url: youtube_url,  label: 'YouTube',                                           icon: <YouTubeGlyph /> },
+    { url: snapchat_url, label: 'Snapchat',                                          icon: <SnapchatGlyph /> },
   ];
 
   const present = allLinks.filter(
-    (l): l is { url: string; label: string; icon: ReactNode } => Boolean(l.url),
+    (l): l is { url: string; label: string; handle?: string; icon: ReactNode } => Boolean(l.url),
   );
 
   if (present.length === 0) return null;
 
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
-      {present.map(({ url, label, icon }) => {
-        const handle = handleFromUrl(url);
-        return (
-          <a
-            key={label}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={handle ? `${label} — ${handle}` : label}
-            title={handle ?? label}
-            className={cn(
-              'flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-card/40 text-muted-foreground',
-              'transition-colors hover:border-primary/50 hover:text-foreground',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-            )}
-          >
-            {icon}
-          </a>
-        );
-      })}
+      {present.map(({ url, label, handle, icon }) => (
+        <a
+          key={label}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={handle ? `${label} — @${handle}` : label}
+          title={handle ? `@${handle}` : label}
+          className={cn(
+            'flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-card/40 text-muted-foreground',
+            'transition-colors hover:border-primary/50 hover:text-foreground',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+          )}
+        >
+          {icon}
+        </a>
+      ))}
     </div>
   );
 }
 
-// ── Subtle, monochrome brand glyphs (inherit currentColor) ──────────────────
+// ── Brand glyphs (inherit currentColor) ──────────────────────────────────────
 
 function InstagramGlyph() {
   return (

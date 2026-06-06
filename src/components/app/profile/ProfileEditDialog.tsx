@@ -18,12 +18,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth, type Profile } from '@/contexts/AuthContext';
 import {
-  normalizeSocialLink,
+  cleanHandle,
   normalizeUsername,
   normalizePhone,
   validateUsername,
   validatePhone,
-  handleFromUrl,
 } from '@/lib/profile';
 import { AvatarUploader } from './AvatarUploader';
 
@@ -48,11 +47,9 @@ const schema = z.object({
     }))
     .optional()
     .or(z.literal('')),
-  instagram: z.string().trim().max(200).optional().or(z.literal('')),
-  tiktok: z.string().trim().max(200).optional().or(z.literal('')),
-  x: z.string().trim().max(200).optional().or(z.literal('')),
-  youtube: z.string().trim().max(200).optional().or(z.literal('')),
-  snapchat: z.string().trim().max(200).optional().or(z.literal('')),
+  instagram_handle: z.string().trim().max(40).optional().or(z.literal('')),
+  tiktok_handle: z.string().trim().max(40).optional().or(z.literal('')),
+  x_handle: z.string().trim().max(15).optional().or(z.literal('')),
   avatar_url: z.string().nullable(),
 });
 
@@ -98,11 +95,9 @@ export function ProfileEditDialog({ profile, open, onOpenChange }: ProfileEditDi
       home_city: values.home_city?.trim() ? values.home_city.trim() : 'Miami',
       avatar_url: values.avatar_url,
       phone_number: rawPhone ? normalizePhone(rawPhone) : null,
-      instagram_url: normalizeSocialLink(values.instagram ?? '', 'instagram'),
-      tiktok_url: normalizeSocialLink(values.tiktok ?? '', 'tiktok'),
-      x_url: normalizeSocialLink(values.x ?? '', 'x'),
-      youtube_url: normalizeSocialLink(values.youtube ?? '', 'youtube'),
-      snapchat_url: normalizeSocialLink(values.snapchat ?? '', 'snapchat'),
+      instagram_handle: cleanHandle(values.instagram_handle ?? '', 'instagram'),
+      tiktok_handle:    cleanHandle(values.tiktok_handle    ?? '', 'tiktok'),
+      x_handle:         cleanHandle(values.x_handle         ?? '', 'x'),
     });
 
     if (error) {
@@ -192,52 +187,42 @@ export function ProfileEditDialog({ profile, open, onOpenChange }: ProfileEditDi
             />
           </Field>
 
-          {/* Social links */}
+          {/* Social identity */}
           <fieldset className="space-y-3">
-            <legend className="text-sm font-medium text-foreground">Social Links</legend>
+            <legend className="text-sm font-medium text-foreground">Social Identity</legend>
             <p className="-mt-1 text-xs text-muted-foreground">
-              Optional. Paste a handle or full link — we'll tidy it up.
+              Enter your username only — no URLs or @ symbols needed.
             </p>
-            <Field id="instagram" label="Instagram" error={errors.instagram?.message} compact>
+            <HandleField id="instagram_handle" label="Instagram" error={errors.instagram_handle?.message}>
               <Input
-                id="instagram"
-                placeholder="@handle or link"
+                id="instagram_handle"
+                placeholder="username"
                 autoCapitalize="none"
-                {...register('instagram')}
+                autoCorrect="off"
+                spellCheck={false}
+                {...register('instagram_handle')}
               />
-            </Field>
-            <Field id="tiktok" label="TikTok" error={errors.tiktok?.message} compact>
+            </HandleField>
+            <HandleField id="tiktok_handle" label="TikTok" error={errors.tiktok_handle?.message}>
               <Input
-                id="tiktok"
-                placeholder="@handle or link"
+                id="tiktok_handle"
+                placeholder="username"
                 autoCapitalize="none"
-                {...register('tiktok')}
+                autoCorrect="off"
+                spellCheck={false}
+                {...register('tiktok_handle')}
               />
-            </Field>
-            <Field id="x" label="X" error={errors.x?.message} compact>
+            </HandleField>
+            <HandleField id="x_handle" label="X" error={errors.x_handle?.message}>
               <Input
-                id="x"
-                placeholder="@handle or link"
+                id="x_handle"
+                placeholder="username"
                 autoCapitalize="none"
-                {...register('x')}
+                autoCorrect="off"
+                spellCheck={false}
+                {...register('x_handle')}
               />
-            </Field>
-            <Field id="youtube" label="YouTube" error={errors.youtube?.message} compact>
-              <Input
-                id="youtube"
-                placeholder="@handle or link"
-                autoCapitalize="none"
-                {...register('youtube')}
-              />
-            </Field>
-            <Field id="snapchat" label="Snapchat" error={errors.snapchat?.message} compact>
-              <Input
-                id="snapchat"
-                placeholder="@handle or link"
-                autoCapitalize="none"
-                {...register('snapchat')}
-              />
-            </Field>
+            </HandleField>
           </fieldset>
 
           <DialogFooter className="gap-2 sm:gap-2">
@@ -272,11 +257,9 @@ function toFormValues(profile: Profile): FormValues {
     bio: profile.bio ?? '',
     home_city: profile.home_city ?? '',
     phone_number: profile.phone_number ?? '',
-    instagram: handleFromUrl(profile.instagram_url) ?? '',
-    tiktok: handleFromUrl(profile.tiktok_url) ?? '',
-    x: handleFromUrl(profile.x_url) ?? '',
-    youtube: handleFromUrl(profile.youtube_url) ?? '',
-    snapchat: handleFromUrl(profile.snapchat_url) ?? '',
+    instagram_handle: profile.instagram_handle ?? '',
+    tiktok_handle:    profile.tiktok_handle    ?? '',
+    x_handle:         profile.x_handle         ?? '',
     avatar_url: profile.avatar_url,
   };
 }
@@ -303,6 +286,35 @@ function Field({
         {hint && !error && <span className="text-xs text-muted-foreground">{hint}</span>}
       </div>
       {children}
+      {error && (
+        <p role="alert" className="text-xs text-destructive">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function HandleField({
+  id,
+  label,
+  error,
+  children,
+}: {
+  id: string;
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <Label htmlFor={id} className="text-xs text-muted-foreground">
+        {label}
+      </Label>
+      <div className="flex items-center rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
+        <span className="pl-3 text-sm text-muted-foreground select-none">@</span>
+        {children}
+      </div>
       {error && (
         <p role="alert" className="text-xs text-destructive">
           {error}

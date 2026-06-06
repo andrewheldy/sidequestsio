@@ -24,6 +24,9 @@ export interface Profile {
   x_url: string | null;
   youtube_url: string | null;
   snapchat_url: string | null;
+  instagram_handle: string | null;
+  tiktok_handle: string | null;
+  x_handle: string | null;
   is_profile_public: boolean;
   show_social_links: boolean;
   show_completed_quests: boolean;
@@ -59,6 +62,9 @@ export type EditableProfile = Partial<
     | 'x_url'
     | 'youtube_url'
     | 'snapchat_url'
+    | 'instagram_handle'
+    | 'tiktok_handle'
+    | 'x_handle'
     | 'is_profile_public'
     | 'show_social_links'
     | 'show_completed_quests'
