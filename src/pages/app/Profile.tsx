@@ -30,7 +30,7 @@ import {
 } from '@/components/app/profile/parts';
 
 const Profile = () => {
-  const { user, profile, loading, signOut, updateProfile } = useAuth();
+  const { user, profile, loading, signOut, updateProfile, refreshProfile } = useAuth();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
@@ -40,7 +40,18 @@ const Profile = () => {
     [favorites],
   );
 
-  if (loading || !profile) return <ProfileSkeleton />;
+  if (loading) return <ProfileSkeleton />;
+
+  if (!profile) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 pt-16 text-center">
+        <p className="text-muted-foreground">Could not load your profile. Please try again.</p>
+        <Button variant="outline" onClick={() => void refreshProfile()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   const name = profile.display_name || user?.email?.split('@')[0] || 'Explorer';
   const joined = formatJoined(profile.created_at);
