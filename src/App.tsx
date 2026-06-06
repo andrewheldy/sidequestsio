@@ -25,6 +25,10 @@ import Explore from "./pages/app/Explore";
 import MapView from "./pages/app/MapView";
 import Favorites from "./pages/app/Favorites";
 import Profile from "./pages/app/Profile";
+import Settings from "./pages/app/Settings";
+import QuestBrowser from "./pages/app/QuestBrowser";
+import AppCommunityNotes from "./pages/app/AppCommunityNotes";
+import CheckIn from "./pages/app/CheckIn";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,6 +75,16 @@ const App = () => (
                     <Route index element={<Navigate to="/app/explore" replace />} />
                     <Route path="explore" element={<Explore />} />
                     <Route path="map" element={<MapView />} />
+                    <Route path="quests" element={<QuestBrowser />} />
+                    <Route path="community-notes" element={<AppCommunityNotes />} />
+                    <Route
+                      path="checkin"
+                      element={
+                        <ProtectedRoute>
+                          <CheckIn />
+                        </ProtectedRoute>
+                      }
+                    />
                     <Route
                       path="favorites"
                       element={
@@ -84,6 +98,14 @@ const App = () => (
                       element={
                         <ProtectedRoute>
                           <Profile />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="settings"
+                      element={
+                        <ProtectedRoute>
+                          <Settings />
                         </ProtectedRoute>
                       }
                     />
