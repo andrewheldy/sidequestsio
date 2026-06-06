@@ -1,197 +1,140 @@
-import { useEffect, useState } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Loader2, Mail, Lock, User as UserIcon } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import dotlingLogo from '@/assets/dotling-logo.jpg';
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { Mail, Sparkles } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { activeBackend } from "@/lib/db";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
-type Mode = 'signin' | 'signup';
+const DEMO_ACCOUNTS = [
+  { email: "quester@sidequests.io", label: "Demo Quester", role: "user" },
+  { email: "partner@wynwood.example", label: "Demo Partner", role: "partner" },
+  { email: "admin@sidequests.io", label: "Demo Admin", role: "admin" },
+];
 
-const Auth = () => {
-  const { user, profile, loading, isConfigured, signIn, signUp } = useAuth();
-  const location = useLocation();
-  const { toast } = useToast();
-
-  const [mode, setMode] = useState<Mode>('signin');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function Auth() {
+  const { signInWithEmail, signInWithProvider, isAuthenticated } = useAuth();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const next = params.get("next") || "/app";
+  const isLocal = activeBackend() === "local";
 
   useEffect(() => {
-    setError(null);
-  }, [mode]);
+    if (isAuthenticated) navigate(decodeURIComponent(next), { replace: true });
+  }, [isAuthenticated, navigate, next]);
 
-  // Redirect already-signed-in users away from the auth screen.
-  if (!loading && user) {
-    if (profile && !profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
-    const dest = (location.state as { from?: string } | null)?.from ?? '/app';
-    return <Navigate to={dest} replace />;
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!email || !password) {
-      setError('Please enter your email and password.');
-      return;
+    if (!email) return;
+    setBusy(true);
+    try {
+      await signInWithEmail(email);
+      if (isLocal) {
+        toast.success("Signed in");
+      } else {
+        toast.success("Magic link sent — check your email.");
+      }
+    } catch {
+      toast.error("Could not sign in. Please try again.");
+    } finally {
+      setBusy(false);
     }
-    if (mode === 'signup' && password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
+  };
 
-    setSubmitting(true);
-    const result =
-      mode === 'signin'
-        ? await signIn(email, password)
-        : await signUp(email, password, displayName.trim() || undefined);
-    setSubmitting(false);
-
-    if (result.error) {
-      setError(result.error);
-      return;
-    }
-
-    if (mode === 'signup') {
-      toast({
-        title: 'Welcome aboard! 🎉',
-        description:
-          'Account created. If email confirmation is on, check your inbox — otherwise you can sign in now.',
-      });
-      setMode('signin');
-    } else {
-      toast({ title: 'Signed in', description: 'Welcome back, explorer.' });
+  const handleDemo = async (demoEmail: string) => {
+    setBusy(true);
+    try {
+      await signInWithEmail(demoEmail);
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo via-indigo-light to-background">
-      <div className="absolute -right-32 top-1/4 h-96 w-96 rounded-full bg-coral/20 blur-3xl" />
-      <div className="absolute -left-32 bottom-1/4 h-96 w-96 rounded-full bg-turquoise/10 blur-3xl" />
-
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-8">
-        <Link
-          to="/"
-          className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back home
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-12">
+        <Link to="/" className="mb-8 text-center">
+          <span className="font-poppins text-3xl font-extrabold italic text-gradient-coral">
+            SIDEQUESTS
+          </span>
         </Link>
 
-        <div className="mb-8 flex flex-col items-center text-center">
-          <img src={dotlingLogo} alt="SideQuests.io" className="mb-4 h-14 w-14 rounded-xl object-cover" />
-          <h1 className="font-poppins text-2xl font-bold">
-            <span className="bg-gradient-to-r from-coral via-foreground to-turquoise bg-clip-text text-transparent">
-              SideQuests
-            </span>
-            <span className="text-primary">.io</span>
+        <div className="glass-card p-6">
+          <h1 className="font-poppins text-2xl font-bold text-foreground">
+            Sign in to continue
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Your adventure across the city starts here.
+          <p className="mt-1 text-sm text-muted-foreground">
+            Save your progress, earn points, and unlock rewards.
           </p>
+
+          <form onSubmit={handleEmail} className="mt-6 space-y-3">
+            <Input
+              type="email"
+              required
+              placeholder="you@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-muted/50"
+            />
+            <Button type="submit" disabled={busy} className="w-full gap-2">
+              <Mail className="h-4 w-4" />
+              {isLocal ? "Continue with email" : "Email me a magic link"}
+            </Button>
+          </form>
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">or</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={busy}
+              onClick={() => signInWithProvider("google")}
+            >
+              Continue with Google
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={busy}
+              onClick={() => signInWithProvider("apple")}
+            >
+              Continue with Apple
+            </Button>
+          </div>
         </div>
 
-        {!isConfigured && (
-          <div className="mb-6 rounded-xl border border-coral/40 bg-coral/10 p-4 text-sm text-foreground">
-            Accounts aren&apos;t connected yet. Add <code className="text-coral">VITE_SUPABASE_URL</code> and{' '}
-            <code className="text-coral">VITE_SUPABASE_ANON_KEY</code> to enable sign in.
+        {isLocal && (
+          <div className="mt-6">
+            <p className="mb-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+              <Sparkles className="h-3 w-3" /> Demo accounts (local mode)
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {DEMO_ACCOUNTS.map((a) => (
+                <button
+                  key={a.email}
+                  onClick={() => handleDemo(a.email)}
+                  disabled={busy}
+                  className="rounded-lg border border-border bg-card/50 px-2 py-2 text-xs text-foreground hover:border-primary"
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign in</TabsTrigger>
-            <TabsTrigger value="signup">Create account</TabsTrigger>
-          </TabsList>
-
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <TabsContent value="signup" className="m-0 space-y-4 data-[state=inactive]:hidden">
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Display name</Label>
-                <div className="relative">
-                  <UserIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="displayName"
-                    type="text"
-                    autoComplete="name"
-                    placeholder="Miami Explorer"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="h-12 pl-10"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 pl-10"
-                />
-              </div>
-            </div>
-
-            {error && (
-              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {error}
-              </p>
-            )}
-
-            <Button type="submit" size="lg" className="h-12 w-full" disabled={submitting}>
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {mode === 'signin' ? 'Signing in…' : 'Creating account…'}
-                </>
-              ) : mode === 'signin' ? (
-                'Sign in'
-              ) : (
-                'Create account'
-              )}
-            </Button>
-          </form>
-        </Tabs>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          New to the city?{' '}
-          <Link to="/onboarding" className="font-medium text-primary hover:underline">
-            Take the tour first
-          </Link>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          By continuing you agree to our Terms &amp; Privacy Policy.
         </p>
       </div>
     </div>
   );
-};
-
-export default Auth;
+}

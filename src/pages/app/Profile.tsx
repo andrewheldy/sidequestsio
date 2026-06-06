@@ -1,111 +1,171 @@
-import { useNavigate } from 'react-router-dom';
-import { LogOut, MapPin, Trophy, Flame, Zap } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { EXPLORER_STYLES, NEIGHBORHOODS, VIBES } from '@/lib/onboarding';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import { LogOut, Shield, BarChart3, Settings2 } from "lucide-react";
+import AppLayout from "@/components/app/AppLayout";
+import { StatTile, SectionHeader, Loading } from "@/components/app/ui";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/contexts/AuthContext";
+import { getRepository } from "@/lib/db";
+import { levelProgress } from "@/lib/app/leveling";
+import type { PrivacyPreferences } from "@/types/db";
+import { toast } from "sonner";
 
-const Profile = () => {
-  const { user, profile, signOut } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
+export default function Profile() {
+  const { user, profile, role, signOut } = useAuth();
+  const qc = useQueryClient();
 
-  const name = profile?.display_name || user?.email?.split('@')[0] || 'Explorer';
-  const style = EXPLORER_STYLES.find((s) => s.id === profile?.quest_style);
-  const area = NEIGHBORHOODS.find((n) => n.id === profile?.starting_area);
-  const interests = (profile?.interests ?? [])
-    .map((id) => VIBES.find((v) => v.id === id))
-    .filter(Boolean);
+  const { data: privacy, isLoading } = useQuery({
+    queryKey: ["privacy", user?.id],
+    queryFn: async () => (await getRepository()).getPrivacy(user!.id),
+    enabled: !!user,
+  });
 
-  const xp = profile?.xp ?? 0;
-  const level = profile?.level ?? 1;
-  const streak = profile?.streak ?? 0;
-  const nextLevelXp = level * 250;
-  const xpPct = Math.min(100, Math.round((xp / nextLevelXp) * 100));
-
-  const handleSignOut = async () => {
-    await signOut();
-    toast({ title: 'Signed out', description: 'See you on the next quest.' });
-    navigate('/');
+  const update = async (patch: Partial<PrivacyPreferences>) => {
+    if (!user) return;
+    const repo = await getRepository();
+    await repo.updatePrivacy(user.id, patch);
+    // Log consent changes for governance (Phase 14).
+    for (const [k, v] of Object.entries(patch)) {
+      if (k.endsWith("_consent") && typeof v === "boolean") {
+        await repo.recordConsent({
+          userId: user.id,
+          consentType: k.replace("_consent", "") as never,
+          granted: v,
+          source: "profile_settings",
+        });
+      }
+    }
+    qc.invalidateQueries({ queryKey: ["privacy", user.id] });
+    toast.success("Privacy settings updated");
   };
 
+  const lvl = levelProgress(profile?.xp ?? 0);
+
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col items-center gap-3 pt-2 text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-coral to-turquoise text-3xl">
-          {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt={name} className="h-full w-full rounded-3xl object-cover" />
-          ) : (
-            name.charAt(0).toUpperCase()
+    <AppLayout title="Profile">
+      <div className="glass-card mt-2 flex items-center gap-4 p-5">
+        <Avatar className="h-16 w-16 ring-2 ring-primary/50">
+          <AvatarFallback className="bg-muted text-xl">
+            {(user?.display_name ?? "Q").slice(0, 1).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div>
+          <h2 className="font-poppins text-xl font-bold text-foreground">
+            {user?.display_name}
+          </h2>
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
+          <span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-xs capitalize text-muted-foreground">
+            {role}
+          </span>
+        </div>
+      </div>
+
+      <div className="glass-card mt-4 p-4">
+        <div className="flex items-center justify-between">
+          <span className="font-poppins font-semibold text-foreground">
+            Level {lvl.level}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {lvl.xpIntoLevel}/{lvl.nextLevelXp - lvl.currentLevelXp} XP
+          </span>
+        </div>
+        <Progress value={lvl.progress * 100} className="mt-2 h-2" />
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <StatTile label="Points" value={profile?.points_balance_cache ?? 0} accent="coral" />
+          <StatTile label="Quests" value={profile?.completed_quests_count ?? 0} accent="turquoise" />
+          <StatTile label="Notes" value={profile?.community_notes_count ?? 0} />
+        </div>
+      </div>
+
+      {/* Role-based shortcuts (RBAC) */}
+      {(role === "partner" || role === "admin") && (
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {(role === "partner" || role === "admin") && (
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/partner">
+                <BarChart3 className="h-4 w-4" /> Partner Portal
+              </Link>
+            </Button>
+          )}
+          {role === "admin" && (
+            <Button asChild variant="outline" className="gap-2">
+              <Link to="/admin">
+                <Shield className="h-4 w-4" /> Admin
+              </Link>
+            </Button>
           )}
         </div>
-        <div>
-          <h1 className="font-poppins text-2xl font-bold">{name}</h1>
-          <p className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5" /> {profile?.home_city ?? 'Miami'}
-            {style && <span>· {style.emoji} {style.label}</span>}
-          </p>
-        </div>
-      </header>
+      )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${xp}`} label="XP" />
-        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${level}`} label="Level" />
-        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${streak}`} label="Day streak" />
-      </div>
-
-      {/* XP meter */}
-      <div className="glass-card p-5">
-        <div className="mb-1 flex items-center justify-between text-sm">
-          <span className="font-medium">Progress to Level {level + 1}</span>
-          <span className="text-muted-foreground">{xp} / {nextLevelXp}</span>
-        </div>
-        <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted/50">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-coral to-turquoise transition-all"
-            style={{ width: `${xpPct}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Interests */}
-      <div className="glass-card p-5">
-        <p className="mb-3 font-poppins font-semibold">Your interests</p>
-        {interests.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {interests.map((v) => (
-              <span key={v!.id} className="inline-flex items-center gap-1 rounded-full bg-muted/50 px-3 py-1 text-sm">
-                {v!.emoji} {v!.label}
-              </span>
-            ))}
-          </div>
+      {/* Privacy */}
+      <div className="mt-6">
+        <SectionHeader title="Privacy & Consent" />
+        {isLoading || !privacy ? (
+          <Loading />
         ) : (
-          <p className="text-sm text-muted-foreground">No interests selected yet.</p>
-        )}
-        {area && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Home base: <span className="text-foreground">{area.emoji} {area.label}</span>
-          </p>
+          <div className="glass-card divide-y divide-border/50">
+            <Row
+              label="Show me on leaderboards"
+              desc="Display name only — never your email."
+              checked={privacy.leaderboard_visibility === "public"}
+              onChange={(v) =>
+                update({ leaderboard_visibility: v ? "public" : "private" })
+              }
+            />
+            <Row
+              label="Analytics"
+              desc="Help partners measure aggregate, privacy-safe traffic."
+              checked={privacy.analytics_consent}
+              onChange={(v) => update({ analytics_consent: v })}
+            />
+            <Row
+              label="Location for verification"
+              desc="Used only to verify GPS check-ins. Coordinates are never stored."
+              checked={privacy.location_consent}
+              onChange={(v) => update({ location_consent: v })}
+            />
+            <Row
+              label="Marketing emails"
+              desc="Occasional updates about new quests & rewards."
+              checked={privacy.marketing_consent}
+              onChange={(v) => update({ marketing_consent: v })}
+            />
+          </div>
         )}
       </div>
 
-      <Button variant="outline" className="w-full" onClick={handleSignOut}>
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign out
+      <Button variant="ghost" onClick={signOut} className="mt-6 w-full gap-2 text-destructive">
+        <LogOut className="h-4 w-4" /> Sign out
       </Button>
-    </div>
-  );
-};
-
-function StatTile({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
-  return (
-    <div className="glass-card flex flex-col items-center gap-1 p-4">
-      {icon}
-      <span className="font-poppins text-lg font-bold">{value}</span>
-      <span className="text-xs text-muted-foreground">{label}</span>
-    </div>
+      <p className="mt-3 flex items-center justify-center gap-1 text-center text-xs text-muted-foreground">
+        <Settings2 className="h-3 w-3" /> You control your data. Request export or
+        deletion anytime.
+      </p>
+    </AppLayout>
   );
 }
 
-export default Profile;
+function Row({
+  label,
+  desc,
+  checked,
+  onChange,
+}: {
+  label: string;
+  desc: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 p-4">
+      <div>
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">{desc}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+}

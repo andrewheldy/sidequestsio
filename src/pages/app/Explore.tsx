@@ -8,7 +8,7 @@ import AppQuestCard from '@/components/app/AppQuestCard';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Explore = () => {
-  const { profile } = useAuth();
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('All');
 
@@ -31,7 +31,7 @@ const Explore = () => {
     <div className="space-y-5">
       <header>
         <p className="text-sm text-muted-foreground">
-          {profile?.display_name ? `Hey ${profile.display_name},` : 'Welcome,'}
+          {user?.display_name ? `Hey ${user.display_name},` : 'Welcome,'}
         </p>
         <h1 className="font-poppins text-2xl font-bold">Explore Miami</h1>
       </header>
