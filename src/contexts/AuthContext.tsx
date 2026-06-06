@@ -168,9 +168,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('[SQ:auth] onAuthStateChange — event:', event, '| userId:', userId);
       setSession(newSession);
       setUser(newSession?.user ?? null);
+
+      if (event === 'SIGNED_OUT') {
+        console.log('[SQ:auth] SIGNED_OUT — setProfile(null)');
+        setProfile(null);
+        return;
+      }
+
+      // TOKEN_REFRESHED only updates the session/token — profile data is unchanged.
+      if (event === 'TOKEN_REFRESHED') return;
+
       if (newSession?.user) {
-        // Defer the Supabase call to avoid deadlocks inside the callback.
-        setTimeout(() => fetchProfile(newSession.user.id), 0);
+        if (event === 'SIGNED_IN') {
+          // Re-enter loading so the redirect in Auth.tsx waits for the profile.
+          console.log('[SQ:auth] SIGNED_IN — setLoading(true), deferring fetchProfile');
+          setLoading(true);
+          setTimeout(() => {
+            fetchProfile(newSession.user.id).finally(() => {
+              console.log('[SQ:auth] SIGNED_IN path: setLoading(false)');
+              setLoading(false);
+            });
+          }, 0);
+        } else {
+          // INITIAL_SESSION and other events — loading is managed by getSession() path.
+          setTimeout(() => fetchProfile(newSession.user.id), 0);
+        }
       } else {
         console.log('[SQ:auth] onAuthStateChange: no user — setProfile(null)');
         setProfile(null);
