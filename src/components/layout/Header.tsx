@@ -13,7 +13,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { t } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
 
   const navLinks = [
     { href: '/quests', label: t.nav.quests },
@@ -60,7 +60,7 @@ export function Header() {
 
           <div className="hidden lg:flex items-center gap-3">
             <LanguageSwitcher />
-            {isAuthenticated ? (
+            {user ? (
               <Button asChild size="sm">
                 <Link to="/app">Open App</Link>
               </Button>
@@ -70,7 +70,7 @@ export function Header() {
                   <Link to="/auth">{t.nav.signIn}</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link to="/auth">{t.nav.getStarted}</Link>
+                  <Link to="/onboarding">{t.nav.getStarted}</Link>
                 </Button>
               </>
             )}
@@ -97,7 +97,7 @@ export function Header() {
             </Link>
           ))}
           <div className="flex flex-col gap-4 mt-8 w-full max-w-xs">
-            {isAuthenticated ? (
+            {user ? (
               <Button asChild size="lg" className="w-full">
                 <Link to="/app">Open App</Link>
               </Button>
@@ -107,7 +107,7 @@ export function Header() {
                   <Link to="/auth">{t.nav.signIn}</Link>
                 </Button>
                 <Button asChild size="lg" className="w-full">
-                  <Link to="/auth">{t.nav.getStarted}</Link>
+                  <Link to="/onboarding">{t.nav.getStarted}</Link>
                 </Button>
               </>
             )}
