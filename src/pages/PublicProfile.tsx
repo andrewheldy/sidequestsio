@@ -76,23 +76,40 @@ const PublicProfile = () => {
 function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
   const name = profile.display_name || profile.username || 'Explorer';
   const joined = formatJoined(profile.created_at);
+  const hasSocial = Boolean(profile.instagram_url || profile.tiktok_url || profile.x_url);
 
   return (
-    <div className="space-y-6">
-      <header className="glass-card flex flex-col items-center gap-3 p-5 text-center">
-        <div className="h-24 w-24 overflow-hidden rounded-3xl ring-2 ring-primary/40">
-          {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt={name} className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
-              {name.charAt(0).toUpperCase()}
-            </div>
+    <div className="space-y-5">
+      {/* ── Profile header ──────────────────────────────────────────── */}
+      <header className="glass-card overflow-hidden">
+        {/* Decorative gradient banner */}
+        <div
+          aria-hidden
+          className="h-16 bg-gradient-to-br from-coral/30 via-primary/10 to-turquoise/20"
+        />
+
+        <div className="flex flex-col items-center px-5 pb-6 text-center">
+          {/* Avatar, overlapping the banner */}
+          <div className="-mt-12 mb-3 h-24 w-24 overflow-hidden rounded-[22px] ring-2 ring-primary/40">
+            {profile.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt={name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
+                {name.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+
+          <h1 className="font-poppins text-xl font-bold">{name}</h1>
+          {profile.username && (
+            <p className="text-sm text-muted-foreground">@{profile.username}</p>
           )}
-        </div>
-        <div>
-          <h1 className="font-poppins text-2xl font-bold">{name}</h1>
-          {profile.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
-          <p className="mt-1 flex flex-wrap items-center justify-center gap-x-2 text-sm text-muted-foreground">
+
+          <p className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Trophy className="h-3.5 w-3.5 text-coral" /> Level {profile.level}
             </span>
@@ -106,15 +123,26 @@ function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
             )}
           </p>
           {joined && <p className="mt-0.5 text-xs text-muted-foreground">{joined}</p>}
+
+          {profile.bio && (
+            <p className="mx-auto mt-3 max-w-[300px] text-sm text-foreground/90">
+              {profile.bio}
+            </p>
+          )}
+
+          {hasSocial && (
+            <div className="mt-4">
+              <SocialLinks
+                instagram={profile.instagram_url}
+                tiktok={profile.tiktok_url}
+                x={profile.x_url}
+              />
+            </div>
+          )}
         </div>
-        {profile.bio && <p className="max-w-prose text-sm text-foreground/90">{profile.bio}</p>}
-        <SocialLinks
-          instagram={profile.instagram_url}
-          tiktok={profile.tiktok_url}
-          x={profile.x_url}
-        />
       </header>
 
+      {/* ── Stats ───────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3">
         <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${profile.level}`} label="Level" />
         <StatTile icon={<Award className="h-5 w-5 text-turquoise" />} value={`${profile.xp}`} label="XP" />
@@ -122,6 +150,7 @@ function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
 
       <XpMeter xp={profile.xp} level={profile.level} />
 
+      {/* ── Activity (only shown if owner opted in) ──────────────────── */}
       {profile.show_completed_quests && (
         <ActivitySection
           icon={<Compass className="h-4 w-4" />}
