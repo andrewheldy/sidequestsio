@@ -14,11 +14,11 @@ import { supabase } from '@/lib/supabase';
 
 // ── Social links ───────────────────────────────────────────────────────────
 
-export type SocialPlatform = 'instagram' | 'tiktok' | 'x';
+export type SocialPlatform = 'instagram' | 'tiktok' | 'x' | 'youtube' | 'snapchat';
 
 const SOCIAL_CONFIG: Record<
   SocialPlatform,
-  { base: (handle: string) => string; allowed: RegExp; hosts: string[]; tiktokAt?: boolean }
+  { base: (handle: string) => string; allowed: RegExp; hosts: string[] }
 > = {
   instagram: {
     base: (h) => `https://instagram.com/${h}`,
@@ -29,12 +29,21 @@ const SOCIAL_CONFIG: Record<
     base: (h) => `https://tiktok.com/@${h}`,
     allowed: /[^a-zA-Z0-9._]/g,
     hosts: ['tiktok.com', 'www.tiktok.com'],
-    tiktokAt: true,
   },
   x: {
     base: (h) => `https://x.com/${h}`,
     allowed: /[^a-zA-Z0-9_]/g,
     hosts: ['x.com', 'www.x.com', 'twitter.com', 'www.twitter.com'],
+  },
+  youtube: {
+    base: (h) => `https://youtube.com/@${h}`,
+    allowed: /[^a-zA-Z0-9._-]/g,
+    hosts: ['youtube.com', 'www.youtube.com', 'youtu.be'],
+  },
+  snapchat: {
+    base: (h) => `https://snapchat.com/add/${h}`,
+    allowed: /[^a-zA-Z0-9._-]/g,
+    hosts: ['snapchat.com', 'www.snapchat.com'],
   },
 };
 
@@ -88,6 +97,25 @@ export function handleFromUrl(url: string | null | undefined): string | null {
   } catch {
     return null;
   }
+}
+
+// ── Phone number ────────────────────────────────────────────────────────────
+
+/** Strip everything except digits and a leading +. */
+export function normalizePhone(raw: string): string {
+  const trimmed = (raw ?? '').trim();
+  const withPlus = trimmed.startsWith('+') ? '+' : '';
+  return withPlus + trimmed.replace(/\D/g, '');
+}
+
+/** Returns an error string, or `null` when the phone is acceptable (or empty). */
+export function validatePhone(raw: string): string | null {
+  const normalized = normalizePhone(raw);
+  if (!normalized) return null; // phone is optional
+  const digits = normalized.replace(/\D/g, '');
+  if (digits.length < 7) return 'Enter at least 7 digits.';
+  if (digits.length > 15) return 'That number is too long (max 15 digits).';
+  return null;
 }
 
 // ── Username ────────────────────────────────────────────────────────────────

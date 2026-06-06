@@ -10,6 +10,7 @@ import {
   MapPin,
   MessageSquare,
   Pencil,
+  Phone,
   Trophy,
   Zap,
 } from 'lucide-react';
@@ -40,21 +41,22 @@ const Profile = () => {
     [favorites],
   );
 
+  // Still bootstrapping auth — show skeleton.
   if (loading) return <ProfileSkeleton />;
 
-  if (!profile) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 pt-16 text-center">
-        <p className="text-muted-foreground">Could not load your profile. Please try again.</p>
-        <Button variant="outline" onClick={() => void refreshProfile()}>
-          Retry
-        </Button>
-      </div>
-    );
-  }
+  // Auth loaded but no profile row in the DB yet (trigger not applied, or
+  // first-run before migrations). Derive sensible defaults from the auth user
+  // so the page is usable rather than stuck on a skeleton forever.
+  const name = profile?.display_name || user?.email?.split('@')[0] || 'Explorer';
+  const joined = formatJoined(profile?.created_at);
+  const hasSocial = Boolean(
+    profile?.instagram_url || profile?.tiktok_url || profile?.x_url ||
+    profile?.youtube_url || profile?.snapchat_url,
+  );
 
-  const name = profile.display_name || user?.email?.split('@')[0] || 'Explorer';
-  const joined = formatJoined(profile.created_at);
+  const xp = profile?.xp ?? 0;
+  const level = profile?.level ?? 1;
+  const streak = profile?.streak ?? 0;
 
   const setPrivacy = async (
     key:
@@ -69,88 +71,73 @@ const Profile = () => {
   };
 
   return (
-    <div className="space-y-5 pb-8">
-      {/* ── Profile header ────────────────────────────────────────────── */}
-      <header className="glass-card overflow-hidden">
-        {/* Decorative gradient banner */}
-        <div
-          aria-hidden
-          className="h-16 bg-gradient-to-br from-coral/30 via-primary/10 to-turquoise/20"
-        />
-
-        <div className="flex flex-col items-center px-5 pb-6">
-          {/* Avatar with edit affordance, overlapping the banner */}
-          <div className="relative -mt-12 mb-3">
-            <div className="h-24 w-24 overflow-hidden rounded-[22px] ring-2 ring-primary/40">
-              {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt={name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
-                  {name.charAt(0).toUpperCase()}
-                </div>
-              )}
+    <div className="space-y-6">
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <header className="glass-card flex flex-col items-center gap-3 p-5 text-center">
+        <div className="h-24 w-24 overflow-hidden rounded-3xl ring-2 ring-primary/40">
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt={name} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
+              {name.charAt(0).toUpperCase()}
             </div>
 
-            {/* Camera edit badge */}
-            <button
-              type="button"
-              onClick={() => setEditOpen(true)}
-              aria-label="Edit profile photo"
-              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary shadow-md ring-2 ring-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
-              <Camera className="h-3.5 w-3.5 text-primary-foreground" />
-            </button>
-          </div>
-
-          {/* Name & username */}
-          <h1 className="font-poppins text-xl font-bold">{name}</h1>
-          {profile.username && (
+        <div>
+          <h1 className="font-poppins text-2xl font-bold">{name}</h1>
+          {profile?.username && (
             <p className="text-sm text-muted-foreground">@{profile.username}</p>
           )}
 
           {/* Level · city · joined */}
           <p className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
-              <Trophy className="h-3.5 w-3.5 text-coral" /> Level {profile.level}
+              <Trophy className="h-3.5 w-3.5 text-coral" /> Level {level}
             </span>
             <span aria-hidden>·</span>
             <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" /> {profile.home_city || 'Miami'}
+              <MapPin className="h-3.5 w-3.5" /> {profile?.home_city || 'Miami'}
             </span>
           </p>
           {joined && <p className="mt-0.5 text-xs text-muted-foreground">{joined}</p>}
-
-          {/* Bio */}
-          {profile.bio && (
-            <p className="mx-auto mt-3 max-w-[300px] text-center text-sm text-foreground/90">
-              {profile.bio}
+          {profile?.phone_number && (
+            <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <Phone className="h-3 w-3" aria-hidden />
+              {profile.phone_number}
             </p>
           )}
+        </div>
 
-          {/* Edit Profile */}
+        {profile?.bio && <p className="max-w-prose text-sm text-foreground/90">{profile.bio}</p>}
+
+        {hasSocial && (
+          <SocialLinks
+            instagram={profile?.instagram_url}
+            tiktok={profile?.tiktok_url}
+            x={profile?.x_url}
+            youtube={profile?.youtube_url}
+            snapchat={profile?.snapchat_url}
+          />
+        )}
+
+        {profile && (
           <Button
             variant="outline"
-            size="sm"
-            className="mt-4 min-h-[44px] px-6"
+            className="mt-1 min-h-[44px] w-full sm:w-auto"
             onClick={() => setEditOpen(true)}
           >
             <Pencil className="mr-2 h-4 w-4" /> Edit Profile
           </Button>
-        </div>
+        )}
       </header>
 
       {/* ── Stats ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-3">
-        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${profile.xp}`} label="XP" />
-        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${profile.level}`} label="Level" />
-        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${profile.streak}`} label="Day streak" />
+        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${xp}`} label="XP" />
+        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${level}`} label="Level" />
+        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${streak}`} label="Day streak" />
       </div>
 
-      <XpMeter xp={profile.xp} level={profile.level} />
+      <XpMeter xp={xp} level={level} />
 
       {/* ── Social links ─────────────────────────────────────────────── */}
       <SocialLinksEditor
@@ -222,28 +209,29 @@ const Profile = () => {
         <PrivacyRow
           label="Show profile publicly"
           desc="Let others view your profile at its public link."
-          checked={profile.is_profile_public}
+          checked={profile?.is_profile_public ?? false}
+          disabled={!profile}
           onChange={(v) => setPrivacy('is_profile_public', v)}
         />
         <PrivacyRow
           label="Show social links"
           desc="Display your Instagram, TikTok and X on your public profile."
-          checked={profile.show_social_links}
-          disabled={!profile.is_profile_public}
+          checked={profile?.show_social_links ?? false}
+          disabled={!profile || !profile.is_profile_public}
           onChange={(v) => setPrivacy('show_social_links', v)}
         />
         <PrivacyRow
           label="Show completed quests"
           desc="Share the quests you've finished."
-          checked={profile.show_completed_quests}
-          disabled={!profile.is_profile_public}
+          checked={profile?.show_completed_quests ?? false}
+          disabled={!profile || !profile.is_profile_public}
           onChange={(v) => setPrivacy('show_completed_quests', v)}
         />
         <PrivacyRow
           label="Show community notes"
           desc="Share the Breadcrumbs you've left behind."
-          checked={profile.show_breadcrumbs}
-          disabled={!profile.is_profile_public}
+          checked={profile?.show_breadcrumbs ?? false}
+          disabled={!profile || !profile.is_profile_public}
           onChange={(v) => setPrivacy('show_breadcrumbs', v)}
         />
       </section>
@@ -260,7 +248,9 @@ const Profile = () => {
         <LogOut className="mr-2 h-4 w-4" /> Sign out
       </Button>
 
-      <ProfileEditDialog profile={profile} open={editOpen} onOpenChange={setEditOpen} />
+      {profile && (
+        <ProfileEditDialog profile={profile} open={editOpen} onOpenChange={setEditOpen} />
+      )}
     </div>
   );
 };
