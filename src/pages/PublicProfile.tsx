@@ -24,6 +24,8 @@ interface PublicProfileRow {
   instagram_url: string | null;
   tiktok_url: string | null;
   x_url: string | null;
+  youtube_url: string | null;
+  snapchat_url: string | null;
   show_completed_quests: boolean;
   show_breadcrumbs: boolean;
 }
@@ -112,6 +114,8 @@ function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
           instagram={profile.instagram_url}
           tiktok={profile.tiktok_url}
           x={profile.x_url}
+          youtube={profile.youtube_url}
+          snapchat={profile.snapchat_url}
         />
       </header>
 

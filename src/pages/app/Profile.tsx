@@ -9,6 +9,7 @@ import {
   MapPin,
   MessageSquare,
   Pencil,
+  Phone,
   Trophy,
   Zap,
 } from 'lucide-react';
@@ -47,7 +48,10 @@ const Profile = () => {
   // so the page is usable rather than stuck on a skeleton forever.
   const name = profile?.display_name || user?.email?.split('@')[0] || 'Explorer';
   const joined = formatJoined(profile?.created_at);
-  const hasSocial = Boolean(profile?.instagram_url || profile?.tiktok_url || profile?.x_url);
+  const hasSocial = Boolean(
+    profile?.instagram_url || profile?.tiktok_url || profile?.x_url ||
+    profile?.youtube_url || profile?.snapchat_url,
+  );
 
   const xp = profile?.xp ?? 0;
   const level = profile?.level ?? 1;
@@ -94,6 +98,12 @@ const Profile = () => {
             </span>
           </p>
           {joined && <p className="mt-0.5 text-xs text-muted-foreground">{joined}</p>}
+          {profile?.phone_number && (
+            <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <Phone className="h-3 w-3" aria-hidden />
+              {profile.phone_number}
+            </p>
+          )}
         </div>
 
         {profile?.bio && <p className="max-w-prose text-sm text-foreground/90">{profile.bio}</p>}
@@ -103,6 +113,8 @@ const Profile = () => {
             instagram={profile?.instagram_url}
             tiktok={profile?.tiktok_url}
             x={profile?.x_url}
+            youtube={profile?.youtube_url}
+            snapchat={profile?.snapchat_url}
           />
         )}
 

@@ -18,9 +18,12 @@ export interface Profile {
   avatar_url: string | null;
   home_city: string;
   bio: string | null;
+  phone_number: string | null;
   instagram_url: string | null;
   tiktok_url: string | null;
   x_url: string | null;
+  youtube_url: string | null;
+  snapchat_url: string | null;
   is_profile_public: boolean;
   show_social_links: boolean;
   show_completed_quests: boolean;
@@ -45,9 +48,12 @@ export type EditableProfile = Partial<
     | 'avatar_url'
     | 'home_city'
     | 'bio'
+    | 'phone_number'
     | 'instagram_url'
     | 'tiktok_url'
     | 'x_url'
+    | 'youtube_url'
+    | 'snapchat_url'
     | 'is_profile_public'
     | 'show_social_links'
     | 'show_completed_quests'
