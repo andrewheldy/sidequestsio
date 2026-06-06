@@ -16,10 +16,8 @@ export function Header() {
   const { user } = useAuth();
 
   const navLinks = [
-    { href: '/quests', label: t.nav.quests },
+    { href: '/quests', label: t.common.explore },
     { href: '/community-notes', label: t.nav.communityNotes },
-    { href: '/verticals', label: t.nav.verticals },
-    { href: '/partnerships', label: t.nav.partnerships },
     { href: '/hosts', label: t.nav.hosts },
   ];
 
@@ -47,10 +45,10 @@ export function Header() {
             </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5">
             {navLinks.map((link) => (
               <Link key={link.href} to={link.href} className={cn(
-                'px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200',
+                'px-3 py-2 rounded-lg font-medium text-sm transition-colors duration-200',
                 location.pathname === link.href ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               )}>
                 {link.label}
@@ -58,10 +56,10 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
             <LanguageSwitcher />
             <Button asChild variant="ghost" size="sm"><Link to="/auth">{t.nav.signIn}</Link></Button>
-            <Button asChild size="sm"><Link to="/app">{t.nav.getStarted}</Link></Button>
+            <Button asChild size="sm" className="font-semibold"><Link to="/app">{t.nav.getStarted}</Link></Button>
           </div>
 
           <div className="lg:hidden flex items-center gap-2">

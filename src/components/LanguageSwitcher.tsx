@@ -18,9 +18,8 @@ export const LanguageSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2 px-2">
+        <Button variant="ghost" size="sm" className="px-2" aria-label="Change language">
           <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{languageFlags[language]}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40 bg-background border border-border">
