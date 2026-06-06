@@ -17,6 +17,14 @@ export interface Profile {
   username: string | null;
   avatar_url: string | null;
   home_city: string;
+  bio: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  x_url: string | null;
+  is_profile_public: boolean;
+  show_social_links: boolean;
+  show_completed_quests: boolean;
+  show_breadcrumbs: boolean;
   interests: string[];
   quest_style: string | null;
   quest_energy: string | null;
@@ -25,7 +33,27 @@ export interface Profile {
   level: number;
   streak: number;
   onboarding_completed: boolean;
+  created_at: string | null;
 }
+
+/** Columns the user is allowed to edit on their own profile. */
+export type EditableProfile = Partial<
+  Pick<
+    Profile,
+    | 'display_name'
+    | 'username'
+    | 'avatar_url'
+    | 'home_city'
+    | 'bio'
+    | 'instagram_url'
+    | 'tiktok_url'
+    | 'x_url'
+    | 'is_profile_public'
+    | 'show_social_links'
+    | 'show_completed_quests'
+    | 'show_breadcrumbs'
+  >
+>;
 
 interface AuthResult {
   error: string | null;
@@ -41,6 +69,7 @@ interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfile: (patch: EditableProfile) => Promise<AuthResult>;
   completeOnboarding: (selections: OnboardingSelections) => Promise<AuthResult>;
 }
 
@@ -138,6 +167,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) await fetchProfile(user.id);
   }, [user, fetchProfile]);
 
+  const updateProfile = useCallback<AuthContextValue['updateProfile']>(
+    async (patch) => {
+      if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
+      if (!user) return { error: 'You need to be signed in to update your profile.' };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(patch)
+        .eq('user_id', user.id);
+
+      if (error) {
+        // Unique violation on the username column → friendly message.
+        if (error.code === '23505') return { error: 'That username is already taken.' };
+        return { error: error.message };
+      }
+      await fetchProfile(user.id);
+      return { error: null };
+    },
+    [user, fetchProfile],
+  );
+
   const completeOnboarding = useCallback<AuthContextValue['completeOnboarding']>(
     async (selections) => {
       if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
@@ -177,6 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signOut,
     refreshProfile,
+    updateProfile,
     completeOnboarding,
   };
 

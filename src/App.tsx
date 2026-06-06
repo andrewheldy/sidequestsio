@@ -18,6 +18,7 @@ import Partnerships from "./pages/Partnerships";
 import Hosts from "./pages/Hosts";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
+import PublicProfile from "./pages/PublicProfile";
 import Placeholder from "./pages/Placeholder";
 import AppLayout from "./pages/app/AppLayout";
 import Explore from "./pages/app/Explore";
@@ -61,6 +62,9 @@ const App = () => (
                   {/* Auth + onboarding */}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/onboarding" element={<Onboarding />} />
+
+                  {/* Public profile (read-only, privacy-safe) */}
+                  <Route path="/u/:username" element={<PublicProfile />} />
 
                   {/* In-app experience */}
                   <Route path="/app" element={<AppLayout />}>
