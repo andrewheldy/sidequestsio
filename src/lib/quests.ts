@@ -130,6 +130,19 @@ export const QUESTS: Quest[] = [
     x: 60, y: 50,
     lat: 25.7745, lng: -80.1903,
   },
+  {
+    id: 'wynwood-sweet-caroline-karaoke',
+    title: 'Sweet Caroline Karaoke Night',
+    neighborhood: 'Wynwood',
+    category: 'Nightlife',
+    reward: 'Free Round of Drinks',
+    xp: 130,
+    distance: '0.4 mi',
+    time: '45 min',
+    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
+    x: 44, y: 35,
+    lat: 25.8025, lng: -80.1998,
+  },
 ];
 
 export const QUEST_CATEGORIES = [

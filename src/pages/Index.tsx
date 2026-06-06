@@ -32,12 +32,12 @@ const featuredQuests = [
     image: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=400&h=300&fit=crop',
   },
   {
-    title: 'Sunrise Beach Yoga',
-    location: 'Miami Beach',
-    category: 'Outdoors',
-    duration: '1 hour',
-    participants: 203,
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop',
+    title: 'Sweet Caroline Karaoke Night',
+    location: 'Wynwood',
+    category: 'Nightlife',
+    duration: '45 min',
+    participants: 64,
+    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
   },
 ];
 
