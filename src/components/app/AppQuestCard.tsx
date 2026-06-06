@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock, Gift, Heart, MapPin, Zap } from 'lucide-react';
+import { Clock, Gift, Heart, Loader2, MapPin, QrCode, Zap } from 'lucide-react';
 import type { Quest } from '@/lib/quests';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -7,25 +7,32 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useSignInPrompt } from '@/contexts/SignInPromptContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
-/**
- * In-app quest card with a working favorite toggle and a detail dialog.
- * Signed-out users are nudged into the sign-in prompt for the conversion
- * actions (favorite, start quest).
- */
 export function AppQuestCard({ quest }: { quest: Quest }) {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { promptSignIn } = useSignInPrompt();
   const { toast } = useToast();
+
   const [open, setOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
+  const [qrCode, setQrCode] = useState('');
+  const [completing, setCompleting] = useState(false);
+  const [completionData, setCompletionData] = useState<{
+    xp_awarded: number;
+    points_awarded: number;
+  } | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
 
   const favorited = isFavorite(quest.id);
 
@@ -49,7 +56,32 @@ export function AppQuestCard({ quest }: { quest: Quest }) {
       return;
     }
     setOpen(false);
-    toast({ title: 'Quest started! 🧭', description: `Good luck with “${quest.title}”.` });
+    setQrCode('');
+    setCompletionData(null);
+    setCompletionError(null);
+    setQrOpen(true);
+  };
+
+  const handleSubmitQr = async () => {
+    const code = qrCode.trim();
+    if (!code || !supabase || completing) return;
+    setCompleting(true);
+    setCompletionError(null);
+    const { data, error } = await supabase.rpc('complete_quest_by_qr', { p_code: code });
+    setCompleting(false);
+    if (error) {
+      setCompletionError(error.message ?? 'Something went wrong. Please try again.');
+    } else {
+      setCompletionData({ xp_awarded: data.xp_awarded, points_awarded: data.points_awarded });
+      await refreshProfile();
+    }
+  };
+
+  const handleQrClose = () => {
+    setQrOpen(false);
+    setQrCode('');
+    setCompletionData(null);
+    setCompletionError(null);
   };
 
   return (
@@ -101,6 +133,7 @@ export function AppQuestCard({ quest }: { quest: Quest }) {
         </div>
       </div>
 
+      {/* Quest detail dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-sm overflow-hidden p-0">
           <div className="relative h-44">
@@ -140,6 +173,77 @@ export function AppQuestCard({ quest }: { quest: Quest }) {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* QR verification dialog */}
+      <Dialog open={qrOpen} onOpenChange={(v) => { if (!v) handleQrClose(); }}>
+        <DialogContent className="max-w-sm">
+          {completionData ? (
+            <div className="space-y-5 py-2 text-center">
+              <div className="text-5xl">🎉</div>
+              <DialogTitle className="font-poppins text-xl">Quest Complete!</DialogTitle>
+              <p className="text-muted-foreground text-sm">{quest.title}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-muted/30 p-4">
+                  <Zap className="mx-auto mb-1.5 h-5 w-5 text-turquoise" />
+                  <p className="font-poppins text-xl font-bold">{completionData.xp_awarded}</p>
+                  <p className="text-xs text-muted-foreground">XP earned</p>
+                </div>
+                <div className="rounded-xl bg-muted/30 p-4">
+                  <Gift className="mx-auto mb-1.5 h-5 w-5 text-coral" />
+                  <p className="font-poppins text-xl font-bold">{completionData.points_awarded}</p>
+                  <p className="text-xs text-muted-foreground">Points earned</p>
+                </div>
+              </div>
+              <Button className="w-full" onClick={handleQrClose}>
+                Awesome!
+              </Button>
+            </div>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 font-poppins">
+                  <QrCode className="h-5 w-5 text-primary" />
+                  Enter QR Code
+                </DialogTitle>
+                <DialogDescription>
+                  Scan or type the code from the QR sign at {quest.neighborhood}.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3 pt-1">
+                <Input
+                  placeholder="e.g. MIAMI-QUEST-ABC123"
+                  value={qrCode}
+                  onChange={(e) => setQrCode(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubmitQr()}
+                  autoFocus
+                  disabled={completing}
+                />
+                {completionError && (
+                  <p className="text-sm text-destructive">{completionError}</p>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={handleQrClose}
+                    disabled={completing}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={handleSubmitQr}
+                    disabled={!qrCode.trim() || completing}
+                  >
+                    {completing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {completing ? 'Verifying…' : 'Verify'}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>
