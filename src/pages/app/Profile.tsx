@@ -10,6 +10,7 @@ import {
   MapPin,
   MessageSquare,
   Pencil,
+  RefreshCw,
   Trophy,
   Zap,
 } from 'lucide-react';
@@ -40,7 +41,34 @@ const Profile = () => {
     [favorites],
   );
 
-  if (loading || !profile) return <ProfileSkeleton />;
+  if (loading) return <ProfileSkeleton />;
+
+  if (!profile) {
+    return (
+      <div className="glass-card flex flex-col items-center gap-4 p-8 text-center">
+        <div className="rounded-2xl bg-muted/30 p-4">
+          <RefreshCw className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <div>
+          <h2 className="font-poppins font-semibold">Profile unavailable</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            We couldn't load your profile. Try signing out and back in.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="min-h-[44px]"
+          onClick={async () => {
+            await signOut();
+            toast('Signed out', { description: 'See you on the next quest.' });
+            navigate('/');
+          }}
+        >
+          <LogOut className="mr-2 h-4 w-4" /> Sign out
+        </Button>
+      </div>
+    );
+  }
 
   const name = profile.display_name || user?.email?.split('@')[0] || 'Explorer';
   const joined = formatJoined(profile.created_at);
