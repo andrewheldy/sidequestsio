@@ -1,0 +1,11 @@
+{
+  "user_id": "demo-user",
+  "home_city": "Miami, FL",
+  "xp": 750,
+  "level": 5,
+  "points_balance_cache": 1200,
+  "lifetime_points": 2500,
+  "completed_quests_count": 7,
+  "community_notes_count": 3,
+  "rewards_redeemed_count": 2
+}

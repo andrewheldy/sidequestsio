@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, MessageSquare, Send } from "lucide-react";
+import { Heart, Info, MessageSquare, Send } from "lucide-react";
 import { getRepository } from "@/lib/db";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics/events";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SectionHeader } from "@/components/app/ui";
 import { toast } from "sonner";
+import { isDemoMode } from "@/lib/demo";
 
 const MAX = 280;
 
@@ -34,6 +35,10 @@ export function CommunityNotes({
   });
 
   const submit = async () => {
+    if (isDemoMode) {
+      toast.info("Demo mode — saving disabled for now.");
+      return;
+    }
     if (!user || !content.trim()) return;
     setBusy(true);
     const repo = await getRepository();
@@ -59,7 +64,11 @@ export function CommunityNotes({
     <section>
       <SectionHeader title="Community Notes" />
 
-      {canPost && (
+      {isDemoMode ? (
+        <div className="glass-card mb-4 flex items-center gap-2 p-4 text-sm text-muted-foreground">
+          <Info className="h-4 w-4 shrink-0" /> Demo mode — posting community notes is disabled.
+        </div>
+      ) : canPost && (
         <div className="glass-card mb-4 p-4">
           <Textarea
             value={content}

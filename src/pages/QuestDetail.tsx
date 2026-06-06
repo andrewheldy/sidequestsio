@@ -13,6 +13,7 @@ import {
 import { getRepository } from "@/lib/db";
 import { useAuth } from "@/contexts/AuthContext";
 import { recordQuestScan } from "@/lib/quests/scanFlow";
+import { isDemoMode } from "@/lib/demo";
 import { track } from "@/lib/analytics/events";
 import {
   setPendingScan,
@@ -59,8 +60,12 @@ export default function QuestDetail() {
     if (!questId || scanParam || recordedRef.current) return;
     recordedRef.current = true;
     (async () => {
-      const res = await recordQuestScan(questId, user?.id ?? null);
-      if (res.scan) setScanId(res.scan.id);
+      try {
+        const res = await recordQuestScan(questId, user?.id ?? null);
+        if (res.scan) setScanId(res.scan.id);
+      } catch {
+        // In demo mode, scan recording may be a no-op — ignore errors.
+      }
     })();
   }, [questId, scanParam, user]);
 
@@ -85,6 +90,10 @@ export default function QuestDetail() {
   const needsCode = quest.verification_type === "venue_code";
 
   const handleComplete = async () => {
+    if (isDemoMode) {
+      toast.info("Demo mode — saving disabled for now.");
+      return;
+    }
     if (!isAuthenticated || !user) {
       // Preserve scan context across the auth boundary.
       if (scanId) setPendingScan({ questId: quest.id, scanId });

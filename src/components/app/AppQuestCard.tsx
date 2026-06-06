@@ -17,6 +17,7 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { useSignInPrompt } from '@/contexts/SignInPromptContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '@/lib/demo';
 
 export function AppQuestCard({ quest }: { quest: Quest }) {
   const { user, refreshProfile } = useAuth();
@@ -63,6 +64,10 @@ export function AppQuestCard({ quest }: { quest: Quest }) {
   };
 
   const handleSubmitQr = async () => {
+    if (isDemoMode) {
+      toast({ title: "Demo mode", description: "Saving disabled for now." });
+      return;
+    }
     const code = qrCode.trim();
     if (!code || !supabase || completing) return;
     setCompleting(true);

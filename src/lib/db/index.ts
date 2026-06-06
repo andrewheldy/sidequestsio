@@ -1,7 +1,8 @@
 /**
  * Repository selector.
  *
- * Returns the SupabaseRepository when Supabase env vars are configured,
+ * Returns the MockRepository when VITE_DATA_SOURCE=mock,
+ * the SupabaseRepository when Supabase env vars are configured,
  * otherwise the fully-functional in-browser LocalRepository. Call sites use
  * `await getRepository()` and never care which backend is active.
  */
@@ -9,11 +10,18 @@
 import type { Repository } from "./repository";
 import { LocalRepository } from "./local/LocalRepository";
 import { getSupabase, supabaseConfigured } from "@/lib/supabase/client";
+import { isDemoMode } from "@/lib/demo";
 
 let instance: Repository | null = null;
 
 export async function getRepository(): Promise<Repository> {
   if (instance) return instance;
+
+  if (isDemoMode) {
+    const { MockRepository } = await import("./mock/MockRepository");
+    instance = new MockRepository();
+    return instance;
+  }
 
   if (supabaseConfigured()) {
     const sb = await getSupabase();
@@ -28,7 +36,8 @@ export async function getRepository(): Promise<Repository> {
   return instance;
 }
 
-export function activeBackend(): "supabase" | "local" {
+export function activeBackend(): "supabase" | "local" | "mock" {
+  if (isDemoMode) return "mock";
   return supabaseConfigured() ? "supabase" : "local";
 }
 
