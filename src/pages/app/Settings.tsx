@@ -12,6 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRepository } from "@/lib/db";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
+import { isDemoMode } from "@/lib/demo";
 
 export default function Settings() {
   const { user, profile, updateProfile } = useAuth();
@@ -35,15 +36,29 @@ export default function Settings() {
     isError: privacyError,
     refetch: refetchPrivacy,
   } = useQuery({
-    queryKey: ["privacy", user?.id],
-    queryFn: async () => (await getRepository()).getPrivacy(user!.id),
-    enabled: !!user,
+    queryKey: ["privacy", user?.id ?? "demo"],
+    queryFn: async () =>
+      isDemoMode
+        ? {
+            user_id: "demo",
+            analytics_consent: true,
+            marketing_consent: false,
+            location_consent: true,
+            leaderboard_visibility: "public" as const,
+            profile_visibility: "public" as const,
+          }
+        : (await getRepository()).getPrivacy(user!.id),
+    enabled: !!user || isDemoMode,
   });
 
   const set = (field: keyof typeof form) => (value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
   const save = async () => {
+    if (isDemoMode) {
+      toast.info("Demo mode — saving disabled for now.");
+      return;
+    }
     setSaving(true);
     const { error } = await updateProfile({
       display_name: form.display_name || null,
@@ -64,6 +79,10 @@ export default function Settings() {
   const cancel = () => navigate("/app/profile");
 
   const updatePrivacy = async (patch: Partial<PrivacyPreferences>) => {
+    if (isDemoMode) {
+      toast.info("Demo mode — saving disabled for now.");
+      return;
+    }
     if (!user) return;
     const repo = await getRepository();
     await repo.updatePrivacy(user.id, patch);
@@ -143,6 +162,11 @@ export default function Settings() {
         </section>
 
         {/* Save / Cancel */}
+        {isDemoMode && (
+          <p className="rounded-lg bg-amber-500/10 px-4 py-2 text-center text-sm text-amber-700 dark:text-amber-400">
+            Demo mode — saving disabled for now.
+          </p>
+        )}
         <div className="flex gap-3">
           <Button
             variant="outline"

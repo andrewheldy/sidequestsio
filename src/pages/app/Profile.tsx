@@ -12,19 +12,47 @@ import { getRepository } from "@/lib/db";
 import { levelProgress } from "@/lib/app/leveling";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
+import { isDemoMode } from "@/lib/demo";
 
 export default function Profile() {
   const { user, profile, role, signOut } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
 
+  const demoProfile = isDemoMode && !user
+    ? {
+        display_name: "Demo Explorer",
+        xp: 750,
+        level: 5,
+        points_balance_cache: 1200,
+        completed_quests_count: 7,
+        community_notes_count: 3,
+      }
+    : null;
+
+  const effectiveProfile = profile ?? demoProfile;
+
   const { data: privacy, isLoading, isError, refetch } = useQuery({
-    queryKey: ["privacy", user?.id],
-    queryFn: async () => (await getRepository()).getPrivacy(user!.id),
-    enabled: !!user,
+    queryKey: ["privacy", user?.id ?? "demo"],
+    queryFn: async () =>
+      isDemoMode
+        ? {
+            user_id: "demo",
+            analytics_consent: true,
+            marketing_consent: false,
+            location_consent: true,
+            leaderboard_visibility: "public" as const,
+            profile_visibility: "public" as const,
+          }
+        : (await getRepository()).getPrivacy(user!.id),
+    enabled: !!user || isDemoMode,
   });
 
   const update = async (patch: Partial<PrivacyPreferences>) => {
+    if (isDemoMode) {
+      toast.info("Demo mode — saving disabled for now.");
+      return;
+    }
     if (!user) return;
     const repo = await getRepository();
     await repo.updatePrivacy(user.id, patch);
@@ -42,9 +70,9 @@ export default function Profile() {
     toast.success("Privacy settings updated");
   };
 
-  const displayName = profile?.display_name ?? user?.email ?? "Explorer";
+  const displayName = effectiveProfile?.display_name ?? user?.email ?? "Explorer";
   const initials = displayName.slice(0, 1).toUpperCase();
-  const lvl = levelProgress(profile?.xp ?? 0);
+  const lvl = levelProgress(effectiveProfile?.xp ?? 0);
 
   return (
     <AppLayout title="Profile">
@@ -66,7 +94,9 @@ export default function Profile() {
           <h2 className="font-poppins text-xl font-bold text-foreground truncate">
             {displayName}
           </h2>
-          <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+          <p className="text-sm text-muted-foreground truncate">
+            {user?.email ?? (isDemoMode ? "demo@sidequests.io" : "")}
+          </p>
           <span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-xs capitalize text-muted-foreground">
             {role}
           </span>
@@ -94,9 +124,9 @@ export default function Profile() {
         </div>
         <Progress value={lvl.progress * 100} className="mt-2 h-2" />
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <StatTile label="Points" value={profile?.points_balance_cache ?? 0} accent="coral" />
-          <StatTile label="Quests" value={profile?.completed_quests_count ?? 0} accent="turquoise" />
-          <StatTile label="Notes" value={profile?.community_notes_count ?? 0} />
+          <StatTile label="Points" value={effectiveProfile?.points_balance_cache ?? 0} accent="coral" />
+          <StatTile label="Quests" value={effectiveProfile?.completed_quests_count ?? 0} accent="turquoise" />
+          <StatTile label="Notes" value={effectiveProfile?.community_notes_count ?? 0} />
         </div>
       </div>
 
@@ -178,13 +208,15 @@ export default function Profile() {
         </Link>
       </Button>
 
-      <Button
-        variant="ghost"
-        onClick={signOut}
-        className="mt-3 w-full h-11 gap-2 text-destructive"
-      >
-        <LogOut className="h-4 w-4" /> Sign out
-      </Button>
+      {!isDemoMode && (
+        <Button
+          variant="ghost"
+          onClick={signOut}
+          className="mt-3 w-full h-11 gap-2 text-destructive"
+        >
+          <LogOut className="h-4 w-4" /> Sign out
+        </Button>
+      )}
 
       <p className="mt-3 flex items-center justify-center gap-1 text-center text-xs text-muted-foreground">
         <Settings2 className="h-3 w-3" /> You control your data. Request export or

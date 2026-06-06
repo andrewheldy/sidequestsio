@@ -9,6 +9,7 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { SignInPromptProvider } from "@/contexts/SignInPromptContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { DemoBanner } from "@/components/DemoBanner";
 import Index from "./pages/Index";
 import Quests from "./pages/Quests";
 import CommunityNotes from "./pages/CommunityNotes";
@@ -20,6 +21,11 @@ import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import PublicProfile from "./pages/PublicProfile";
 import Placeholder from "./pages/Placeholder";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import QuestDetail from "./pages/QuestDetail";
+import QrLanding from "./pages/QrLanding";
+import ScanResolve from "./pages/ScanResolve";
 import AppLayout from "./pages/app/AppLayout";
 import Explore from "./pages/app/Explore";
 import MapView from "./pages/app/MapView";
@@ -30,6 +36,8 @@ import QuestBrowser from "./pages/app/QuestBrowser";
 import AppCommunityNotes from "./pages/app/AppCommunityNotes";
 import CheckIn from "./pages/app/CheckIn";
 import NotFound from "./pages/NotFound";
+
+const isDemoMode = import.meta.env.VITE_DATA_SOURCE === "mock";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +51,7 @@ const App = () => (
           <AuthProvider>
             <FavoritesProvider>
               <SignInPromptProvider>
+                <DemoBanner />
                 <ScrollToTop />
                 <Routes>
                   {/* Marketing site */}
@@ -54,14 +63,8 @@ const App = () => (
                   <Route path="/verticals/:slug" element={<VerticalDetail />} />
                   <Route path="/partnerships" element={<Partnerships />} />
                   <Route path="/hosts" element={<Hosts />} />
-                  <Route
-                    path="/privacy"
-                    element={<Placeholder title="Privacy Policy" description="Our full privacy policy is on the way." />}
-                  />
-                  <Route
-                    path="/terms"
-                    element={<Placeholder title="Terms of Service" description="Our full terms of service are on the way." />}
-                  />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
 
                   {/* Auth + onboarding */}
                   <Route path="/auth" element={<Auth />} />
@@ -69,6 +72,11 @@ const App = () => (
 
                   {/* Public profile (read-only, privacy-safe) */}
                   <Route path="/u/:username" element={<PublicProfile />} />
+
+                  {/* Quest detail & QR resolution */}
+                  <Route path="/quests/:questId" element={<QuestDetail />} />
+                  <Route path="/q/:questId" element={<QrLanding />} />
+                  <Route path="/scan/:code" element={<ScanResolve />} />
 
                   {/* In-app experience */}
                   <Route path="/app" element={<AppLayout />}>
@@ -96,17 +104,25 @@ const App = () => (
                     <Route
                       path="profile"
                       element={
-                        <ProtectedRoute>
+                        isDemoMode ? (
                           <Profile />
-                        </ProtectedRoute>
+                        ) : (
+                          <ProtectedRoute>
+                            <Profile />
+                          </ProtectedRoute>
+                        )
                       }
                     />
                     <Route
                       path="settings"
                       element={
-                        <ProtectedRoute>
+                        isDemoMode ? (
                           <Settings />
-                        </ProtectedRoute>
+                        ) : (
+                          <ProtectedRoute>
+                            <Settings />
+                          </ProtectedRoute>
+                        )
                       }
                     />
                   </Route>
