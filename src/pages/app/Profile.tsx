@@ -49,12 +49,12 @@ export default function Profile() {
       <div className="glass-card mt-2 flex items-center gap-4 p-5">
         <Avatar className="h-16 w-16 ring-2 ring-primary/50">
           <AvatarFallback className="bg-muted text-xl">
-            {(user?.display_name ?? "Q").slice(0, 1).toUpperCase()}
+            {(profile?.display_name ?? "Q").slice(0, 1).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div>
           <h2 className="font-poppins text-xl font-bold text-foreground">
-            {user?.display_name}
+            {profile?.display_name}
           </h2>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
           <span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-xs capitalize text-muted-foreground">
