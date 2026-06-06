@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { QUESTS } from '@/lib/quests';
+import { MIAMI_QUESTS } from '@/data/miami/toQuest';
 import { MapSkeleton } from '@/components/map';
 
 // Lazy-loaded so Mapbox GL only enters the bundle when the Map tab is visited.
@@ -21,7 +21,7 @@ const MapView = () => (
     </header>
 
     <Suspense fallback={<MapSkeleton height={MAP_HEIGHT} />}>
-      <QuestMap quests={QUESTS} height={MAP_HEIGHT} />
+      <QuestMap quests={MIAMI_QUESTS} height={MAP_HEIGHT} />
     </Suspense>
   </div>
 );

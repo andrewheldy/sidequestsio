@@ -40,6 +40,7 @@ const QuestMap = ({
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -49,13 +50,15 @@ const QuestMap = ({
   useEffect(() => {
     if (!MAPBOX_TOKEN || !containerRef.current) return;
 
+    let errorFired = false;
+
     const map = new mapboxgl.Map({
       container: containerRef.current,
       style: 'mapbox://styles/mapbox/dark-v11',
       center: initialCenter,
       zoom: initialZoom,
+      accessToken: MAPBOX_TOKEN,
       attributionControl: false,
-      // Disable rotation gestures on mobile for a simpler UX
       dragRotate: false,
       touchPitch: false,
     });
@@ -68,6 +71,26 @@ const QuestMap = ({
     map.on('load', () => {
       mapRef.current = map;
       setMapReady(true);
+    });
+
+    // Catch auth errors (domain allowlist mismatch, expired token, etc.)
+    map.on('error', (e) => {
+      if (errorFired) return;
+      const status = (e.error as any)?.status;
+      const msg: string = (e.error as any)?.message ?? '';
+      if (
+        status === 401 || status === 403 ||
+        msg.toLowerCase().includes('unauthorized') ||
+        msg.toLowerCase().includes('forbidden') ||
+        msg.toLowerCase().includes('not allowed')
+      ) {
+        errorFired = true;
+        console.error('[SideQuests] Mapbox auth error:', e.error);
+        setMapError(
+          'Mapbox token is not authorized for this domain.\n' +
+          'Go to account.mapbox.com/access-tokens → edit your token → remove URL restrictions (or add this domain).'
+        );
+      }
     });
 
     return () => {
@@ -198,18 +221,29 @@ const QuestMap = ({
     [toast],
   );
 
-  // ── No-token fallback ──────────────────────────────────────────────────────
-  if (!MAPBOX_TOKEN) {
+  // ── Token / auth error fallbacks ───────────────────────────────────────────
+  if (!MAPBOX_TOKEN || mapError) {
+    const isAuthError = Boolean(mapError);
     return (
       <div
-        className="flex items-center justify-center rounded-2xl bg-card/50 text-center text-sm text-muted-foreground"
-        style={{ height }}
+        className="flex flex-col items-center justify-center gap-3 rounded-2xl border text-center text-sm"
+        style={{
+          height,
+          background: 'hsl(var(--card))',
+          borderColor: isAuthError ? '#F59E0B55' : 'hsl(var(--border))',
+        }}
       >
-        <p className="px-6">
-          Map unavailable.
-          <br />
-          Add <code className="text-xs">VITE_MAPBOX_PUBLIC_TOKEN</code> to your <code className="text-xs">.env</code> file.
-        </p>
+        <span className="text-2xl">{isAuthError ? '🗺️' : '📍'}</span>
+        <div className="px-8 space-y-1">
+          <p className="font-semibold text-foreground">
+            {isAuthError ? 'Mapbox token domain restriction' : 'Map token not configured'}
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {isAuthError
+              ? 'Your Mapbox token does not allow requests from this domain. Go to account.mapbox.com/access-tokens → edit your token → clear the "Allowed URLs" list (or add this domain).'
+              : 'Set VITE_MAPBOX_PUBLIC_TOKEN in your environment. In Lovable: Settings → Secrets. In Vercel: Project Settings → Environment Variables (then redeploy).'}
+          </p>
+        </div>
       </div>
     );
   }
