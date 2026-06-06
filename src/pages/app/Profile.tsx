@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Award,
+  Camera,
   Compass,
   Flame,
   Heart,
@@ -19,8 +20,8 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { MIAMI_QUESTS } from '@/data/miami/toQuest';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { SocialLinks } from '@/components/app/profile/SocialLinks';
 import { ProfileEditDialog } from '@/components/app/profile/ProfileEditDialog';
+import { SocialLinksEditor } from '@/components/app/profile/SocialLinksEditor';
 import {
   ActivitySection,
   ProfileSkeleton,
@@ -30,7 +31,7 @@ import {
 } from '@/components/app/profile/parts';
 
 const Profile = () => {
-  const { user, profile, loading, signOut, updateProfile } = useAuth();
+  const { user, profile, loading, signOut, updateProfile, refreshProfile } = useAuth();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
@@ -80,15 +81,15 @@ const Profile = () => {
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
               {name.charAt(0).toUpperCase()}
             </div>
-          )}
-        </div>
 
         <div>
           <h1 className="font-poppins text-2xl font-bold">{name}</h1>
           {profile?.username && (
             <p className="text-sm text-muted-foreground">@{profile.username}</p>
           )}
-          <p className="mt-1 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+
+          {/* Level · city · joined */}
+          <p className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Trophy className="h-3.5 w-3.5 text-coral" /> Level {level}
             </span>
@@ -129,7 +130,7 @@ const Profile = () => {
         )}
       </header>
 
-      {/* ── Stats ──────────────────────────────────────────────────────── */}
+      {/* ── Stats ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-3">
         <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${xp}`} label="XP" />
         <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${level}`} label="Level" />
@@ -138,7 +139,14 @@ const Profile = () => {
 
       <XpMeter xp={xp} level={level} />
 
-      {/* ── Quest activity ─────────────────────────────────────────────── */}
+      {/* ── Social links ─────────────────────────────────────────────── */}
+      <SocialLinksEditor
+        instagram={profile.instagram_url}
+        tiktok={profile.tiktok_url}
+        x={profile.x_url}
+      />
+
+      {/* ── Quest activity ───────────────────────────────────────────── */}
       <ActivitySection
         icon={<Compass className="h-4 w-4" />}
         title="Completed Quests"
@@ -190,7 +198,7 @@ const Profile = () => {
         )}
       </ActivitySection>
 
-      {/* ── Privacy ────────────────────────────────────────────────────── */}
+      {/* ── Privacy controls ─────────────────────────────────────────── */}
       <section className="glass-card divide-y divide-border/50">
         <div className="p-5 pb-3">
           <h2 className="font-poppins font-semibold">Public Profile</h2>

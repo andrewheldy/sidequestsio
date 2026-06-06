@@ -16,7 +16,7 @@ export function formatJoined(createdAt: string | null | undefined): string | nul
 
 export function StatTile({ icon, value, label }: { icon: ReactNode; value: string; label: string }) {
   return (
-    <div className="glass-card flex flex-col items-center gap-1 p-4">
+    <div className="glass-card flex flex-col items-center gap-1 p-4 text-center">
       {icon}
       <span className="font-poppins text-lg font-bold">{value}</span>
       <span className="text-xs text-muted-foreground">{label}</span>
@@ -44,7 +44,7 @@ export function XpMeter({ xp, level }: { xp: number; level: number }) {
         aria-label="Level progress"
       >
         <div
-          className="h-full rounded-full bg-gradient-to-r from-coral to-turquoise transition-all"
+          className="h-full rounded-full bg-gradient-to-r from-coral to-turquoise transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -88,19 +88,39 @@ export function ActivitySection({
 
 export function ProfileSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading profile">
-      <div className="flex flex-col items-center gap-3 pt-2">
-        <Skeleton className="h-24 w-24 rounded-3xl" />
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-4 w-28" />
+    <div className="space-y-5 pb-8" aria-busy="true" aria-label="Loading profile">
+      {/* Header card */}
+      <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/60">
+        {/* Gradient banner placeholder */}
+        <div className="h-16 bg-muted/30" />
+        {/* Content */}
+        <div className="flex flex-col items-center px-5 pb-6">
+          {/* Avatar overlapping banner */}
+          <Skeleton className="-mt-12 mb-3 h-24 w-24 rounded-[22px]" />
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="mt-1.5 h-4 w-24" />
+          <Skeleton className="mt-1 h-4 w-40" />
+          <Skeleton className="mt-3 h-4 w-52" />
+          <Skeleton className="mt-4 h-10 w-32 rounded-xl" />
+        </div>
       </div>
+
+      {/* Stats grid */}
       <div className="grid grid-cols-3 gap-3">
         <Skeleton className="h-24 rounded-2xl" />
         <Skeleton className="h-24 rounded-2xl" />
         <Skeleton className="h-24 rounded-2xl" />
       </div>
+
+      {/* XP meter */}
       <Skeleton className="h-20 rounded-2xl" />
-      <Skeleton className="h-28 rounded-2xl" />
+
+      {/* Social links section */}
+      <Skeleton className="h-36 rounded-2xl" />
+
+      {/* Activity sections */}
+      <Skeleton className="h-20 rounded-2xl" />
+      <Skeleton className="h-20 rounded-2xl" />
     </div>
   );
 }

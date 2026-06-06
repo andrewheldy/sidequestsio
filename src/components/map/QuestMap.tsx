@@ -86,15 +86,19 @@ const QuestMap = ({
       ) {
         errorFired = true;
         console.error('[SideQuests] Mapbox auth error:', e.error);
-        setMapError(
-          'Mapbox token is not authorized for this domain.\n' +
-          'Go to account.mapbox.com/access-tokens → edit your token → remove URL restrictions (or add this domain).'
-        );
+        // Destroy the map before triggering a re-render so the container div
+        // removal doesn't leave a zombie Mapbox instance trying to access a
+        // detached DOM node.
+        map.remove();
+        mapRef.current = null;
+        setMapReady(false);
+        setMapError('domain-restriction');
       }
     });
 
     return () => {
-      map.remove();
+      // Skip remove() if the error handler already destroyed the map.
+      if (!errorFired) map.remove();
       mapRef.current = null;
       setMapReady(false);
     };
@@ -234,15 +238,33 @@ const QuestMap = ({
         }}
       >
         <span className="text-2xl">{isAuthError ? '🗺️' : '📍'}</span>
-        <div className="px-8 space-y-1">
+        <div className="px-6 space-y-2 max-w-xs">
           <p className="font-semibold text-foreground">
             {isAuthError ? 'Mapbox token domain restriction' : 'Map token not configured'}
           </p>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {isAuthError
-              ? 'Your Mapbox token does not allow requests from this domain. Go to account.mapbox.com/access-tokens → edit your token → clear the "Allowed URLs" list (or add this domain).'
-              : 'Set VITE_MAPBOX_PUBLIC_TOKEN in your environment. In Lovable: Settings → Secrets. In Vercel: Project Settings → Environment Variables (then redeploy).'}
-          </p>
+          {isAuthError ? (
+            <div className="text-xs text-muted-foreground leading-relaxed space-y-2 text-left">
+              <p>Your Mapbox token does not allow requests from this domain.</p>
+              <p>
+                Go to{' '}
+                <span className="font-mono text-foreground/70">account.mapbox.com/access-tokens</span>
+                {' '}→ edit your token → add the following to <strong>Allowed URLs</strong>:
+              </p>
+              <ul className="font-mono text-[10px] space-y-0.5 pl-2">
+                <li>https://miamisidequests.io/*</li>
+                <li>https://*.vercel.app/*</li>
+                <li>http://localhost:*</li>
+              </ul>
+              <p className="text-muted-foreground/70">
+                Or clear the Allowed URLs list entirely to allow all origins during development.
+              </p>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Set <span className="font-mono">VITE_MAPBOX_PUBLIC_TOKEN</span> in your environment.
+              In Vercel: Project Settings → Environment Variables, then redeploy.
+            </p>
+          )}
         </div>
       </div>
     );
