@@ -154,7 +154,13 @@ export function AppQuestCard({ quest }: { quest: Quest }) {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <Stat icon={<Gift className="h-4 w-4 text-coral" />} label="Reward" value={quest.reward} />
               <Stat icon={<Zap className="h-4 w-4 text-turquoise" />} label="XP" value={`${quest.xp} XP`} />
-              <Stat icon={<MapPin className="h-4 w-4 text-coral" />} label="Distance" value={quest.distance} />
+              {quest.address ? (
+                <div className="col-span-2">
+                  <Stat icon={<MapPin className="h-4 w-4 text-coral" />} label="Address" value={quest.address} />
+                </div>
+              ) : quest.distance ? (
+                <Stat icon={<MapPin className="h-4 w-4 text-coral" />} label="Distance" value={quest.distance} />
+              ) : null}
               <Stat icon={<Clock className="h-4 w-4 text-turquoise" />} label="Time" value={quest.time} />
             </div>
             <div className="flex gap-2">

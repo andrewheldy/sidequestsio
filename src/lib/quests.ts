@@ -1,7 +1,8 @@
 /**
  * Mock quest catalogue powering the in-app Explore / Map / Favorites tabs.
  * Kept as static data so the MVP needs no quest backend. Each quest has stable
- * `id`s used for favorites and a normalized `x`/`y` (0–100) for the map view.
+ * `id`s used for favorites, normalized `x`/`y` (0–100) for legacy grid views,
+ * and real `lat`/`lng` GPS coordinates for the Mapbox map.
  */
 
 export interface Quest {
@@ -14,9 +15,14 @@ export interface Quest {
   distance: string;
   time: string;
   image: string;
-  /** Normalized map position (0–100). */
+  /** Normalized map position (0–100). Kept for backward compat. */
   x: number;
   y: number;
+  /** Real-world GPS coordinates used by the Mapbox map. */
+  lat: number;
+  lng: number;
+  /** Street address — populated for CRM-backed quests. */
+  address?: string;
 }
 
 export const QUESTS: Quest[] = [
@@ -30,8 +36,8 @@ export const QUESTS: Quest[] = [
     distance: '0.6 mi',
     time: '20 min',
     image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=300&fit=crop',
-    x: 42,
-    y: 30,
+    x: 42, y: 30,
+    lat: 25.8002, lng: -80.1986,
   },
   {
     id: 'south-beach-sunrise',
@@ -43,8 +49,8 @@ export const QUESTS: Quest[] = [
     distance: '0.5 mi',
     time: '25 min',
     image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop',
-    x: 78,
-    y: 55,
+    x: 78, y: 55,
+    lat: 25.7854, lng: -80.1303,
   },
   {
     id: 'wynwood-mural-hunt',
@@ -56,8 +62,8 @@ export const QUESTS: Quest[] = [
     distance: '0.8 mi',
     time: '35 min',
     image: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=400&h=300&fit=crop',
-    x: 38,
-    y: 40,
+    x: 38, y: 40,
+    lat: 25.8058, lng: -80.1997,
   },
   {
     id: 'little-havana-cafecito',
@@ -69,8 +75,8 @@ export const QUESTS: Quest[] = [
     distance: '0.7 mi',
     time: '30 min',
     image: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=400&h=300&fit=crop',
-    x: 22,
-    y: 62,
+    x: 22, y: 62,
+    lat: 25.7679, lng: -80.2268,
   },
   {
     id: 'brickell-skyline-loop',
@@ -82,8 +88,8 @@ export const QUESTS: Quest[] = [
     distance: '0.9 mi',
     time: '30 min',
     image: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=300&fit=crop',
-    x: 55,
-    y: 70,
+    x: 55, y: 70,
+    lat: 25.7616, lng: -80.1927,
   },
   {
     id: 'coconut-grove-bayfront',
@@ -95,8 +101,8 @@ export const QUESTS: Quest[] = [
     distance: '1.2 mi',
     time: '30 min',
     image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=300&fit=crop',
-    x: 35,
-    y: 82,
+    x: 35, y: 82,
+    lat: 25.7283, lng: -80.2381,
   },
   {
     id: 'design-district-gallery',
@@ -108,8 +114,8 @@ export const QUESTS: Quest[] = [
     distance: '0.8 mi',
     time: '40 min',
     image: 'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&h=300&fit=crop',
-    x: 48,
-    y: 18,
+    x: 48, y: 18,
+    lat: 25.8149, lng: -80.1866,
   },
   {
     id: 'downtown-legends',
@@ -121,8 +127,21 @@ export const QUESTS: Quest[] = [
     distance: '0.6 mi',
     time: '25 min',
     image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=300&fit=crop',
-    x: 60,
-    y: 50,
+    x: 60, y: 50,
+    lat: 25.7745, lng: -80.1903,
+  },
+  {
+    id: 'wynwood-sweet-caroline-karaoke',
+    title: 'Sweet Caroline Karaoke Night',
+    neighborhood: 'Wynwood',
+    category: 'Nightlife',
+    reward: 'Free Round of Drinks',
+    xp: 130,
+    distance: '0.4 mi',
+    time: '45 min',
+    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop',
+    x: 44, y: 35,
+    lat: 25.8025, lng: -80.1998,
   },
 ];
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
-import { QUESTS, QUEST_CATEGORIES } from '@/lib/quests';
+import { QUEST_CATEGORIES } from '@/lib/quests';
+import { MIAMI_QUESTS } from '@/data/miami/toQuest';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import AppQuestCard from '@/components/app/AppQuestCard';
@@ -13,11 +14,14 @@ const Explore = () => {
 
   const quests = useMemo(
     () =>
-      QUESTS.filter((q) => {
+      MIAMI_QUESTS.filter((q) => {
         const matchesCategory = category === 'All' || q.category === category;
+        const q_ = query.toLowerCase();
         const matchesQuery =
-          q.title.toLowerCase().includes(query.toLowerCase()) ||
-          q.neighborhood.toLowerCase().includes(query.toLowerCase());
+          !q_ ||
+          q.title.toLowerCase().includes(q_) ||
+          q.neighborhood.toLowerCase().includes(q_) ||
+          (q.address ?? '').toLowerCase().includes(q_);
         return matchesCategory && matchesQuery;
       }),
     [query, category],

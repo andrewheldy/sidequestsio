@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-import { QUESTS } from '@/lib/quests';
+import { MIAMI_QUESTS } from '@/data/miami/toQuest';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { Button } from '@/components/ui/button';
 import AppQuestCard from '@/components/app/AppQuestCard';
 
 const Favorites = () => {
   const { favorites } = useFavorites();
-  const saved = QUESTS.filter((q) => favorites.includes(q.id));
+  const saved = MIAMI_QUESTS.filter((q) => favorites.includes(q.id));
 
   return (
     <div className="space-y-5">
       <header>
         <h1 className="font-poppins text-2xl font-bold">Your Favorites</h1>
-        <p className="text-sm text-muted-foreground">Quests you’ve saved for later.</p>
+        <p className="text-sm text-muted-foreground">Quests you've saved for later.</p>
       </header>
 
       {saved.length > 0 ? (

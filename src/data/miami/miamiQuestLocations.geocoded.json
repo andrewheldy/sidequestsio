@@ -1,0 +1,3002 @@
+[
+  {
+    "Business Name": "Panther Coffee",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "2390 NW 2nd Ave, Miami, FL 33127",
+    "Quest Name": "The Caffeine Chronicles: Panther Coffee",
+    "Suggested Quest Concept": "Order the house cortadito and log the bean's origin country in your Breadcrumb",
+    "Suggested Reward": "Free single-origin pour-over with quest completion",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @panthercoffee]",
+    "coordinates": {
+      "lat": 25.8002,
+      "lng": -80.1982
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Panther Coffee, 2390 NW 2nd Ave, Miami, FL 33127",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Vice City Bean",
+    "Neighborhood": "Edgewater",
+    "Address / Mapbox Coordinates": "1657 N Miami Ave, Miami, FL 33136",
+    "Quest Name": "The Caffeine Chronicles: Vice City Bean",
+    "Suggested Quest Concept": "Order the signature Vice City latte and capture the bay-facing window seat",
+    "Suggested Reward": "$2 off any specialty espresso drink",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @vicecitybean]",
+    "coordinates": {
+      "lat": 25.7888,
+      "lng": -80.1952
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Vice City Bean, 1657 N Miami Ave, Miami, FL 33136",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Salty Donut",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "50 NW 23rd St #112, Miami, FL 33127",
+    "Quest Name": "Sweet Tooth Tour: The Salty Donut",
+    "Suggested Quest Concept": "Try the weekly limited-edition donut and leave a tasting Breadcrumb for the next visitor",
+    "Suggested Reward": "Buy 4 donuts, get 1 free voucher on next visit",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thesaltydonut]",
+    "coordinates": {
+      "lat": 25.8024,
+      "lng": -80.2
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "The Salty Donut, 50 NW 23rd St #112, Miami, FL 33127",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Threefold Cafe",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "141 Giralda Ave, Coral Gables, FL 33134",
+    "Quest Name": "Discover Threefold Cafe",
+    "Suggested Quest Concept": "Decode the Australian brunch menu and order a dish you've never heard of",
+    "Suggested Reward": "Complimentary flat white with any brunch entrée",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @threefoldcafe]",
+    "coordinates": {
+      "lat": 25.7491,
+      "lng": -80.2575
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Threefold Cafe, 141 Giralda Ave, Coral Gables, FL 33134",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Imperial Moto Café",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "2418 NW 5th Ave, Miami, FL 33127",
+    "Quest Name": "Retro Treasures: Imperial Moto Café",
+    "Suggested Quest Concept": "Photograph the rotating vintage motorcycle on display and tag your favorite build detail",
+    "Suggested Reward": "Imperial Moto sticker pack + 10% off morning espresso",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @imperialmoto]",
+    "coordinates": {
+      "lat": 25.8022,
+      "lng": -80.2028
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Imperial Moto Café, 2418 NW 5th Ave, Miami, FL 33127",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Honey Veil Co.",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "Miami Design District, Miami, FL 33137",
+    "Quest Name": "Literary Escape: Honey Veil Co.",
+    "Suggested Quest Concept": "Watch a ceremonial matcha whisk and log the matcha grade in your Breadcrumb",
+    "Suggested Reward": "Free upgrade to ceremonial-grade matcha on first visit",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @honeyveilco]",
+    "coordinates": {
+      "lat": 25.8149,
+      "lng": -80.1866
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Honey Veil Co., Miami Design District, Miami, FL 33137",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "B Bistro + Bakery",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "600 Brickell Ave, Miami, FL 33131",
+    "Quest Name": "Discover B Bistro + Bakery",
+    "Suggested Quest Concept": "Sample the daily croissant and rate it against your last Paris bakery memory",
+    "Suggested Reward": "10% off a pastry box pickup",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @bbistromiami]",
+    "coordinates": {
+      "lat": 25.7637,
+      "lng": -80.1925
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "B Bistro + Bakery, 600 Brickell Ave, Miami, FL 33131",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Brewing Buddha Café",
+    "Neighborhood": "South Miami",
+    "Address / Mapbox Coordinates": "8219 SW 124th St, Miami, FL 33156",
+    "Quest Name": "Literary Escape: Brewing Buddha Café",
+    "Suggested Quest Concept": "Find the meditation corner and write a one-line daily intention in their guest book",
+    "Suggested Reward": "Free chai tea on next visit with quest completion",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @brewingbuddha]",
+    "coordinates": {
+      "lat": 25.6654,
+      "lng": -80.3298
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Brewing Buddha Café, 8219 SW 124th St, Miami, FL 33156",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Sweat Records",
+    "Neighborhood": "Little Haiti",
+    "Address / Mapbox Coordinates": "5505 NE 2nd Ave, Miami, FL 33137",
+    "Quest Name": "Vinyl Vibes: Sweat Records",
+    "Suggested Quest Concept": "Find a vinyl by a Miami-based artist you've never heard of and photograph the cover",
+    "Suggested Reward": "10% off any Miami-artist vinyl record",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @sweatrecords]",
+    "coordinates": {
+      "lat": 25.8275,
+      "lng": -80.1843
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Sweat Records, 5505 NE 2nd Ave, Miami, FL 33137",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Books & Books",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "265 Aragon Ave, Coral Gables, FL 33134",
+    "Quest Name": "Literary Escape: Books & Books",
+    "Suggested Quest Concept": "Locate a book by a Florida-based author you've never read and snap the first page",
+    "Suggested Reward": "Free coffee at the café with any book purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @booksandbooks]",
+    "coordinates": {
+      "lat": 25.7494,
+      "lng": -80.2601
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Books & Books, 265 Aragon Ave, Coral Gables, FL 33134",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Macondo Coffee Roasters",
+    "Neighborhood": "Midtown",
+    "Address / Mapbox Coordinates": "2494 NW 89th Pl, Doral, FL 33172",
+    "Quest Name": "Literary Escape: Macondo Coffee Roasters",
+    "Suggested Quest Concept": "Order a Colombian-origin pour-over and log a tasting note in your Breadcrumb",
+    "Suggested Reward": "Buy one, get one half-off on Latin-origin pour-overs",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @macondocoffee]",
+    "coordinates": {
+      "lat": 25.8081,
+      "lng": -80.3507
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Macondo Coffee Roasters, 2494 NW 89th Pl, Doral, FL 33172",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Rosetta Bakery",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "1666 Collins Ave, Miami Beach, FL 33139",
+    "Quest Name": "Discover Rosetta Bakery",
+    "Suggested Quest Concept": "Identify a Roman-style pastry not commonly found in Miami and photograph it",
+    "Suggested Reward": "10% off a pastry-and-coffee combo",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @rosettabakery]",
+    "coordinates": {
+      "lat": 25.7839,
+      "lng": -80.1305
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Rosetta Bakery, 1666 Collins Ave, Miami Beach, FL 33139",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Walls Caffe",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Walls Caffe, Wynwood, Miami, FL",
+    "Quest Name": "Discover Walls Caffe",
+    "Suggested Quest Concept": "Find the indoor mural and decode its meaning from staff",
+    "Suggested Reward": "Complimentary cortadito with breakfast order",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @wallscaffe]",
+    "coordinates": {
+      "lat": 25.8012,
+      "lng": -80.1975
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Walls Caffe, Walls Caffe, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Boxelder Craft Beer",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Downtown Miami, FL",
+    "Quest Name": "Brews & Views: Boxelder Craft Beer",
+    "Suggested Quest Concept": "Try a Florida-brewed pour you've never had and log the brewery's hometown",
+    "Suggested Reward": "Free 4oz tasting flight with first pint purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @boxeldermiami]",
+    "coordinates": {
+      "lat": 25.7763,
+      "lng": -80.1944
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Boxelder Craft Beer, Downtown Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Under the Mango Tree",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "737 5th St, Miami Beach, FL 33139",
+    "Quest Name": "Discover Under the Mango Tree",
+    "Suggested Quest Concept": "Order a custom green juice and rate the freshness on a 1–5 leaf scale",
+    "Suggested Reward": "$3 off a smoothie bowl with quest completion",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @underthemangotree_sb]",
+    "coordinates": {
+      "lat": 25.7712,
+      "lng": -80.1355
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Under the Mango Tree, 737 5th St, Miami Beach, FL 33139",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Dasher & Crank",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "2211 NW 2nd Ave, Miami, FL 33127",
+    "Quest Name": "Literary Escape: Dasher & Crank",
+    "Suggested Quest Concept": "Try the weekly experimental flavor and submit a new flavor idea in your Breadcrumb",
+    "Suggested Reward": "Free single scoop with any pint purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @dasherandcrank]",
+    "coordinates": {
+      "lat": 25.7988,
+      "lng": -80.1982
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Dasher & Crank, 2211 NW 2nd Ave, Miami, FL 33127",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "All Day",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "1035 N Miami Ave, Miami, FL 33136",
+    "Quest Name": "Discover All Day",
+    "Suggested Quest Concept": "Find the daily art rotation on the cafe walls and photograph your favorite piece",
+    "Suggested Reward": "$2 off any espresso drink during off-peak hours",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @alldaymia]",
+    "coordinates": {
+      "lat": 25.7874,
+      "lng": -80.1952
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "All Day, 1035 N Miami Ave, Miami, FL 33136",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Small Tea",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "205 Aragon Ave, Coral Gables, FL 33134",
+    "Quest Name": "Literary Escape: Small Tea",
+    "Suggested Quest Concept": "Order a tea you've never tried and log its origin region in your Breadcrumb",
+    "Suggested Reward": "Free pastry with any tea-and-snack combo",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @smallteaco]",
+    "coordinates": {
+      "lat": 25.7496,
+      "lng": -80.2591
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Small Tea, 205 Aragon Ave, Coral Gables, FL 33134",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Morelia Gourmet Paletas",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "185 Brickell Ave, Miami, FL 33131",
+    "Quest Name": "Discover Morelia Gourmet Paletas",
+    "Suggested Quest Concept": "Try the spiciest paleta on the menu and rate the heat level for the next visitor",
+    "Suggested Reward": "Buy 2 paletas, get the third half-off",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @moreliapaletas]",
+    "coordinates": {
+      "lat": 25.7618,
+      "lng": -80.1909
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Morelia Gourmet Paletas, 185 Brickell Ave, Miami, FL 33131",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Midorie Miami",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "Midorie Miami, Coconut Grove, Miami, FL",
+    "Quest Name": "The Caffeine Chronicles: Midorie Miami",
+    "Suggested Quest Concept": "Order a matcha latte with house oat milk and photograph the foam art",
+    "Suggested Reward": "Free matcha cookie with any matcha drink purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @midoriemiami]",
+    "coordinates": {
+      "lat": 25.7283,
+      "lng": -80.2381
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Midorie Miami, Midorie Miami, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Corner",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "1035 N Miami Ave, Miami, FL 33136",
+    "Quest Name": "Brews & Views: The Corner",
+    "Suggested Quest Concept": "Order the bartender's choice and have them sign a Breadcrumb tasting card",
+    "Suggested Reward": "10% off second cocktail with first quest completion",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thecornermiami]",
+    "coordinates": {
+      "lat": 25.7877,
+      "lng": -80.1949
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "The Corner, 1035 N Miami Ave, Miami, FL 33136",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Miam Café",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "2750 NW 3rd Ave, Miami, FL 33127",
+    "Quest Name": "Discover Miam Café",
+    "Suggested Quest Concept": "Try the daily French pastry and log the regional French origin",
+    "Suggested Reward": "Complimentary espresso with any quiche order",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamcafe]",
+    "coordinates": {
+      "lat": 25.8057,
+      "lng": -80.2001
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Miam Café, 2750 NW 3rd Ave, Miami, FL 33127",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "El Carajo",
+    "Neighborhood": "Coral Way",
+    "Address / Mapbox Coordinates": "2465 SW 17th Ave, Miami, FL 33145",
+    "Quest Name": "Discover El Carajo",
+    "Suggested Quest Concept": "Find the hidden wine cellar entrance behind the gas station and photograph it",
+    "Suggested Reward": "Complimentary tapas plate with wine bottle purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @elcarajomiami]",
+    "coordinates": {
+      "lat": 25.7619,
+      "lng": -80.2178
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "El Carajo, 2465 SW 17th Ave, Miami, FL 33145",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Salty Donut (SB)",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "The Salty Donut (SB), South Beach, Miami, FL",
+    "Quest Name": "Discover The Salty Donut (SB)",
+    "Suggested Quest Concept": "Try the South Beach exclusive flavor and rate it against the Wynwood flagship",
+    "Suggested Reward": "Free single donut with any 3-pack purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thesaltydonut]",
+    "coordinates": {
+      "lat": 25.7854,
+      "lng": -80.1303
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Salty Donut (SB), The Salty Donut (SB), South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Pasion del Cielo",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "Pasion del Cielo, Brickell, Miami, FL",
+    "Quest Name": "The Caffeine Chronicles: Pasion del Cielo",
+    "Suggested Quest Concept": "Order a Latin American specialty coffee and log the country of origin",
+    "Suggested Reward": "10% off coffee bag purchase with quest",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @pasiondelcielofl]",
+    "coordinates": {
+      "lat": 25.7616,
+      "lng": -80.1935
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Pasion del Cielo, Pasion del Cielo, Brickell, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Wynwood Walls",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "266 NW 26th St, Miami, FL 33127",
+    "Quest Name": "Discover Wynwood Walls",
+    "Suggested Quest Concept": "Find a mural by a featured international artist and tag the country of origin",
+    "Suggested Reward": "Discounted ticket bundle for SideQuests verified users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @wynwoodwallsofficial]",
+    "coordinates": {
+      "lat": 25.8048,
+      "lng": -80.1987
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Wynwood Walls, 266 NW 26th St, Miami, FL 33127",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "PAMM (Pérez Art Museum)",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "1103 Biscayne Blvd, Miami, FL 33132",
+    "Quest Name": "Discover PAMM (Pérez Art Museum)",
+    "Suggested Quest Concept": "Find the hanging gardens designed by Patrick Blanc and log a botanical observation",
+    "Suggested Reward": "Free admission on SideQuests partner days",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @pamm]",
+    "coordinates": {
+      "lat": 25.7845,
+      "lng": -80.1862
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "PAMM (Pérez Art Museum), 1103 Biscayne Blvd, Miami, FL 33132",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "ICA Miami",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "61 NE 41st St, Miami, FL 33137",
+    "Quest Name": "Discover ICA Miami",
+    "Suggested Quest Concept": "Find the current featured artist's most thought-provoking piece and log your reaction",
+    "Suggested Reward": "Free admission for SideQuests users on quest days (already free, add tote)",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @icamiami]",
+    "coordinates": {
+      "lat": 25.8155,
+      "lng": -80.1883
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "ICA Miami, 61 NE 41st St, Miami, FL 33137",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Bachour",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "2020 Salzedo St, Coral Gables, FL 33134",
+    "Quest Name": "Literary Escape: Bachour",
+    "Suggested Quest Concept": "Try the most visually stunning pastry of the day and rate the plating in your Breadcrumb",
+    "Suggested Reward": "Complimentary macaron with any pastry box purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @bachourmiami]",
+    "coordinates": {
+      "lat": 25.7496,
+      "lng": -80.2583
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Bachour, 2020 Salzedo St, Coral Gables, FL 33134",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Temple House",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "The Temple House, South Beach, Miami, FL",
+    "Quest Name": "Discover The Temple House",
+    "Suggested Quest Concept": "Photograph the rooftop architectural detail visible only from inside the venue",
+    "Suggested Reward": "Priority RSVP access for future curated events",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thetemplehouse]",
+    "coordinates": {
+      "lat": 25.784,
+      "lng": -80.132
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Temple House, The Temple House, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Faena Hotel (The Golden Myth)",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Faena Hotel (The Golden Myth), South Beach, Miami, FL",
+    "Quest Name": "Discover Faena Hotel (The Golden Myth)",
+    "Suggested Quest Concept": "Find the Damien Hirst Gilded Mammoth and capture its golden reflection",
+    "Suggested Reward": "Complimentary lobby coffee experience for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @faena]",
+    "coordinates": {
+      "lat": 25.7907,
+      "lng": -80.1278
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Faena Hotel (The Golden Myth), Faena Hotel (The Golden Myth), South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "E11EVEN",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "29 NE 11th St, Miami, FL 33132",
+    "Quest Name": "Discover E11EVEN",
+    "Suggested Quest Concept": "Find the iconic golden statue and photograph it in the entrance lobby",
+    "Suggested Reward": "Skip-the-line entry pass for SideQuests verified users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @11miami]",
+    "coordinates": {
+      "lat": 25.7799,
+      "lng": -80.1939
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "E11EVEN, 29 NE 11th St, Miami, FL 33132",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Swan",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "90 NE 39th St, Miami, FL 33137",
+    "Quest Name": "Discover Swan",
+    "Suggested Quest Concept": "Find the swan motif hidden in the wallpaper and photograph it",
+    "Suggested Reward": "Complimentary signature mocktail with brunch",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @swanmiami]",
+    "coordinates": {
+      "lat": 25.8148,
+      "lng": -80.1893
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Swan, 90 NE 39th St, Miami, FL 33137",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Sugar (East Hotel)",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "788 Brickell Plaza, Miami, FL 33131",
+    "Quest Name": "Discover Sugar (East Hotel)",
+    "Suggested Quest Concept": "Capture the Brickell skyline from the rooftop garden during golden hour",
+    "Suggested Reward": "Free entry pass during weekday happy hour",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @sugarmiami]",
+    "coordinates": {
+      "lat": 25.7608,
+      "lng": -80.1909
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Sugar (East Hotel), 788 Brickell Plaza, Miami, FL 33131",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Lagniappe",
+    "Neighborhood": "Midtown",
+    "Address / Mapbox Coordinates": "3425 NE 2nd Ave, Miami, FL 33137",
+    "Quest Name": "Literary Escape: Lagniappe",
+    "Suggested Quest Concept": "Order a wine you've never tried by the glass and log a tasting Breadcrumb",
+    "Suggested Reward": "Free cheese plate add-on with bottle order",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @lagniappehouse]",
+    "coordinates": {
+      "lat": 25.8094,
+      "lng": -80.1882
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Lagniappe, 3425 NE 2nd Ave, Miami, FL 33137",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Dante's HiFi",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "51 NE 24th St, Miami, FL 33137",
+    "Quest Name": "Literary Escape: Dante's HiFi",
+    "Suggested Quest Concept": "Identify the album playing on the sound system and log it in your Breadcrumb",
+    "Suggested Reward": "Priority entry pass on busy nights",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @danteshifi]",
+    "coordinates": {
+      "lat": 25.8019,
+      "lng": -80.1916
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Dante's HiFi, 51 NE 24th St, Miami, FL 33137",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Superblue Miami",
+    "Neighborhood": "Allapattah",
+    "Address / Mapbox Coordinates": "1101 NW 23rd St, Miami, FL 33127",
+    "Quest Name": "Discover Superblue Miami",
+    "Suggested Quest Concept": "Find your favorite immersive room and capture it without people in frame",
+    "Suggested Reward": "Discounted ticket bundle for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @superblue]",
+    "coordinates": {
+      "lat": 25.8018,
+      "lng": -80.2118
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Superblue Miami, 1101 NW 23rd St, Miami, FL 33127",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Standard Spa",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "40 Island Ave, Miami Beach, FL 33139",
+    "Quest Name": "Discover The Standard Spa",
+    "Suggested Quest Concept": "Find the hammam and log a one-word reflection on the experience",
+    "Suggested Reward": "Complimentary tea service in the lounge",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thestandard]",
+    "coordinates": {
+      "lat": 25.7766,
+      "lng": -80.145
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "The Standard Spa, 40 Island Ave, Miami Beach, FL 33139",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Vizcaya Museum & Gardens",
+    "Neighborhood": "South Coconut Grove",
+    "Address / Mapbox Coordinates": "3251 S Miami Ave, Miami, FL 33129",
+    "Quest Name": "Brews & Views: Vizcaya Museum & Gardens",
+    "Suggested Quest Concept": "Find the stone barge in the bay and photograph it from the seawall",
+    "Suggested Reward": "Discounted member-day admission for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @vizcayamuseum]",
+    "coordinates": {
+      "lat": 25.7443,
+      "lng": -80.2064
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Vizcaya Museum & Gardens, 3251 S Miami Ave, Miami, FL 33129",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Frost Science Museum",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "1101 Biscayne Blvd, Miami, FL 33132",
+    "Quest Name": "Literary Escape: Frost Science Museum",
+    "Suggested Quest Concept": "Find the aquarium shark tank and log the species name in your Breadcrumb",
+    "Suggested Reward": "Free planetarium upgrade with admission",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @frostscience]",
+    "coordinates": {
+      "lat": 25.7841,
+      "lng": -80.1862
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Frost Science Museum, 1101 Biscayne Blvd, Miami, FL 33132",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Komodo",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "801 Brickell Ave, Miami, FL 33131",
+    "Quest Name": "Discover Komodo",
+    "Suggested Quest Concept": "Find the upstairs tree house dining nook and photograph the view",
+    "Suggested Reward": "Complimentary appetizer with reservation",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @komodomiami]",
+    "coordinates": {
+      "lat": 25.7608,
+      "lng": -80.1912
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Komodo, 801 Brickell Ave, Miami, FL 33131",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Joia Beach",
+    "Neighborhood": "Watson Island",
+    "Address / Mapbox Coordinates": "Joia Beach, Watson Island, Miami, FL",
+    "Quest Name": "Discover Joia Beach",
+    "Suggested Quest Concept": "Capture the Miami skyline from the beach lounge during sunset",
+    "Suggested Reward": "Discounted day pass for weekday visits",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @joiabeach]",
+    "coordinates": {
+      "lat": 25.789,
+      "lng": -80.1671
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Joia Beach, Joia Beach, Watson Island, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Sexy Fish",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "1001 South Miami Ave, Miami, FL 33130",
+    "Quest Name": "Discover Sexy Fish",
+    "Suggested Quest Concept": "Find the Damien Hirst mermaid sculpture and photograph it discreetly",
+    "Suggested Reward": "Complimentary signature mocktail with lunch",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @sexyfishmiami]",
+    "coordinates": {
+      "lat": 25.7601,
+      "lng": -80.1978
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Sexy Fish, 1001 South Miami Ave, Miami, FL 33130",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Astra",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Astra, Wynwood, Miami, FL",
+    "Quest Name": "Discover Astra",
+    "Suggested Quest Concept": "Capture the Wynwood mural panorama from the rooftop deck",
+    "Suggested Reward": "Priority rooftop seating on weekday evenings",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @astrawynwood]",
+    "coordinates": {
+      "lat": 25.801,
+      "lng": -80.1995
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Astra, Astra, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Mandolin Aegean Bistro",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "4312 NE 2nd Ave, Miami, FL 33137",
+    "Quest Name": "Discover Mandolin Aegean Bistro",
+    "Suggested Quest Concept": "Find the outdoor garden patio and capture the Aegean blue door",
+    "Suggested Reward": "Complimentary Greek coffee with entrée",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @mandolinmiami]",
+    "coordinates": {
+      "lat": 25.817,
+      "lng": -80.1882
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Mandolin Aegean Bistro, 4312 NE 2nd Ave, Miami, FL 33137",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Bass Museum",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "The Bass Museum, South Beach, Miami, FL",
+    "Quest Name": "Discover The Bass Museum",
+    "Suggested Quest Concept": "Find a sculpture by a contemporary Latin American artist and log your impression",
+    "Suggested Reward": "Discounted membership trial for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thebassmoa]",
+    "coordinates": {
+      "lat": 25.7938,
+      "lng": -80.131
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Bass Museum, The Bass Museum, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Ball & Chain",
+    "Neighborhood": "Little Havana",
+    "Address / Mapbox Coordinates": "1513 SW 8th St, Miami, FL 33135",
+    "Quest Name": "Literary Escape: Ball & Chain",
+    "Suggested Quest Concept": "Catch a live salsa performance and log the band name in your Breadcrumb",
+    "Suggested Reward": "Free mojito with dinner during weekday shows",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @ballandchainmia]",
+    "coordinates": {
+      "lat": 25.7695,
+      "lng": -80.2225
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Ball & Chain, 1513 SW 8th St, Miami, FL 33135",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Mila",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Mila, South Beach, Miami, FL",
+    "Quest Name": "Discover Mila",
+    "Suggested Quest Concept": "Find the indoor garden ceiling installation and photograph it straight up",
+    "Suggested Reward": "Complimentary welcome drink on first visit",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @milamiamibeach]",
+    "coordinates": {
+      "lat": 25.786,
+      "lng": -80.131
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Mila, Mila, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Rubell Museum",
+    "Neighborhood": "Allapattah",
+    "Address / Mapbox Coordinates": "Rubell Museum, Allapattah, Miami, FL",
+    "Quest Name": "Discover Rubell Museum",
+    "Suggested Quest Concept": "Find the most provocative work in the current rotation and log your reaction",
+    "Suggested Reward": "Discounted member preview access for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @rubellmuseum]",
+    "coordinates": {
+      "lat": 25.802,
+      "lng": -80.213
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Rubell Museum, Rubell Museum, Allapattah, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Chimi @ The Oasis",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Chimi @ The Oasis, Wynwood, Miami, FL",
+    "Quest Name": "Discover Chimi @ The Oasis",
+    "Suggested Quest Concept": "Order from the Dominican stand and log your favorite topping combo",
+    "Suggested Reward": "Free side with any combo plate",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @oasiswynwood]",
+    "coordinates": {
+      "lat": 25.8002,
+      "lng": -80.1978
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Chimi @ The Oasis, Chimi @ The Oasis, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Brickell City Centre",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "Brickell City Centre, Brickell, Miami, FL",
+    "Quest Name": "Discover Brickell City Centre",
+    "Suggested Quest Concept": "Find the Climate Ribbon and photograph its current shade pattern",
+    "Suggested Reward": "Validated parking discount with quest verification",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @brickellcitycentre]",
+    "coordinates": {
+      "lat": 25.7637,
+      "lng": -80.1937
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Brickell City Centre, Brickell City Centre, Brickell, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Lincoln Road Mall",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Lincoln Road Mall, South Beach, Miami, FL",
+    "Quest Name": "Literary Escape: Lincoln Road Mall",
+    "Suggested Quest Concept": "Find a Morris Lapidus architectural detail and tag it in your Breadcrumb",
+    "Suggested Reward": "Curated BID merchant discount network access",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @lincolnrd]",
+    "coordinates": {
+      "lat": 25.79,
+      "lng": -80.139
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Lincoln Road Mall, Lincoln Road Mall, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Bayside Marketplace",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Bayside Marketplace, Downtown, Miami, FL",
+    "Quest Name": "Discover Bayside Marketplace",
+    "Suggested Quest Concept": "Find the Hard Rock guitar and photograph it against the bay backdrop",
+    "Suggested Reward": "10% off select vendor offers via partner pass",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @baysidemarketplace]",
+    "coordinates": {
+      "lat": 25.7763,
+      "lng": -80.1863
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Bayside Marketplace, Bayside Marketplace, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Oasis Wynwood",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "The Oasis Wynwood, Wynwood, Miami, FL",
+    "Quest Name": "Discover The Oasis Wynwood",
+    "Suggested Quest Concept": "Find the central courtyard mural and submit a one-word impression",
+    "Suggested Reward": "Free entry to upcoming weekly Sunset Sessions",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @oasiswynwood]",
+    "coordinates": {
+      "lat": 25.8005,
+      "lng": -80.198
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Oasis Wynwood, The Oasis Wynwood, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Time Out Market",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Time Out Market, South Beach, Miami, FL",
+    "Quest Name": "Discover Time Out Market",
+    "Suggested Quest Concept": "Try a vendor you've never tried before and log a chef recommendation",
+    "Suggested Reward": "Validation token for one free vendor item",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @timeoutmarketmiami]",
+    "coordinates": {
+      "lat": 25.79,
+      "lng": -80.135
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Time Out Market, Time Out Market, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "1-800-LUCKY",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "1-800-LUCKY, Wynwood, Miami, FL",
+    "Quest Name": "Literary Escape: 1-800-LUCKY",
+    "Suggested Quest Concept": "Hit the karaoke booth and log your song choice in your Breadcrumb",
+    "Suggested Reward": "Free karaoke session with food purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @1800lucky]",
+    "coordinates": {
+      "lat": 25.8002,
+      "lng": -80.1993
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "1-800-LUCKY, 1-800-LUCKY, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Midtown Miami Shops",
+    "Neighborhood": "Midtown",
+    "Address / Mapbox Coordinates": "Midtown Miami Shops, Midtown, Miami, FL",
+    "Quest Name": "Discover Midtown Miami Shops",
+    "Suggested Quest Concept": "Find the seasonal art installation and photograph it",
+    "Suggested Reward": "Validated parking with quest verification",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @shopmidtownmiami]",
+    "coordinates": {
+      "lat": 25.8094,
+      "lng": -80.19
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Midtown Miami Shops, Midtown Miami Shops, Midtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Mary Brickell Village",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "Mary Brickell Village, Brickell, Miami, FL",
+    "Quest Name": "Vinyl Vibes: Mary Brickell Village",
+    "Suggested Quest Concept": "Find the live music stage and log the artist's name during a Friday session",
+    "Suggested Reward": "Validated parking pass on partner nights",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @marybrickellvillage]",
+    "coordinates": {
+      "lat": 25.7617,
+      "lng": -80.1927
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Mary Brickell Village, Mary Brickell Village, Brickell, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Bayfront Park",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Bayfront Park, Downtown, Miami, FL",
+    "Quest Name": "Discover Bayfront Park",
+    "Suggested Quest Concept": "Find the Challenger Memorial and capture its bay-facing view",
+    "Suggested Reward": "Digital badge + access to city culture programs",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @bayfrontparkmia]",
+    "coordinates": {
+      "lat": 25.7763,
+      "lng": -80.1863
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Bayfront Park, Bayfront Park, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Lummus Park",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Lummus Park, South Beach, Miami, FL",
+    "Quest Name": "Discover Lummus Park",
+    "Suggested Quest Concept": "Find a historic Art Deco lifeguard tower and log its color combo",
+    "Suggested Reward": "Digital badge for completed beachfront quest",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @cityofmiamibeach]",
+    "coordinates": {
+      "lat": 25.788,
+      "lng": -80.1302
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Lummus Park, Lummus Park, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Miami Design District Plaza",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "Miami Design District Plaza, Design District, Miami, FL",
+    "Quest Name": "Discover Miami Design District Plaza",
+    "Suggested Quest Concept": "Find the Buckminster Fuller Fly's Eye Dome and photograph its geometry",
+    "Suggested Reward": "Curated retailer partner discount access",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamidesigndistrict]",
+    "coordinates": {
+      "lat": 25.8149,
+      "lng": -80.1886
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Miami Design District Plaza, Miami Design District Plaza, Design District, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Miami Worldcenter",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Miami Worldcenter, Downtown, Miami, FL",
+    "Quest Name": "Discover Miami Worldcenter",
+    "Suggested Quest Concept": "Find the public art installation and log the artist's name",
+    "Suggested Reward": "Validation token for select retail partners",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamiworldcenter]",
+    "coordinates": {
+      "lat": 25.7802,
+      "lng": -80.1939
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Miami Worldcenter, Miami Worldcenter, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "South Pointe Park Pier",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "South Pointe Park Pier, South Beach, Miami, FL",
+    "Quest Name": "Discover South Pointe Park Pier",
+    "Suggested Quest Concept": "Watch a cruise ship sail past the pier and log the ship's name",
+    "Suggested Reward": "Digital badge for landmark quest",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @cityofmiamibeach]",
+    "coordinates": {
+      "lat": 25.7639,
+      "lng": -80.137
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "South Pointe Park Pier, South Pointe Park Pier, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Miracle Mile",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "Miracle Mile, Coral Gables, Miami, FL",
+    "Quest Name": "Discover Miracle Mile",
+    "Suggested Quest Concept": "Find the Mediterranean Revival fountain and photograph its tilework",
+    "Suggested Reward": "BID partner discount across participating shops",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @cityofcoralgables]",
+    "coordinates": {
+      "lat": 25.7494,
+      "lng": -80.2591
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Miracle Mile, Miracle Mile, Coral Gables, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Kaseya Center Plaza",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Kaseya Center Plaza, Downtown, Miami, FL",
+    "Quest Name": "Discover Kaseya Center Plaza",
+    "Suggested Quest Concept": "Find the championship banners outside the arena and photograph your favorite",
+    "Suggested Reward": "Discounted parking on non-event nights",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @kaseyacenter]",
+    "coordinates": {
+      "lat": 25.7812,
+      "lng": -80.1957
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Kaseya Center Plaza, Kaseya Center Plaza, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Jungle Island",
+    "Neighborhood": "Watson Island",
+    "Address / Mapbox Coordinates": "Jungle Island, Watson Island, Miami, FL",
+    "Quest Name": "Discover Jungle Island",
+    "Suggested Quest Concept": "Find an animal you've never seen before and log its origin region",
+    "Suggested Reward": "Discounted admission for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @jungleisland]",
+    "coordinates": {
+      "lat": 25.7874,
+      "lng": -80.1668
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Jungle Island, Jungle Island, Watson Island, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Wharf Miami",
+    "Neighborhood": "Downtown / River",
+    "Address / Mapbox Coordinates": "The Wharf Miami, Downtown / River, Miami, FL",
+    "Quest Name": "Literary Escape: The Wharf Miami",
+    "Suggested Quest Concept": "Catch a live DJ set and log the genre in your Breadcrumb",
+    "Suggested Reward": "Complimentary welcome cocktail on weekdays",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thewharfmiami]",
+    "coordinates": {
+      "lat": 25.7706,
+      "lng": -80.199
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Wharf Miami, The Wharf Miami, Downtown / River, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Brickell Key Park",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "Brickell Key Park, Brickell, Miami, FL",
+    "Quest Name": "Discover Brickell Key Park",
+    "Suggested Quest Concept": "Walk the 1.4-mile loop and log a bay view photo at sunrise",
+    "Suggested Reward": "Digital badge + curated bay-side route map",
+    "Thumbnail Image URL": "[Insert image asset or scrape from Instagram]",
+    "coordinates": {
+      "lat": 25.7637,
+      "lng": -80.188
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Brickell Key Park, Brickell Key Park, Brickell, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Giralda Plaza",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "Giralda Plaza, Coral Gables, Miami, FL",
+    "Quest Name": "Discover Giralda Plaza",
+    "Suggested Quest Concept": "Find a Mediterranean-style architectural detail and photograph it",
+    "Suggested Reward": "Plaza merchant discount network access",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @giraldaplaza]",
+    "coordinates": {
+      "lat": 25.7494,
+      "lng": -80.2575
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Giralda Plaza, Giralda Plaza, Coral Gables, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Jungle Plaza",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "Jungle Plaza, Design District, Miami, FL",
+    "Quest Name": "Discover Jungle Plaza",
+    "Suggested Quest Concept": "Find the rotating public art installation and submit a one-word reaction",
+    "Suggested Reward": "Event RSVP priority for SideQuests verified users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamidesigndistrict]",
+    "coordinates": {
+      "lat": 25.8149,
+      "lng": -80.1876
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Jungle Plaza, Jungle Plaza, Design District, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Citizens MiamiCentral",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Citizens MiamiCentral, Downtown, Miami, FL",
+    "Quest Name": "Discover Citizens MiamiCentral",
+    "Suggested Quest Concept": "Try a vendor before catching a Brightline and log the dish",
+    "Suggested Reward": "Validated Brightline + Citizens dual discount combo",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @citizens_miami]",
+    "coordinates": {
+      "lat": 25.7802,
+      "lng": -80.1939
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Citizens MiamiCentral, Citizens MiamiCentral, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Museum Park (Maurice Ferré)",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Museum Park (Maurice Ferré), Downtown, Miami, FL",
+    "Quest Name": "Discover Museum Park (Maurice Ferré)",
+    "Suggested Quest Concept": "Find the public art installation visible from the bay-front lawn and photograph it",
+    "Suggested Reward": "Digital cultural park badge",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamiparks]",
+    "coordinates": {
+      "lat": 25.7845,
+      "lng": -80.1862
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Museum Park (Maurice Ferré), Museum Park (Maurice Ferré), Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Española Way",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Española Way, South Beach, Miami, FL",
+    "Quest Name": "Discover Española Way",
+    "Suggested Quest Concept": "Find the Mediterranean-style alleyway and capture the architectural patina",
+    "Suggested Reward": "Merchant discount network access",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @espanolaway]",
+    "coordinates": {
+      "lat": 25.7876,
+      "lng": -80.1365
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Española Way, Española Way, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Regatta Harbour",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "Regatta Harbour, Coconut Grove, Miami, FL",
+    "Quest Name": "Literary Escape: Regatta Harbour",
+    "Suggested Quest Concept": "Watch the boats dock and log a favorite boat name in your Breadcrumb",
+    "Suggested Reward": "Validated parking pass for partner tenants",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @regattaharbour]",
+    "coordinates": {
+      "lat": 25.7258,
+      "lng": -80.237
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Regatta Harbour, Regatta Harbour, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Government Center Station",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Government Center Station, Downtown, Miami, FL",
+    "Quest Name": "Discover Government Center Station",
+    "Suggested Quest Concept": "Find a public art installation in the transit corridor and photograph it",
+    "Suggested Reward": "Digital transit hub badge",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @iridemdt]",
+    "coordinates": {
+      "lat": 25.7763,
+      "lng": -80.1975
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Government Center Station, Government Center Station, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Tea Room (EAST Miami)",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "Tea Room (EAST Miami), Brickell, Miami, FL",
+    "Quest Name": "Brews & Views: Tea Room (EAST Miami)",
+    "Suggested Quest Concept": "Order the bartender's secret menu drink and log the flavor profile",
+    "Suggested Reward": "Complimentary tea-tasting flight pre-cocktail",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @tearoom_east]",
+    "coordinates": {
+      "lat": 25.761,
+      "lng": -80.1912
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Tea Room (EAST Miami), Tea Room (EAST Miami), Brickell, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Kampong",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "The Kampong, Coconut Grove, Miami, FL",
+    "Quest Name": "Discover The Kampong",
+    "Suggested Quest Concept": "Find a tropical fruit tree you've never seen and log its name",
+    "Suggested Reward": "Free guided tour pass with admission",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thekampong]",
+    "coordinates": {
+      "lat": 25.7283,
+      "lng": -80.2395
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Kampong, The Kampong, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Swizzle Rum Bar & Drinkery",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Swizzle Rum Bar & Drinkery, South Beach, Miami, FL",
+    "Quest Name": "Discover Swizzle Rum Bar & Drinkery",
+    "Suggested Quest Concept": "Order a rum flight from three different islands and log your favorite",
+    "Suggested Reward": "Free dim sum side with any cocktail flight",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @swizzlemiami]",
+    "coordinates": {
+      "lat": 25.7873,
+      "lng": -80.1375
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Swizzle Rum Bar & Drinkery, Swizzle Rum Bar & Drinkery, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Supercar Rooms Miami",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Supercar Rooms Miami, Wynwood, Miami, FL",
+    "Quest Name": "Literary Escape: Supercar Rooms Miami",
+    "Suggested Quest Concept": "Find the supercar of the month and log its rarity in your Breadcrumb",
+    "Suggested Reward": "Priority RSVP for next dinner experience",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @supercarrooms]",
+    "coordinates": {
+      "lat": 25.801,
+      "lng": -80.1985
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Supercar Rooms Miami, Supercar Rooms Miami, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Dale Zine",
+    "Neighborhood": "Little River",
+    "Address / Mapbox Coordinates": "Dale Zine, Little River, Miami, FL",
+    "Quest Name": "Discover Dale Zine",
+    "Suggested Quest Concept": "Find a zine by a Miami-based artist you've never heard of and photograph the cover",
+    "Suggested Reward": "Free zine pack with any purchase over $20",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @dale_zine]",
+    "coordinates": {
+      "lat": 25.836,
+      "lng": -80.1943
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Dale Zine, Dale Zine, Little River, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Naomi's Garden",
+    "Neighborhood": "Little Haiti",
+    "Address / Mapbox Coordinates": "Naomi's Garden, Little Haiti, Miami, FL",
+    "Quest Name": "Literary Escape: Naomi's Garden",
+    "Suggested Quest Concept": "Find the outdoor garden patio and log a botanical observation in your Breadcrumb",
+    "Suggested Reward": "Complimentary house cocktail with dinner entrée",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @naomisgardenmia]",
+    "coordinates": {
+      "lat": 25.8272,
+      "lng": -80.1975
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Naomi's Garden, Naomi's Garden, Little Haiti, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Broken Shaker",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Broken Shaker, South Beach, Miami, FL",
+    "Quest Name": "Discover Broken Shaker",
+    "Suggested Quest Concept": "Order the seasonal punch and log its herb infusion",
+    "Suggested Reward": "Free welcome shot on first visit",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @brokenshaker]",
+    "coordinates": {
+      "lat": 25.7863,
+      "lng": -80.1378
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Broken Shaker, Broken Shaker, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Mac's Club Deuce",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Mac's Club Deuce, South Beach, Miami, FL",
+    "Quest Name": "Discover Mac's Club Deuce",
+    "Suggested Quest Concept": "Find the iconic neon sign and photograph it after dark",
+    "Suggested Reward": "Free shot for SideQuests verified users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @macsclubdeuce]",
+    "coordinates": {
+      "lat": 25.782,
+      "lng": -80.1392
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Mac's Club Deuce, Mac's Club Deuce, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Warehouse 44",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Warehouse 44, Wynwood, Miami, FL",
+    "Quest Name": "Literary Escape: Warehouse 44",
+    "Suggested Quest Concept": "Find the current artist-in-residence and log their medium in your Breadcrumb",
+    "Suggested Reward": "Studio open-house priority RSVP access",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @warehouse44_]",
+    "coordinates": {
+      "lat": 25.801,
+      "lng": -80.1978
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Warehouse 44, Warehouse 44, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Plant the Future",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "Plant the Future, Design District, Miami, FL",
+    "Quest Name": "Discover Plant the Future",
+    "Suggested Quest Concept": "Find the rarest plant sculpture and photograph it",
+    "Suggested Reward": "10% off any plant arrangement",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @plantthefuture]",
+    "coordinates": {
+      "lat": 25.8149,
+      "lng": -80.1876
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Plant the Future, Plant the Future, Design District, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Moore Building (Elastika)",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "The Moore Building (Elastika), Design District, Miami, FL",
+    "Quest Name": "Discover The Moore Building (Elastika)",
+    "Suggested Quest Concept": "Find Zaha Hadid's Elastika sculpture and capture it from the atrium floor",
+    "Suggested Reward": "Discounted access during Design Week",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamidesigndistrict]",
+    "coordinates": {
+      "lat": 25.8143,
+      "lng": -80.188
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Moore Building (Elastika), The Moore Building (Elastika), Design District, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Under the Ground Records",
+    "Neighborhood": "Midtown",
+    "Address / Mapbox Coordinates": "Under the Ground Records, Midtown, Miami, FL",
+    "Quest Name": "Vinyl Vibes: Under the Ground Records",
+    "Suggested Quest Concept": "Find a vinyl in a genre you've never explored and log your first impression",
+    "Suggested Reward": "10% off any vinyl purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @underthegroundrecords]",
+    "coordinates": {
+      "lat": 25.8094,
+      "lng": -80.1882
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Under the Ground Records, Under the Ground Records, Midtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Coral Gables Congregational Church",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "Coral Gables Congregational Church, Coral Gables, Miami, FL",
+    "Quest Name": "Discover Coral Gables Congregational Church",
+    "Suggested Quest Concept": "Find the Mediterranean Revival architecture and photograph the bell tower",
+    "Suggested Reward": "Free historic walking tour pass",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @gablesucc]",
+    "coordinates": {
+      "lat": 25.7491,
+      "lng": -80.2583
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Coral Gables Congregational Church, Coral Gables Congregational Church, Coral Gables, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "El Espacio 23",
+    "Neighborhood": "Allapattah",
+    "Address / Mapbox Coordinates": "El Espacio 23, Allapattah, Miami, FL",
+    "Quest Name": "Literary Escape: El Espacio 23",
+    "Suggested Quest Concept": "Find the current featured artist and log their hometown in your Breadcrumb",
+    "Suggested Reward": "Private viewing RSVP priority",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @elespacio23]",
+    "coordinates": {
+      "lat": 25.8018,
+      "lng": -80.2188
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "El Espacio 23, El Espacio 23, Allapattah, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Mid Beach Boardwalk (Secret Section)",
+    "Neighborhood": "Mid Beach",
+    "Address / Mapbox Coordinates": "Mid Beach Boardwalk (Secret Section), Mid Beach, Miami, FL",
+    "Quest Name": "Discover Mid Beach Boardwalk (Secret Section)",
+    "Suggested Quest Concept": "Find the hidden access point off Indian Creek and log the sunrise time",
+    "Suggested Reward": "Digital secret-route badge",
+    "Thumbnail Image URL": "[Insert image asset or scrape from Instagram]",
+    "coordinates": {
+      "lat": 25.818,
+      "lng": -80.127
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Mid Beach Boardwalk (Secret Section), Mid Beach Boardwalk (Secret Section), Mid Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Over Under",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Over Under, Downtown, Miami, FL",
+    "Quest Name": "Discover Over Under",
+    "Suggested Quest Concept": "Order the seasonal tasting menu and log the chef's signature touch",
+    "Suggested Reward": "Complimentary house bread service with dinner",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @overundermiami]",
+    "coordinates": {
+      "lat": 25.7763,
+      "lng": -80.196
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Over Under, Over Under, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Lost Boy & Co.",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Lost Boy & Co., Downtown, Miami, FL",
+    "Quest Name": "Literary Escape: Lost Boy & Co.",
+    "Suggested Quest Concept": "Find the hidden upstairs lounge and photograph the bookshelves",
+    "Suggested Reward": "Free pint with any pub-fare order",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @lostboymiami]",
+    "coordinates": {
+      "lat": 25.7763,
+      "lng": -80.1956
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Lost Boy & Co., Lost Boy & Co., Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Books & Books (Arsht Center)",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Books & Books (Arsht Center), Downtown, Miami, FL",
+    "Quest Name": "Literary Escape: Books & Books (Arsht Center)",
+    "Suggested Quest Concept": "Find a book recommended by an Arsht performer and log the title",
+    "Suggested Reward": "Free coffee with book purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @booksandbooks]",
+    "coordinates": {
+      "lat": 25.7845,
+      "lng": -80.1873
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Books & Books (Arsht Center), Books & Books (Arsht Center), Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Standard Mudroom",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "The Standard Mudroom, South Beach, Miami, FL",
+    "Quest Name": "Literary Escape: The Standard Mudroom",
+    "Suggested Quest Concept": "Attend a workshop and log the topic in your Breadcrumb",
+    "Suggested Reward": "Priority RSVP for next workshop session",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thestandard]",
+    "coordinates": {
+      "lat": 25.7766,
+      "lng": -80.145
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Standard Mudroom, The Standard Mudroom, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Fairchild Tropical Botanic Garden",
+    "Neighborhood": "Coral Gables (south edge)",
+    "Address / Mapbox Coordinates": "Fairchild Tropical Botanic Garden, Coral Gables (south edge), Miami, FL",
+    "Quest Name": "Discover Fairchild Tropical Botanic Garden",
+    "Suggested Quest Concept": "Find a plant from a continent you've never visited and log its origin",
+    "Suggested Reward": "Discounted member-day admission",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @fairchildgarden]",
+    "coordinates": {
+      "lat": 25.7068,
+      "lng": -80.2756
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Fairchild Tropical Botanic Garden, Fairchild Tropical Botanic Garden, Coral Gables (south edge), Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Bodega Speakeasy",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Bodega Speakeasy, South Beach, Miami, FL",
+    "Quest Name": "Taco Quest: Bodega Speakeasy",
+    "Suggested Quest Concept": "Find the hidden speakeasy entrance behind the taco truck and photograph the doorway",
+    "Suggested Reward": "Skip-the-line entry pass for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @bodegasouthbeach]",
+    "coordinates": {
+      "lat": 25.7873,
+      "lng": -80.1365
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Bodega Speakeasy, Bodega Speakeasy, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Wynwood Garage Rooftop",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Wynwood Garage Rooftop, Wynwood, Miami, FL",
+    "Quest Name": "Discover Wynwood Garage Rooftop",
+    "Suggested Quest Concept": "Find the rooftop mural visible from the top floor and photograph the panorama",
+    "Suggested Reward": "Validated parking pass for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from Instagram]",
+    "coordinates": {
+      "lat": 25.801,
+      "lng": -80.198
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Wynwood Garage Rooftop, Wynwood Garage Rooftop, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Miami River Walk (Hidden Trail)",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Miami River Walk (Hidden Trail), Downtown, Miami, FL",
+    "Quest Name": "Discover Miami River Walk (Hidden Trail)",
+    "Suggested Quest Concept": "Find the original Tequesta marker along the trail and photograph it",
+    "Suggested Reward": "Digital hidden-trail badge",
+    "Thumbnail Image URL": "[Insert image asset or scrape from Instagram]",
+    "coordinates": {
+      "lat": 25.7706,
+      "lng": -80.1987
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Miami River Walk (Hidden Trail), Miami River Walk (Hidden Trail), Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Assembly Concept Space",
+    "Neighborhood": "Midtown",
+    "Address / Mapbox Coordinates": "Assembly Concept Space, Midtown, Miami, FL",
+    "Quest Name": "Literary Escape: Assembly Concept Space",
+    "Suggested Quest Concept": "Find a piece by a local Miami maker and log their craft in your Breadcrumb",
+    "Suggested Reward": "10% off curated local-maker products",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @assemblymiami]",
+    "coordinates": {
+      "lat": 25.8094,
+      "lng": -80.189
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Assembly Concept Space, Assembly Concept Space, Midtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Margot Natural Wine Bar",
+    "Neighborhood": "Downtown",
+    "Address / Mapbox Coordinates": "Margot Natural Wine Bar, Downtown, Miami, FL",
+    "Quest Name": "Literary Escape: Margot Natural Wine Bar",
+    "Suggested Quest Concept": "Order a natural wine you've never tried and log the producer in your Breadcrumb",
+    "Suggested Reward": "Free cheese pairing with wine flight",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @margotmiami]",
+    "coordinates": {
+      "lat": 25.7763,
+      "lng": -80.195
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Margot Natural Wine Bar, Margot Natural Wine Bar, Downtown, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Concrete Beach Brewery",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Concrete Beach Brewery, Wynwood, Miami, FL",
+    "Quest Name": "Brews & Views: Concrete Beach Brewery",
+    "Suggested Quest Concept": "Try the Stiltsville Pilsner and log your tasting notes against a brewery from your hometown",
+    "Suggested Reward": "Free 4oz tasting flight with any pint purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @concretebeachbrewery]",
+    "coordinates": {
+      "lat": 25.801,
+      "lng": -80.201
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Concrete Beach Brewery, Concrete Beach Brewery, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Wynwood Brewing Company",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Wynwood Brewing Company, Wynwood, Miami, FL",
+    "Quest Name": "Brews & Views: Wynwood Brewing Company",
+    "Suggested Quest Concept": "Take a brewery tour and log the most unusual ingredient you spot",
+    "Suggested Reward": "Complimentary brewery tour with any purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @wynwoodbrewing]",
+    "coordinates": {
+      "lat": 25.7991,
+      "lng": -80.2016
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Wynwood Brewing Company, Wynwood Brewing Company, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "J. Wakefield Brewing",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "J. Wakefield Brewing, Wynwood, Miami, FL",
+    "Quest Name": "Discover J. Wakefield Brewing",
+    "Suggested Quest Concept": "Find the Star Wars mural inside the taproom and photograph your favorite character",
+    "Suggested Reward": "First Miami Mada IPA pour 50% off",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @jwakefieldbrewing]",
+    "coordinates": {
+      "lat": 25.7985,
+      "lng": -80.2013
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "J. Wakefield Brewing, J. Wakefield Brewing, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Veza Sur Brewing Co.",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Veza Sur Brewing Co., Wynwood, Miami, FL",
+    "Quest Name": "Discover Veza Sur Brewing Co.",
+    "Suggested Quest Concept": "Try a Latin-inspired brew and log the heritage country it nods to",
+    "Suggested Reward": "Free side empanada with any flight",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @vezasur]",
+    "coordinates": {
+      "lat": 25.7984,
+      "lng": -80.2008
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Veza Sur Brewing Co., Veza Sur Brewing Co., Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Gramps Bar",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Gramps Bar, Wynwood, Miami, FL",
+    "Quest Name": "Literary Escape: Gramps Bar",
+    "Suggested Quest Concept": "Find the photo booth and submit a Breadcrumb selfie with the day's drink special",
+    "Suggested Reward": "$1 off any draft beer for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @grampswynwood]",
+    "coordinates": {
+      "lat": 25.8009,
+      "lng": -80.1979
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Gramps Bar, Gramps Bar, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Coyo Taco",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Coyo Taco, Wynwood, Miami, FL",
+    "Quest Name": "Discover Coyo Taco",
+    "Suggested Quest Concept": "Find the hidden back speakeasy and log the password phrase staff gave you",
+    "Suggested Reward": "Free elote with any taco trio order",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @coyotaco]",
+    "coordinates": {
+      "lat": 25.8007,
+      "lng": -80.1997
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Coyo Taco, Coyo Taco, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "KYU",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "KYU, Wynwood, Miami, FL",
+    "Quest Name": "Discover KYU",
+    "Suggested Quest Concept": "Order the wood-fire roasted cauliflower and log a one-word reaction",
+    "Suggested Reward": "Complimentary signature mocktail with dinner",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @kyumiami]",
+    "coordinates": {
+      "lat": 25.801,
+      "lng": -80.1985
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "KYU, KYU, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Bakan",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Bakan, Wynwood, Miami, FL",
+    "Quest Name": "Discover Bakan",
+    "Suggested Quest Concept": "Try a mezcal flight and log the agave variety you preferred",
+    "Suggested Reward": "Free chapulines (grasshopper) starter with flight",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @bakanwynwood]",
+    "coordinates": {
+      "lat": 25.8006,
+      "lng": -80.1993
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Bakan, Bakan, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "R House Wynwood",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "R House Wynwood, Wynwood, Miami, FL",
+    "Quest Name": "Literary Escape: R House Wynwood",
+    "Suggested Quest Concept": "Catch a drag performance and log the queen's signature number in your Breadcrumb",
+    "Suggested Reward": "Complimentary welcome mimosa for brunch reservations",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @rhousewynwood]",
+    "coordinates": {
+      "lat": 25.8012,
+      "lng": -80.198
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "R House Wynwood, R House Wynwood, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Beaker & Gray",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Beaker & Gray, Wynwood, Miami, FL",
+    "Quest Name": "Brews & Views: Beaker & Gray",
+    "Suggested Quest Concept": "Order an off-menu cocktail crafted by the bartender and log the spirit base",
+    "Suggested Reward": "Free amuse-bouche with any tasting menu",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @beakerandgray]",
+    "coordinates": {
+      "lat": 25.8002,
+      "lng": -80.1982
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Beaker & Gray, Beaker & Gray, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Versailles Restaurant",
+    "Neighborhood": "Little Havana",
+    "Address / Mapbox Coordinates": "3555 SW 8th St, Miami, FL 33135",
+    "Quest Name": "Discover Versailles Restaurant",
+    "Suggested Quest Concept": "Order a cafecito at the window counter and log a conversation you overheard",
+    "Suggested Reward": "Free pastelito with any cafecito order",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @versaillesmiami]",
+    "coordinates": {
+      "lat": 25.7631,
+      "lng": -80.234
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Versailles Restaurant, 3555 SW 8th St, Miami, FL 33135",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Azucar Ice Cream Company",
+    "Neighborhood": "Little Havana",
+    "Address / Mapbox Coordinates": "1503 SW 8th St, Miami, FL 33135",
+    "Quest Name": "Discover Azucar Ice Cream Company",
+    "Suggested Quest Concept": "Try the Abuela María flavor and log what it reminds you of",
+    "Suggested Reward": "Free single scoop with any pint purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @azucaricecream]",
+    "coordinates": {
+      "lat": 25.7693,
+      "lng": -80.2225
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Azucar Ice Cream Company, 1503 SW 8th St, Miami, FL 33135",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Cubaocho Museum & Performing Arts",
+    "Neighborhood": "Little Havana",
+    "Address / Mapbox Coordinates": "Cubaocho Museum & Performing Arts, Little Havana, Miami, FL",
+    "Quest Name": "Discover Cubaocho Museum & Performing Arts",
+    "Suggested Quest Concept": "Find a pre-revolution Cuban painting and log the artist's name",
+    "Suggested Reward": "Free cultural workshop pass with museum visit",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @cubaocho]",
+    "coordinates": {
+      "lat": 25.7693,
+      "lng": -80.2178
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Cubaocho Museum & Performing Arts, Cubaocho Museum & Performing Arts, Little Havana, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Domino Park (Máximo Gómez Park)",
+    "Neighborhood": "Little Havana",
+    "Address / Mapbox Coordinates": "Domino Park (Máximo Gómez Park), Little Havana, Miami, FL",
+    "Quest Name": "Literary Escape: Domino Park (Máximo Gómez Park)",
+    "Suggested Quest Concept": "Watch a domino match in progress and log a player's nickname in your Breadcrumb",
+    "Suggested Reward": "Digital cultural landmark badge",
+    "Thumbnail Image URL": "[Insert image asset or scrape from Instagram]",
+    "coordinates": {
+      "lat": 25.7693,
+      "lng": -80.22
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Domino Park (Máximo Gómez Park), Domino Park (Máximo Gómez Park), Little Havana, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Tower Theater",
+    "Neighborhood": "Little Havana",
+    "Address / Mapbox Coordinates": "Tower Theater, Little Havana, Miami, FL",
+    "Quest Name": "Discover Tower Theater",
+    "Suggested Quest Concept": "Catch a Spanish-language film and log the director's hometown",
+    "Suggested Reward": "Discounted ticket for next showing with quest completion",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @towertheatermiami]",
+    "coordinates": {
+      "lat": 25.7694,
+      "lng": -80.2183
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Tower Theater, Tower Theater, Little Havana, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Anderson",
+    "Neighborhood": "MiMo / Upper East",
+    "Address / Mapbox Coordinates": "The Anderson, MiMo / Upper East, Miami, FL",
+    "Quest Name": "Discover The Anderson",
+    "Suggested Quest Concept": "Find the retro tropical wallpaper and capture a portrait against it",
+    "Suggested Reward": "Complimentary house mocktail with any cocktail order",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @andersonmiami]",
+    "coordinates": {
+      "lat": 25.8406,
+      "lng": -80.187
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Anderson, The Anderson, MiMo / Upper East, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Phuc Yea",
+    "Neighborhood": "MiMo / Upper East",
+    "Address / Mapbox Coordinates": "Phuc Yea, MiMo / Upper East, Miami, FL",
+    "Quest Name": "Discover Phuc Yea",
+    "Suggested Quest Concept": "Order the chef's special and log the regional Vietnamese origin",
+    "Suggested Reward": "Free spring rolls with any entrée",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @phucyea]",
+    "coordinates": {
+      "lat": 25.8396,
+      "lng": -80.1873
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Phuc Yea, Phuc Yea, MiMo / Upper East, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Mignonette",
+    "Neighborhood": "Edgewater",
+    "Address / Mapbox Coordinates": "Mignonette, Edgewater, Miami, FL",
+    "Quest Name": "Discover Mignonette",
+    "Suggested Quest Concept": "Try three oysters from different coasts and log which East/West you preferred",
+    "Suggested Reward": "Free side mignonette pairing with half-dozen oysters",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @mignonettemiami]",
+    "coordinates": {
+      "lat": 25.794,
+      "lng": -80.1896
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Mignonette, Mignonette, Edgewater, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Cake Thai",
+    "Neighborhood": "Edgewater / Wynwood",
+    "Address / Mapbox Coordinates": "Cake Thai, Edgewater / Wynwood, Miami, FL",
+    "Quest Name": "Discover Cake Thai",
+    "Suggested Quest Concept": "Order a dish at Chef's recommended spice level and log your heat tolerance honestly",
+    "Suggested Reward": "Free Thai iced tea with any spicy entrée",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @cakethaikitchen]",
+    "coordinates": {
+      "lat": 25.7953,
+      "lng": -80.1963
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Cake Thai, Cake Thai, Edgewater / Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Boia De",
+    "Neighborhood": "Buena Vista",
+    "Address / Mapbox Coordinates": "Boia De, Buena Vista, Miami, FL",
+    "Quest Name": "Discover Boia De",
+    "Suggested Quest Concept": "Try the handmade pasta of the day and log the chef's regional Italian inspiration",
+    "Suggested Reward": "Complimentary house focaccia with any reservation",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @boiademiami]",
+    "coordinates": {
+      "lat": 25.817,
+      "lng": -80.189
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Boia De, Boia De, Buena Vista, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Glass & Vine",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "Glass & Vine, Coconut Grove, Miami, FL",
+    "Quest Name": "Discover Glass & Vine",
+    "Suggested Quest Concept": "Find the outdoor garden seating and capture the park view",
+    "Suggested Reward": "Complimentary welcome aperitif with reservation",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @glassandvine]",
+    "coordinates": {
+      "lat": 25.7292,
+      "lng": -80.2375
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Glass & Vine, Glass & Vine, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Greenstreet Cafe",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "Greenstreet Cafe, Coconut Grove, Miami, FL",
+    "Quest Name": "Discover Greenstreet Cafe",
+    "Suggested Quest Concept": "Find the people-watching corner table and log the most stylish outfit you spotted",
+    "Suggested Reward": "Free pastry with any breakfast plate",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @greenstreetcafemiami]",
+    "coordinates": {
+      "lat": 25.7283,
+      "lng": -80.2395
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Greenstreet Cafe, Greenstreet Cafe, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Atchana's Homegrown Thai",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "Atchana's Homegrown Thai, Coconut Grove, Miami, FL",
+    "Quest Name": "Discover Atchana's Homegrown Thai",
+    "Suggested Quest Concept": "Order chef's mother's recipe item and log the family-story flavor",
+    "Suggested Reward": "Complimentary house dessert with dinner entrée",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @atchanasthai]",
+    "coordinates": {
+      "lat": 25.7295,
+      "lng": -80.2377
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Atchana's Homegrown Thai, Atchana's Homegrown Thai, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Lulu in the Grove",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "Lulu in the Grove, Coconut Grove, Miami, FL",
+    "Quest Name": "Discover Lulu in the Grove",
+    "Suggested Quest Concept": "Find the al fresco patio and capture the leafy canopy overhead",
+    "Suggested Reward": "Free side salad with any lunch entrée",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @luluinthegrove]",
+    "coordinates": {
+      "lat": 25.729,
+      "lng": -80.2385
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Lulu in the Grove, Lulu in the Grove, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Monty's Coconut Grove",
+    "Neighborhood": "Coconut Grove",
+    "Address / Mapbox Coordinates": "Monty's Coconut Grove, Coconut Grove, Miami, FL",
+    "Quest Name": "Discover Monty's Coconut Grove",
+    "Suggested Quest Concept": "Watch a sunset from the tiki deck and log the marina's most unusual boat name",
+    "Suggested Reward": "Complimentary stone crab claw with any platter",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @montysrawbar]",
+    "coordinates": {
+      "lat": 25.7258,
+      "lng": -80.2388
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Monty's Coconut Grove, Monty's Coconut Grove, Coconut Grove, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Bulla Gastrobar",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "Bulla Gastrobar, Coral Gables, Miami, FL",
+    "Quest Name": "Discover Bulla Gastrobar",
+    "Suggested Quest Concept": "Order tapas off the chef's recommendation and log your favorite small plate",
+    "Suggested Reward": "Free croquetas with any tapas order over $40",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @bullagastrobar]",
+    "coordinates": {
+      "lat": 25.7491,
+      "lng": -80.2588
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Bulla Gastrobar, Bulla Gastrobar, Coral Gables, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Caja Caliente",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "Caja Caliente, Coral Gables, Miami, FL",
+    "Quest Name": "Discover Caja Caliente",
+    "Suggested Quest Concept": "Try the chef's reinvented Cuban sandwich and log how it compares to a classic Cubano",
+    "Suggested Reward": "Free yuca fries with any sandwich purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @cajacaliente]",
+    "coordinates": {
+      "lat": 25.7488,
+      "lng": -80.2591
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Caja Caliente, Caja Caliente, Coral Gables, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Coral Gables Museum",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "Coral Gables Museum, Coral Gables, Miami, FL",
+    "Quest Name": "Discover Coral Gables Museum",
+    "Suggested Quest Concept": "Find the city's original 1925 master plan and photograph a detail nobody notices",
+    "Suggested Reward": "Discounted member trial with quest completion",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @coralgablesmuseum]",
+    "coordinates": {
+      "lat": 25.7494,
+      "lng": -80.2561
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Coral Gables Museum, Coral Gables Museum, Coral Gables, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Coral Gables Art Cinema",
+    "Neighborhood": "Coral Gables",
+    "Address / Mapbox Coordinates": "Coral Gables Art Cinema, Coral Gables, Miami, FL",
+    "Quest Name": "Discover Coral Gables Art Cinema",
+    "Suggested Quest Concept": "Catch an indie film and log the director's country of origin",
+    "Suggested Reward": "Free popcorn upgrade with ticket purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @gablescinema]",
+    "coordinates": {
+      "lat": 25.7494,
+      "lng": -80.2591
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Coral Gables Art Cinema, Coral Gables Art Cinema, Coral Gables, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Joe's Stone Crab",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Joe's Stone Crab, South Beach, Miami, FL",
+    "Quest Name": "Discover Joe's Stone Crab",
+    "Suggested Quest Concept": "Order from the takeaway window during peak season and log your wait time",
+    "Suggested Reward": "Complimentary key lime pie with dinner reservation",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @joesstonecrab]",
+    "coordinates": {
+      "lat": 25.7636,
+      "lng": -80.1402
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Joe's Stone Crab, Joe's Stone Crab, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Wolfsonian-FIU",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Wolfsonian-FIU, South Beach, Miami, FL",
+    "Quest Name": "Discover Wolfsonian-FIU",
+    "Suggested Quest Concept": "Find the propaganda poster collection and log the era you found most striking",
+    "Suggested Reward": "Discounted student-rate admission for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @wolfsoniansfiu]",
+    "coordinates": {
+      "lat": 25.7829,
+      "lng": -80.1362
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Wolfsonian-FIU, Wolfsonian-FIU, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "World Erotic Art Museum (WEAM)",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "World Erotic Art Museum (WEAM), South Beach, Miami, FL",
+    "Quest Name": "Literary Escape: World Erotic Art Museum (WEAM)",
+    "Suggested Quest Concept": "Find a piece from before 1900 and log the cultural origin tactfully in your Breadcrumb",
+    "Suggested Reward": "Discounted admission for SideQuests verified users (21+)",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @weammiami]",
+    "coordinates": {
+      "lat": 25.7893,
+      "lng": -80.1371
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "World Erotic Art Museum (WEAM), World Erotic Art Museum (WEAM), South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Jewish Museum of Florida–FIU",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Jewish Museum of Florida–FIU, South Beach, Miami, FL",
+    "Quest Name": "Discover Jewish Museum of Florida–FIU",
+    "Suggested Quest Concept": "Find an artifact tied to Cuban-Jewish migration and log its dated provenance",
+    "Suggested Reward": "Free admission for SideQuests users on partner days",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @jewishmuseumfl]",
+    "coordinates": {
+      "lat": 25.774,
+      "lng": -80.1362
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Jewish Museum of Florida–FIU, Jewish Museum of Florida–FIU, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "News Cafe",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "News Cafe, South Beach, Miami, FL",
+    "Quest Name": "Discover News Cafe",
+    "Suggested Quest Concept": "Sit at the iconic outdoor patio and log how Ocean Drive has changed since the 90s",
+    "Suggested Reward": "Free Cuban coffee with any breakfast plate",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @newscafesouthbeach]",
+    "coordinates": {
+      "lat": 25.7827,
+      "lng": -80.1304
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "News Cafe, News Cafe, South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Sweet Liberty Drinks & Supply Co.",
+    "Neighborhood": "South Beach",
+    "Address / Mapbox Coordinates": "Sweet Liberty Drinks & Supply Co., South Beach, Miami, FL",
+    "Quest Name": "Sweet Tooth Tour: Sweet Liberty Drinks & Supply Co.",
+    "Suggested Quest Concept": "Order the Sweet Liberty Daiquiri and log how it differs from a classic Hemingway",
+    "Suggested Reward": "Free welcome shot with any cocktail purchase",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @mysweetlibertymia]",
+    "coordinates": {
+      "lat": 25.7876,
+      "lng": -80.1382
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Sweet Liberty Drinks & Supply Co., Sweet Liberty Drinks & Supply Co., South Beach, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Locust Projects",
+    "Neighborhood": "Little River",
+    "Address / Mapbox Coordinates": "Locust Projects, Little River, Miami, FL",
+    "Quest Name": "Discover Locust Projects",
+    "Suggested Quest Concept": "Find the current site-specific installation and log how the space transformed it",
+    "Suggested Reward": "Free workshop pass with quest completion",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @locustprojects]",
+    "coordinates": {
+      "lat": 25.836,
+      "lng": -80.1953
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Locust Projects, Locust Projects, Little River, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Bakehouse Art Complex",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "The Bakehouse Art Complex, Wynwood, Miami, FL",
+    "Quest Name": "Discover The Bakehouse Art Complex",
+    "Suggested Quest Concept": "Find an artist working in their studio and log the medium they're using",
+    "Suggested Reward": "Open-studio priority RSVP for SideQuests users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @bacflorg]",
+    "coordinates": {
+      "lat": 25.8002,
+      "lng": -80.1993
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Bakehouse Art Complex, The Bakehouse Art Complex, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Mana Wynwood",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Mana Wynwood, Wynwood, Miami, FL",
+    "Quest Name": "Discover Mana Wynwood",
+    "Suggested Quest Concept": "Find the rotating large-scale installation and submit a one-word reaction",
+    "Suggested Reward": "Event RSVP priority for upcoming Art Basel programming",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @manawynwood]",
+    "coordinates": {
+      "lat": 25.8012,
+      "lng": -80.2016
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Mana Wynwood, Mana Wynwood, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Citadel",
+    "Neighborhood": "Little River",
+    "Address / Mapbox Coordinates": "The Citadel, Little River, Miami, FL",
+    "Quest Name": "Discover The Citadel",
+    "Suggested Quest Concept": "Try a vendor you've never heard of and log a chef's recommendation",
+    "Suggested Reward": "Free side or drink with any vendor combo",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thecitadelmiami]",
+    "coordinates": {
+      "lat": 25.836,
+      "lng": -80.196
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Citadel, The Citadel, Little River, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Wynwood Marketplace",
+    "Neighborhood": "Wynwood",
+    "Address / Mapbox Coordinates": "Wynwood Marketplace, Wynwood, Miami, FL",
+    "Quest Name": "Discover Wynwood Marketplace",
+    "Suggested Quest Concept": "Find a maker booth and log the most unusual craft on display",
+    "Suggested Reward": "Free entry to next weekend market event",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @wynwoodmarketplace]",
+    "coordinates": {
+      "lat": 25.8002,
+      "lng": -80.1989
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Wynwood Marketplace, Wynwood Marketplace, Wynwood, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Webster",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "The Webster, Design District, Miami, FL",
+    "Quest Name": "Discover The Webster",
+    "Suggested Quest Concept": "Find a designer you've never heard of and log their country of origin",
+    "Suggested Reward": "Complimentary in-store espresso during browsing",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @thewebster]",
+    "coordinates": {
+      "lat": 25.8149,
+      "lng": -80.1886
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Webster, The Webster, Design District, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "OTL Café",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "OTL Café, Design District, Miami, FL",
+    "Quest Name": "Discover OTL Café",
+    "Suggested Quest Concept": "Order the avocado toast and capture the all-pink interior",
+    "Suggested Reward": "Free side smoothie shot with any brunch plate",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @otl_cafe]",
+    "coordinates": {
+      "lat": 25.8143,
+      "lng": -80.189
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "OTL Café, OTL Café, Design District, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Estefan Kitchen Express",
+    "Neighborhood": "Design District",
+    "Address / Mapbox Coordinates": "Estefan Kitchen Express, Design District, Miami, FL",
+    "Quest Name": "Discover Estefan Kitchen Express",
+    "Suggested Quest Concept": "Try the croqueta sampler and log your favorite filling",
+    "Suggested Reward": "Free guava pastelito with any combo",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @estefankitchen]",
+    "coordinates": {
+      "lat": 25.8149,
+      "lng": -80.1876
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Estefan Kitchen Express, Estefan Kitchen Express, Design District, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Pubbelly Sushi",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "Pubbelly Sushi, Brickell, Miami, FL",
+    "Quest Name": "Discover Pubbelly Sushi",
+    "Suggested Quest Concept": "Order a signature roll and log how it fuses Latin and Asian flavor profiles",
+    "Suggested Reward": "Free edamame with any sushi platter",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @pubbellysushi]",
+    "coordinates": {
+      "lat": 25.761,
+      "lng": -80.1912
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "Pubbelly Sushi, Pubbelly Sushi, Brickell, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "La Mar by Gastón Acurio",
+    "Neighborhood": "Brickell",
+    "Address / Mapbox Coordinates": "La Mar by Gastón Acurio, Brickell, Miami, FL",
+    "Quest Name": "Brews & Views: La Mar by Gastón Acurio",
+    "Suggested Quest Concept": "Order a Pisco cocktail and log the grape variety used by the bartender",
+    "Suggested Reward": "Complimentary ceviche side with main course",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @lamarmiami]",
+    "coordinates": {
+      "lat": 25.7618,
+      "lng": -80.1909
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "La Mar by Gastón Acurio, La Mar by Gastón Acurio, Brickell, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Pinecrest Gardens",
+    "Neighborhood": "Pinecrest",
+    "Address / Mapbox Coordinates": "Pinecrest Gardens, Pinecrest, Miami, FL",
+    "Quest Name": "Literary Escape: Pinecrest Gardens",
+    "Suggested Quest Concept": "Find the historic Parrot Jungle pavilion and log a botanical species in your Breadcrumb",
+    "Suggested Reward": "Discounted admission for SideQuests users on event days",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @pinecrestgardens]",
+    "coordinates": {
+      "lat": 25.6667,
+      "lng": -80.304
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Pinecrest Gardens, Pinecrest Gardens, Pinecrest, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Matheson Hammock Park & Atoll Pool",
+    "Neighborhood": "Coral Gables (south)",
+    "Address / Mapbox Coordinates": "Matheson Hammock Park & Atoll Pool, Coral Gables (south), Miami, FL",
+    "Quest Name": "Discover Matheson Hammock Park & Atoll Pool",
+    "Suggested Quest Concept": "Capture the man-made atoll lagoon at high tide and log the bay reflection",
+    "Suggested Reward": "Digital natural-landmark badge + curated route",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamidadeparks]",
+    "coordinates": {
+      "lat": 25.6906,
+      "lng": -80.2756
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Matheson Hammock Park & Atoll Pool, Matheson Hammock Park & Atoll Pool, Coral Gables (south), Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "The Underline",
+    "Neighborhood": "Brickell → South Miami",
+    "Address / Mapbox Coordinates": "The Underline, Brickell → South Miami, Miami, FL",
+    "Quest Name": "Discover The Underline",
+    "Suggested Quest Concept": "Find a piece of the trail's public art and log the artist or piece title",
+    "Suggested Reward": "Digital trail completion badge + curated route map",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @theunderlinemia]",
+    "coordinates": {
+      "lat": 25.7616,
+      "lng": -80.1927
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "medium",
+      "mapboxPlaceName": "The Underline, The Underline, Brickell → South Miami, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Margaret Pace Park",
+    "Neighborhood": "Edgewater",
+    "Address / Mapbox Coordinates": "Margaret Pace Park, Edgewater, Miami, FL",
+    "Quest Name": "Discover Margaret Pace Park",
+    "Suggested Quest Concept": "Watch a sunset over Biscayne Bay and log the silhouette of a passing boat",
+    "Suggested Reward": "Digital bayfront-park badge",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @miamiparks]",
+    "coordinates": {
+      "lat": 25.794,
+      "lng": -80.1862
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Margaret Pace Park, Margaret Pace Park, Edgewater, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  },
+  {
+    "Business Name": "Deering Estate",
+    "Neighborhood": "Cutler Bay",
+    "Address / Mapbox Coordinates": "Deering Estate, Cutler Bay, Miami, FL",
+    "Quest Name": "Discover Deering Estate",
+    "Suggested Quest Concept": "Find the Tequesta burial mound site marker and log its historical context",
+    "Suggested Reward": "Discounted admission for SideQuests verified users",
+    "Thumbnail Image URL": "[Insert image asset or scrape from @deeringestate]",
+    "coordinates": {
+      "lat": 25.6073,
+      "lng": -80.2828
+    },
+    "geocoding": {
+      "status": "matched",
+      "confidence": "high",
+      "mapboxPlaceName": "Deering Estate, Deering Estate, Cutler Bay, Miami, FL",
+      "mapboxFeatureType": "local-lookup",
+      "mapboxId": null
+    }
+  }
+]

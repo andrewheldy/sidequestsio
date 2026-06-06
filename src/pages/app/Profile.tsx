@@ -117,6 +117,8 @@ const Profile = () => {
     navigate('/');
   };
 
+  const lvl = levelProgress(profile?.xp ?? 0);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -172,11 +174,11 @@ const Profile = () => {
           <span className="font-medium">Progress to Level {level + 1}</span>
           <span className="text-muted-foreground">{xp} / {nextLevelXp} XP</span>
         </div>
-        <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted/50">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-coral to-turquoise transition-all"
-            style={{ width: `${xpPct}%` }}
-          />
+        <Progress value={lvl.progress * 100} className="mt-2 h-2" />
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <StatTile label="Points" value={profile?.points_balance_cache ?? 0} accent="coral" />
+          <StatTile label="Quests" value={profile?.completed_quests_count ?? 0} accent="turquoise" />
+          <StatTile label="Notes" value={profile?.community_notes_count ?? 0} />
         </div>
       </div>
 
@@ -289,9 +291,8 @@ const Profile = () => {
         )}
       </div>
 
-      <Button variant="outline" className="w-full" onClick={handleSignOut}>
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign out
+      <Button variant="ghost" onClick={signOut} className="mt-6 w-full gap-2 text-destructive">
+        <LogOut className="h-4 w-4" /> Sign out
       </Button>
 
       {/* Claim code dialog */}
@@ -315,16 +316,26 @@ const Profile = () => {
       </Dialog>
     </div>
   );
-};
+}
 
-function StatTile({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+function Row({
+  label,
+  desc,
+  checked,
+  onChange,
+}: {
+  label: string;
+  desc: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
-    <div className="glass-card flex flex-col items-center gap-1 p-4">
-      {icon}
-      <span className="font-poppins text-lg font-bold">{value}</span>
-      <span className="text-xs text-muted-foreground">{label}</span>
+    <div className="flex items-center justify-between gap-4 p-4">
+      <div>
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">{desc}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
     </div>
   );
 }
-
-export default Profile;
