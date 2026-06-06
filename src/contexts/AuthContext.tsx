@@ -100,10 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!error && !data) {
       // No profile row yet — the signup trigger may not have fired (e.g. migration
       // not applied in production, or the user pre-dates the trigger). Create a
-      // minimal row so the profile page can render.
+      // minimal row so the profile page can render. Mark onboarding as completed
+      // so AppLayout doesn't redirect an existing auth user back to /onboarding.
       const { error: insertError } = await supabase
         .from('profiles')
-        .insert({ user_id: userId });
+        .insert({ user_id: userId, onboarding_completed: true });
 
       // 23505 = unique_violation: the trigger created the row concurrently — fine.
       if (!insertError || insertError.code === '23505') {

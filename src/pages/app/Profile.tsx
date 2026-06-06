@@ -14,7 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, type Profile as ProfileType } from '@/contexts/AuthContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { MIAMI_QUESTS } from '@/data/miami/toQuest';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,34 @@ import {
   formatJoined,
 } from '@/components/app/profile/parts';
 
+/** Shown when the real profile row hasn't loaded yet (new account, fetch error, etc.). */
+function buildFallbackProfile(userId: string, email: string | undefined): ProfileType {
+  return {
+    user_id: userId,
+    display_name: email?.split('@')[0] ?? null,
+    username: null,
+    avatar_url: null,
+    home_city: 'Miami',
+    bio: null,
+    instagram_url: null,
+    tiktok_url: null,
+    x_url: null,
+    is_profile_public: false,
+    show_social_links: false,
+    show_completed_quests: false,
+    show_breadcrumbs: false,
+    interests: [],
+    quest_style: null,
+    quest_energy: null,
+    starting_area: null,
+    xp: 0,
+    level: 1,
+    streak: 0,
+    onboarding_completed: false,
+    created_at: null,
+  };
+}
+
 const Profile = () => {
   const { user, profile, loading, signOut, updateProfile, refreshProfile } = useAuth();
   const { favorites } = useFavorites();
@@ -42,19 +70,12 @@ const Profile = () => {
 
   if (loading) return <ProfileSkeleton />;
 
-  if (!profile) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 pt-16 text-center">
-        <p className="text-muted-foreground">Could not load your profile. Please try again.</p>
-        <Button variant="outline" onClick={() => void refreshProfile()}>
-          Retry
-        </Button>
-      </div>
-    );
-  }
+  // Fall back to a local stand-in when the profile row hasn't arrived yet so
+  // the UI always renders. Edits will trigger a real upsert once the row exists.
+  const effectiveProfile = profile ?? buildFallbackProfile(user?.id ?? '', user?.email);
 
-  const name = profile.display_name || user?.email?.split('@')[0] || 'Explorer';
-  const joined = formatJoined(profile.created_at);
+  const name = effectiveProfile.display_name || user?.email?.split('@')[0] || 'Explorer';
+  const joined = formatJoined(effectiveProfile.created_at);
 
   const setPrivacy = async (
     key:
@@ -82,9 +103,9 @@ const Profile = () => {
           {/* Avatar with edit affordance, overlapping the banner */}
           <div className="relative -mt-12 mb-3">
             <div className="h-24 w-24 overflow-hidden rounded-[22px] ring-2 ring-primary/40">
-              {profile.avatar_url ? (
+              {effectiveProfile.avatar_url ? (
                 <img
-                  src={profile.avatar_url}
+                  src={effectiveProfile.avatar_url}
                   alt={name}
                   className="h-full w-full object-cover"
                 />
@@ -108,26 +129,26 @@ const Profile = () => {
 
           {/* Name & username */}
           <h1 className="font-poppins text-xl font-bold">{name}</h1>
-          {profile.username && (
-            <p className="text-sm text-muted-foreground">@{profile.username}</p>
+          {effectiveProfile.username && (
+            <p className="text-sm text-muted-foreground">@{effectiveProfile.username}</p>
           )}
 
           {/* Level · city · joined */}
           <p className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
-              <Trophy className="h-3.5 w-3.5 text-coral" /> Level {profile.level}
+              <Trophy className="h-3.5 w-3.5 text-coral" /> Level {effectiveProfile.level}
             </span>
             <span aria-hidden>·</span>
             <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" /> {profile.home_city || 'Miami'}
+              <MapPin className="h-3.5 w-3.5" /> {effectiveProfile.home_city || 'Miami'}
             </span>
           </p>
           {joined && <p className="mt-0.5 text-xs text-muted-foreground">{joined}</p>}
 
           {/* Bio */}
-          {profile.bio && (
+          {effectiveProfile.bio && (
             <p className="mx-auto mt-3 max-w-[300px] text-center text-sm text-foreground/90">
-              {profile.bio}
+              {effectiveProfile.bio}
             </p>
           )}
 
@@ -145,18 +166,18 @@ const Profile = () => {
 
       {/* ── Stats ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-3">
-        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${profile.xp}`} label="XP" />
-        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${profile.level}`} label="Level" />
-        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${profile.streak}`} label="Day streak" />
+        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${effectiveProfile.xp}`} label="XP" />
+        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${effectiveProfile.level}`} label="Level" />
+        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${effectiveProfile.streak}`} label="Day streak" />
       </div>
 
-      <XpMeter xp={profile.xp} level={profile.level} />
+      <XpMeter xp={effectiveProfile.xp} level={effectiveProfile.level} />
 
       {/* ── Social links ─────────────────────────────────────────────── */}
       <SocialLinksEditor
-        instagram={profile.instagram_url}
-        tiktok={profile.tiktok_url}
-        x={profile.x_url}
+        instagram={effectiveProfile.instagram_url}
+        tiktok={effectiveProfile.tiktok_url}
+        x={effectiveProfile.x_url}
       />
 
       {/* ── Quest activity ───────────────────────────────────────────── */}
@@ -222,28 +243,28 @@ const Profile = () => {
         <PrivacyRow
           label="Show profile publicly"
           desc="Let others view your profile at its public link."
-          checked={profile.is_profile_public}
+          checked={effectiveProfile.is_profile_public}
           onChange={(v) => setPrivacy('is_profile_public', v)}
         />
         <PrivacyRow
           label="Show social links"
           desc="Display your Instagram, TikTok and X on your public profile."
-          checked={profile.show_social_links}
-          disabled={!profile.is_profile_public}
+          checked={effectiveProfile.show_social_links}
+          disabled={!effectiveProfile.is_profile_public}
           onChange={(v) => setPrivacy('show_social_links', v)}
         />
         <PrivacyRow
           label="Show completed quests"
           desc="Share the quests you've finished."
-          checked={profile.show_completed_quests}
-          disabled={!profile.is_profile_public}
+          checked={effectiveProfile.show_completed_quests}
+          disabled={!effectiveProfile.is_profile_public}
           onChange={(v) => setPrivacy('show_completed_quests', v)}
         />
         <PrivacyRow
           label="Show community notes"
           desc="Share the Breadcrumbs you've left behind."
-          checked={profile.show_breadcrumbs}
-          disabled={!profile.is_profile_public}
+          checked={effectiveProfile.show_breadcrumbs}
+          disabled={!effectiveProfile.is_profile_public}
           onChange={(v) => setPrivacy('show_breadcrumbs', v)}
         />
       </section>
@@ -260,7 +281,7 @@ const Profile = () => {
         <LogOut className="mr-2 h-4 w-4" /> Sign out
       </Button>
 
-      <ProfileEditDialog profile={profile} open={editOpen} onOpenChange={setEditOpen} />
+      <ProfileEditDialog profile={effectiveProfile} open={editOpen} onOpenChange={setEditOpen} />
     </div>
   );
 };
