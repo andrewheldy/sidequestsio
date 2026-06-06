@@ -1,73 +1,138 @@
-# Welcome to your Lovable project
+# SideQuests.io
 
-## Project info
+Mobile-first QR quest platform — scan, explore, earn.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Tech stack
 
-## How can I edit this code?
+- **Vite + React + TypeScript**
+- **shadcn/ui** — accessible component primitives
+- **Tailwind CSS** — design system
+- **Supabase** — auth + profiles
+- **Mapbox GL JS** — interactive quest maps
+- **React Router v6** — client-side routing
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Local setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# 1. Clone
 git clone <YOUR_GIT_URL>
+cd sidequestsio
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Configure environment (see sections below)
+cp .env.example .env
+# Then fill in VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_MAPBOX_PUBLIC_TOKEN
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Start dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Mapbox setup
 
-**Use GitHub Codespaces**
+The interactive quest map uses [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/).
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 1. Get a token
 
-## What technologies are used for this project?
+Sign in at [account.mapbox.com](https://account.mapbox.com/access-tokens/) and create
+a **public** token (starts with `pk.`). Public tokens are safe to ship to the browser.
 
-This project is built with:
+### 2. Add to `.env`
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+VITE_MAPBOX_PUBLIC_TOKEN=pk.your_token_here
+```
 
-## How can I deploy this project?
+### 3. Set on Vercel (production)
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+In Vercel → Project Settings → Environment Variables, add:
 
-## Can I connect a custom domain to my Lovable project?
+| Name | Value |
+|------|-------|
+| `VITE_MAPBOX_PUBLIC_TOKEN` | `pk.your_token_here` |
 
-Yes, you can!
+The map degrades gracefully when the token is missing — an info message is shown
+instead of a blank screen.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Supabase setup
+
+### 1. Environment variables
+
+| Variable | Description |
+|---|---|
+| `VITE_SUPABASE_URL` | Your Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | The project's public **anon** key (safe for the browser) |
+
+> Never put a `service_role` key in a `VITE_*` variable — it would be shipped to the browser.
+
+### 2. Database
+
+Run the migration in `supabase/migrations/0001_profiles.sql`:
+
+```sh
+supabase db push
+# or paste into the Supabase SQL editor
+```
+
+This creates the `profiles` table, RLS policies, and an auto-create-profile trigger on sign-up.
+
+### 3. Auth settings
+
+Enable the **Email** provider in Supabase → Authentication. For local testing you
+can disable "Confirm email"; leave it enabled in production.
+
+---
+
+## Deployment (Vercel)
+
+The project includes `vercel.json` with a catch-all SPA rewrite so direct URL
+access and page refresh work correctly on all routes.
+
+```json
+{ "rewrites": [{ "source": "/(.*)", "destination": "/" }] }
+```
+
+Set all `VITE_*` environment variables in Vercel → Project Settings → Environment Variables.
+
+---
+
+## Map components
+
+| Component | Location | Description |
+|-----------|----------|-------------|
+| `QuestMap` | `src/components/map/QuestMap.tsx` | Core Mapbox GL map |
+| `UserLocationButton` | `src/components/map/UserLocationButton.tsx` | GPS button (tap-to-request) |
+| `QuestMapPopup` | `src/components/map/QuestMapPopup.tsx` | Slide-up quest preview |
+| `NearbyQuestsMapSection` | `src/components/map/NearbyQuestsMapSection.tsx` | Drop-in section with skeleton + empty state |
+| `MapSkeleton` | `src/components/map/MapSkeleton.tsx` | Loading placeholder |
+
+### Usage
+
+```tsx
+// Drop-in section (handles lazy loading, skeleton, empty state)
+import { NearbyQuestsMapSection } from '@/components/map';
+
+<NearbyQuestsMapSection
+  quests={quests}
+  title="Nearby Quests"
+  subtitle="Tap a pin to preview."
+  height="420px"
+/>
+
+// Or lazy-load QuestMap directly
+const QuestMap = lazy(() => import('@/components/map/QuestMap'));
+<QuestMap quests={quests} height="400px" />
+```
+
+### Privacy
+
+- Location is **never** requested on page load — only when the user taps the ⊕ button.
+- Coordinates are used only for local distance calculations; nothing is sent to any server.
+- To add analytics, see the comment hook in `src/lib/mapbox.ts → calcDistance`.

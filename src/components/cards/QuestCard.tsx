@@ -1,4 +1,5 @@
-import { MapPin, Clock, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, Clock, Users, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Badge } from '@/components/ui/badge';
@@ -7,8 +8,14 @@ interface QuestCardProps {
   title: string;
   location: string;
   category: string;
-  duration: string;
-  participants: number;
+  duration?: string;
+  participants?: number;
+  /** Quest concept / description (replaces duration+participants when provided) */
+  concept?: string;
+  /** XP earned on completion */
+  xp?: number;
+  /** Physical reward text */
+  physicalReward?: string;
   image: string;
   delay?: number;
   className?: string;
@@ -20,13 +27,25 @@ export function QuestCard({
   category,
   duration,
   participants,
+  concept,
+  xp,
+  physicalReward,
   image,
   delay = 0,
   className,
 }: QuestCardProps) {
+  const navigate = useNavigate();
+  const useMiamiLayout = concept !== undefined;
+
   return (
     <AnimatedSection direction="up" delay={delay}>
       <div
+        role="button"
+        tabIndex={0}
+        onClick={() => navigate('/app/explore')}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') navigate('/app/explore');
+        }}
         className={cn(
           'glass-card overflow-hidden hover-lift group cursor-pointer',
           className
@@ -47,25 +66,45 @@ export function QuestCard({
 
         {/* Content */}
         <div className="p-5">
-          <h3 className="font-poppins font-semibold text-lg text-foreground mb-2 line-clamp-1">
+          <h3 className="font-poppins font-semibold text-lg text-foreground mb-2 line-clamp-2 leading-snug">
             {title}
           </h3>
 
           <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
-            <MapPin className="w-4 h-4 text-primary" />
+            <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
             <span className="line-clamp-1">{location}</span>
           </div>
 
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>{duration}</span>
+          {useMiamiLayout ? (
+            <>
+              {concept && (
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
+                  {concept}
+                </p>
+              )}
+              <div className="flex items-center gap-1.5 text-sm font-medium text-primary">
+                <Zap className="w-4 h-4 flex-shrink-0" />
+                <span>{xp} XP</span>
+                {physicalReward && (
+                  <>
+                    <span className="text-muted-foreground font-normal">•</span>
+                    <span className="text-muted-foreground font-normal line-clamp-1">{physicalReward}</span>
+                  </>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{duration}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                <span>{participants} explorers</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              <span>{participants} explorers</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </AnimatedSection>

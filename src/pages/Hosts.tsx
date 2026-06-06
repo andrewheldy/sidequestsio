@@ -157,7 +157,7 @@ const Hosts = () => {
       <CTASection
         title={t.hosts.cta.title}
         description={t.hosts.cta.description}
-        primaryAction={{ label: t.hosts.cta.button, href: '#' }}
+        primaryAction={{ label: t.hosts.cta.button, href: '/partnerships' }}
         variant="turquoise"
       />
     </Layout>

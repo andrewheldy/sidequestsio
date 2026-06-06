@@ -16,6 +16,15 @@ import Verticals from "./pages/Verticals";
 import VerticalDetail from "./pages/VerticalDetail";
 import Partnerships from "./pages/Partnerships";
 import Hosts from "./pages/Hosts";
+import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
+import PublicProfile from "./pages/PublicProfile";
+import Placeholder from "./pages/Placeholder";
+import AppLayout from "./pages/app/AppLayout";
+import Explore from "./pages/app/Explore";
+import MapView from "./pages/app/MapView";
+import Favorites from "./pages/app/Favorites";
+import Profile from "./pages/app/Profile";
 import NotFound from "./pages/NotFound";
 
 // --- Functional app: public ---
