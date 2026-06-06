@@ -91,11 +91,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
+
     if (!error && data) {
       setProfile(data as Profile);
-    } else {
-      setProfile(null);
+      return;
     }
+
+    if (!error && !data) {
+      // No profile row yet — the signup trigger may not have fired (e.g. migration
+      // not applied in production, or the user pre-dates the trigger). Create a
+      // minimal row so the profile page can render.
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({ user_id: userId });
+
+      // 23505 = unique_violation: the trigger created the row concurrently — fine.
+      if (!insertError || insertError.code === '23505') {
+        const { data: refetched } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+        setProfile((refetched as Profile) ?? null);
+      } else {
+        console.error('[SideQuests] fetchProfile: could not create profile row', insertError);
+        setProfile(null);
+      }
+      return;
+    }
+
+    // Genuine fetch error.
+    console.error('[SideQuests] fetchProfile error:', error);
+    setProfile(null);
   }, []);
 
   // Bootstrap session + subscribe to auth state changes.
