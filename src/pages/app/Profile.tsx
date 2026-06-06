@@ -39,11 +39,19 @@ const Profile = () => {
     [favorites],
   );
 
-  if (loading || !profile) return <ProfileSkeleton />;
+  // Still bootstrapping auth — show skeleton.
+  if (loading) return <ProfileSkeleton />;
 
-  const name = profile.display_name || user?.email?.split('@')[0] || 'Explorer';
-  const joined = formatJoined(profile.created_at);
-  const hasSocial = Boolean(profile.instagram_url || profile.tiktok_url || profile.x_url);
+  // Auth loaded but no profile row in the DB yet (trigger not applied, or
+  // first-run before migrations). Derive sensible defaults from the auth user
+  // so the page is usable rather than stuck on a skeleton forever.
+  const name = profile?.display_name || user?.email?.split('@')[0] || 'Explorer';
+  const joined = formatJoined(profile?.created_at);
+  const hasSocial = Boolean(profile?.instagram_url || profile?.tiktok_url || profile?.x_url);
+
+  const xp = profile?.xp ?? 0;
+  const level = profile?.level ?? 1;
+  const streak = profile?.streak ?? 0;
 
   const setPrivacy = async (
     key:
@@ -62,7 +70,7 @@ const Profile = () => {
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <header className="glass-card flex flex-col items-center gap-3 p-5 text-center">
         <div className="h-24 w-24 overflow-hidden rounded-3xl ring-2 ring-primary/40">
-          {profile.avatar_url ? (
+          {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt={name} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
@@ -73,48 +81,50 @@ const Profile = () => {
 
         <div>
           <h1 className="font-poppins text-2xl font-bold">{name}</h1>
-          {profile.username && (
+          {profile?.username && (
             <p className="text-sm text-muted-foreground">@{profile.username}</p>
           )}
           <p className="mt-1 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
-              <Trophy className="h-3.5 w-3.5 text-coral" /> Level {profile.level}
+              <Trophy className="h-3.5 w-3.5 text-coral" /> Level {level}
             </span>
             <span aria-hidden>·</span>
             <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" /> {profile.home_city || 'Miami'}
+              <MapPin className="h-3.5 w-3.5" /> {profile?.home_city || 'Miami'}
             </span>
           </p>
           {joined && <p className="mt-0.5 text-xs text-muted-foreground">{joined}</p>}
         </div>
 
-        {profile.bio && <p className="max-w-prose text-sm text-foreground/90">{profile.bio}</p>}
+        {profile?.bio && <p className="max-w-prose text-sm text-foreground/90">{profile.bio}</p>}
 
         {hasSocial && (
           <SocialLinks
-            instagram={profile.instagram_url}
-            tiktok={profile.tiktok_url}
-            x={profile.x_url}
+            instagram={profile?.instagram_url}
+            tiktok={profile?.tiktok_url}
+            x={profile?.x_url}
           />
         )}
 
-        <Button
-          variant="outline"
-          className="mt-1 min-h-[44px] w-full sm:w-auto"
-          onClick={() => setEditOpen(true)}
-        >
-          <Pencil className="mr-2 h-4 w-4" /> Edit Profile
-        </Button>
+        {profile && (
+          <Button
+            variant="outline"
+            className="mt-1 min-h-[44px] w-full sm:w-auto"
+            onClick={() => setEditOpen(true)}
+          >
+            <Pencil className="mr-2 h-4 w-4" /> Edit Profile
+          </Button>
+        )}
       </header>
 
       {/* ── Stats ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-3">
-        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${profile.xp}`} label="XP" />
-        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${profile.level}`} label="Level" />
-        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${profile.streak}`} label="Day streak" />
+        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${xp}`} label="XP" />
+        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${level}`} label="Level" />
+        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${streak}`} label="Day streak" />
       </div>
 
-      <XpMeter xp={profile.xp} level={profile.level} />
+      <XpMeter xp={xp} level={level} />
 
       {/* ── Quest activity ─────────────────────────────────────────────── */}
       <ActivitySection
@@ -179,28 +189,29 @@ const Profile = () => {
         <PrivacyRow
           label="Show profile publicly"
           desc="Let others view your profile at its public link."
-          checked={profile.is_profile_public}
+          checked={profile?.is_profile_public ?? false}
+          disabled={!profile}
           onChange={(v) => setPrivacy('is_profile_public', v)}
         />
         <PrivacyRow
           label="Show social links"
           desc="Display your Instagram, TikTok and X on your public profile."
-          checked={profile.show_social_links}
-          disabled={!profile.is_profile_public}
+          checked={profile?.show_social_links ?? false}
+          disabled={!profile || !profile.is_profile_public}
           onChange={(v) => setPrivacy('show_social_links', v)}
         />
         <PrivacyRow
           label="Show completed quests"
           desc="Share the quests you've finished."
-          checked={profile.show_completed_quests}
-          disabled={!profile.is_profile_public}
+          checked={profile?.show_completed_quests ?? false}
+          disabled={!profile || !profile.is_profile_public}
           onChange={(v) => setPrivacy('show_completed_quests', v)}
         />
         <PrivacyRow
           label="Show community notes"
           desc="Share the Breadcrumbs you've left behind."
-          checked={profile.show_breadcrumbs}
-          disabled={!profile.is_profile_public}
+          checked={profile?.show_breadcrumbs ?? false}
+          disabled={!profile || !profile.is_profile_public}
           onChange={(v) => setPrivacy('show_breadcrumbs', v)}
         />
       </section>
@@ -217,7 +228,9 @@ const Profile = () => {
         <LogOut className="mr-2 h-4 w-4" /> Sign out
       </Button>
 
-      <ProfileEditDialog profile={profile} open={editOpen} onOpenChange={setEditOpen} />
+      {profile && (
+        <ProfileEditDialog profile={profile} open={editOpen} onOpenChange={setEditOpen} />
+      )}
     </div>
   );
 };
