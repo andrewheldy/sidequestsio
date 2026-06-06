@@ -86,13 +86,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = useCallback(async (userId: string) => {
     if (!supabase) return;
+
+    console.log('[SQ:profile] fetchProfile called — userId:', userId);
+
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
 
+    console.log('[SQ:profile] query result — data:', data, '| error:', error);
+
     if (!error && data) {
+      console.log('[SQ:profile] success — setting profile');
       setProfile(data as Profile);
       return;
     }
@@ -101,57 +107,72 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // No profile row yet — the signup trigger may not have fired (e.g. migration
       // not applied in production, or the user pre-dates the trigger). Create a
       // minimal row so the profile page can render.
+      console.warn('[SQ:profile] no row found for userId:', userId, '— attempting auto-insert');
       const { error: insertError } = await supabase
         .from('profiles')
         .insert({ user_id: userId });
 
+      console.log('[SQ:profile] insert result — error:', insertError);
+
       // 23505 = unique_violation: the trigger created the row concurrently — fine.
       if (!insertError || insertError.code === '23505') {
-        const { data: refetched } = await supabase
+        const { data: refetched, error: refetchError } = await supabase
           .from('profiles')
           .select('*')
           .eq('user_id', userId)
           .maybeSingle();
+        console.log('[SQ:profile] refetch after insert — data:', refetched, '| error:', refetchError);
         setProfile((refetched as Profile) ?? null);
       } else {
-        console.error('[SideQuests] fetchProfile: could not create profile row', insertError);
+        console.error('[SQ:profile] could not create profile row', insertError);
         setProfile(null);
       }
       return;
     }
 
     // Genuine fetch error.
-    console.error('[SideQuests] fetchProfile error:', error);
+    console.error('[SQ:profile] fetchProfile error:', error);
     setProfile(null);
   }, []);
 
   // Bootstrap session + subscribe to auth state changes.
   useEffect(() => {
     if (!supabase) {
+      console.log('[SQ:auth] Supabase not configured — skipping auth bootstrap');
       setLoading(false);
       return;
     }
 
     let active = true;
+    console.log('[SQ:auth] bootstrap: calling getSession()');
 
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
+      const userId = data.session?.user?.id ?? null;
+      console.log('[SQ:auth] getSession resolved — userId:', userId, '| session:', data.session ? 'present' : 'null');
       setSession(data.session);
       setUser(data.session?.user ?? null);
       if (data.session?.user) {
-        fetchProfile(data.session.user.id).finally(() => active && setLoading(false));
+        fetchProfile(data.session.user.id).finally(() => {
+          console.log('[SQ:auth] getSession path: setLoading(false)');
+          if (active) setLoading(false);
+        });
       } else {
+        console.log('[SQ:auth] no session — setLoading(false)');
         setLoading(false);
       }
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
+      const userId = newSession?.user?.id ?? null;
+      console.log('[SQ:auth] onAuthStateChange — event:', event, '| userId:', userId);
       setSession(newSession);
       setUser(newSession?.user ?? null);
       if (newSession?.user) {
         // Defer the Supabase call to avoid deadlocks inside the callback.
         setTimeout(() => fetchProfile(newSession.user.id), 0);
       } else {
+        console.log('[SQ:auth] onAuthStateChange: no user — setProfile(null)');
         setProfile(null);
       }
     });
