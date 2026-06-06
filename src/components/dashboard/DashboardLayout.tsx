@@ -18,7 +18,7 @@ interface DashboardLayoutProps {
 
 /** Shared portal shell for partner & admin areas (wider, table-friendly). */
 export default function DashboardLayout({ title, nav, children }: DashboardLayoutProps) {
-  const { user, role } = useAuth();
+  const { user, role, profile } = useAuth();
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60 bg-card/40 backdrop-blur">
@@ -30,7 +30,7 @@ export default function DashboardLayout({ title, nav, children }: DashboardLayou
             <span className="font-poppins text-lg font-bold text-foreground">{title}</span>
           </div>
           <span className="rounded-full bg-muted px-3 py-1 text-xs capitalize text-muted-foreground">
-            {user?.display_name} · {role}
+            {profile?.display_name ?? (user?.user_metadata?.display_name as string | undefined)} · {role}
           </span>
         </div>
         <nav className="mx-auto max-w-5xl overflow-x-auto px-4">

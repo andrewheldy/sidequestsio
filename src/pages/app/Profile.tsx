@@ -117,7 +117,11 @@ const Profile = () => {
     navigate('/');
   };
 
-  const lvl = levelProgress(profile?.xp ?? 0);
+const Profile = () => {
+  const { user, profile, loading, signOut, updateProfile } = useAuth();
+  const { favorites } = useFavorites();
+  const navigate = useNavigate();
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -180,7 +184,6 @@ const Profile = () => {
           <StatTile label="Quests" value={profile?.completed_quests_count ?? 0} accent="turquoise" />
           <StatTile label="Notes" value={profile?.community_notes_count ?? 0} />
         </div>
-      </div>
 
       {/* Interests */}
       <div className="glass-card p-5">
@@ -289,10 +292,117 @@ const Profile = () => {
             })}
           </div>
         )}
+      </header>
+
+      {/* ── Stats ──────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-3">
+        <StatTile icon={<Zap className="h-5 w-5 text-turquoise" />} value={`${xp}`} label="XP" />
+        <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${level}`} label="Level" />
+        <StatTile icon={<Flame className="h-5 w-5 text-coral" />} value={`${streak}`} label="Day streak" />
       </div>
 
-      <Button variant="ghost" onClick={signOut} className="mt-6 w-full gap-2 text-destructive">
-        <LogOut className="h-4 w-4" /> Sign out
+      <XpMeter xp={xp} level={level} />
+
+      {/* ── Quest activity ─────────────────────────────────────────────── */}
+      <ActivitySection
+        icon={<Compass className="h-4 w-4" />}
+        title="Completed Quests"
+        count={0}
+        emptyText="No quests completed yet. Your next side quest is waiting."
+      />
+
+      <ActivitySection
+        icon={<MessageSquare className="h-4 w-4" />}
+        title="Community Notes"
+        count={0}
+        emptyText="No community notes yet. Leave your mark after your first quest."
+      />
+
+      <ActivitySection
+        icon={<Award className="h-4 w-4" />}
+        title="Rewards Earned"
+        count={0}
+        emptyText="No rewards yet. Complete quests to start stacking perks."
+      />
+
+      <ActivitySection
+        icon={<Heart className="h-4 w-4" />}
+        title="Saved Quests"
+        count={savedQuests.length}
+        emptyText="Nothing saved yet. Tap the heart on a quest to keep it here."
+      >
+        {savedQuests.length > 0 && (
+          <ul className="space-y-2">
+            {savedQuests.slice(0, 5).map((q) => (
+              <li key={q.id}>
+                <Link
+                  to="/app/favorites"
+                  className="flex items-center justify-between gap-3 rounded-xl bg-muted/40 px-3 py-2 text-sm transition-colors hover:bg-muted/60"
+                >
+                  <span className="truncate">{q.title}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground">{q.neighborhood}</span>
+                </Link>
+              </li>
+            ))}
+            {savedQuests.length > 5 && (
+              <li className="pt-1 text-center text-xs text-muted-foreground">
+                <Link to="/app/favorites" className="hover:text-foreground">
+                  View all {savedQuests.length} saved
+                </Link>
+              </li>
+            )}
+          </ul>
+        )}
+      </ActivitySection>
+
+      {/* ── Privacy ────────────────────────────────────────────────────── */}
+      <section className="glass-card divide-y divide-border/50">
+        <div className="p-5 pb-3">
+          <h2 className="font-poppins font-semibold">Public Profile</h2>
+          <p className="text-xs text-muted-foreground">
+            You're in control. Nothing is shared until you switch it on.
+          </p>
+        </div>
+        <PrivacyRow
+          label="Show profile publicly"
+          desc="Let others view your profile at its public link."
+          checked={profile?.is_profile_public ?? false}
+          disabled={!profile}
+          onChange={(v) => setPrivacy('is_profile_public', v)}
+        />
+        <PrivacyRow
+          label="Show social links"
+          desc="Display your Instagram, TikTok and X on your public profile."
+          checked={profile?.show_social_links ?? false}
+          disabled={!profile || !profile.is_profile_public}
+          onChange={(v) => setPrivacy('show_social_links', v)}
+        />
+        <PrivacyRow
+          label="Show completed quests"
+          desc="Share the quests you've finished."
+          checked={profile?.show_completed_quests ?? false}
+          disabled={!profile || !profile.is_profile_public}
+          onChange={(v) => setPrivacy('show_completed_quests', v)}
+        />
+        <PrivacyRow
+          label="Show community notes"
+          desc="Share the Breadcrumbs you've left behind."
+          checked={profile?.show_breadcrumbs ?? false}
+          disabled={!profile || !profile.is_profile_public}
+          onChange={(v) => setPrivacy('show_breadcrumbs', v)}
+        />
+      </section>
+
+      <Button
+        variant="outline"
+        className="min-h-[44px] w-full"
+        onClick={async () => {
+          await signOut();
+          toast('Signed out', { description: 'See you on the next quest.' });
+          navigate('/');
+        }}
+      >
+        <LogOut className="mr-2 h-4 w-4" /> Sign out
       </Button>
 
       {/* Claim code dialog */}
@@ -316,26 +426,35 @@ const Profile = () => {
       </Dialog>
     </div>
   );
-}
+};
 
-function Row({
+function PrivacyRow({
   label,
   desc,
   checked,
+  disabled,
   onChange,
 }: {
   label: string;
   desc: string;
   checked: boolean;
+  disabled?: boolean;
   onChange: (v: boolean) => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 p-4">
-      <div>
+      <div className={disabled ? 'opacity-50' : undefined}>
         <p className="text-sm font-medium text-foreground">{label}</p>
         <p className="text-xs text-muted-foreground">{desc}</p>
       </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
+      <Switch
+        checked={checked}
+        disabled={disabled}
+        onCheckedChange={onChange}
+        aria-label={label}
+      />
     </div>
   );
 }
+
+export default Profile;
