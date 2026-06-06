@@ -1,183 +1,241 @@
-/**
- * AuthContext
- * -----------
- * Provides the current session + profile to the whole app and abstracts the two
- * backends:
- *   - LocalRepository mode: a simulated email "magic link" that signs the user
- *     in immediately (great for development & demos), plus one-tap demo logins.
- *   - Supabase mode: real magic-link / OAuth via supabase-auth.
- *
- * On sign-in it links any pending pre-auth scan context so the user resumes the
- * exact quest they scanned (anonymous → authenticated continuity).
- */
-
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
   type ReactNode,
-} from "react";
-import type { Role, User, UserProfile } from "@/types/db";
-import { getRepository, activeBackend } from "@/lib/db";
-import { getSupabase } from "@/lib/supabase/client";
-import { getAnonymousSessionId } from "@/lib/app/session";
-import { track } from "@/lib/analytics/events";
+} from 'react';
+import type { Session, User } from '@supabase/supabase-js';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import type { OnboardingSelections } from '@/lib/onboarding';
+import { EXPLORER_STYLES } from '@/lib/onboarding';
 
-const LOCAL_SESSION_KEY = "sq.session.user_id";
+export interface Profile {
+  user_id: string;
+  display_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  home_city: string;
+  bio: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  x_url: string | null;
+  is_profile_public: boolean;
+  show_social_links: boolean;
+  show_completed_quests: boolean;
+  show_breadcrumbs: boolean;
+  interests: string[];
+  quest_style: string | null;
+  quest_energy: string | null;
+  starting_area: string | null;
+  xp: number;
+  level: number;
+  streak: number;
+  onboarding_completed: boolean;
+  created_at: string | null;
+}
+
+/** Columns the user is allowed to edit on their own profile. */
+export type EditableProfile = Partial<
+  Pick<
+    Profile,
+    | 'display_name'
+    | 'username'
+    | 'avatar_url'
+    | 'home_city'
+    | 'bio'
+    | 'instagram_url'
+    | 'tiktok_url'
+    | 'x_url'
+    | 'is_profile_public'
+    | 'show_social_links'
+    | 'show_completed_quests'
+    | 'show_breadcrumbs'
+  >
+>;
+
+interface AuthResult {
+  error: string | null;
+}
 
 interface AuthContextValue {
-  user: User | null;
-  profile: UserProfile | null;
-  role: Role;
+  isConfigured: boolean;
   loading: boolean;
-  isAuthenticated: boolean;
-  signInWithEmail: (email: string, displayName?: string) => Promise<void>;
-  signInWithProvider: (provider: "google" | "apple") => Promise<void>;
+  user: User | null;
+  session: Session | null;
+  profile: Profile | null;
+  signUp: (email: string, password: string, displayName?: string) => Promise<AuthResult>;
+  signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
-  refresh: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+  updateProfile: (patch: EditableProfile) => Promise<AuthResult>;
+  completeOnboarding: (selections: OnboardingSelections) => Promise<AuthResult>;
 }
+
+const NOT_CONFIGURED_MESSAGE =
+  'Accounts are not set up yet. Add your Supabase keys to enable sign in.';
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-  const loadUser = useCallback(async (userId: string | null) => {
-    if (!userId) {
-      setUser(null);
+  const fetchProfile = useCallback(async (userId: string) => {
+    if (!supabase) return;
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!error && data) {
+      setProfile(data as Profile);
+    } else {
       setProfile(null);
-      return;
     }
-    const repo = await getRepository();
-    const u = await repo.getUserById(userId);
-    setUser(u);
-    setProfile(u ? await repo.getProfile(userId) : null);
   }, []);
 
-  const refresh = useCallback(async () => {
-    if (user) await loadUser(user.id);
-  }, [user, loadUser]);
-
-  // Bootstrap session.
+  // Bootstrap session + subscribe to auth state changes.
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     let active = true;
-    (async () => {
-      try {
-        if (activeBackend() === "supabase") {
-          const sb = await getSupabase();
-          const { data } = (await sb?.auth.getSession()) ?? { data: { session: null } };
-          const email = data.session?.user?.email ?? null;
-          if (email) {
-            const repo = await getRepository();
-            const u = await repo.getUserByEmail(email);
-            if (active) await loadUser(u?.id ?? null);
-          }
-          sb?.auth.onAuthStateChange(async (_evt, session) => {
-            const e = session?.user?.email ?? null;
-            if (!e) return loadUser(null);
-            const repo = await getRepository();
-            const u = await repo.getUserByEmail(e);
-            await loadUser(u?.id ?? null);
-          });
-        } else {
-          const id = window.localStorage.getItem(LOCAL_SESSION_KEY);
-          if (active) await loadUser(id);
-        }
-      } finally {
-        if (active) setLoading(false);
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      if (data.session?.user) {
+        fetchProfile(data.session.user.id).finally(() => active && setLoading(false));
+      } else {
+        setLoading(false);
       }
-    })();
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      if (newSession?.user) {
+        // Defer the Supabase call to avoid deadlocks inside the callback.
+        setTimeout(() => fetchProfile(newSession.user.id), 0);
+      } else {
+        setProfile(null);
+      }
+    });
+
     return () => {
       active = false;
+      sub.subscription.unsubscribe();
     };
-  }, [loadUser]);
+  }, [fetchProfile]);
 
-  const finishSignIn = useCallback(
-    async (signedIn: User) => {
-      window.localStorage.setItem(LOCAL_SESSION_KEY, signedIn.id);
-      track("auth_completed", {
-        user_id: signedIn.id,
-        anonymous_session_id: getAnonymousSessionId(),
-      });
-      await loadUser(signedIn.id);
-    },
-    [loadUser],
-  );
-
-  const signInWithEmail = useCallback(
-    async (email: string, displayName?: string) => {
-      track("auth_started", { props: { method: "email" } });
-      const repo = await getRepository();
-      if (activeBackend() === "supabase") {
-        const sb = await getSupabase();
-        await sb?.auth.signInWithOtp({ email });
-        // The onAuthStateChange handler completes sign-in after the user clicks
-        // the magic link; we still upsert the app-side user row.
-        await repo.upsertUser({ email, display_name: displayName });
-        return;
-      }
-      // Local mode: simulate magic-link by signing in immediately.
-      const u = await repo.upsertUser({ email, display_name: displayName });
-      await finishSignIn(u);
-    },
-    [finishSignIn],
-  );
-
-  const signInWithProvider = useCallback(
-    async (provider: "google" | "apple") => {
-      track("auth_started", { props: { method: provider } });
-      if (activeBackend() === "supabase") {
-        const sb = await getSupabase();
-        await sb?.auth.signInWithOAuth({ provider });
-        return;
-      }
-      // Local mode: simulate an OAuth identity.
-      const repo = await getRepository();
-      const email = `${provider}-user@sidequests.io`;
-      const u = await repo.upsertUser({
+  const signUp = useCallback<AuthContextValue['signUp']>(
+    async (email, password, displayName) => {
+      if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
+      const { error } = await supabase.auth.signUp({
         email,
-        display_name: provider === "google" ? "Google Quester" : "Apple Quester",
+        password,
+        options: {
+          data: displayName ? { display_name: displayName } : undefined,
+          emailRedirectTo: `${window.location.origin}/app`,
+        },
       });
-      await finishSignIn(u);
+      return { error: error?.message ?? null };
     },
-    [finishSignIn],
+    [],
   );
+
+  const signIn = useCallback<AuthContextValue['signIn']>(async (email, password) => {
+    if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message ?? null };
+  }, []);
 
   const signOut = useCallback(async () => {
-    if (activeBackend() === "supabase") {
-      const sb = await getSupabase();
-      await sb?.auth.signOut();
-    }
-    window.localStorage.removeItem(LOCAL_SESSION_KEY);
-    setUser(null);
+    if (!supabase) return;
+    await supabase.auth.signOut();
     setProfile(null);
   }, []);
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      user,
-      profile,
-      role: user?.role ?? "user",
-      loading,
-      isAuthenticated: !!user,
-      signInWithEmail,
-      signInWithProvider,
-      signOut,
-      refresh,
-    }),
-    [user, profile, loading, signInWithEmail, signInWithProvider, signOut, refresh],
+  const refreshProfile = useCallback(async () => {
+    if (user) await fetchProfile(user.id);
+  }, [user, fetchProfile]);
+
+  const updateProfile = useCallback<AuthContextValue['updateProfile']>(
+    async (patch) => {
+      if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
+      if (!user) return { error: 'You need to be signed in to update your profile.' };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(patch)
+        .eq('user_id', user.id);
+
+      if (error) {
+        // Unique violation on the username column → friendly message.
+        if (error.code === '23505') return { error: 'That username is already taken.' };
+        return { error: error.message };
+      }
+      await fetchProfile(user.id);
+      return { error: null };
+    },
+    [user, fetchProfile],
   );
+
+  const completeOnboarding = useCallback<AuthContextValue['completeOnboarding']>(
+    async (selections) => {
+      if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
+      if (!user) return { error: 'You need to be signed in to save your adventure.' };
+
+      const energy =
+        EXPLORER_STYLES.find((s) => s.id === selections.explorerStyle)?.energy ?? null;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          interests: selections.vibes,
+          quest_style: selections.explorerStyle,
+          quest_energy: energy,
+          starting_area: selections.neighborhood,
+          xp: 100,
+          level: 1,
+          streak: 1,
+          onboarding_completed: true,
+        })
+        .eq('user_id', user.id);
+
+      if (error) return { error: error.message };
+      await fetchProfile(user.id);
+      return { error: null };
+    },
+    [user, fetchProfile],
+  );
+
+  const value: AuthContextValue = {
+    isConfigured: isSupabaseConfigured,
+    loading,
+    user,
+    session,
+    profile,
+    signUp,
+    signIn,
+    signOut,
+    refreshProfile,
+    updateProfile,
+    completeOnboarding,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth(): AuthContextValue {
+export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
   return ctx;
 }
