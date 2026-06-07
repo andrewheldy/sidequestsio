@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
-import { getRepository } from "@/lib/db";
+import { getRepository, activeBackend } from "@/lib/db";
 import { levelProgress } from "@/lib/app/leveling";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
@@ -158,7 +158,7 @@ export default function Profile() {
         ) : isError || !privacy ? (
           <div className="glass-card flex flex-col items-center gap-3 p-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Couldn't load privacy settings.
+              Couldn't load privacy settings from the {activeBackend()} provider.
             </p>
             <Button
               variant="outline"

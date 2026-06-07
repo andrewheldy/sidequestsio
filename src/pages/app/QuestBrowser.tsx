@@ -6,7 +6,7 @@ import AppLayout from "@/components/app/AppLayout";
 import { Loading, EmptyState } from "@/components/app/ui";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { getRepository } from "@/lib/db";
+import { getRepository, activeBackend } from "@/lib/db";
 import { MIAMI_QUESTS } from "@/data/miami/toQuest";
 import type { QuestCategory, QuestWithContext } from "@/types/db";
 
@@ -68,7 +68,7 @@ const FALLBACK_QUESTS = MIAMI_QUESTS.map(miamiToContext);
 export default function QuestBrowser() {
   const [category, setCategory] = useState<QuestCategory | "all">("all");
 
-  const { data: repoQuests, isLoading, isError } = useQuery({
+  const { data: repoQuests, isLoading, isError, error } = useQuery({
     queryKey: ["browse-quests"],
     queryFn: async () => {
       const timeout = new Promise<never>((_, reject) =>
@@ -84,6 +84,11 @@ export default function QuestBrowser() {
   // the query errors, times out, or returns empty (schema not ready yet).
   const allQuests: QuestWithContext[] =
     repoQuests && repoQuests.length > 0 ? repoQuests : FALLBACK_QUESTS;
+
+  const providerLabel = activeBackend();
+  const errorDetail = isError
+    ? `Quest data failed to load from the ${providerLabel} provider${error instanceof Error && error.message ? ` (${error.message})` : ""}. Showing offline data instead.`
+    : null;
 
   const filtered =
     category === "all" ? allQuests : allQuests.filter((q) => q.category === category);
@@ -106,6 +111,12 @@ export default function QuestBrowser() {
           </button>
         ))}
       </div>
+
+      {errorDetail && (
+        <p className="mb-3 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+          {errorDetail}
+        </p>
+      )}
 
       {isLoading ? (
         <Loading />

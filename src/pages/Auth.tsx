@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { isDemoMode } from '@/lib/demo';
 import dotlingLogo from '@/assets/dotling-logo.jpg';
 
 type Mode = 'signin' | 'signup';
@@ -62,10 +63,11 @@ const Auth = () => {
     if (mode === 'signup') {
       toast({
         title: 'Welcome aboard! 🎉',
-        description:
-          'Account created. If email confirmation is on, check your inbox — otherwise you can sign in now.',
+        description: isDemoMode
+          ? 'Demo account ready — enjoy exploring!'
+          : 'Account created. If email confirmation is on, check your inbox — otherwise you can sign in now.',
       });
-      setMode('signin');
+      if (!isDemoMode) setMode('signin');
     } else {
       toast({ title: 'Signed in', description: 'Welcome back, explorer.' });
     }
@@ -98,12 +100,17 @@ const Auth = () => {
           </p>
         </div>
 
-        {!isConfigured && (
+        {isDemoMode ? (
+          <div className="mb-6 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-sm text-foreground">
+            <span className="font-semibold text-amber-700 dark:text-amber-400">Demo Mode</span>
+            {' '}— any email and password will work. Your session is stored locally.
+          </div>
+        ) : !isConfigured ? (
           <div className="mb-6 rounded-xl border border-coral/40 bg-coral/10 p-4 text-sm text-foreground">
             Accounts aren&apos;t connected yet. Add <code className="text-coral">VITE_SUPABASE_URL</code> and{' '}
             <code className="text-coral">VITE_SUPABASE_ANON_KEY</code> to enable sign in.
           </div>
-        )}
+        ) : null}
 
         <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)} className="w-full">
           <TabsList className="grid w-full grid-cols-2">

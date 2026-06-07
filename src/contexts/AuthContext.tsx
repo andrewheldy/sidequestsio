@@ -14,26 +14,44 @@ import { isDemoMode } from '@/lib/demo';
 import { useDemoSession } from '@/contexts/DemoSessionContext';
 
 // ---------------------------------------------------------------------------
-// Demo user — returned by AuthContext when the demo session toggle is active.
+// Mock user persistence key — stores email + displayName on mock sign-up.
 // ---------------------------------------------------------------------------
-const DEMO_USER = {
-  id: 'demo-user',
-  aud: 'authenticated',
-  role: 'authenticated',
-  email: 'demo@sidequests.io',
-  email_confirmed_at: '2024-01-01T00:00:00Z',
-  phone: '',
-  confirmed_at: '2024-01-01T00:00:00Z',
-  last_sign_in_at: new Date().toISOString(),
-  app_metadata: { provider: 'email', providers: ['email'] },
-  user_metadata: { display_name: 'Demo Explorer', role: 'user' },
-  identities: [],
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: new Date().toISOString(),
-} as unknown as User;
+const MOCK_USER_KEY = 'sq_mock_user';
 
-const DEMO_PROFILE: Profile = {
-  user_id: 'demo-user',
+function getMockUserData(): { email: string; displayName: string } | null {
+  try {
+    const raw = localStorage.getItem(MOCK_USER_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Demo user/profile builders — read from localStorage so sign-up name sticks.
+// ---------------------------------------------------------------------------
+const BASE_DEMO_USER_ID = 'demo-user';
+
+function buildDemoUser(): User {
+  const mock = getMockUserData();
+  return {
+    id: BASE_DEMO_USER_ID,
+    aud: 'authenticated',
+    role: 'authenticated',
+    email: mock?.email ?? 'demo@sidequests.io',
+    email_confirmed_at: '2024-01-01T00:00:00Z',
+    phone: '',
+    confirmed_at: '2024-01-01T00:00:00Z',
+    last_sign_in_at: new Date().toISOString(),
+    app_metadata: { provider: 'email', providers: ['email'] },
+    user_metadata: { display_name: mock?.displayName ?? 'Demo Explorer', role: 'user' },
+    identities: [],
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: new Date().toISOString(),
+  } as unknown as User;
+}
+
+const BASE_DEMO_PROFILE: Profile = {
+  user_id: BASE_DEMO_USER_ID,
   display_name: 'Demo Explorer',
   username: 'demo_explorer',
   avatar_url: null,
@@ -63,6 +81,11 @@ const DEMO_PROFILE: Profile = {
   onboarding_completed: true,
   created_at: '2024-01-15T00:00:00Z',
 };
+
+function buildDemoProfile(): Profile {
+  const mock = getMockUserData();
+  return { ...BASE_DEMO_PROFILE, display_name: mock?.displayName ?? 'Demo Explorer' };
+}
 
 export interface Profile {
   user_id: string;
@@ -149,13 +172,18 @@ const NOT_CONFIGURED_MESSAGE =
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [loading, setLoading] = useState(true);
+  // Must be called before any useCallback that references setDemoSignedIn.
+  const { isDemoSignedIn, setSignedIn: setDemoSignedIn } = useDemoSession();
+  const demoActive = isDemoMode && isDemoSignedIn;
+
+  // In mock mode we never talk to Supabase, so skip the loading delay entirely.
+  const [loading, setLoading] = useState(!isDemoMode);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    if (!supabase) return;
+    if (isDemoMode || !supabase) return;
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -168,9 +196,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Bootstrap session + subscribe to auth state changes.
+  // Bootstrap session + subscribe to auth state changes (Supabase only).
   useEffect(() => {
-    if (!supabase) {
+    if (isDemoMode || !supabase) {
       setLoading(false);
       return;
     }
@@ -205,12 +233,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [fetchProfile]);
 
+  // ---------------------------------------------------------------------------
+  // Auth actions
+  // ---------------------------------------------------------------------------
+
   const signUp = useCallback<AuthContextValue['signUp']>(
-    async (email, password, displayName) => {
+    async (email, _password, displayName) => {
+      if (isDemoMode) {
+        // Persist mock identity so display name/email show across the session.
+        localStorage.setItem(
+          MOCK_USER_KEY,
+          JSON.stringify({ email, displayName: displayName?.trim() || 'Demo Explorer' }),
+        );
+        setDemoSignedIn(true);
+        return { error: null };
+      }
       if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
       const { error } = await supabase.auth.signUp({
         email,
-        password,
+        password: _password,
         options: {
           data: displayName ? { display_name: displayName } : undefined,
           emailRedirectTo: `${window.location.origin}/app`,
@@ -218,27 +259,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       return { error: error?.message ?? null };
     },
-    [],
+    [setDemoSignedIn],
   );
 
-  const signIn = useCallback<AuthContextValue['signIn']>(async (email, password) => {
-    if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
-  }, []);
+  const signIn = useCallback<AuthContextValue['signIn']>(
+    async (_email, _password) => {
+      if (isDemoMode) {
+        setDemoSignedIn(true);
+        return { error: null };
+      }
+      if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
+      const { error } = await supabase.auth.signInWithPassword({ email: _email, password: _password });
+      return { error: error?.message ?? null };
+    },
+    [setDemoSignedIn],
+  );
 
   const signOut = useCallback(async () => {
+    if (isDemoMode) {
+      localStorage.removeItem(MOCK_USER_KEY);
+      setDemoSignedIn(false);
+      return;
+    }
     if (!supabase) return;
     await supabase.auth.signOut();
     setProfile(null);
-  }, []);
+  }, [setDemoSignedIn]);
 
   const refreshProfile = useCallback(async () => {
+    if (isDemoMode) return;
     if (user) await fetchProfile(user.id);
   }, [user, fetchProfile]);
 
   const updateProfile = useCallback<AuthContextValue['updateProfile']>(
     async (patch) => {
+      if (isDemoMode) return { error: null };
       if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
       if (!user) return { error: 'You need to be signed in to update your profile.' };
 
@@ -260,6 +315,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const completeOnboarding = useCallback<AuthContextValue['completeOnboarding']>(
     async (selections) => {
+      if (isDemoMode) return { error: null };
       if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
       if (!user) return { error: 'You need to be signed in to save your adventure.' };
 
@@ -289,24 +345,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const role = (user?.user_metadata?.role as 'partner' | 'admin' | undefined) ?? 'user';
 
-  const { isDemoSignedIn, toggle: toggleDemo } = useDemoSession();
-  const demoActive = isDemoMode && isDemoSignedIn;
-
   const value: AuthContextValue = {
-    isConfigured: isSupabaseConfigured,
+    // In mock mode the app IS configured (just not for Supabase).
+    isConfigured: isDemoMode ? true : isSupabaseConfigured,
     loading: demoActive ? false : loading,
     isAuthenticated: demoActive ? true : !!user,
     role: demoActive ? 'user' : role,
-    user: demoActive ? DEMO_USER : user,
+    user: demoActive ? buildDemoUser() : user,
     session: demoActive ? null : session,
-    profile: demoActive ? DEMO_PROFILE : profile,
+    profile: demoActive ? buildDemoProfile() : profile,
     signUp,
     signIn,
-    signOut: demoActive ? async () => toggleDemo() : signOut,
+    signOut,
     refresh: refreshProfile,
     refreshProfile,
-    updateProfile: demoActive ? async () => ({ error: null }) : updateProfile,
-    completeOnboarding: demoActive ? async () => ({ error: null }) : completeOnboarding,
+    updateProfile,
+    completeOnboarding,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
