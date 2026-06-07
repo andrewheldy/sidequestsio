@@ -21,7 +21,9 @@ export type AppEventName =
   | "reward_viewed"
   | "reward_redeemed"
   | "community_note_created"
-  | "leaderboard_viewed";
+  | "leaderboard_viewed"
+  | "proof_captured"
+  | "proof_shared";
 
 /** Common envelope attached to every emitted event. */
 export interface AppEventContext {
