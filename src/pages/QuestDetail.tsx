@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/app/ui";
 import { CommunityNotes } from "@/components/app/CommunityNotes";
+import { QuestProofCamera } from "@/components/app/QuestProofCamera";
 import { toast } from "sonner";
 import type { CompleteQuestResult } from "@/lib/db/repository";
 
@@ -40,6 +41,7 @@ export default function QuestDetail() {
   const [venueCode, setVenueCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<CompleteQuestResult | null>(null);
+  const [showProofCamera, setShowProofCamera] = useState(false);
   const recordedRef = useRef(false);
 
   const { data: quest, isLoading } = useQuery({
@@ -141,6 +143,7 @@ export default function QuestDetail() {
     await refresh();
     qc.invalidateQueries({ queryKey: ["completed", questId, user.id] });
     toast.success(`+${res.xpAwarded} XP · +${res.pointsAwarded} points!`);
+    setShowProofCamera(true);
   };
 
   const isDone = completed || result?.ok;
@@ -245,6 +248,15 @@ export default function QuestDetail() {
           />
         </div>
       </div>
+
+      {/* Quest Proof Camera — shown after successful completion */}
+      {showProofCamera && result?.ok && quest && (
+        <QuestProofCamera
+          quest={quest}
+          result={result}
+          onDone={() => setShowProofCamera(false)}
+        />
+      )}
     </div>
   );
 }
