@@ -10,6 +10,59 @@ import type { Session, User } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import type { OnboardingSelections } from '@/lib/onboarding';
 import { EXPLORER_STYLES } from '@/lib/onboarding';
+import { isDemoMode } from '@/lib/demo';
+import { useDemoSession } from '@/contexts/DemoSessionContext';
+
+// ---------------------------------------------------------------------------
+// Demo user — returned by AuthContext when the demo session toggle is active.
+// ---------------------------------------------------------------------------
+const DEMO_USER = {
+  id: 'demo-user',
+  aud: 'authenticated',
+  role: 'authenticated',
+  email: 'demo@sidequests.io',
+  email_confirmed_at: '2024-01-01T00:00:00Z',
+  phone: '',
+  confirmed_at: '2024-01-01T00:00:00Z',
+  last_sign_in_at: new Date().toISOString(),
+  app_metadata: { provider: 'email', providers: ['email'] },
+  user_metadata: { display_name: 'Demo Explorer', role: 'user' },
+  identities: [],
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: new Date().toISOString(),
+} as unknown as User;
+
+const DEMO_PROFILE: Profile = {
+  user_id: 'demo-user',
+  display_name: 'Demo Explorer',
+  username: 'demo_explorer',
+  avatar_url: null,
+  home_city: 'Miami, FL',
+  bio: 'Exploring Miami one side quest at a time.',
+  phone_number: null,
+  instagram_url: null,
+  tiktok_url: null,
+  x_url: null,
+  youtube_url: null,
+  snapchat_url: null,
+  is_profile_public: true,
+  show_social_links: true,
+  show_completed_quests: true,
+  show_breadcrumbs: true,
+  points_balance_cache: 1200,
+  completed_quests_count: 7,
+  community_notes_count: 3,
+  lifetime_points: 2500,
+  interests: ['Food', 'Culture', 'Nightlife'],
+  quest_style: 'adventurer',
+  quest_energy: 'high',
+  starting_area: 'Wynwood',
+  xp: 750,
+  level: 5,
+  streak: 3,
+  onboarding_completed: true,
+  created_at: '2024-01-15T00:00:00Z',
+};
 
 export interface Profile {
   user_id: string;
@@ -236,21 +289,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const role = (user?.user_metadata?.role as 'partner' | 'admin' | undefined) ?? 'user';
 
+  const { isDemoSignedIn, toggle: toggleDemo } = useDemoSession();
+  const demoActive = isDemoMode && isDemoSignedIn;
+
   const value: AuthContextValue = {
     isConfigured: isSupabaseConfigured,
-    loading,
-    isAuthenticated: !!user,
-    role,
-    user,
-    session,
-    profile,
+    loading: demoActive ? false : loading,
+    isAuthenticated: demoActive ? true : !!user,
+    role: demoActive ? 'user' : role,
+    user: demoActive ? DEMO_USER : user,
+    session: demoActive ? null : session,
+    profile: demoActive ? DEMO_PROFILE : profile,
     signUp,
     signIn,
-    signOut,
+    signOut: demoActive ? async () => toggleDemo() : signOut,
     refresh: refreshProfile,
     refreshProfile,
-    updateProfile,
-    completeOnboarding,
+    updateProfile: demoActive ? async () => ({ error: null }) : updateProfile,
+    completeOnboarding: demoActive ? async () => ({ error: null }) : completeOnboarding,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
