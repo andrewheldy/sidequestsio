@@ -386,7 +386,7 @@ export class MockRepository implements Repository {
   async listNotesForModeration(
     _status?: ModerationStatus,
   ): Promise<CommunityNoteWithAuthor[]> {
-    return [];
+    return notesData as CommunityNoteWithAuthor[];
   }
 
   async setNoteModeration(_noteId: string, _status: ModerationStatus): Promise<void> {
