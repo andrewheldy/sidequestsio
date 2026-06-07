@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { DemoSessionProvider } from "@/contexts/DemoSessionContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { SignInPromptProvider } from "@/contexts/SignInPromptContext";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -37,8 +38,6 @@ import AppCommunityNotes from "./pages/app/AppCommunityNotes";
 import CheckIn from "./pages/app/CheckIn";
 import NotFound from "./pages/NotFound";
 
-const isDemoMode = import.meta.env.VITE_DATA_SOURCE === "mock";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -48,90 +47,85 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AuthProvider>
-            <FavoritesProvider>
-              <SignInPromptProvider>
-                <DemoBanner />
-                <ScrollToTop />
-                <Routes>
-                  {/* Marketing site */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/quests" element={<Quests />} />
-                  <Route path="/community-notes" element={<CommunityNotes />} />
-                  <Route path="/breadcrumbs" element={<Navigate to="/community-notes" replace />} />
-                  <Route path="/verticals" element={<Verticals />} />
-                  <Route path="/verticals/:slug" element={<VerticalDetail />} />
-                  <Route path="/partnerships" element={<Partnerships />} />
-                  <Route path="/hosts" element={<Hosts />} />
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/terms" element={<TermsOfService />} />
+          {/* DemoSessionProvider must wrap AuthProvider so AuthContext can read the demo toggle */}
+          <DemoSessionProvider>
+            <AuthProvider>
+              <FavoritesProvider>
+                <SignInPromptProvider>
+                  <DemoBanner />
+                  <ScrollToTop />
+                  <Routes>
+                    {/* Marketing site */}
+                    <Route path="/" element={<Index />} />
+                    <Route path="/quests" element={<Quests />} />
+                    <Route path="/community-notes" element={<CommunityNotes />} />
+                    <Route path="/breadcrumbs" element={<Navigate to="/community-notes" replace />} />
+                    <Route path="/verticals" element={<Verticals />} />
+                    <Route path="/verticals/:slug" element={<VerticalDetail />} />
+                    <Route path="/partnerships" element={<Partnerships />} />
+                    <Route path="/hosts" element={<Hosts />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/terms" element={<TermsOfService />} />
 
-                  {/* Auth + onboarding */}
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/onboarding" element={<Onboarding />} />
+                    {/* Auth + onboarding */}
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/onboarding" element={<Onboarding />} />
 
-                  {/* Public profile (read-only, privacy-safe) */}
-                  <Route path="/u/:username" element={<PublicProfile />} />
+                    {/* Public profile (read-only, privacy-safe) */}
+                    <Route path="/u/:username" element={<PublicProfile />} />
 
-                  {/* Quest detail & QR resolution */}
-                  <Route path="/quests/:questId" element={<QuestDetail />} />
-                  <Route path="/q/:questId" element={<QrLanding />} />
-                  <Route path="/scan/:code" element={<ScanResolve />} />
+                    {/* Quest detail & QR resolution */}
+                    <Route path="/quests/:questId" element={<QuestDetail />} />
+                    <Route path="/q/:questId" element={<QrLanding />} />
+                    <Route path="/scan/:code" element={<ScanResolve />} />
 
-                  {/* In-app experience */}
-                  <Route path="/app" element={<AppLayout />}>
-                    <Route index element={<Navigate to="/app/explore" replace />} />
-                    <Route path="explore" element={<Explore />} />
-                    <Route path="map" element={<MapView />} />
-                    <Route path="quests" element={<QuestBrowser />} />
-                    <Route path="community-notes" element={<AppCommunityNotes />} />
-                    <Route
-                      path="checkin"
-                      element={
-                        <ProtectedRoute>
-                          <CheckIn />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="favorites"
-                      element={
-                        <ProtectedRoute>
-                          <Favorites />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="profile"
-                      element={
-                        isDemoMode ? (
-                          <Profile />
-                        ) : (
+                    {/* In-app experience */}
+                    <Route path="/app" element={<AppLayout />}>
+                      <Route index element={<Navigate to="/app/explore" replace />} />
+                      <Route path="explore" element={<Explore />} />
+                      <Route path="map" element={<MapView />} />
+                      <Route path="quests" element={<QuestBrowser />} />
+                      <Route path="community-notes" element={<AppCommunityNotes />} />
+                      <Route
+                        path="checkin"
+                        element={
+                          <ProtectedRoute>
+                            <CheckIn />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="favorites"
+                        element={
+                          <ProtectedRoute>
+                            <Favorites />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="profile"
+                        element={
                           <ProtectedRoute>
                             <Profile />
                           </ProtectedRoute>
-                        )
-                      }
-                    />
-                    <Route
-                      path="settings"
-                      element={
-                        isDemoMode ? (
-                          <Settings />
-                        ) : (
+                        }
+                      />
+                      <Route
+                        path="settings"
+                        element={
                           <ProtectedRoute>
                             <Settings />
                           </ProtectedRoute>
-                        )
-                      }
-                    />
-                  </Route>
+                        }
+                      />
+                    </Route>
 
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </SignInPromptProvider>
-            </FavoritesProvider>
-          </AuthProvider>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </SignInPromptProvider>
+              </FavoritesProvider>
+            </AuthProvider>
+          </DemoSessionProvider>
         </BrowserRouter>
       </TooltipProvider>
     </LanguageProvider>
