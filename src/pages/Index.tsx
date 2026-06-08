@@ -141,12 +141,12 @@ const Index = () => {
                   className={`bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 group ${ctaPulse ? 'cta-pulse' : ''}`}
                 >
                   <Link to="/quests">
-                    {t.home.hero.cta}
+                    Start Exploring
                     <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="border-border hover:bg-muted">
-                  <Link to="/community-notes">{t.home.hero.secondaryCta}</Link>
+                  <Link to="/app/explore">Take the Tour</Link>
                 </Button>
               </div>
             </AnimatedSection>
