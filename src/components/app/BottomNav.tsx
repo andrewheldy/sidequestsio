@@ -1,17 +1,17 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Home, Compass, QrCode, MessageSquare, User } from "lucide-react";
+import { Home, Compass, QrCode, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: "/app", label: "Home", icon: Home, end: true },
   { to: "/app/quests", label: "Quests", icon: Compass, end: false },
-  { to: "/app/community-notes", label: "Notes", icon: MessageSquare, end: false },
   { to: "/app/profile", label: "Profile", icon: User, end: false },
 ];
 
 /** Mobile-first bottom navigation with a central "Check In" (scan) action. */
 export default function BottomNav() {
   const navigate = useNavigate();
+  // Home + Quests on the left, Profile on the right
   const left = items.slice(0, 2);
   const right = items.slice(2);
 

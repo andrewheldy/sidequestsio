@@ -10,6 +10,9 @@ export type AppEventName =
   | "qr_scanned"
   | "nfc_tapped"
   | "quest_viewed"
+  | "quest_page_viewed"     // direct page visit (distinct from QR scan flow)
+  | "link_clicked"          // business/host link tapped on a quest page
+  | "checkin_started"       // user initiates the check-in / completion flow
   | "auth_started"
   | "auth_completed"
   | "quest_started"
@@ -21,6 +24,7 @@ export type AppEventName =
   | "reward_viewed"
   | "reward_redeemed"
   | "community_note_created"
+  | "breadcrumb_created"    // alias for community_note_created; preferred in new UI
   | "leaderboard_viewed"
   | "proof_captured"
   | "proof_shared";
@@ -33,6 +37,8 @@ export interface AppEventContext {
   venue_id?: string | null;
   partner_id?: string;
   qr_code_id?: string | null;
+  /** Populated for `link_clicked` events — identifies which link type was tapped. */
+  link_type?: string;
   /** Free-form, privacy-safe properties (never PII). */
   props?: Record<string, string | number | boolean | null>;
 }
