@@ -11,6 +11,14 @@ export type AppEventName =
   | "nfc_tapped"
   | "quest_viewed"
   | "quest_page_viewed"     // direct page visit (distinct from QR scan flow)
+  | "quest_page_view"       // alias used by funky action tracking
+  | "action_card_view"      // funky action card becomes visible
+  | "complete_quest_click"  // user taps the Complete Quest button
+  | "proof_started"         // user begins proof capture flow
+  | "proof_submitted"       // user submits proof
+  | "google_review_click"   // user taps Google Reviews link
+  | "website_click"         // user taps website link
+  | "social_share_click"    // user taps a social share button
   | "link_clicked"          // business/host link tapped on a quest page
   | "checkin_started"       // user initiates the check-in / completion flow
   | "auth_started"

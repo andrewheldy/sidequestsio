@@ -46,7 +46,7 @@ export interface DbSnapshot {
 }
 
 const STORE_KEY = "sq.db";
-const STORE_VERSION = 3;
+const STORE_VERSION = 4;
 const VERSION_KEY = "sq.db.version";
 
 let memory: DbSnapshot | null = null;

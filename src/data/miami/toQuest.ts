@@ -1,6 +1,7 @@
 import type { Quest } from '@/lib/quests';
 import type { MiamiCRMRow } from './index';
 import geocodedRaw from './miamiQuestLocations.geocoded.json';
+import funkyActionsRaw from './funkyActions.json';
 
 export interface MiamiQuest extends Quest {
   address: string;
@@ -51,6 +52,22 @@ const IMAGES_BY_CATEGORY: Record<string, string[]> = {
     'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=300&fit=crop',
   ],
 };
+
+// Normalize funky actions into a lookup by rank (1-indexed)
+const FUNKY_ACTIONS: Record<number, string> = Object.fromEntries(
+  (funkyActionsRaw as Array<{ rank: number; funky_action: string }>).map(
+    (fa) => [fa.rank, fa.funky_action]
+  )
+);
+
+// Derive a sensible proof_method from the quest's funky_action text
+function inferProofMethod(funkyAction: string): string {
+  const lower = funkyAction.toLowerCase();
+  if (/photograph|photo|snap|pic\b|selfie|portrait/i.test(lower)) return 'camera';
+  if (/breadcrumb/i.test(lower)) return 'breadcrumb';
+  if (/tell.*staff|say.*staff|staff.*phrase|passphrase|code word|password/i.test(lower)) return 'staff_phrase';
+  return 'manual';
+}
 
 function inferCategory(questName: string): string {
   if (/caffeine chronicles|sweet tooth|taco quest/i.test(questName)) return 'Foodie';
@@ -105,8 +122,9 @@ let imageCounters: Record<string, number> = {};
 
 export const MIAMI_QUESTS: MiamiQuest[] = raw
   .filter(row => row.coordinates?.lat != null)
-  .map(row => {
+  .map((row, index) => {
     const questName = row['Quest Name'];
+    const businessName = row['Business Name'];
     const address = row['Address / Mapbox Coordinates'];
     const concept = row['Suggested Quest Concept'];
     const physicalReward = row['Suggested Reward'];
@@ -117,9 +135,15 @@ export const MIAMI_QUESTS: MiamiQuest[] = raw
     const category = inferCategory(questName);
     const xp = XP_BY_CATEGORY[category] ?? 100;
 
-    const idx = imageCounters[category] ?? 0;
-    imageCounters[category] = idx + 1;
-    const image = pickImage(category, idx);
+    const imgIdx = imageCounters[category] ?? 0;
+    imageCounters[category] = imgIdx + 1;
+    const image = pickImage(category, imgIdx);
+
+    // Assign funky action by 1-based rank cycling through the 150 available
+    const funkyRank = (index % Object.keys(FUNKY_ACTIONS).length) + 1;
+    const funkyAction = FUNKY_ACTIONS[funkyRank] ?? null;
+    const proofMethod = funkyAction ? inferProofMethod(funkyAction) : 'manual';
+    const socialSharePrompt = `Just completed "${questName}" at ${businessName}! 🗺️ #SideQuests #Miami #${neighborhood.replace(/\s+/g, '')}`;
 
     return {
       id: toSlug(questName),
@@ -138,5 +162,9 @@ export const MIAMI_QUESTS: MiamiQuest[] = raw
       address,
       concept,
       physicalReward,
+      funky_action: funkyAction,
+      proof_method: proofMethod,
+      social_share_prompt: socialSharePrompt,
+      estimated_time: '5–10 min',
     };
   });

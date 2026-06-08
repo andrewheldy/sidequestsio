@@ -23,6 +23,12 @@ export interface Quest {
   lng: number;
   /** Street address — populated for CRM-backed quests. */
   address?: string;
+  /** The playful real-world action the user must complete at the venue. */
+  funky_action?: string | null;
+  proof_method?: string | null;
+  social_share_prompt?: string | null;
+  staff_phrase?: string | null;
+  estimated_time?: string | null;
 }
 
 export const QUESTS: Quest[] = [

@@ -145,6 +145,8 @@ export interface Venue {
 // Quests
 // ---------------------------------------------------------------------------
 
+export type ProofMethod = "camera" | "photo" | "staff_phrase" | "breadcrumb" | "qr" | "manual";
+
 export interface Quest {
   id: string;
   partner_id: string;
@@ -163,6 +165,20 @@ export interface Quest {
   verification_secret: string | null;
   image_url: string | null;
   created_at: string;
+  /** The playful real-world action the user must complete at the business. */
+  funky_action?: string | null;
+  /** Broad category of the action: e.g. "social", "taste", "explore". */
+  action_type?: string | null;
+  /** Optional secondary prompt giving more detail about the action. */
+  action_prompt?: string | null;
+  /** How the user proves they completed the funky action. */
+  proof_method?: ProofMethod | null;
+  /** Suggested caption/copy for social sharing post-completion. */
+  social_share_prompt?: string | null;
+  /** Phrase the user tells staff to unlock the quest (staff_phrase proof). */
+  staff_phrase?: string | null;
+  /** Human-readable estimated time to complete, e.g. "5 min". */
+  estimated_time?: string | null;
 }
 
 export interface QrCode {
