@@ -31,6 +31,7 @@ import {
   Share2,
 } from "lucide-react";
 import { getRepository } from "@/lib/db";
+import { DEMO_QUESTS, DEMO_CATEGORY_MAP } from "@/data/demo/demoQuests";
 import { useAuth } from "@/contexts/AuthContext";
 import { recordQuestScan } from "@/lib/quests/scanFlow";
 import { isDemoMode } from "@/lib/demo";
@@ -142,7 +143,46 @@ export default function QuestDetail() {
     refetch,
   } = useQuery({
     queryKey: ["quest", questId],
-    queryFn: async () => (await getRepository()).getQuest(questId!),
+    queryFn: async (): Promise<QuestWithContext | null> => {
+      const fromRepo = await (await getRepository()).getQuest(questId!);
+      if (fromRepo) return fromRepo;
+      // Fall back to static demo data so the page works on any backend
+      const demo = DEMO_QUESTS.find((q) => q.id === questId);
+      if (!demo) return null;
+      return {
+        id: demo.id,
+        partner_id: "demo",
+        venue_id: `venue-${demo.id}`,
+        title: demo.title,
+        description: demo.concept,
+        category: (DEMO_CATEGORY_MAP[demo.category] ?? "culture") as QuestWithContext["category"],
+        difficulty: "easy",
+        xp_reward: demo.xp,
+        points_reward: Math.floor(demo.xp / 2),
+        status: "active",
+        start_date: null,
+        end_date: null,
+        verification_type: "qr",
+        verification_secret: null,
+        image_url: demo.image,
+        created_at: new Date().toISOString(),
+        funky_action: demo.funky_action ?? null,
+        proof_method: demo.proof_method as QuestWithContext["proof_method"],
+        social_share_prompt: demo.social_share_prompt ?? null,
+        estimated_time: demo.estimated_time ?? null,
+        staff_phrase: demo.staff_phrase ?? null,
+        venue: {
+          id: `venue-${demo.id}`,
+          partner_id: "demo",
+          name: demo.businessName,
+          address: demo.address,
+          city: "Miami",
+          latitude: demo.lat,
+          longitude: demo.lng,
+          status: "active",
+        },
+      };
+    },
     enabled: !!questId,
     retry: 2,
     staleTime: 30_000,

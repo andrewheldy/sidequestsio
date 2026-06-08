@@ -2,6 +2,9 @@
  * Demo-ready quests: the 15 fully built-out seed quests reformatted for
  * list/map views.  IDs match the LocalRepository seed so every card links
  * to a working detail page at /quests/:id.
+ *
+ * QuestDetail falls back to this list when the repository (Supabase or local)
+ * returns null — so the demo works on any backend.
  */
 
 import type { Quest } from '@/lib/quests';
@@ -10,6 +13,8 @@ export interface DemoQuest extends Quest {
   address: string;
   concept: string;
   physicalReward: string;
+  /** Business / venue name shown on the detail page */
+  businessName: string;
 }
 
 export const DEMO_QUESTS: DemoQuest[] = [
@@ -17,6 +22,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-wynwood',
     title: 'Wynwood Walls',
+    businessName: 'Wynwood Walls',
     neighborhood: 'Wynwood',
     category: 'Culture',
     reward: 'Gallery Print',
@@ -37,6 +43,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-panther',
     title: 'Panther Coffee: Single-Origin Ritual',
+    businessName: 'Panther Coffee',
     neighborhood: 'Wynwood',
     category: 'Foodie',
     reward: 'Free single-origin pour-over',
@@ -58,6 +65,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-kyu',
     title: 'KYU: Art of the Binchotan',
+    businessName: 'KYU Miami',
     neighborhood: 'Wynwood',
     category: 'Foodie',
     reward: 'Free appetizer on next visit',
@@ -79,6 +87,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-coyo',
     title: 'Coyo Taco: Spice Declaration',
+    businessName: 'Coyo Taco',
     neighborhood: 'Wynwood',
     category: 'Foodie',
     reward: 'Free taco on next visit',
@@ -99,6 +108,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-boxelder',
     title: 'Boxelder: The Tap Room Ritual',
+    businessName: 'Boxelder Craft Beer Market',
     neighborhood: 'Wynwood',
     category: 'Nightlife',
     reward: 'Free craft beer flight',
@@ -119,6 +129,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-gramps',
     title: 'Gramps: Backyard Frequency',
+    businessName: 'Gramps',
     neighborhood: 'Wynwood',
     category: 'Nightlife',
     reward: 'Free drink ticket',
@@ -139,6 +150,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-wood-tavern',
     title: 'Wood Tavern: Terroir Hours',
+    businessName: 'Wood Tavern',
     neighborhood: 'Wynwood',
     category: 'Nightlife',
     reward: 'Natural wine recommendation card',
@@ -160,6 +172,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-beans',
     title: 'Vice City Beans: Secret Menu',
+    businessName: 'Vice City Beans',
     neighborhood: 'South Beach',
     category: 'Foodie',
     reward: '$2 off any specialty espresso',
@@ -181,9 +194,10 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-sunset',
     title: 'Sunset Chase at South Pointe',
+    businessName: 'South Pointe Park',
     neighborhood: 'South Beach',
     category: 'Outdoor',
-    reward: 'Coastal Vibes',
+    reward: 'Community bragging rights',
     xp: 115,
     distance: '0.5 mi',
     time: '25 min',
@@ -201,6 +215,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-art-deco',
     title: 'Ocean Drive: Art Deco Sizing',
+    businessName: 'Ocean Drive Art Deco District',
     neighborhood: 'South Beach',
     category: 'Culture',
     reward: 'Art Deco walking guide',
@@ -222,6 +237,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-pamm',
     title: 'PAMM: 60 Seconds with a Masterpiece',
+    businessName: 'Pérez Art Museum Miami',
     neighborhood: 'Downtown Miami',
     category: 'Culture',
     reward: 'Free audio tour download',
@@ -242,6 +258,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-frost',
     title: 'Frost Science: Deep Sea Portal',
+    businessName: 'Frost Science Museum',
     neighborhood: 'Downtown Miami',
     category: 'Culture',
     reward: 'Free planetarium show ticket',
@@ -262,6 +279,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-vizcaya',
     title: 'Vizcaya: Salute the Stone Barge',
+    businessName: 'Vizcaya Museum & Gardens',
     neighborhood: 'Coconut Grove',
     category: 'Culture',
     reward: 'Historic photo print',
@@ -282,6 +300,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-bass',
     title: 'Bass Museum: Provocation Hunt',
+    businessName: 'Bass Museum of Art',
     neighborhood: 'Miami Beach',
     category: 'Culture',
     reward: 'Exclusive exhibit preview',
@@ -303,6 +322,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   {
     id: 'quest-brickell-key',
     title: 'Brickell Key: The Skyline Claim',
+    businessName: 'Brickell Key Park',
     neighborhood: 'Brickell',
     category: 'Outdoor',
     reward: 'Skyline photo print',
@@ -321,3 +341,15 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Pointed at the Miami skyline and said 'that's mine' with full conviction 🏙️ #SideQuests #BrickellKey #Miami",
   },
 ];
+
+/** Map from display category to QuestCategory DB enum */
+export const DEMO_CATEGORY_MAP: Record<string, string> = {
+  Foodie: 'food',
+  Culture: 'culture',
+  Nightlife: 'nightlife',
+  Wellness: 'fitness',
+  Outdoor: 'outdoors',
+  Community: 'culture',
+  'Hidden Gems': 'hidden_gem',
+  Art: 'art',
+};
