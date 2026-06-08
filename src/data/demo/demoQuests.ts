@@ -1,7 +1,12 @@
 /**
  * Demo-ready quests: the 15 fully built-out seed quests reformatted for
- * list/map views.  IDs match the LocalRepository seed so every card links
- * to a working detail page at /quests/:id.
+ * list/map views.
+ *
+ * IDs use stable UUIDs (de000000-... prefix) that match:
+ *   supabase/seed_demo.sql  — production database seed
+ *   src/lib/db/local/seed.ts — LocalRepository fallback seed
+ *
+ * Every card links to a working detail page at /quests/:id.
  */
 
 import type { Quest } from '@/lib/quests';
@@ -15,7 +20,7 @@ export interface DemoQuest extends Quest {
 export const DEMO_QUESTS: DemoQuest[] = [
   // ── Wynwood ──────────────────────────────────────────────────────────────
   {
-    id: 'quest-wynwood',
+    id: 'de000000-0000-0000-0000-000000000001',
     title: 'Wynwood Walls',
     neighborhood: 'Wynwood',
     category: 'Culture',
@@ -35,7 +40,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Just stood in front of my favorite mural at Wynwood Walls and said 'I feel seen' 🎨 #SideQuests #WynwoodWalls #Miami",
   },
   {
-    id: 'quest-panther',
+    id: 'de000000-0000-0000-0000-000000000002',
     title: 'Panther Coffee: Single-Origin Ritual',
     neighborhood: 'Wynwood',
     category: 'Foodie',
@@ -56,7 +61,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Described my Panther Coffee order using only geography and honestly... it worked ☕ #SideQuests #PantherCoffee #Wynwood",
   },
   {
-    id: 'quest-kyu',
+    id: 'de000000-0000-0000-0000-000000000003',
     title: 'KYU: Art of the Binchotan',
     neighborhood: 'Wynwood',
     category: 'Foodie',
@@ -77,7 +82,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Ordered the chef's secret pick at KYU Miami and it was absolutely fire 🔥 #SideQuests #KYUMiami #Wynwood",
   },
   {
-    id: 'quest-coyo',
+    id: 'de000000-0000-0000-0000-000000000004',
     title: 'Coyo Taco: Spice Declaration',
     neighborhood: 'Wynwood',
     category: 'Foodie',
@@ -97,7 +102,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Announced my spice level at Coyo Taco and held my ground 🌶️ #SideQuests #CoyoTaco #Wynwood",
   },
   {
-    id: 'quest-boxelder',
+    id: 'de000000-0000-0000-0000-000000000005',
     title: 'Boxelder: The Tap Room Ritual',
     neighborhood: 'Wynwood',
     category: 'Nightlife',
@@ -117,7 +122,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Clinked my glass against the Boxelder sign before my first sip 🍺 #SideQuests #Boxelder #Wynwood",
   },
   {
-    id: 'quest-gramps',
+    id: 'de000000-0000-0000-0000-000000000006',
     title: 'Gramps: Backyard Frequency',
     neighborhood: 'Wynwood',
     category: 'Nightlife',
@@ -137,7 +142,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Nodded to the beat at Gramps for 30 whole seconds and I'm not ashamed 🎵 #SideQuests #Gramps #Wynwood",
   },
   {
-    id: 'quest-wood-tavern',
+    id: 'de000000-0000-0000-0000-000000000007',
     title: 'Wood Tavern: Terroir Hours',
     neighborhood: 'Wynwood',
     category: 'Nightlife',
@@ -158,7 +163,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   },
   // ── South Beach ──────────────────────────────────────────────────────────
   {
-    id: 'quest-beans',
+    id: 'de000000-0000-0000-0000-000000000008',
     title: 'Vice City Beans: Secret Menu',
     neighborhood: 'South Beach',
     category: 'Foodie',
@@ -179,7 +184,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Ordered coffee at Vice City Beans and described it using only geography ☕ #SideQuests #ViceCityBeans #Miami",
   },
   {
-    id: 'quest-sunset',
+    id: 'de000000-0000-0000-0000-000000000009',
     title: 'Sunset Chase at South Pointe',
     neighborhood: 'South Beach',
     category: 'Outdoor',
@@ -199,7 +204,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Arms out wide at South Pointe Park, soaking in the Miami sunset 🌅 #SideQuests #SouthPointe #Miami",
   },
   {
-    id: 'quest-art-deco',
+    id: 'de000000-0000-0000-0000-000000000010',
     title: 'Ocean Drive: Art Deco Sizing',
     neighborhood: 'South Beach',
     category: 'Culture',
@@ -220,7 +225,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   },
   // ── Museums & Landmarks ──────────────────────────────────────────────────
   {
-    id: 'quest-pamm',
+    id: 'de000000-0000-0000-0000-000000000011',
     title: 'PAMM: 60 Seconds with a Masterpiece',
     neighborhood: 'Downtown Miami',
     category: 'Culture',
@@ -240,7 +245,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Stood in front of a painting at PAMM for 60 full seconds. No phone. Just vibes 🎨 #SideQuests #PAMM #Miami",
   },
   {
-    id: 'quest-frost',
+    id: 'de000000-0000-0000-0000-000000000012',
     title: 'Frost Science: Deep Sea Portal',
     neighborhood: 'Downtown Miami',
     category: 'Culture',
@@ -260,7 +265,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Put my hand on the Frost Science aquarium glass and the fish looked back at me 🐟 #SideQuests #FrostScience #Miami",
   },
   {
-    id: 'quest-vizcaya',
+    id: 'de000000-0000-0000-0000-000000000013',
     title: 'Vizcaya: Salute the Stone Barge',
     neighborhood: 'Coconut Grove',
     category: 'Culture',
@@ -280,7 +285,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
     social_share_prompt: "Saluted the stone barge at Vizcaya like the sea captain I was born to be ⛵ #SideQuests #Vizcaya #Miami",
   },
   {
-    id: 'quest-bass',
+    id: 'de000000-0000-0000-0000-000000000014',
     title: 'Bass Museum: Provocation Hunt',
     neighborhood: 'Miami Beach',
     category: 'Culture',
@@ -301,7 +306,7 @@ export const DEMO_QUESTS: DemoQuest[] = [
   },
   // ── Brickell ─────────────────────────────────────────────────────────────
   {
-    id: 'quest-brickell-key',
+    id: 'de000000-0000-0000-0000-000000000015',
     title: 'Brickell Key: The Skyline Claim',
     neighborhood: 'Brickell',
     category: 'Outdoor',

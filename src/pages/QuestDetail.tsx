@@ -148,11 +148,15 @@ export default function QuestDetail() {
   } = useQuery({
     queryKey: ["quest", questId],
     queryFn: async () => {
-      const repo = await getRepository();
-      const found = await repo.getQuest(questId!);
-      if (found) return found;
-      // Supabase doesn't have it yet — fall back to the local seed data so
-      // demo quests always render even without a live DB.
+      try {
+        const repo = await getRepository();
+        const found = await repo.getQuest(questId!);
+        if (found) return found;
+      } catch {
+        // Primary repo threw (e.g. invalid-UUID error on Supabase) — fall through
+      }
+      // Not found or errored — fall back to local seed data so demo quests
+      // always render even before the live DB is seeded.
       const { LocalRepository } = await import("@/lib/db/local/LocalRepository");
       return new LocalRepository().getQuest(questId!);
     },
