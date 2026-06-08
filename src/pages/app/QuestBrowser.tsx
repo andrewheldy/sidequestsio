@@ -7,7 +7,7 @@ import { Loading, EmptyState } from "@/components/app/ui";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getRepository } from "@/lib/db";
-import { MIAMI_QUESTS } from "@/data/miami/toQuest";
+import { DEMO_QUESTS } from "@/data/demo/demoQuests";
 import type { QuestCategory, QuestWithContext } from "@/types/db";
 
 const CATEGORIES: (QuestCategory | "all")[] = [
@@ -32,13 +32,13 @@ const CATEGORY_MAP: Record<string, QuestCategory> = {
   Art: "art",
 };
 
-function miamiToContext(q: (typeof MIAMI_QUESTS)[0]): QuestWithContext {
+function demoToContext(q: (typeof DEMO_QUESTS)[0]): QuestWithContext {
   return {
     id: q.id,
     partner_id: "local",
     venue_id: `venue-${q.id}`,
     title: q.title,
-    description: (q as any).concept ?? `Discover ${q.title} in ${q.neighborhood}.`,
+    description: q.concept,
     category: (CATEGORY_MAP[q.category] ?? "culture") as QuestCategory,
     difficulty: "easy",
     xp_reward: q.xp,
@@ -50,11 +50,15 @@ function miamiToContext(q: (typeof MIAMI_QUESTS)[0]): QuestWithContext {
     verification_secret: null,
     image_url: q.image,
     created_at: new Date().toISOString(),
+    funky_action: q.funky_action ?? null,
+    proof_method: (q.proof_method as any) ?? null,
+    social_share_prompt: q.social_share_prompt ?? null,
+    estimated_time: q.estimated_time ?? null,
     venue: {
       id: `venue-${q.id}`,
       partner_id: "local",
       name: q.neighborhood,
-      address: q.address ?? null,
+      address: q.address,
       city: "Miami",
       latitude: q.lat,
       longitude: q.lng,
@@ -63,7 +67,7 @@ function miamiToContext(q: (typeof MIAMI_QUESTS)[0]): QuestWithContext {
   };
 }
 
-const FALLBACK_QUESTS = MIAMI_QUESTS.map(miamiToContext);
+const FALLBACK_QUESTS = DEMO_QUESTS.map(demoToContext);
 
 export default function QuestBrowser() {
   const [category, setCategory] = useState<QuestCategory | "all">("all");
