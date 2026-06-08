@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import CTASection from '@/components/CTASection';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { NearbyQuestsMapSection } from '@/components/map';
-import { MIAMI_QUESTS } from '@/data/miami/toQuest';
+import { DEMO_QUESTS } from '@/data/demo/demoQuests';
 
 const CATEGORY_FILTERS = ['All', 'Foodie', 'Culture', 'Nightlife', 'Hidden Gems', 'Wellness', 'Outdoor', 'Community'] as const;
 type CategoryFilter = typeof CATEGORY_FILTERS[number];
@@ -18,7 +18,7 @@ const Quests = () => {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredQuests = MIAMI_QUESTS.filter((quest) => {
+  const filteredQuests = DEMO_QUESTS.filter((quest) => {
     const matchesCategory = activeCategory === 'All' || quest.category === activeCategory;
     const q = searchQuery.toLowerCase();
     const matchesSearch =
@@ -64,7 +64,7 @@ const Quests = () => {
         <div className="container">
           <AnimatedSection>
             <NearbyQuestsMapSection
-              quests={MIAMI_QUESTS}
+              quests={DEMO_QUESTS}
               title="Explore the Map"
               subtitle="Quests are live across Miami. Tap any pin to preview — use ⊕ to find ones near you."
               height="420px"
@@ -103,6 +103,7 @@ const Quests = () => {
             {filteredQuests.map((quest, index) => (
               <QuestCard
                 key={quest.id}
+                questId={quest.id}
                 title={quest.title}
                 location={quest.address}
                 category={quest.category}

@@ -19,6 +19,8 @@ interface QuestCardProps {
   image: string;
   delay?: number;
   className?: string;
+  /** If provided, clicking navigates to /quests/:questId instead of /app/explore */
+  questId?: string;
 }
 
 export function QuestCard({
@@ -33,18 +35,20 @@ export function QuestCard({
   image,
   delay = 0,
   className,
+  questId,
 }: QuestCardProps) {
   const navigate = useNavigate();
   const useMiamiLayout = concept !== undefined;
+  const dest = questId ? `/quests/${questId}` : '/app/explore';
 
   return (
     <AnimatedSection direction="up" delay={delay}>
       <div
         role="button"
         tabIndex={0}
-        onClick={() => navigate('/app/explore')}
+        onClick={() => navigate(dest)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') navigate('/app/explore');
+          if (e.key === 'Enter' || e.key === ' ') navigate(dest);
         }}
         className={cn(
           'glass-card overflow-hidden hover-lift group cursor-pointer',

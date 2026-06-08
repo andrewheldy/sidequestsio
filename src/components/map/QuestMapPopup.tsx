@@ -32,7 +32,7 @@ const QuestMapPopup = ({ quest, userCoords, onClose }: QuestMapPopupProps) => {
     : quest.distance;
 
   const handleViewQuest = () => {
-    navigate('/app/explore');
+    navigate(`/quests/${quest.id}`);
     onClose();
   };
 
