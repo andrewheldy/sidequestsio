@@ -8,7 +8,6 @@ import {
   Trophy,
   CheckCircle2,
   ArrowLeft,
-  ShieldCheck,
   Globe,
   Instagram,
   Twitter,
@@ -29,6 +28,9 @@ import {
   QrCode,
   Sparkles,
   Share2,
+  BarChart2,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { getRepository } from "@/lib/db";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,6 +53,7 @@ import {
 } from "@/components/ui/sheet";
 import { CommunityNotes } from "@/components/app/CommunityNotes";
 import { QuestProofCamera } from "@/components/app/QuestProofCamera";
+import { CaptureTheMoment } from "@/components/app/CaptureTheMoment";
 import { toast } from "sonner";
 import type { CompleteQuestResult } from "@/lib/db/repository";
 import type { QuestLinks, QuestWithContext, ProofMethod } from "@/types/db";
@@ -124,11 +127,13 @@ export default function QuestDetail() {
   const qc = useQueryClient();
 
   const scanParam = params.get("scan");
+  const showHostAnalytics = params.get("host") === "1" || isDemoMode;
   const [scanId, setScanId] = useState<string | null>(scanParam);
   const [venueCode, setVenueCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<CompleteQuestResult | null>(null);
   const [showProofCamera, setShowProofCamera] = useState(false);
+  const [showCaptureTheMoment, setShowCaptureTheMoment] = useState(false);
   const [showCompletionSheet, setShowCompletionSheet] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
   const recordedRef = useRef(false);
@@ -515,6 +520,19 @@ export default function QuestDetail() {
           </a>
         )}
 
+        {/* ── Capture the Moment CTA ── */}
+        <CaptureTheMomentCard
+          questTitle={quest.title}
+          onCapture={() => {
+            track("capture_moment_click", {
+              quest_id: quest.id,
+              partner_id: quest.partner_id,
+              user_id: user?.id ?? null,
+            });
+            setShowCaptureTheMoment(true);
+          }}
+        />
+
         {/* ── Completion CTA ── */}
         {isDone ? (
           <CompletedCard
@@ -547,6 +565,11 @@ export default function QuestDetail() {
           canPost={!!isDone && isAuthenticated}
           title="Breadcrumbs"
         />
+
+        {/* ── Host Analytics (demo / ?host=1) ── */}
+        {showHostAnalytics && (
+          <DemoHostAnalytics questTitle={quest.title} />
+        )}
       </div>
 
       {/* ── Completion Sheet ── */}
@@ -615,6 +638,18 @@ export default function QuestDetail() {
           quest={quest}
           result={result}
           onDone={() => setShowProofCamera(false)}
+        />
+      )}
+
+      {/* Capture the Moment — triggered from CTA button */}
+      {showCaptureTheMoment && (
+        <CaptureTheMoment
+          questId={quest.id}
+          questTitle={quest.title}
+          venueName={quest.venue?.name ?? quest.partner?.name ?? null}
+          xp={quest.xp_reward}
+          reward={quest.links?.special_deals ?? null}
+          onDone={() => setShowCaptureTheMoment(false)}
         />
       )}
     </div>
@@ -854,6 +889,142 @@ function CompletedCard({
               <Twitter className="h-3.5 w-3.5" /> X
             </Button>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Capture the Moment card — primary action CTA
+// ---------------------------------------------------------------------------
+
+function CaptureTheMomentCard({
+  questTitle,
+  onCapture,
+}: {
+  questTitle: string;
+  onCapture: () => void;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-5 shadow-sm">
+      <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-secondary/10 blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
+
+      <div className="relative">
+        <div className="mb-1 flex items-center gap-2">
+          <Camera className="h-4 w-4 text-primary" />
+          <span className="text-xs font-bold uppercase tracking-widest text-primary">
+            Capture the Moment
+          </span>
+        </div>
+        <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+          Snap a photo or video at the venue. Add the SideQuests overlay and share with the world.
+        </p>
+        <Button onClick={onCapture} className="w-full gap-2" size="lg">
+          <Camera className="h-5 w-5" />
+          📸 Capture the Moment
+        </Button>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Optional · Your moment, your choice to share
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Demo host analytics section
+// ---------------------------------------------------------------------------
+
+const DEMO_METRICS = [
+  { label: "Quest Views",           value: 847,  icon: "👁️",  color: "text-foreground" },
+  { label: "Quest Starts",          value: 312,  icon: "▶️",  color: "text-foreground" },
+  { label: "Completions",           value: 156,  icon: "✅",  color: "text-green-400" },
+  { label: "Reward Redemptions",    value: 98,   icon: "🎁",  color: "text-amber-400" },
+  { label: "Capture Button Clicks", value: 203,  icon: "📸",  color: "text-primary" },
+  { label: "Photos Uploaded",       value: 178,  icon: "🖼️",  color: "text-primary" },
+  { label: "Videos Uploaded",       value: 25,   icon: "🎥",  color: "text-primary" },
+  { label: "Social Shares",         value: 89,   icon: "🔗",  color: "text-secondary" },
+  { label: "Instagram Shares",      value: 56,   icon: "📸",  color: "text-secondary" },
+  { label: "TikTok Shares",         value: 18,   icon: "🎵",  color: "text-secondary" },
+  { label: "X Shares",              value: 15,   icon: "𝕏",   color: "text-secondary" },
+  { label: "Downloads",             value: 63,   icon: "⬇️",  color: "text-foreground" },
+  { label: "Google Review Clicks",  value: 74,   icon: "⭐",  color: "text-yellow-400" },
+  { label: "Website Clicks",        value: 131,  icon: "🌐",  color: "text-foreground" },
+  { label: "Social Link Clicks",    value: 96,   icon: "💬",  color: "text-foreground" },
+];
+
+function DemoHostAnalytics({ questTitle }: { questTitle: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const completions = 156;
+  const views = 847;
+  const conversionRate = Math.round((completions / views) * 100);
+  const captureRate = Math.round((178 / views) * 100);
+  const shareRate = Math.round((89 / 178) * 100);
+
+  return (
+    <div className="rounded-2xl border border-border/60 bg-muted/20">
+      {/* Header / toggle */}
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="flex w-full items-center justify-between rounded-2xl p-4 transition-colors hover:bg-muted/30"
+      >
+        <div className="flex items-center gap-2">
+          <BarChart2 className="h-4 w-4 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Host Analytics</span>
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+            Demo
+          </span>
+        </div>
+        {expanded ? (
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        )}
+      </button>
+
+      {expanded && (
+        <div className="border-t border-border/40 px-4 pb-5 pt-4 space-y-4">
+          <p className="text-xs text-muted-foreground">
+            Mock analytics for <span className="font-medium text-foreground">{questTitle}</span>.
+            Real data connects when you go live.
+          </p>
+
+          {/* Highlight stats */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-col items-center rounded-xl bg-muted/50 p-3 text-center">
+              <p className="font-poppins text-2xl font-bold text-foreground">{conversionRate}%</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">Conversion Rate</p>
+            </div>
+            <div className="flex flex-col items-center rounded-xl bg-muted/50 p-3 text-center">
+              <p className="font-poppins text-2xl font-bold text-primary">{captureRate}%</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">Capture Rate</p>
+            </div>
+            <div className="flex flex-col items-center rounded-xl bg-muted/50 p-3 text-center">
+              <p className="font-poppins text-2xl font-bold text-secondary">{shareRate}%</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">Share Rate</p>
+            </div>
+          </div>
+
+          {/* Full metrics table */}
+          <div className="divide-y divide-border/30 rounded-xl bg-muted/30 overflow-hidden">
+            {DEMO_METRICS.map(({ label, value, icon, color }) => (
+              <div key={label} className="flex items-center justify-between px-3 py-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{icon}</span>
+                  <span className="text-xs text-muted-foreground">{label}</span>
+                </div>
+                <span className={`text-sm font-semibold tabular-nums ${color}`}>
+                  {value.toLocaleString()}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground">
+            These are demo numbers. Connect your real venue to see live data.
+          </p>
         </div>
       )}
     </div>
