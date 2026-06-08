@@ -14,15 +14,18 @@ import { isDemoMode } from "@/lib/demo";
 const MAX = 280;
 
 /**
- * Quest-specific Community Notes (Phase 10). Notes are tips left by questers who
- * completed the quest — not a social feed. Only completers can post.
+ * Quest-specific Breadcrumbs / Community Notes. Notes are tips left by questers
+ * who completed the quest — not a social feed. Only completers can post.
  */
 export function CommunityNotes({
   questId,
   canPost,
+  title = "Breadcrumbs",
 }: {
   questId: string;
   canPost: boolean;
+  /** Section heading shown above the notes list. Defaults to "Breadcrumbs". */
+  title?: string;
 }) {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -62,7 +65,7 @@ export function CommunityNotes({
 
   return (
     <section>
-      <SectionHeader title="Community Notes" />
+      <SectionHeader title={title} />
 
       {isDemoMode ? (
         <div className="glass-card mb-4 flex items-center gap-2 p-4 text-sm text-muted-foreground">
@@ -91,7 +94,7 @@ export function CommunityNotes({
 
       {notes.length === 0 ? (
         <div className="glass-card flex items-center gap-2 p-4 text-sm text-muted-foreground">
-          <MessageSquare className="h-4 w-4" /> No notes yet — be the first to share a tip.
+          <MessageSquare className="h-4 w-4" /> No breadcrumbs yet — complete this quest to leave the first tip.
         </div>
       ) : (
         <div className="space-y-3">

@@ -333,12 +333,38 @@ export interface AuditLog {
 }
 
 // ---------------------------------------------------------------------------
+// Quest business/host links (optional, configurable per quest)
+// ---------------------------------------------------------------------------
+
+/** Optional external links attached to a quest by a partner/host.
+ *  Not every quest is a restaurant — all fields are optional.
+ *  Stored as a JSONB column or separate table in the backend. */
+export interface QuestLinks {
+  website_url?: string | null;
+  instagram_url?: string | null;
+  tiktok_url?: string | null;
+  x_url?: string | null;
+  facebook_url?: string | null;
+  google_reviews_url?: string | null;
+  menu_url?: string | null;
+  reservation_url?: string | null;
+  order_url?: string | null;
+  delivery_url?: string | null;
+  /** Plain-text description of a special deal or reward available at the venue. */
+  special_deals?: string | null;
+  /** E.164 phone number for a "call/save contact" action. */
+  contact_phone?: string | null;
+}
+
+// ---------------------------------------------------------------------------
 // Convenience view-models (joined shapes the UI consumes)
 // ---------------------------------------------------------------------------
 
 export interface QuestWithContext extends Quest {
   partner?: Partner;
   venue?: Venue;
+  /** Optional business/host links — only populated when the partner has set them. */
+  links?: QuestLinks;
 }
 
 export interface LeaderboardRow {
