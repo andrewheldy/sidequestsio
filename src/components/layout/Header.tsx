@@ -3,22 +3,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import dotlingLogo from '@/assets/dotling-logo.jpg';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { t } = useLanguage();
-  const { user } = useAuth();
 
   const navLinks = [
     { href: '/quests', label: t.nav.quests },
-    { href: '/community-notes', label: t.nav.communityNotes },
-    { href: '/verticals', label: t.nav.verticals },
     { href: '/partnerships', label: t.nav.partnerships },
     { href: '/hosts', label: t.nav.hosts },
   ];
@@ -40,10 +34,9 @@ export function Header() {
         isScrolled ? 'bg-background/80 backdrop-blur-xl border-b border-border/50 py-3' : 'bg-transparent py-5'
       )}>
         <div className="container flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <img src={dotlingLogo} alt="SideQuests.io" className="w-10 h-10 rounded-lg object-cover transition-transform duration-300 group-hover:scale-110" />
-            <span className="font-poppins font-bold text-xl hidden sm:block">
-              <span className="bg-gradient-to-r from-coral via-primary to-turquoise bg-clip-text text-transparent">SideQuests</span><span className="text-primary">.io</span>
+          <Link to="/" className="group">
+            <span className="font-poppins font-bold text-xl">
+              <span className="bg-gradient-to-r from-coral via-primary to-turquoise bg-clip-text text-transparent">sidequests</span>
             </span>
           </Link>
 
@@ -59,14 +52,16 @@ export function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-3">
-            <LanguageSwitcher />
             <Button asChild variant="ghost" size="sm"><Link to="/auth">{t.nav.signIn}</Link></Button>
-            <Button asChild size="sm"><Link to="/app">{t.nav.getStarted}</Link></Button>
+            <Button asChild size="sm"><Link to="/onboarding">{t.nav.getStarted}</Link></Button>
           </div>
 
           <div className="lg:hidden flex items-center gap-2">
-            <LanguageSwitcher />
-            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-lg hover:bg-muted/50">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-muted/50"
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -85,8 +80,8 @@ export function Header() {
             </Link>
           ))}
           <div className="flex flex-col gap-4 mt-8 w-full max-w-xs">
-            <Button asChild variant="outline" size="lg" className="w-full"><Link to="/auth">{t.nav.signIn}</Link></Button>
-            <Button asChild size="lg" className="w-full"><Link to="/app">{t.nav.getStarted}</Link></Button>
+            <Button asChild variant="outline" size="lg" className="w-full min-h-[44px]"><Link to="/auth">{t.nav.signIn}</Link></Button>
+            <Button asChild size="lg" className="w-full min-h-[44px]"><Link to="/onboarding">{t.nav.getStarted}</Link></Button>
           </div>
         </nav>
       </div>
