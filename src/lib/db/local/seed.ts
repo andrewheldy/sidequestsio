@@ -168,6 +168,11 @@ export function buildSeed(): DbSnapshot {
         image_url:
           "https://images.unsplash.com/photo-1569700296499-d5671c74cb3d?w=800&h=600&fit=crop",
         created_at: now,
+        funky_action: "Stand in front of your favorite piece and say 'I feel seen' with complete sincerity",
+        action_type: "social",
+        proof_method: "camera",
+        social_share_prompt: "Just stood in front of my favorite mural at Wynwood Walls and said 'I feel seen' 🎨 #SideQuests #WynwoodWalls #Miami",
+        estimated_time: "5 min",
       },
       {
         id: "quest-beans",
@@ -188,6 +193,12 @@ export function buildSeed(): DbSnapshot {
         image_url:
           "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop",
         created_at: now,
+        funky_action: "Describe the coffee's flavor to the barista using only geography ('tastes like altitude')",
+        action_type: "taste",
+        staff_phrase: "SUNRISE",
+        proof_method: "staff_phrase",
+        social_share_prompt: "Ordered coffee at Vice City Beans and described it using only geography ☕ #SideQuests #ViceCityBeans #Miami",
+        estimated_time: "5 min",
       },
       {
         id: "quest-sunset",
@@ -208,6 +219,11 @@ export function buildSeed(): DbSnapshot {
         image_url:
           "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop",
         created_at: now,
+        funky_action: "Spread your arms out wide when you reach the park and face the horizon",
+        action_type: "explore",
+        proof_method: "camera",
+        social_share_prompt: "Arms out wide at South Pointe Park, soaking in the Miami sunset 🌅 #SideQuests #SouthPointe #Miami",
+        estimated_time: "2 min",
       },
     ],
 
