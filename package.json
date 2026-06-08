@@ -10,7 +10,11 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "geocode:miami": "tsx scripts/geocode-miami-crm.ts",
-    "geocode:miami:local": "tsx scripts/geocode-miami-crm-local.ts"
+    "geocode:miami:local": "tsx scripts/geocode-miami-crm-local.ts",
+    "crm:dry-run": "tsx scripts/import-crm.ts --dry-run",
+    "crm:sql": "tsx scripts/import-crm.ts --sql",
+    "crm:import": "tsx scripts/import-crm.ts --import",
+    "crm:mapping": "tsx scripts/import-crm.ts --mapping"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

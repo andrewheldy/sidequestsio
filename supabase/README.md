@@ -57,13 +57,94 @@ rows. After your demo accounts have signed up:
 
 ---
 
+## CRM import (150 Miami businesses)
+
+`scripts/import-crm.ts` transforms `src/data/miami/miamiQuestLocations.geocoded.json`
+into database rows. Each of the 150 CRM records produces one row in each of:
+partners, venues, quests, qr_codes, rewards.
+
+### Prerequisites
+
+- Migrations 1–5 applied (schema must exist).
+- `seed_full.sql` run (not required, but run order matters for UUID ranges).
+- For `--import` mode: `.env.local` with `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`.
+
+### Step 1 — Preview (no writes)
+
+```bash
+npm run crm:dry-run
+```
+
+Prints counts, category breakdown, address quality, and a 3-row sample. No
+database writes occur.
+
+### Step 2a — Generate SQL (Supabase SQL Editor)
+
+```bash
+npm run crm:sql > /tmp/crm_import.sql
+```
+
+Open the Supabase SQL Editor, paste the contents of `/tmp/crm_import.sql`, and
+run it. The script wraps everything in a single transaction (`BEGIN` / `COMMIT`)
+and uses `ON CONFLICT (id) DO NOTHING` throughout — safe to run twice.
+
+### Step 2b — Direct import (programmatic)
+
+```bash
+# Requires .env.local with SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+npm run crm:import
+```
+
+Uses the Supabase JS client with the service-role key (bypasses RLS for seeding).
+Inserts in batches of 50 with `ignoreDuplicates: true`.
+
+### Step 3 — Verify
+
+Open the Supabase SQL Editor and run `supabase/verify_crm_import.sql`.
+
+Expected counts after both `seed_full.sql` and the CRM import:
+
+| Table      | Rows |
+| ---------- | ---- |
+| partners   | 157  |
+| venues     | 159  |
+| quests     | 159  |
+| qr_codes   | 159  |
+| rewards    | 160  |
+
+### Notes on the CRM data
+
+- **No website / social / reservation links** in the source JSON — only business
+  name, neighborhood, address, quest concept, and reward text. These fields will
+  remain NULL until enriched manually or via a future data pass.
+- **All 150 thumbnail URLs are placeholders** (`[Insert image asset…]`); they are
+  stored as NULL. Replace with real CDN URLs after assets are sourced.
+- **112 of 150 venues** have only a neighborhood-level address; `venue.address`
+  is NULL for these rows. The remaining 38 have full street addresses.
+- **Community notes are not included** — they require real `auth.users` UUIDs.
+  See `import_notes.sql` for the template.
+
+### CRM UUID ranges
+
+| Prefix       | Entity   |
+| ------------ | -------- |
+| `70000000-`  | partners |
+| `80000000-`  | venues   |
+| `90000000-`  | quests   |
+| `a0000000-`  | qr_codes |
+| `b0000000-`  | rewards  |
+
+Full name → UUID mapping: `supabase/crm_import_mapping.json`
+
+---
+
 ## ID mapping
 
 `supabase/import_mapping.json` documents every mock string ID from
 `src/data/mock/` and its corresponding stable UUID used in `seed_full.sql`.
 This is the canonical reference for the JSON → Supabase import.
 
-UUID ranges:
+UUID ranges (mock / seed data):
 
 | Prefix      | Entity        |
 | ----------- | ------------- |
