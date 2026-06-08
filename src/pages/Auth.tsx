@@ -180,6 +180,16 @@ const Auth = () => {
                 'Create account'
               )}
             </Button>
+
+            {mode === 'signup' && (
+              <p className="text-center text-xs text-muted-foreground">
+                By creating an account you agree to our{' '}
+                <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+            )}
           </form>
         </Tabs>
 
