@@ -1,39 +1,36 @@
-# SideQuests.io — Supabase Backend
+# Trainr — Supabase Backend
 
-The application ships with two interchangeable backends behind one
-`Repository` interface (`src/lib/db/repository.ts`):
-
-| Mode      | When                                   | Storage                         |
-| --------- | -------------------------------------- | ------------------------------- |
-| **Local** | default (no env vars)                  | `localStorage`, seeded demo data |
-| **Supabase** | `VITE_SUPABASE_URL` + anon key set | PostgreSQL + Auth + RLS         |
-
-No application code changes between modes — only environment variables.
+Auth, profiles, and storage are backed by Supabase (PostgreSQL + Auth + RLS +
+Storage). The client talks to it through `src/lib/supabase.ts` and the
+`AuthContext`. When the `VITE_SUPABASE_*` env vars are unset the app still boots
+in a guest/demo mode (auth actions surface a friendly message).
 
 ## Setup (production)
 
 1. Create a Supabase project.
 2. Run the migrations **in order** (SQL editor or `supabase db push`):
-   - `migrations/0001_schema.sql` — tables, enums, indexes, views
-   - `migrations/0002_rls.sql` — Row Level Security policies + helpers
-   - `migrations/0003_functions.sql` — RPCs (completion, redemption, analytics…)
-3. (Optional) Run `seed.sql` for catalog demo data.
-4. Copy `.env.example` → `.env.local` and fill in the URL + anon key.
-5. Enable the auth providers you want (Email magic link, Google, Apple) in
+   - `migrations/0001_profiles.sql` — `profiles` table, RLS, signup trigger
+   - `migrations/0002_profile_overhaul.sql` — bio/social columns + `public_profiles` view
+   - `migrations/0003_avatars_storage.sql` — avatars storage bucket + policies
+   - `migrations/0004_phone_social.sql` — phone + extra social columns
+   - `migrations/0005_note_reports.sql` — note reporting
+3. Copy `.env.example` → `.env.local` and fill in the URL + anon key.
+4. Enable the auth providers you want (Email, Google, Apple) in
    **Authentication → Providers**.
 
 ## Design notes
 
-- **Append-only ledger.** Points/XP truth lives in `points_ledger`;
-  `user_profiles.points_balance_cache` is a denormalized cache updated inside
-  the same transaction as the ledger insert.
-- **Integrity in the database.** All abuse-sensitive mutations (`complete_quest`,
-  `redeem_reward`, `create_community_note`, `record_scan`, `adjust_points`) are
-  `SECURITY DEFINER` functions, so RLS can keep direct table writes locked down.
-- **Anti-farming.** `quest_completions` has a `unique (user_id, quest_id)`
-  constraint; completion is idempotent and double-awards are impossible.
-- **Privacy-first analytics.** `partner_analytics()` returns aggregate counts
-  only, suppresses per-segment breakdowns below 5 scans, and never exposes
-  emails, individual profiles, or precise coordinates.
-- **New-user bootstrap.** A trigger on `auth.users` creates the matching
-  `users` / `user_profiles` / `privacy_preferences` rows on sign-up.
+- **One user model.** Each `auth.users` row owns exactly one `public.profiles`
+  row, created by a single `on_auth_user_created` trigger
+  (`handle_new_user`). Profile fields cover identity, onboarding selections,
+  social links, privacy/visibility flags, and lightweight gamification
+  (`xp`, `level`, `streak`).
+- **Privacy-safe public reads.** Other users' profiles are only ever read
+  through the `public_profiles` view, which exposes a hand-picked, flag-gated
+  subset of columns for opted-in (`is_profile_public`) profiles.
+- **RLS everywhere.** The `profiles` base table is owner-only for select/update;
+  the public view is the single public read path.
+
+> The Trainr feature tables (creators, programs, subscriptions, workout
+> sessions, …) are introduced by later MVP migrations — see
+> `docs/trainr-mvp-revenue-scope.md`.

@@ -1,5 +1,15 @@
 # SideQuests.io — App Architecture & MVP Build
 
+> ⚠️ **Historical / partly superseded (Trainr migration, MVP-1).** The
+> backend-agnostic `Repository` abstraction (`LocalRepository` /
+> `SupabaseRepository` / `MockRepository`), the `users`/`user_profiles`/quest
+> MVP schema, and the functional quest/partner/admin app pages described below
+> have been **removed**. The app now standardizes on the live `profiles` +
+> `AuthContext` layer (see `supabase/README.md`). The forward plan is in
+> `docs/trainr-mvp-revenue-scope.md`, `docs/trainr-execution-roadmap.md`, and
+> `docs/trainr-audit-and-plan.md`. The sections below are retained for
+> historical context only.
+
 > Real-world discovery platform. Users complete quests by scanning QR codes,
 > tapping NFC tags, or checking in at venues; they earn XP & points, unlock
 > rewards, climb leaderboards, and leave Community Notes. Partners create quests,
