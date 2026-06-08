@@ -1,0 +1,73 @@
+{
+  "_comment": "Maps every mock JSON string ID (src/data/mock/) to the stable UUID used in seed_full.sql and the live Supabase database. Update this file if IDs change.",
+  "partners": {
+    "partner-wynwood":         "10000000-0000-0000-0000-000000000001",
+    "partner-south-beach":     "10000000-0000-0000-0000-000000000002",
+    "partner-little-havana":   "10000000-0000-0000-0000-000000000003",
+    "partner-brickell":        "10000000-0000-0000-0000-000000000004",
+    "partner-coconut-grove":   "10000000-0000-0000-0000-000000000005",
+    "partner-design-district": "10000000-0000-0000-0000-000000000006",
+    "partner-downtown":        "10000000-0000-0000-0000-000000000007"
+  },
+  "venues": {
+    "venue-wynwood-coffee":    "20000000-0000-0000-0000-000000000001",
+    "venue-south-beach":       "20000000-0000-0000-0000-000000000002",
+    "venue-wynwood-walls":     "20000000-0000-0000-0000-000000000003",
+    "venue-little-havana":     "20000000-0000-0000-0000-000000000004",
+    "venue-brickell":          "20000000-0000-0000-0000-000000000005",
+    "venue-coconut-grove":     "20000000-0000-0000-0000-000000000006",
+    "venue-design-district":   "20000000-0000-0000-0000-000000000007",
+    "venue-downtown":          "20000000-0000-0000-0000-000000000008",
+    "venue-sweet-caroline":    "20000000-0000-0000-0000-000000000009"
+  },
+  "quests": {
+    "wynwood-coffee-crawl":           "30000000-0000-0000-0000-000000000001",
+    "south-beach-sunrise":            "30000000-0000-0000-0000-000000000002",
+    "wynwood-mural-hunt":             "30000000-0000-0000-0000-000000000003",
+    "little-havana-cafecito":         "30000000-0000-0000-0000-000000000004",
+    "brickell-skyline-loop":          "30000000-0000-0000-0000-000000000005",
+    "coconut-grove-bayfront":         "30000000-0000-0000-0000-000000000006",
+    "design-district-gallery":        "30000000-0000-0000-0000-000000000007",
+    "downtown-legends":               "30000000-0000-0000-0000-000000000008",
+    "wynwood-sweet-caroline-karaoke": "30000000-0000-0000-0000-000000000009"
+  },
+  "qrCodes": {
+    "qr-wynwood-coffee-crawl":           "40000000-0000-0000-0000-000000000001",
+    "qr-south-beach-sunrise":            "40000000-0000-0000-0000-000000000002",
+    "qr-wynwood-mural-hunt":             "40000000-0000-0000-0000-000000000003",
+    "qr-little-havana-cafecito":         "40000000-0000-0000-0000-000000000004",
+    "qr-brickell-skyline-loop":          "40000000-0000-0000-0000-000000000005",
+    "qr-coconut-grove-bayfront":         "40000000-0000-0000-0000-000000000006",
+    "qr-design-district-gallery":        "40000000-0000-0000-0000-000000000007",
+    "qr-downtown-legends":               "40000000-0000-0000-0000-000000000008",
+    "qr-wynwood-sweet-caroline-karaoke": "40000000-0000-0000-0000-000000000009"
+  },
+  "rewards": {
+    "reward-wynwood-art-print":        "50000000-0000-0000-0000-000000000001",
+    "reward-sweet-caroline-round":     "50000000-0000-0000-0000-000000000002",
+    "reward-south-beach-smoothie":     "50000000-0000-0000-0000-000000000003",
+    "reward-little-havana-pastelito":  "50000000-0000-0000-0000-000000000004",
+    "reward-brickell-nightlife-pass":  "50000000-0000-0000-0000-000000000005",
+    "reward-grove-bike-rental":        "50000000-0000-0000-0000-000000000006",
+    "reward-design-district-discount": "50000000-0000-0000-0000-000000000007",
+    "reward-ica-members-pass":         "50000000-0000-0000-0000-000000000008",
+    "reward-downtown-badge-pack":      "50000000-0000-0000-0000-000000000009",
+    "reward-bayside-cruise-ticket":    "50000000-0000-0000-0000-000000000010"
+  },
+  "id_range_legend": {
+    "10000000-...": "partners",
+    "20000000-...": "venues",
+    "30000000-...": "quests",
+    "40000000-...": "qr_codes",
+    "50000000-...": "rewards"
+  },
+  "demo_users": {
+    "_comment": "demo-user-* IDs in community-notes.json are placeholder strings with no real auth.users counterpart. Community notes cannot be seeded until real users sign up. Use import_notes.sql as a template, substituting real user UUIDs.",
+    "demo-user-1": null,
+    "demo-user-2": null,
+    "demo-user-3": null,
+    "demo-user-4": null,
+    "demo-user-5": null,
+    "demo-user-6": null
+  }
+}
