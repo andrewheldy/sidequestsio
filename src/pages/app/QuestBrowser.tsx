@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import AppLayout from "@/components/app/AppLayout";
 import { Loading, EmptyState } from "@/components/app/ui";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { getRepository } from "@/lib/db";
 import { DEMO_QUESTS } from "@/data/demo/demoQuests";
 import type { QuestCategory, QuestWithContext } from "@/types/db";
 
@@ -72,25 +70,10 @@ const FALLBACK_QUESTS = DEMO_QUESTS.map(demoToContext);
 export default function QuestBrowser() {
   const [category, setCategory] = useState<QuestCategory | "all">("all");
 
-  const { data: repoQuests, isLoading, isError } = useQuery({
-    queryKey: ["browse-quests"],
-    queryFn: async () => {
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), 5000),
-      );
-      const fetch = getRepository().then((r) => r.listQuests({ status: "active" }));
-      return Promise.race([fetch, timeout]);
-    },
-    retry: 0,
-  });
-
-  // Use repo data when available; fall back to static MIAMI_QUESTS when
-  // the query errors, times out, or returns empty (schema not ready yet).
-  const allQuests: QuestWithContext[] =
-    repoQuests && repoQuests.length > 0 ? repoQuests : FALLBACK_QUESTS;
-
   const filtered =
-    category === "all" ? allQuests : allQuests.filter((q) => q.category === category);
+    category === "all"
+      ? FALLBACK_QUESTS
+      : FALLBACK_QUESTS.filter((q) => q.category === category);
 
   return (
     <AppLayout title="Quests" subtitle="Discover side quests near you">

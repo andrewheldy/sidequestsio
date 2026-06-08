@@ -1,21 +1,48 @@
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { Flame, Star, Sparkles } from "lucide-react";
 import AppLayout from "@/components/app/AppLayout";
 import { SectionHeader, StatTile, Loading } from "@/components/app/ui";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { getRepository } from "@/lib/db";
+import { DEMO_QUESTS, DEMO_CATEGORY_MAP } from "@/data/demo/demoQuests";
 import { levelProgress } from "@/lib/app/leveling";
+import type { QuestWithContext } from "@/types/db";
+
+const NEARBY_QUESTS: QuestWithContext[] = DEMO_QUESTS.slice(0, 3).map((q) => ({
+  id: q.id,
+  partner_id: "demo",
+  venue_id: `venue-${q.id}`,
+  title: q.title,
+  description: q.concept,
+  category: (DEMO_CATEGORY_MAP[q.category] ?? "culture") as QuestWithContext["category"],
+  difficulty: "easy" as const,
+  xp_reward: q.xp,
+  points_reward: Math.floor(q.xp / 2),
+  status: "active" as const,
+  start_date: null,
+  end_date: null,
+  verification_type: "qr" as const,
+  verification_secret: null,
+  image_url: q.image,
+  created_at: new Date().toISOString(),
+  venue: {
+    id: `venue-${q.id}`,
+    partner_id: "demo",
+    name: q.businessName,
+    address: q.address,
+    city: "Miami",
+    latitude: q.lat,
+    longitude: q.lng,
+    status: "active" as const,
+  },
+}));
 
 export default function AppHome() {
   const { user, profile } = useAuth();
 
-  const { data: quests = [], isLoading } = useQuery({
-    queryKey: ["quests", "active"],
-    queryFn: async () => (await getRepository()).listQuests({ status: "active" }),
-  });
+  const quests = NEARBY_QUESTS;
+  const isLoading = false;
 
   const { data: notes = [] } = useQuery({
     queryKey: ["recent-notes"],
