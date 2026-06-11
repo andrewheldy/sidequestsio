@@ -312,7 +312,7 @@ export function CaptureTheMoment({
 
   // Share handlers
   const handleNativeShare = async () => {
-    track('capture_moment_share', { quest_id: questId, platform: 'native' });
+    track('capture_moment_share', { quest_id: questId, props: { platform: 'native' } });
     try {
       if (composedBlob && navigator.canShare?.({ files: [new File([composedBlob], 'moment.webp', { type: 'image/webp' })] })) {
         await navigator.share({
@@ -330,7 +330,7 @@ export function CaptureTheMoment({
   };
 
   const handlePlatformShare = async (platform: 'instagram' | 'tiktok' | 'x') => {
-    track('capture_moment_share', { quest_id: questId, platform });
+    track('capture_moment_share', { quest_id: questId, props: { platform } });
     await navigator.clipboard.writeText(caption).catch(() => {});
     if (platform === 'x') {
       window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(caption)}`, '_blank', 'noopener');

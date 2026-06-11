@@ -35,7 +35,12 @@ export type AppEventName =
   | "breadcrumb_created"    // alias for community_note_created; preferred in new UI
   | "leaderboard_viewed"
   | "proof_captured"
-  | "proof_shared";
+  | "proof_shared"
+  | "capture_moment_photo"
+  | "capture_moment_video"
+  | "capture_moment_share"
+  | "capture_moment_download"
+  | "capture_moment_click";
 
 /** Common envelope attached to every emitted event. */
 export interface AppEventContext {
