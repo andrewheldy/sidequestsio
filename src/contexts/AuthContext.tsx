@@ -45,6 +45,7 @@ const DEMO_PROFILE: Profile = {
   x_url: null,
   youtube_url: null,
   snapchat_url: null,
+  is_public: true,
   is_profile_public: true,
   show_social_links: true,
   show_completed_quests: true,
@@ -77,6 +78,7 @@ export interface Profile {
   x_url: string | null;
   youtube_url: string | null;
   snapchat_url: string | null;
+  is_public: boolean;
   is_profile_public: boolean;
   show_social_links: boolean;
   show_completed_quests: boolean;
@@ -112,6 +114,7 @@ export type EditableProfile = Partial<
     | 'x_url'
     | 'youtube_url'
     | 'snapchat_url'
+    | 'is_public'
     | 'is_profile_public'
     | 'show_social_links'
     | 'show_completed_quests'

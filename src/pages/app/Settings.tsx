@@ -29,6 +29,7 @@ export default function Settings() {
   });
 
   const [saving, setSaving] = useState(false);
+  const [isPublic, setIsPublic] = useState(profile?.is_public ?? false);
 
   const {
     data: privacy,
@@ -77,6 +78,22 @@ export default function Settings() {
   };
 
   const cancel = () => navigate("/app/profile");
+
+  const togglePublicProfile = async (value: boolean) => {
+    if (isDemoMode) {
+      toast.info("Demo mode — saving disabled for now.");
+      return;
+    }
+    if (!user) return;
+    setIsPublic(value);
+    const { error } = await updateProfile({ is_public: value });
+    if (error) {
+      setIsPublic(!value);
+      toast.error(error);
+    } else {
+      toast.success("Profile visibility updated");
+    }
+  };
 
   const updatePrivacy = async (patch: Partial<PrivacyPreferences>) => {
     if (isDemoMode) {
@@ -213,6 +230,12 @@ export default function Settings() {
             </div>
           ) : (
             <div className="glass-card divide-y divide-border/50">
+              <PrivacyRow
+                label="Public Profile"
+                desc="Allow other users to view your profile, username, avatar, bio, XP, and quest stats."
+                checked={isPublic}
+                onChange={togglePublicProfile}
+              />
               <PrivacyRow
                 label="Show me on leaderboards"
                 desc="Display name only — never your email."
