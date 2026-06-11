@@ -209,13 +209,21 @@ export default function Settings() {
         {/* Privacy & Consent */}
         <section>
           <SectionHeader title="Privacy & Consent" />
+          <div className="glass-card divide-y divide-border/50">
+            <PrivacyRow
+              label="Public Profile"
+              desc="Allow other users to view your profile, username, avatar, bio, XP, and quest stats."
+              checked={isPublic}
+              onChange={togglePublicProfile}
+            />
+          </div>
           {privacyLoading ? (
-            <div className="glass-card flex items-center justify-center gap-3 p-6 text-sm text-muted-foreground">
+            <div className="glass-card mt-2 flex items-center justify-center gap-3 p-6 text-sm text-muted-foreground">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               Loading…
             </div>
           ) : privacyError || !privacy ? (
-            <div className="glass-card flex flex-col items-center gap-3 p-6 text-center">
+            <div className="glass-card mt-2 flex flex-col items-center gap-3 p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Couldn't load privacy settings.
               </p>
@@ -229,13 +237,7 @@ export default function Settings() {
               </Button>
             </div>
           ) : (
-            <div className="glass-card divide-y divide-border/50">
-              <PrivacyRow
-                label="Public Profile"
-                desc="Allow other users to view your profile, username, avatar, bio, XP, and quest stats."
-                checked={isPublic}
-                onChange={togglePublicProfile}
-              />
+            <div className="glass-card mt-2 divide-y divide-border/50">
               <PrivacyRow
                 label="Show me on leaderboards"
                 desc="Display name only — never your email."
