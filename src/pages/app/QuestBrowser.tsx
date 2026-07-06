@@ -7,7 +7,6 @@ import { Loading, EmptyState } from "@/components/app/ui";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getRepository } from "@/lib/db";
-import { DEMO_QUESTS } from "@/data/demo/demoQuests";
 import type { QuestCategory, QuestWithContext } from "@/types/db";
 
 const CATEGORIES: (QuestCategory | "all")[] = [
@@ -20,54 +19,6 @@ const CATEGORIES: (QuestCategory | "all")[] = [
   "fitness",
   "art",
 ];
-
-const CATEGORY_MAP: Record<string, QuestCategory> = {
-  Foodie: "food",
-  Culture: "culture",
-  Nightlife: "nightlife",
-  Wellness: "fitness",
-  Outdoor: "outdoors",
-  Community: "culture",
-  "Hidden Gems": "hidden_gem",
-  Art: "art",
-};
-
-function demoToContext(q: (typeof DEMO_QUESTS)[0]): QuestWithContext {
-  return {
-    id: q.id,
-    partner_id: "local",
-    venue_id: `venue-${q.id}`,
-    title: q.title,
-    description: q.concept,
-    category: (CATEGORY_MAP[q.category] ?? "culture") as QuestCategory,
-    difficulty: "easy",
-    xp_reward: q.xp,
-    points_reward: Math.floor(q.xp / 2),
-    status: "active",
-    start_date: null,
-    end_date: null,
-    verification_type: "qr",
-    verification_secret: null,
-    image_url: q.image,
-    created_at: new Date().toISOString(),
-    funky_action: q.funky_action ?? null,
-    proof_method: (q.proof_method as any) ?? null,
-    social_share_prompt: q.social_share_prompt ?? null,
-    estimated_time: q.estimated_time ?? null,
-    venue: {
-      id: `venue-${q.id}`,
-      partner_id: "local",
-      name: q.neighborhood,
-      address: q.address,
-      city: "Miami",
-      latitude: q.lat,
-      longitude: q.lng,
-      status: "active",
-    },
-  };
-}
-
-const FALLBACK_QUESTS = DEMO_QUESTS.map(demoToContext);
 
 export default function QuestBrowser() {
   const [category, setCategory] = useState<QuestCategory | "all">("all");
@@ -84,10 +35,7 @@ export default function QuestBrowser() {
     retry: 0,
   });
 
-  // Use repo data when available; fall back to static MIAMI_QUESTS when
-  // the query errors, times out, or returns empty (schema not ready yet).
-  const allQuests: QuestWithContext[] =
-    repoQuests && repoQuests.length > 0 ? repoQuests : FALLBACK_QUESTS;
+  const allQuests: QuestWithContext[] = repoQuests ?? [];
 
   const filtered =
     category === "all" ? allQuests : allQuests.filter((q) => q.category === category);
@@ -113,8 +61,16 @@ export default function QuestBrowser() {
 
       {isLoading ? (
         <Loading />
+      ) : isError ? (
+        <EmptyState
+          title="Couldn't load quests"
+          description="We're having trouble reaching the server. Please try again shortly."
+        />
       ) : filtered.length === 0 ? (
-        <EmptyState title="No quests here yet" description="Try another category." />
+        <EmptyState
+          title="No quests here yet"
+          description={category === "all" ? "Check back soon for new quests." : "Try another category."}
+        />
       ) : (
         <div className="space-y-4">
           {filtered.map((q) => (

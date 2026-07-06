@@ -1,6 +1,6 @@
 /**
  * MockRepository — read-only demo backend powered by static JSON files.
- * Used when VITE_DATA_SOURCE=mock. All writes are disabled or return stubs.
+ * Used only in dev builds (see isDemoMode). All writes are disabled or return stubs.
  */
 
 import type {

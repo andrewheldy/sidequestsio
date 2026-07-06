@@ -1,9 +1,9 @@
 /**
  * Repository selector.
  *
- * Returns the MockRepository when VITE_DATA_SOURCE=mock,
- * the SupabaseRepository when Supabase env vars are configured,
- * otherwise the fully-functional in-browser LocalRepository. Call sites use
+ * Returns the MockRepository in dev builds only (see isDemoMode), the
+ * SupabaseRepository when Supabase env vars are configured, otherwise the
+ * fully-functional in-browser LocalRepository. Call sites use
  * `await getRepository()` and never care which backend is active.
  */
 
