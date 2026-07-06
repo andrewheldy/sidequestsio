@@ -31,4 +31,4 @@ Creators are a distribution and content channel for reaching businesses and user
 The immediate goal is a polished MVP launch with real Miami businesses, validating engagement, repeat usage, and business ROI before expanding to other markets or verticals.
 
 **2026-07-06 — Engineering favors shipping over premature optimization.**
-Decisions should optimize for launching, onboarding businesses, measuring engagement, and demonstrating ROI — not for hypothetical scale or enterprise requirements the product hasn't earned yet. See `docs/PRODUCT_DIRECTION.md`, "Engineering Principle."
+Decisions should optimize for launching, onboarding businesses, measuring engagement, and demonstrating ROI — not for hypothetical scale or enterprise requirements the product hasn't earned yet. See `docs/PRODUCT_DIRECTION.md`, "Engineering Principles."
