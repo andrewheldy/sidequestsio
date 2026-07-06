@@ -8,9 +8,10 @@ The application ships with two interchangeable backends behind one
 | **Local**    | default (no env vars)                  | `localStorage`, seeded demo data |
 | **Supabase** | `VITE_SUPABASE_URL` + anon key set     | PostgreSQL + Auth + RLS          |
 
-**The MVP demo always runs from mock JSON data.** No application code
-changes between modes — only environment variables. The production switch
-to Supabase happens only after the schema is verified and data is imported.
+Supabase is selected automatically when the env vars are set; otherwise the
+app falls back to the fully functional in-browser `LocalRepository`. The
+static `MockRepository` is **dev-build-only** (`import.meta.env.DEV`) and can
+never be enabled in a production build (see `docs/DECISIONS.md`, 2026-07-06).
 
 ---
 
@@ -26,11 +27,28 @@ exact order**. All files are idempotent and safe to re-run.
 | 3 | `migrations/0007_rls_idempotent.sql` | Full RLS — helper functions + all policies (drop-before-create) |
 | 4 | `migrations/0003_functions.sql` | SECURITY DEFINER RPCs (complete_quest, redeem_reward, analytics…) |
 | 5 | `migrations/0003_avatars_storage.sql` | Avatar storage bucket + object policies |
+| 6 | `migrations/0008_profile_is_public.sql` | Adds `profiles.is_public` (canonical visibility flag) |
+| 7 | `migrations/0009_grants.sql` | **Required.** PostgREST grants for `anon`/`authenticated` — without this every SPA read of the game tables is permission-denied, RLS notwithstanding |
+| 8 | `migrations/0010_auth_bootstrap.sql` | **Required, must run after `0003_functions.sql`.** One canonical `handle_new_auth_user` (creates `users`, `user_profiles`, `privacy_preferences` **and** `profiles`), one trigger, backfill for existing users |
+| 9 | `migrations/0011_profile_visibility.sql` | Canonicalizes visibility on `is_public`; points `public_profiles` view at it |
+| 10 | `migrations/0012_quest_fable_fields.sql` | Fable quest columns (incl. `action_prompt`, `links`) — captures prior live drift |
+| 11 | `migrations/0013_proofs_bucket.sql` | `proofs` storage bucket + policies for quest proof photos/videos |
 
+> ⚠️ **History note:** `0003_functions.sql` and `0006_game_schema.sql` both
+> define `handle_new_auth_user()` with different behavior — running `0003`
+> after `0006` used to silently break profile creation on signup (this
+> happened on the live project; see `docs/PRODUCTION_SPRINT_PLAN.md` §0).
+> `0010_auth_bootstrap.sql` resolves this order trap permanently: whatever
+> state an environment is in, running it last yields the canonical function.
+>
 > Files `0001_schema.sql`, `0002_rls.sql`, `0002_profile_overhaul.sql`,
 > `0004_phone_social.sql`, `0005_note_reports.sql` are **superseded** by
 > `0006_game_schema.sql` + `0007_rls_idempotent.sql`. They exist as history
 > but do not need to be run separately if you start from scratch.
+
+After applying any migration batch, run the read-only reality gate
+`scripts/verify-db.sql` in the SQL editor (every check should pass) and
+`npm run smoke:supabase` locally (anon-client read paths).
 
 ---
 
