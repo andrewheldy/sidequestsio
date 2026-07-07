@@ -3,37 +3,23 @@ import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MapPin,
-  Zap,
-  Star,
   Trophy,
   CheckCircle2,
   ArrowLeft,
-  Globe,
   Instagram,
-  Twitter,
-  Facebook,
-  UtensilsCrossed,
-  CalendarDays,
-  ShoppingBag,
-  Truck,
-  Gift,
-  Phone,
   RefreshCw,
   AlertCircle,
   ExternalLink,
-  Flame,
-  Clock,
   Camera,
   MessageSquare,
   QrCode,
-  Sparkles,
   Share2,
-  BarChart2,
-  ChevronDown,
-  ChevronUp,
+  Twitter,
 } from "lucide-react";
 import { getRepository } from "@/lib/db";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
+import { useSignInPrompt } from "@/contexts/SignInPromptContext";
 import { recordQuestScan } from "@/lib/quests/scanFlow";
 import { isDemoMode } from "@/lib/demo";
 import { track } from "@/lib/analytics/events";
@@ -44,7 +30,6 @@ import {
 } from "@/lib/app/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -53,43 +38,34 @@ import {
 } from "@/components/ui/sheet";
 import { CommunityNotes } from "@/components/app/CommunityNotes";
 import { QuestProofCamera } from "@/components/app/QuestProofCamera";
-import { CaptureTheMoment } from "@/components/app/CaptureTheMoment";
+import BottomNav from "@/components/app/BottomNav";
+import {
+  QuestHero,
+  RewardCard,
+  QuestObjectiveCard,
+  AboutActions,
+  InfoCards,
+} from "@/components/app/quest-detail";
 import { toast } from "sonner";
 import type { CompleteQuestResult } from "@/lib/db/repository";
 import type { QuestLinks, QuestWithContext, ProofMethod } from "@/types/db";
 
 // ---------------------------------------------------------------------------
-// Business link definitions (ordered by typical relevance)
-// ---------------------------------------------------------------------------
-
-const LINK_DEFS: Array<{
-  key: keyof QuestLinks;
-  label: string;
-  icon: React.ElementType;
-  type: string;
-}> = [
-  { key: "website_url",       label: "Website",         icon: Globe,         type: "website" },
-  { key: "menu_url",          label: "Menu",             icon: UtensilsCrossed, type: "menu" },
-  { key: "reservation_url",   label: "Reserve a Table",  icon: CalendarDays,  type: "reservation" },
-  { key: "order_url",         label: "Order Online",     icon: ShoppingBag,   type: "order" },
-  { key: "delivery_url",      label: "Delivery",         icon: Truck,         type: "delivery" },
-  { key: "instagram_url",     label: "Instagram",        icon: Instagram,     type: "instagram" },
-  { key: "tiktok_url",        label: "TikTok",           icon: ExternalLink,  type: "tiktok" },
-  { key: "x_url",             label: "X / Twitter",      icon: Twitter,       type: "x" },
-  { key: "facebook_url",      label: "Facebook",         icon: Facebook,      type: "facebook" },
-];
-
-// Separate from business links so it gets its own CTA section
-const GOOGLE_REVIEW_KEY = "google_reviews_url" as const;
-
-// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function difficultyColor(d: string | null | undefined) {
-  if (d === "easy") return "bg-green-500/20 text-green-400 border-green-500/30";
-  if (d === "hard") return "bg-red-500/20 text-red-400 border-red-500/30";
-  return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+/** First available social link — Socials is a single landing page, never a
+ *  per-network button grid. There is no `socials_url` column yet, so we pick the
+ *  best-available social link; the DB pass can add a proper single field. */
+function resolveSocialsUrl(links: QuestLinks | undefined): string | null {
+  if (!links) return null;
+  return (
+    links.instagram_url ||
+    links.tiktok_url ||
+    links.x_url ||
+    links.facebook_url ||
+    null
+  );
 }
 
 function proofMethodLabel(method: ProofMethod | null | undefined): string {
@@ -123,17 +99,17 @@ export default function QuestDetail() {
   const { questId } = useParams<{ questId: string }>();
   const [params] = useSearchParams();
   const { user, isAuthenticated, refresh } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { promptSignIn } = useSignInPrompt();
   const navigate = useNavigate();
   const qc = useQueryClient();
 
   const scanParam = params.get("scan");
-  const showHostAnalytics = params.get("host") === "1" || isDemoMode;
   const [scanId, setScanId] = useState<string | null>(scanParam);
   const [venueCode, setVenueCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<CompleteQuestResult | null>(null);
   const [showProofCamera, setShowProofCamera] = useState(false);
-  const [showCaptureTheMoment, setShowCaptureTheMoment] = useState(false);
   const [showCompletionSheet, setShowCompletionSheet] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
   const recordedRef = useRef(false);
@@ -364,193 +340,133 @@ export default function QuestDetail() {
       user_id: user?.id ?? null,
       props: { platform },
     });
-    const caption = encodeURIComponent(
-      quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #SideQuests`
-    );
+    const caption = quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #SideQuests`;
     if (platform === "x") {
-      window.open(`https://x.com/intent/tweet?text=${caption}`, "_blank", "noopener");
-    } else if (platform === "instagram") {
-      navigator.clipboard.writeText(quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #SideQuests`);
-      toast.success("Caption copied — paste it into Instagram!");
-    } else if (platform === "tiktok") {
-      navigator.clipboard.writeText(quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #SideQuests`);
-      toast.success("Caption copied — paste it into TikTok!");
+      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(caption)}`, "_blank", "noopener");
+    } else if (platform === "instagram" || platform === "tiktok") {
+      navigator.clipboard?.writeText(caption);
+      toast.success(`Caption copied — paste it into ${platform === "instagram" ? "Instagram" : "TikTok"}!`);
     }
   };
 
+  // Hero "Share" — shares the quest page itself.
+  const handleShare = async () => {
+    track("social_share_click", {
+      quest_id: quest.id,
+      partner_id: quest.partner_id,
+      user_id: user?.id ?? null,
+      props: { platform: "page" },
+    });
+    const url = window.location.href;
+    const shareData = {
+      title: quest.title,
+      text: `Check out this SideQuest: ${quest.title}`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+    } catch {
+      // user cancelled or share failed — fall through to clipboard
+    }
+    try {
+      await navigator.clipboard?.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch {
+      /* ignore */
+    }
+  };
+
+  // Hero "Save" — favorites are gated behind sign-in per app rules.
+  const handleToggleSave = () => {
+    if (!isAuthenticated) {
+      promptSignIn("save this quest");
+      return;
+    }
+    toggleFavorite(quest.id);
+  };
+
   // --- Derived display values ----------------------------------------------
+
+  const businessName = quest.partner?.name ?? quest.venue?.name ?? null;
 
   const venueLabel = quest.venue
     ? [quest.venue.name, quest.venue.city].filter(Boolean).join(" · ")
     : null;
 
-  const businessName = quest.partner?.name ?? quest.venue?.name ?? null;
-
-  const funkyAction =
+  const objective =
     quest.funky_action ??
     quest.description ??
-    (businessName ? `Complete this quest at ${businessName}.` : null);
+    (businessName ? `Complete this quest at ${businessName}.` : "Complete this quest at the venue.");
 
   const proofMethod = quest.proof_method as ProofMethod | null | undefined;
   const ProofIcon = proofMethodIcon(proofMethod);
 
+  const websiteUrl = quest.links?.website_url ?? null;
+  const reviewsUrl = quest.links?.google_reviews_url ?? null;
+  const socialsUrl = resolveSocialsUrl(quest.links);
+
   return (
-    <div className="min-h-screen bg-background pb-16">
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div className="relative h-72 w-full overflow-hidden">
-        {quest.image_url ? (
-          <img
-            src={quest.image_url}
-            alt={quest.title}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-primary/20 to-secondary/20" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/55 to-transparent" />
+    <div className="min-h-screen bg-background pb-28">
+      {/* ── 1. Hero ─────────────────────────────────────────────────────── */}
+      <QuestHero
+        imageUrl={quest.image_url}
+        title={quest.title}
+        businessName={businessName}
+        category={quest.category}
+        difficulty={quest.difficulty}
+        estimatedTime={quest.estimated_time}
+        isSaved={isFavorite(quest.id)}
+        onBack={() => navigate(-1)}
+        onShare={handleShare}
+        onToggleSave={handleToggleSave}
+      />
 
-        {/* Back button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute left-4 top-4 rounded-full bg-background/60 p-2 backdrop-blur"
-          aria-label="Back"
-        >
-          <ArrowLeft className="h-5 w-5 text-foreground" />
-        </button>
+      {/* ── Content ─────────────────────────────────────────────────────── */}
+      <div className="mx-auto w-full max-w-md space-y-5 px-4 pt-5">
 
-        {/* Category badge */}
-        <Badge className="absolute right-4 top-4 bg-primary capitalize text-primary-foreground">
-          {quest.category.replace("_", " ")}
-        </Badge>
+        {/* ── 2. Quest summary ── */}
+        <section>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-poppins text-3xl font-bold leading-tight text-foreground">
+                {quest.title}
+              </h1>
+              {venueLabel && (
+                <div className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground/80">
+                  <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                  <span className="truncate">{venueLabel}</span>
+                </div>
+              )}
+            </div>
+            <RewardCard xp={quest.xp_reward} points={quest.points_reward} />
+          </div>
 
-        {/* Hero info */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-          {/* Quest name */}
-          <h1 className="font-poppins text-2xl font-bold leading-tight text-foreground">
-            {quest.title}
-          </h1>
-
-          {/* Business name */}
-          {businessName && (
-            <p className="mt-0.5 text-sm font-medium text-primary">
-              {businessName}
+          {quest.description && (
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {quest.description}
             </p>
           )}
+        </section>
 
-          {/* Location / neighborhood */}
-          {venueLabel && (
-            <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
-              <span className="truncate">{venueLabel}</span>
-            </div>
-          )}
+        {/* ── 3. Your SideQuest (objective) ── */}
+        <QuestObjectiveCard objective={objective} />
 
-          {/* Reward badges */}
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1 rounded-lg bg-secondary/90 px-2.5 py-1 text-xs font-bold text-secondary-foreground backdrop-blur">
-              <Zap className="h-3 w-3" /> +{quest.xp_reward} XP
-            </span>
-            <span className="flex items-center gap-1 rounded-lg bg-primary/90 px-2.5 py-1 text-xs font-bold text-primary-foreground backdrop-blur">
-              <Star className="h-3 w-3" /> +{quest.points_reward} pts
-            </span>
-            {quest.links?.special_deals && (
-              <span className="flex items-center gap-1 rounded-lg bg-amber-500/90 px-2.5 py-1 text-xs font-bold text-white backdrop-blur">
-                <Gift className="h-3 w-3" /> Deal
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Content ──────────────────────────────────────────────────────── */}
-      <div className="mx-auto w-full max-w-md space-y-4 px-4 pt-4">
-
-        {/* ── Main Quest Action Card ── */}
-        {funkyAction && (
-          <FunkyActionCard
-            quest={quest}
-            funkyAction={funkyAction}
-            proofMethod={proofMethod}
-          />
-        )}
-
-        {/* Special deal highlight */}
-        {quest.links?.special_deals && (
-          <div className="glass-card flex items-start gap-3 border border-amber-500/30 p-4">
-            <Gift className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-            <div>
-              <p className="text-sm font-semibold text-foreground">Special Deal</p>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                {quest.links.special_deals}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Business / host links (excluding Google Reviews — shown separately) */}
-        {quest.links && (
-          <BusinessLinksSection links={quest.links} onLinkClick={handleLinkClick} />
-        )}
-
-        {/* Social placeholders */}
-        {isDone && quest.social_share_prompt && (
-          <SocialShareSection
-            quest={quest}
-            onShare={handleSocialShare}
-          />
-        )}
-
-        {/* Google Review CTA */}
-        {quest.links?.google_reviews_url && (
-          <a
-            href={quest.links.google_reviews_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => handleLinkClick("google_reviews")}
-            className="glass-card flex items-center gap-3 border border-yellow-500/20 p-4 transition-colors hover:border-yellow-500/40 active:scale-[0.98]"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-500/15">
-              <Star className="h-4 w-4 text-yellow-400" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-foreground">Leave a Google Review</p>
-              <p className="text-xs text-muted-foreground">Help others discover this spot</p>
-            </div>
-            <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
-          </a>
-        )}
-
-        {/* ── Capture the Moment CTA ── */}
-        <CaptureTheMomentCard
-          questTitle={quest.title}
-          onCapture={() => {
-            track("capture_moment_click", {
-              quest_id: quest.id,
-              partner_id: quest.partner_id,
-              user_id: user?.id ?? null,
-            });
-            setShowCaptureTheMoment(true);
-          }}
-        />
-
-        {/* ── Completion CTA ── */}
+        {/* ── 4. Primary CTA ── */}
         {isDone ? (
-          <CompletedCard
-            result={result}
-            quest={quest}
-            onShare={handleSocialShare}
-          />
+          <CompletedCard result={result} quest={quest} onShare={handleSocialShare} />
         ) : (
-          <div className="glass-card space-y-3 p-5">
-            <Button
+          <div className="space-y-2">
+            <button
               onClick={handleCompleteClick}
               disabled={busy}
-              className="w-full gap-2"
-              size="lg"
+              className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-[hsl(280_75%_60%)] py-4 font-poppins text-base font-bold uppercase tracking-wide text-white shadow-[0_10px_30px_-8px_hsl(6_89%_68%/0.6)] transition-transform active:scale-[0.98] disabled:opacity-60"
             >
-              <CheckCircle2 className="h-5 w-5" />
               {isAuthenticated ? "Complete Quest" : "Sign in to complete"}
-            </Button>
+              <QrCode className="h-5 w-5" />
+            </button>
             <p className="text-center text-xs text-muted-foreground">
               {quest.verification_type === "gps"
                 ? "Be at the venue to check in. Location is only used to verify — never stored."
@@ -559,17 +475,27 @@ export default function QuestDetail() {
           </div>
         )}
 
-        {/* Breadcrumbs / Notes */}
+        {/* ── 5. About (exactly three actions) ── */}
+        <AboutActions
+          businessName={businessName}
+          websiteUrl={websiteUrl}
+          reviewsUrl={reviewsUrl}
+          socialsUrl={socialsUrl}
+          onAction={handleLinkClick}
+        />
+
+        {/* ── 6. Information cards ── */}
+        <InfoCards
+          neighborhood={quest.venue?.city ?? null}
+          city={quest.venue?.address ?? null}
+        />
+
+        {/* ── 7. Community Notes ── */}
         <CommunityNotes
           questId={quest.id}
           canPost={!!isDone && isAuthenticated}
-          title="Breadcrumbs"
+          title="Community Notes"
         />
-
-        {/* ── Host Analytics (demo / ?host=1) ── */}
-        {showHostAnalytics && (
-          <DemoHostAnalytics questTitle={quest.title} />
-        )}
       </div>
 
       {/* ── Completion Sheet ── */}
@@ -581,15 +507,13 @@ export default function QuestDetail() {
             </SheetTitle>
           </SheetHeader>
 
-          {/* Funky action reminder */}
-          {funkyAction && (
-            <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                Your Side Quest
-              </p>
-              <p className="text-sm leading-relaxed text-foreground">{funkyAction}</p>
-            </div>
-          )}
+          {/* Objective reminder */}
+          <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
+              Your Side Quest
+            </p>
+            <p className="text-sm leading-relaxed text-foreground">{objective}</p>
+          </div>
 
           {/* Proof method instructions */}
           <div className="mb-4 flex items-start gap-3 rounded-xl bg-muted/50 p-3">
@@ -632,7 +556,7 @@ export default function QuestDetail() {
         </SheetContent>
       </Sheet>
 
-      {/* Quest Proof Camera — shown after successful completion */}
+      {/* Quest Proof Camera — shown after successful completion (proof system) */}
       {showProofCamera && result?.ok && quest && (
         <QuestProofCamera
           quest={quest}
@@ -641,190 +565,14 @@ export default function QuestDetail() {
         />
       )}
 
-      {/* Capture the Moment — triggered from CTA button */}
-      {showCaptureTheMoment && (
-        <CaptureTheMoment
-          questId={quest.id}
-          questTitle={quest.title}
-          venueName={quest.venue?.name ?? quest.partner?.name ?? null}
-          xp={quest.xp_reward}
-          reward={quest.links?.special_deals ?? null}
-          onDone={() => setShowCaptureTheMoment(false)}
-        />
-      )}
+      {/* ── Bottom navigation ── */}
+      <BottomNav />
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Funky Action Card — the hero mission element
-// ---------------------------------------------------------------------------
-
-function FunkyActionCard({
-  quest,
-  funkyAction,
-  proofMethod,
-}: {
-  quest: QuestWithContext;
-  funkyAction: string;
-  proofMethod: ProofMethod | null | undefined;
-}) {
-  const ProofIcon = proofMethodIcon(proofMethod);
-
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-5 shadow-sm">
-      {/* Decorative glow */}
-      <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
-
-      {/* Header */}
-      <div className="mb-3 flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-primary" />
-        <span className="text-xs font-bold uppercase tracking-widest text-primary">
-          Your Side Quest
-        </span>
-      </div>
-
-      {/* Main action text */}
-      <p className="text-base font-medium leading-relaxed text-foreground">
-        {funkyAction}
-      </p>
-
-      {/* Meta badges */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        {quest.difficulty && (
-          <span
-            className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold ${difficultyColor(quest.difficulty)}`}
-          >
-            <Flame className="h-3 w-3" />
-            {quest.difficulty.charAt(0).toUpperCase() + quest.difficulty.slice(1)}
-          </span>
-        )}
-        {quest.estimated_time && (
-          <span className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            {quest.estimated_time}
-          </span>
-        )}
-        {proofMethod && (
-          <span className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-            <ProofIcon className="h-3 w-3" />
-            {proofMethodLabel(proofMethod)}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Social share section
-// ---------------------------------------------------------------------------
-
-function SocialShareSection({
-  quest,
-  onShare,
-}: {
-  quest: QuestWithContext;
-  onShare: (platform: string) => void;
-}) {
-  const caption = quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #SideQuests`;
-
-  return (
-    <div className="glass-card p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <Share2 className="h-4 w-4 text-primary" />
-        <p className="text-sm font-semibold text-foreground">Share your quest</p>
-      </div>
-      <p className="mb-3 rounded-lg bg-muted/50 px-3 py-2 text-xs italic text-muted-foreground">
-        "{caption}"
-      </p>
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 gap-1.5 text-xs"
-          onClick={() => onShare("instagram")}
-        >
-          <Instagram className="h-3.5 w-3.5" />
-          Instagram
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 gap-1.5 text-xs"
-          onClick={() => onShare("tiktok")}
-        >
-          <ExternalLink className="h-3.5 w-3.5" />
-          TikTok
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 gap-1.5 text-xs"
-          onClick={() => onShare("x")}
-        >
-          <Twitter className="h-3.5 w-3.5" />
-          X
-        </Button>
-      </div>
-      <p className="mt-2 text-center text-xs text-muted-foreground">
-        Sharing is optional — your quest is complete either way.
-      </p>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Business links section
-// ---------------------------------------------------------------------------
-
-function BusinessLinksSection({
-  links,
-  onLinkClick,
-}: {
-  links: QuestLinks;
-  onLinkClick: (type: string) => void;
-}) {
-  // Exclude Google Reviews — shown in its own CTA below
-  const available = LINK_DEFS.filter(({ key }) => links[key]);
-  const hasContact = !!links.contact_phone;
-
-  if (available.length === 0 && !hasContact) return null;
-
-  return (
-    <div className="glass-card p-4">
-      <p className="mb-3 text-sm font-semibold text-foreground">Links</p>
-      <div className="grid grid-cols-2 gap-2">
-        {available.map(({ key, label, icon: Icon, type }) => (
-          <a
-            key={key}
-            href={links[key] as string}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => onLinkClick(type)}
-            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-muted/50 px-3 py-2.5 text-sm font-medium text-foreground transition-colors active:scale-95 hover:bg-muted"
-          >
-            <Icon className="h-4 w-4 shrink-0 text-primary" />
-            <span className="truncate">{label}</span>
-          </a>
-        ))}
-        {hasContact && (
-          <a
-            href={`tel:${links.contact_phone}`}
-            onClick={() => onLinkClick("contact")}
-            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-muted/50 px-3 py-2.5 text-sm font-medium text-foreground transition-colors active:scale-95 hover:bg-muted"
-          >
-            <Phone className="h-4 w-4 shrink-0 text-primary" />
-            <span className="truncate">Call</span>
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Completed card
+// Completed card — replaces the primary CTA once the quest is done
 // ---------------------------------------------------------------------------
 
 function CompletedCard({
@@ -856,10 +604,10 @@ function CompletedCard({
       )}
       <div className="mt-2 flex flex-wrap justify-center gap-2">
         <Button asChild variant="outline" size="sm">
-          <Link to="/app/quests">More quests</Link>
+          <Link to="/app/explore">More quests</Link>
         </Button>
         <Button asChild size="sm">
-          <Link to="/app/wallet">View wallet</Link>
+          <Link to="/app/profile">View progress</Link>
         </Button>
         {quest.social_share_prompt && (
           <Button
@@ -889,142 +637,6 @@ function CompletedCard({
               <Twitter className="h-3.5 w-3.5" /> X
             </Button>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Capture the Moment card — primary action CTA
-// ---------------------------------------------------------------------------
-
-function CaptureTheMomentCard({
-  questTitle,
-  onCapture,
-}: {
-  questTitle: string;
-  onCapture: () => void;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-5 shadow-sm">
-      <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-secondary/10 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
-
-      <div className="relative">
-        <div className="mb-1 flex items-center gap-2">
-          <Camera className="h-4 w-4 text-primary" />
-          <span className="text-xs font-bold uppercase tracking-widest text-primary">
-            Capture the Moment
-          </span>
-        </div>
-        <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
-          Snap a photo or video at the venue. Add the SideQuests overlay and share with the world.
-        </p>
-        <Button onClick={onCapture} className="w-full gap-2" size="lg">
-          <Camera className="h-5 w-5" />
-          📸 Capture the Moment
-        </Button>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          Optional · Your moment, your choice to share
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Demo host analytics section
-// ---------------------------------------------------------------------------
-
-const DEMO_METRICS = [
-  { label: "Quest Views",           value: 847,  icon: "👁️",  color: "text-foreground" },
-  { label: "Quest Starts",          value: 312,  icon: "▶️",  color: "text-foreground" },
-  { label: "Completions",           value: 156,  icon: "✅",  color: "text-green-400" },
-  { label: "Reward Redemptions",    value: 98,   icon: "🎁",  color: "text-amber-400" },
-  { label: "Capture Button Clicks", value: 203,  icon: "📸",  color: "text-primary" },
-  { label: "Photos Uploaded",       value: 178,  icon: "🖼️",  color: "text-primary" },
-  { label: "Videos Uploaded",       value: 25,   icon: "🎥",  color: "text-primary" },
-  { label: "Social Shares",         value: 89,   icon: "🔗",  color: "text-secondary" },
-  { label: "Instagram Shares",      value: 56,   icon: "📸",  color: "text-secondary" },
-  { label: "TikTok Shares",         value: 18,   icon: "🎵",  color: "text-secondary" },
-  { label: "X Shares",              value: 15,   icon: "𝕏",   color: "text-secondary" },
-  { label: "Downloads",             value: 63,   icon: "⬇️",  color: "text-foreground" },
-  { label: "Google Review Clicks",  value: 74,   icon: "⭐",  color: "text-yellow-400" },
-  { label: "Website Clicks",        value: 131,  icon: "🌐",  color: "text-foreground" },
-  { label: "Social Link Clicks",    value: 96,   icon: "💬",  color: "text-foreground" },
-];
-
-function DemoHostAnalytics({ questTitle }: { questTitle: string }) {
-  const [expanded, setExpanded] = useState(false);
-  const completions = 156;
-  const views = 847;
-  const conversionRate = Math.round((completions / views) * 100);
-  const captureRate = Math.round((178 / views) * 100);
-  const shareRate = Math.round((89 / 178) * 100);
-
-  return (
-    <div className="rounded-2xl border border-border/60 bg-muted/20">
-      {/* Header / toggle */}
-      <button
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between rounded-2xl p-4 transition-colors hover:bg-muted/30"
-      >
-        <div className="flex items-center gap-2">
-          <BarChart2 className="h-4 w-4 text-primary" />
-          <span className="text-sm font-semibold text-foreground">Host Analytics</span>
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-            Demo
-          </span>
-        </div>
-        {expanded ? (
-          <ChevronUp className="h-4 w-4 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        )}
-      </button>
-
-      {expanded && (
-        <div className="border-t border-border/40 px-4 pb-5 pt-4 space-y-4">
-          <p className="text-xs text-muted-foreground">
-            Mock analytics for <span className="font-medium text-foreground">{questTitle}</span>.
-            Real data connects when you go live.
-          </p>
-
-          {/* Highlight stats */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="flex flex-col items-center rounded-xl bg-muted/50 p-3 text-center">
-              <p className="font-poppins text-2xl font-bold text-foreground">{conversionRate}%</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">Conversion Rate</p>
-            </div>
-            <div className="flex flex-col items-center rounded-xl bg-muted/50 p-3 text-center">
-              <p className="font-poppins text-2xl font-bold text-primary">{captureRate}%</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">Capture Rate</p>
-            </div>
-            <div className="flex flex-col items-center rounded-xl bg-muted/50 p-3 text-center">
-              <p className="font-poppins text-2xl font-bold text-secondary">{shareRate}%</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">Share Rate</p>
-            </div>
-          </div>
-
-          {/* Full metrics table */}
-          <div className="divide-y divide-border/30 rounded-xl bg-muted/30 overflow-hidden">
-            {DEMO_METRICS.map(({ label, value, icon, color }) => (
-              <div key={label} className="flex items-center justify-between px-3 py-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{icon}</span>
-                  <span className="text-xs text-muted-foreground">{label}</span>
-                </div>
-                <span className={`text-sm font-semibold tabular-nums ${color}`}>
-                  {value.toLocaleString()}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center text-xs text-muted-foreground">
-            These are demo numbers. Connect your real venue to see live data.
-          </p>
         </div>
       )}
     </div>
