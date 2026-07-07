@@ -8,9 +8,11 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { DemoSessionProvider } from "@/contexts/DemoSessionContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { SignInPromptProvider } from "@/contexts/SignInPromptContext";
+import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { DemoBanner } from "@/components/DemoBanner";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import Index from "./pages/Index";
 import Quests from "./pages/Quests";
 import CommunityNotes from "./pages/CommunityNotes";
@@ -24,6 +26,11 @@ import PublicProfile from "./pages/PublicProfile";
 import Placeholder from "./pages/Placeholder";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import CommunityGuidelines from "./pages/CommunityGuidelines";
+import CookiePolicy from "./pages/CookiePolicy";
+import CookiePreferences from "./pages/CookiePreferences";
+import DeleteAccountPolicy from "./pages/DeleteAccountPolicy";
+import PartnerTerms from "./pages/PartnerTerms";
 import QuestDetail from "./pages/QuestDetail";
 import QrLanding from "./pages/QrLanding";
 import ScanResolve from "./pages/ScanResolve";
@@ -52,76 +59,84 @@ const App = () => (
             <AuthProvider>
               <FavoritesProvider>
                 <SignInPromptProvider>
-                  <DemoBanner />
-                  <ScrollToTop />
-                  <Routes>
-                    {/* Marketing site */}
-                    <Route path="/" element={<Index />} />
-                    <Route path="/quests" element={<Quests />} />
-                    <Route path="/community-notes" element={<CommunityNotes />} />
-                    <Route path="/breadcrumbs" element={<Navigate to="/community-notes" replace />} />
-                    <Route path="/verticals" element={<Verticals />} />
-                    <Route path="/verticals/:slug" element={<VerticalDetail />} />
-                    <Route path="/partnerships" element={<Partnerships />} />
-                    <Route path="/hosts" element={<Hosts />} />
-                    <Route path="/privacy" element={<PrivacyPolicy />} />
-                    <Route path="/terms" element={<TermsOfService />} />
+                  <CookieConsentProvider>
+                    <DemoBanner />
+                    <ScrollToTop />
+                    <Routes>
+                      {/* Marketing site */}
+                      <Route path="/" element={<Index />} />
+                      <Route path="/quests" element={<Quests />} />
+                      <Route path="/community-notes" element={<CommunityNotes />} />
+                      <Route path="/breadcrumbs" element={<Navigate to="/community-notes" replace />} />
+                      <Route path="/verticals" element={<Verticals />} />
+                      <Route path="/verticals/:slug" element={<VerticalDetail />} />
+                      <Route path="/partnerships" element={<Partnerships />} />
+                      <Route path="/hosts" element={<Hosts />} />
+                      <Route path="/privacy" element={<PrivacyPolicy />} />
+                      <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+                      <Route path="/cookies" element={<CookiePolicy />} />
+                      <Route path="/cookie-preferences" element={<CookiePreferences />} />
+                      <Route path="/delete-account" element={<DeleteAccountPolicy />} />
+                      <Route path="/partner-terms" element={<PartnerTerms />} />
 
-                    {/* Auth + onboarding */}
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/onboarding" element={<Onboarding />} />
+                      {/* Auth + onboarding */}
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/onboarding" element={<Onboarding />} />
 
-                    {/* Public profile (read-only, privacy-safe) */}
-                    <Route path="/u/:username" element={<PublicProfile />} />
+                      {/* Public profile (read-only, privacy-safe) */}
+                      <Route path="/u/:username" element={<PublicProfile />} />
 
-                    {/* Quest detail & QR resolution */}
-                    <Route path="/quests/:questId" element={<QuestDetail />} />
-                    <Route path="/q/:questId" element={<QrLanding />} />
-                    <Route path="/scan/:code" element={<ScanResolve />} />
+                      {/* Quest detail & QR resolution */}
+                      <Route path="/quests/:questId" element={<QuestDetail />} />
+                      <Route path="/q/:questId" element={<QrLanding />} />
+                      <Route path="/scan/:code" element={<ScanResolve />} />
 
-                    {/* In-app experience */}
-                    <Route path="/app" element={<AppLayout />}>
-                      <Route index element={<Navigate to="/app/explore" replace />} />
-                      <Route path="explore" element={<Explore />} />
-                      <Route path="map" element={<MapView />} />
-                      <Route path="quests" element={<QuestBrowser />} />
-                      <Route path="community-notes" element={<AppCommunityNotes />} />
-                      <Route
-                        path="checkin"
-                        element={
-                          <ProtectedRoute>
-                            <CheckIn />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="favorites"
-                        element={
-                          <ProtectedRoute>
-                            <Favorites />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="profile"
-                        element={
-                          <ProtectedRoute>
-                            <Profile />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="settings"
-                        element={
-                          <ProtectedRoute>
-                            <Settings />
-                          </ProtectedRoute>
-                        }
-                      />
-                    </Route>
+                      {/* In-app experience */}
+                      <Route path="/app" element={<AppLayout />}>
+                        <Route index element={<Navigate to="/app/explore" replace />} />
+                        <Route path="explore" element={<Explore />} />
+                        <Route path="map" element={<MapView />} />
+                        <Route path="quests" element={<QuestBrowser />} />
+                        <Route path="community-notes" element={<AppCommunityNotes />} />
+                        <Route
+                          path="checkin"
+                          element={
+                            <ProtectedRoute>
+                              <CheckIn />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="favorites"
+                          element={
+                            <ProtectedRoute>
+                              <Favorites />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="profile"
+                          element={
+                            <ProtectedRoute>
+                              <Profile />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="settings"
+                          element={
+                            <ProtectedRoute>
+                              <Settings />
+                            </ProtectedRoute>
+                          }
+                        />
+                      </Route>
 
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                    <CookieConsentBanner />
+                  </CookieConsentProvider>
                 </SignInPromptProvider>
               </FavoritesProvider>
             </AuthProvider>

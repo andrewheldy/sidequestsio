@@ -281,7 +281,10 @@ export const zh: Translations = {
       contact: '联系',
       privacy: '隐私',
       terms: '条款',
-      cookies: 'Cookies',
+      cookies: 'Cookie 政策',
+      cookiePreferences: 'Cookie 偏好设置',
+      communityGuidelines: '社区准则',
+      deleteAccount: '删除账户',
     },
     newsletter: {
       title: '保持更新',
@@ -289,7 +292,7 @@ export const zh: Translations = {
       button: '订阅',
       success: '感谢订阅！',
     },
-    copyright: '© 2024 SideQuests。保留所有权利。',
+    copyright: '© 2026 sidequests。保留所有权利。',
     tagline: '用 ❤️ 为全世界的探索者制作',
   },
   languages: {

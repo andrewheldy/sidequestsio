@@ -12,6 +12,7 @@ import type { OnboardingSelections } from '@/lib/onboarding';
 import { EXPLORER_STYLES } from '@/lib/onboarding';
 import { isDemoMode } from '@/lib/demo';
 import { useDemoSession } from '@/contexts/DemoSessionContext';
+import { CURRENT_PRIVACY_VERSION, CURRENT_TERMS_VERSION } from '@/lib/legal';
 
 // ---------------------------------------------------------------------------
 // Demo user — returned by AuthContext when the demo session toggle is active.
@@ -63,6 +64,12 @@ const DEMO_PROFILE: Profile = {
   streak: 3,
   onboarding_completed: true,
   created_at: '2024-01-15T00:00:00Z',
+  accepted_terms_at: '2024-01-15T00:00:00Z',
+  accepted_privacy_at: '2024-01-15T00:00:00Z',
+  terms_version: CURRENT_TERMS_VERSION,
+  privacy_version: CURRENT_PRIVACY_VERSION,
+  marketing_opt_in: false,
+  marketing_opt_in_at: null,
 };
 
 export interface Profile {
@@ -97,6 +104,14 @@ export interface Profile {
   streak: number;
   onboarding_completed: boolean;
   created_at: string | null;
+  // Legal consent captured at signup (supabase/migrations/0015_legal_consent.sql).
+  // Not user-editable — see EditableProfile below and docs/legal/README.md.
+  accepted_terms_at: string | null;
+  accepted_privacy_at: string | null;
+  terms_version: string | null;
+  privacy_version: string | null;
+  marketing_opt_in: boolean;
+  marketing_opt_in_at: string | null;
 }
 
 /** Columns the user is allowed to edit on their own profile. */
@@ -141,7 +156,12 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
-  signUp: (email: string, password: string, displayName?: string) => Promise<AuthResult>;
+  signUp: (
+    email: string,
+    password: string,
+    displayName?: string,
+    consent?: { marketingOptIn: boolean },
+  ) => Promise<AuthResult>;
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
   /** Alias for refreshProfile — kept for compatibility with MVP pages. */
@@ -252,13 +272,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signUp = useCallback<AuthContextValue['signUp']>(
-    async (email, password, displayName) => {
+    async (email, password, displayName, consent) => {
       if (!supabase) return { error: NOT_CONFIGURED_MESSAGE };
+      // terms_version/privacy_version/marketing_opt_in ride along in signup
+      // metadata (not a follow-up write) so consent is captured by
+      // handle_new_auth_user() even before email confirmation creates a
+      // session — see docs/legal/README.md "How consent versions map to the
+      // database".
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: displayName ? { display_name: displayName } : undefined,
+          data: {
+            ...(displayName ? { display_name: displayName } : {}),
+            terms_version: CURRENT_TERMS_VERSION,
+            privacy_version: CURRENT_PRIVACY_VERSION,
+            marketing_opt_in: consent?.marketingOptIn ?? false,
+          },
           emailRedirectTo: `${window.location.origin}/app`,
         },
       });

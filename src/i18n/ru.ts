@@ -281,7 +281,10 @@ export const ru: Translations = {
       contact: 'Контакты',
       privacy: 'Конфиденциальность',
       terms: 'Условия',
-      cookies: 'Cookies',
+      cookies: 'Политика Cookie',
+      cookiePreferences: 'Настройки Cookie',
+      communityGuidelines: 'Правила Сообщества',
+      deleteAccount: 'Удалить Аккаунт',
     },
     newsletter: {
       title: 'Будьте в Курсе',
@@ -289,7 +292,7 @@ export const ru: Translations = {
       button: 'Подписаться',
       success: 'Спасибо за подписку!',
     },
-    copyright: '© 2024 SideQuests. Все права защищены.',
+    copyright: '© 2026 sidequests. Все права защищены.',
     tagline: 'Сделано с ❤️ для исследователей по всему миру',
   },
   languages: {

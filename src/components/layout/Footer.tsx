@@ -30,14 +30,14 @@ export function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-1">
               <Link to="/" className="flex items-center gap-3 mb-4">
-                <img src={dotlingLogo} alt="SideQuests.io" className="w-10 h-10 rounded-lg object-cover" />
-                <span className="font-poppins font-bold text-lg text-foreground">SideQuests<span className="text-primary">.io</span></span>
+                <img src={dotlingLogo} alt="sidequests" className="w-10 h-10 rounded-lg object-cover" />
+                <span className="font-poppins font-bold text-lg bg-gradient-to-r from-coral via-primary to-turquoise bg-clip-text text-transparent">sidequests</span>
               </Link>
               <p className="text-sm text-muted-foreground mb-4">{t.footer.description}</p>
               <div className="flex gap-3">
                 <button type="button" aria-label="Instagram" onClick={handleSocial('Instagram')} className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Instagram className="w-4 h-4" /></button>
                 <button type="button" aria-label="Twitter" onClick={handleSocial('Twitter')} className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Twitter className="w-4 h-4" /></button>
-                <a href="mailto:hello@sidequests.io" aria-label="Email" className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Mail className="w-4 h-4" /></a>
+                <a href="mailto:support@miamisidequests.io" aria-label="Email" className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Mail className="w-4 h-4" /></a>
               </div>
             </div>
 
@@ -64,6 +64,10 @@ export function Footer() {
               <ul className="space-y-2 text-sm">
                 <li><Link to="/privacy" className="text-muted-foreground hover:text-primary">{t.footer.links.privacy}</Link></li>
                 <li><Link to="/terms" className="text-muted-foreground hover:text-primary">{t.footer.links.terms}</Link></li>
+                <li><Link to="/community-guidelines" className="text-muted-foreground hover:text-primary">{t.footer.links.communityGuidelines}</Link></li>
+                <li><Link to="/cookies" className="text-muted-foreground hover:text-primary">{t.footer.links.cookies}</Link></li>
+                <li><Link to="/cookie-preferences" className="text-muted-foreground hover:text-primary">{t.footer.links.cookiePreferences}</Link></li>
+                <li><Link to="/delete-account" className="text-muted-foreground hover:text-primary">{t.footer.links.deleteAccount}</Link></li>
               </ul>
             </div>
           </div>

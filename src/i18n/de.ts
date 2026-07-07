@@ -281,7 +281,10 @@ export const de: Translations = {
       contact: 'Kontakt',
       privacy: 'Datenschutz',
       terms: 'AGB',
-      cookies: 'Cookies',
+      cookies: 'Cookie-Richtlinie',
+      cookiePreferences: 'Cookie-Einstellungen',
+      communityGuidelines: 'Community-Richtlinien',
+      deleteAccount: 'Konto Löschen',
     },
     newsletter: {
       title: 'Bleib Informiert',
@@ -289,7 +292,7 @@ export const de: Translations = {
       button: 'Abonnieren',
       success: 'Danke fürs Abonnieren!',
     },
-    copyright: '© 2024 SideQuests. Alle Rechte vorbehalten.',
+    copyright: '© 2026 sidequests. Alle Rechte vorbehalten.',
     tagline: 'Mit ❤️ gemacht für Entdecker überall',
   },
   languages: {

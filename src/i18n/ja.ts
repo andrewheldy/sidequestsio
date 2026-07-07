@@ -281,7 +281,10 @@ export const ja: Translations = {
       contact: 'お問い合わせ',
       privacy: 'プライバシー',
       terms: '利用規約',
-      cookies: 'Cookie',
+      cookies: 'Cookieポリシー',
+      cookiePreferences: 'Cookie設定',
+      communityGuidelines: 'コミュニティガイドライン',
+      deleteAccount: 'アカウント削除',
     },
     newsletter: {
       title: '最新情報を受け取る',
@@ -289,7 +292,7 @@ export const ja: Translations = {
       button: '購読',
       success: '購読ありがとうございます！',
     },
-    copyright: '© 2024 SideQuests. All rights reserved.',
+    copyright: '© 2026 sidequests. All rights reserved.',
     tagline: '世界中の探検家のために ❤️ を込めて作成',
   },
   languages: {

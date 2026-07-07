@@ -2,6 +2,14 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-07-07 — Legal, compliance & consent foundation (migration authored, not yet applied)
+
+- Added `docs/legal/` — initial legal drafts (AI-assisted, verified against the live product; flagged for attorney review before relying on them at scale) for Privacy Policy, Terms of Service, Community Guidelines, Cookie Policy, Delete Account, and Partner Terms & Conditions, plus `Legal-Version-History.md` (public changelog) and `README.md` (engineering reference for versioning/rendering/consent-mapping — see that file for the full system explanation).
+- Added markdown-rendering infra: `react-markdown` + `remark-gfm` (new dependencies), `src/components/legal/LegalDocPage.tsx`, `src/lib/slugify.ts`; registered the previously-unused `@tailwindcss/typography` plugin, themed to the app's own CSS-variable palette (`tailwind.config.ts`) instead of default grays. `/privacy` and `/terms` now render live from `docs/legal/*.md` (rewritten in place, same URLs); new routes `/community-guidelines`, `/cookies`, `/delete-account`, `/partner-terms`.
+- Added a client-side cookie consent system (`src/lib/cookieConsent.ts`, `src/contexts/CookieConsentContext.tsx`, `src/components/CookieConsentBanner.tsx`, `/cookie-preferences`): localStorage-only, Necessary/Analytics/Marketing/Preferences categories, first-visit banner. `hasAnalyticsConsent()`/`hasMarketingConsent()` are the API future tools should check before initializing — no analytics/marketing tool is integrated today.
+- Added signup consent capture: `Auth.tsx` now requires a "Terms of Service + Privacy Policy" checkbox (blocks submit) and an optional marketing-emails checkbox. `AuthContext.signUp()` passes `terms_version`/`privacy_version`/`marketing_opt_in` through `auth.users.raw_user_meta_data`; `supabase/migrations/0015_legal_consent.sql` (**authored, not applied** — run manually after a backup) adds `profiles.accepted_terms_at/accepted_privacy_at/terms_version/privacy_version/marketing_opt_in/marketing_opt_in_at` and extends `handle_new_auth_user()` to populate them and seed `privacy_preferences.marketing_consent` from the same choice. No backfill for existing accounts (no fabricated consent history); the existing `consent_events`/`privacy_preferences` system (Settings toggles) is untouched.
+- Footer (`src/components/layout/Footer.tsx`) gained links to the four new documents, in all 8 locales (`src/i18n/*.ts`) — document bodies remain English-only, matching the pre-existing Privacy/Terms pages.
+
 ## 2026-07-06 — Sprint 0 applied & verified; Sprint 1 auth lifecycle + app shell fixes
 
 ### Sprint 0 verification (migrations 0009–0013 now live)

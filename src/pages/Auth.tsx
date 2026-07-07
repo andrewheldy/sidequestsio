@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -23,6 +24,8 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,12 +66,18 @@ const Auth = () => {
       setError('Password must be at least 6 characters.');
       return;
     }
+    if (mode === 'signup' && !agreedToTerms) {
+      setError('Please agree to the Terms of Service and Privacy Policy to continue.');
+      return;
+    }
 
     setSubmitting(true);
     const result =
       mode === 'signin'
         ? await signIn(email, password)
-        : await signUp(email, password, displayName.trim() || undefined);
+        : await signUp(email, password, displayName.trim() || undefined, {
+            marketingOptIn,
+          });
     setSubmitting(false);
 
     if (result.error) {
@@ -179,13 +188,54 @@ const Auth = () => {
               </div>
             </div>
 
+            {mode === 'signup' && (
+              <div className="space-y-3 pt-1">
+                <div className="flex items-start gap-2.5">
+                  <Checkbox
+                    id="agreeToTerms"
+                    checked={agreedToTerms}
+                    onCheckedChange={(v) => setAgreedToTerms(v === true)}
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="agreeToTerms" className="text-sm font-normal leading-snug text-muted-foreground">
+                    I agree to the{' '}
+                    <Link to="/terms" target="_blank" className="text-primary underline underline-offset-2">
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link to="/privacy" target="_blank" className="text-primary underline underline-offset-2">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </Label>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <Checkbox
+                    id="marketingOptIn"
+                    checked={marketingOptIn}
+                    onCheckedChange={(v) => setMarketingOptIn(v === true)}
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="marketingOptIn" className="text-sm font-normal leading-snug text-muted-foreground">
+                    Send me emails about quests, rewards, launches, city updates, events and
+                    promotions.
+                  </Label>
+                </div>
+              </div>
+            )}
+
             {error && (
               <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {error}
               </p>
             )}
 
-            <Button type="submit" size="lg" className="h-12 w-full" disabled={submitting}>
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 w-full"
+              disabled={submitting || (mode === 'signup' && !agreedToTerms)}
+            >
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

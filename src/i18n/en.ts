@@ -418,7 +418,10 @@ export const en = {
       contact: "Contact",
       privacy: "Privacy",
       terms: "Terms",
-      cookies: "Cookies",
+      cookies: "Cookie Policy",
+      cookiePreferences: "Cookie Preferences",
+      communityGuidelines: "Community Guidelines",
+      deleteAccount: "Delete Account",
     },
     newsletter: {
       title: "Stay Updated",
@@ -426,7 +429,7 @@ export const en = {
       button: "Subscribe",
       success: "Thanks for subscribing!",
     },
-    copyright: "© 2024 SideQuests. All rights reserved.",
+    copyright: "© 2026 sidequests. All rights reserved.",
     tagline: "Made with ❤️ for explorers everywhere",
   },
 
