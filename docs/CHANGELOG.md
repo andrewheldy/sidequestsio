@@ -2,6 +2,22 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-07-06 — Sprint 0 applied & verified; Sprint 1 auth lifecycle + app shell fixes
+
+### Sprint 0 verification (migrations 0009–0013 now live)
+
+- Migrations applied to production by the founder (SQL editor, after backup). Post-apply verification: `scripts/verify-db.sql` **16/17 passing** (only the quest-content check remains, by design until content authoring); `npm run smoke:supabase` **8/8** — anon reads of quests/venues/QR/rewards/notes all work, ledger correctly still blocked. Backfill confirmed: `auth.users` = `users` = `profiles` = `user_profiles` = `privacy_preferences`.
+- Live throwaway-signup test: the canonical trigger created all four rows (`users`, `user_profiles`, `privacy_preferences`, `profiles`) with `display_name` propagated from metadata, `is_public=false`, `onboarding_completed=false`. Incidental finding: **email confirmation is enabled** in Supabase Auth (a confirmation email was sent). Test account `vipheldy+sqverify…@gmail.com` left in place; delete via dashboard when convenient.
+
+### Sprint 1 — AUTH-1..3 + SHELL-1..2
+
+- **AUTH-1:** `/auth?next=…` now works. `Auth.tsx` prefers a validated `next` query param (same-origin relative paths only — `safeNextPath` in new `src/lib/navigation.ts` rejects `//`, schemes, backslashes), falling back to `state.from`, then `/app`. The destination is carried through onboarding via route state, so QR → sign-in → onboarding → back-to-quest survives end-to-end (`Onboarding.tsx` finishes to the carried destination).
+- **AUTH-2:** signed-in users with a missing `profiles` row no longer bypass guards. `AuthContext.fetchProfile` distinguishes no-row from error and self-heals by inserting the row (race-safe upsert with `ignoreDuplicates`, mirroring the DB trigger's values); `ProtectedRoute` and the `/app` route shell route missing-profile users to `/onboarding`. A new `profileLoading` context flag prevents the guard from misfiring in the moment between sign-in and profile fetch.
+- **AUTH-3:** `completeOnboarding` uses upsert instead of update, so finishing onboarding creates/repairs the profile row rather than silently updating zero rows.
+- **SHELL-1:** removed dead `/partner` and `/admin` shortcuts from Profile (routes unmounted per PD-1; restored with T-SHELL-3); CheckIn placeholder now shows the real live code format (`WYND-COF1`).
+- **SHELL-2:** removed the nested `components/app/AppLayout` wrapper from all five mounted pages that double-rendered the shell (`Profile`, `Settings`, `CheckIn`, `QuestBrowser`, `AppCommunityNotes`) — each now renders `AppHeader` + content inside the route shell, so every app page has exactly one column and one bottom nav. The wrapper is marked `@deprecated` for the remaining unmounted pages.
+- Validation: typecheck clean, production build clean (pre-existing chunk warnings only), zero new lint issues in touched files, grep gates confirm no dead links or wrapper imports remain in mounted pages. Not yet done (per plan): QuestDetail's `/app/wallet` link (T-QX-1, DATA stream), Explore/Map live data (DATA stream).
+
 ## 2026-07-06 — Sprint 0: production sprint plan + backend-unblock migrations (authored, not yet applied)
 
 - Added `docs/PRODUCTION_SPRINT_PLAN.md` — the evidence-tagged execution plan for the Miami MVP launch, preceded by a live reality-verification pass (read-only Supabase MCP) that settled the audits' open unknowns. Key live confirmations: anon/authenticated grants missing on all game tables (policies exist; grants-only fix); the `handle_new_auth_user` migration-order trap **has fired** on the live DB (both `auth.users` triggers run the variant without the `profiles` insert; 6 `users` vs 5 `profiles`); live `quests` already has the Fable columns except `action_prompt` (drift ahead of repo), all NULL; `public_profiles` view filters `is_profile_public` while Settings writes `is_public` (live `is_public` is nullable default **true**, contradicting checked-in 0008); only the `avatars` bucket exists; no admin user exists; community notes default to `approved`.

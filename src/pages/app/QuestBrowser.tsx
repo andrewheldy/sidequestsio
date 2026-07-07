@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
-import AppLayout from "@/components/app/AppLayout";
+import AppHeader from "@/components/app/AppHeader";
 import { Loading, EmptyState } from "@/components/app/ui";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -41,7 +41,9 @@ export default function QuestBrowser() {
     category === "all" ? allQuests : allQuests.filter((q) => q.category === category);
 
   return (
-    <AppLayout title="Quests" subtitle="Discover side quests near you">
+    <>
+      <AppHeader title="Quests" subtitle="Discover side quests near you" />
+      <div className="mt-4">
       <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
         {CATEGORIES.map((c) => (
           <button
@@ -111,6 +113,7 @@ export default function QuestBrowser() {
           ))}
         </div>
       )}
-    </AppLayout>
+      </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, Shield, BarChart3, Settings, Settings2, RefreshCw } from "lucide-react";
-import AppLayout from "@/components/app/AppLayout";
+import { LogOut, Settings, Settings2, RefreshCw } from "lucide-react";
+import AppHeader from "@/components/app/AppHeader";
 import { StatTile, SectionHeader, Loading } from "@/components/app/ui";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
@@ -75,7 +75,9 @@ export default function Profile() {
   const lvl = levelProgress(effectiveProfile?.xp ?? 0);
 
   return (
-    <AppLayout title="Profile">
+    <>
+      <AppHeader title="Profile" />
+      <div className="mt-4">
       {/* Avatar + name + settings shortcut */}
       <div className="glass-card mt-2 flex items-center gap-4 p-5">
         <button
@@ -130,25 +132,9 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Role-based shortcuts (RBAC) */}
-      {(role === "partner" || role === "admin") && (
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          {(role === "partner" || role === "admin") && (
-            <Button asChild variant="outline" className="gap-2">
-              <Link to="/partner">
-                <BarChart3 className="h-4 w-4" /> Partner Portal
-              </Link>
-            </Button>
-          )}
-          {role === "admin" && (
-            <Button asChild variant="outline" className="gap-2">
-              <Link to="/admin">
-                <Shield className="h-4 w-4" /> Admin
-              </Link>
-            </Button>
-          )}
-        </div>
-      )}
+      {/* Partner/admin portal shortcuts were removed here: those routes are
+          not mounted for the MVP launch (see docs/PRODUCTION_SPRINT_PLAN.md
+          PD-1). Reintroduced when the portals mount (T-SHELL-3). */}
 
       {/* Privacy */}
       <div className="mt-6">
@@ -222,7 +208,8 @@ export default function Profile() {
         <Settings2 className="h-3 w-3" /> You control your data. Request export or
         deletion anytime.
       </p>
-    </AppLayout>
+      </div>
+    </>
   );
 }
 

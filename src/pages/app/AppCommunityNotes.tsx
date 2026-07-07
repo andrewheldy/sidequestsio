@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-import AppLayout from "@/components/app/AppLayout";
+import AppHeader from "@/components/app/AppHeader";
 import { EmptyState, Loading } from "@/components/app/ui";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getRepository } from "@/lib/db";
@@ -15,7 +15,9 @@ export default function AppCommunityNotes() {
   });
 
   return (
-    <AppLayout title="Community Notes" subtitle="Tips from fellow questers">
+    <>
+      <AppHeader title="Community Notes" subtitle="Tips from fellow questers" />
+      <div className="mt-4">
       {isLoading ? (
         <Loading />
       ) : notes.length === 0 ? (
@@ -45,6 +47,7 @@ export default function AppCommunityNotes() {
           ))}
         </div>
       )}
-    </AppLayout>
+      </div>
+    </>
   );
 }

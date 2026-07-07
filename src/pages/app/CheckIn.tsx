@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { QrCode, ArrowRight } from "lucide-react";
-import AppLayout from "@/components/app/AppLayout";
+import AppHeader from "@/components/app/AppHeader";
 import { SectionHeader, Loading } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,9 @@ export default function CheckIn() {
   };
 
   return (
-    <AppLayout title="Check In">
+    <>
+      <AppHeader title="Check In" />
+      <div className="mt-4">
       <div className="glass-card mt-2 flex flex-col items-center gap-3 p-6 text-center">
         <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-coral text-primary-foreground glow-coral">
           <QrCode className="h-8 w-8" />
@@ -41,7 +43,7 @@ export default function CheckIn() {
           <Input
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder="Enter code (e.g. WYNWOOD1)"
+            placeholder="Enter code (e.g. WYND-COF1)"
             className="bg-muted/50 uppercase"
           />
           <Button type="submit" disabled={!code.trim()}>
@@ -74,6 +76,7 @@ export default function CheckIn() {
           </div>
         )}
       </div>
-    </AppLayout>
+      </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Save, Loader2, RefreshCw } from "lucide-react";
-import AppLayout from "@/components/app/AppLayout";
+import AppHeader from "@/components/app/AppHeader";
 import { SectionHeader } from "@/components/app/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,8 +108,9 @@ export default function Settings() {
   };
 
   return (
-    <AppLayout title="Settings">
-      <div className="space-y-6 pb-4">
+    <>
+      <AppHeader title="Settings" />
+      <div className="mt-4 space-y-6 pb-4">
         <Button
           variant="ghost"
           onClick={cancel}
@@ -274,7 +275,7 @@ export default function Settings() {
           · Request export or deletion anytime.
         </p>
       </div>
-    </AppLayout>
+    </>
   );
 }
 
