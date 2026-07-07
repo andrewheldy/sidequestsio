@@ -54,18 +54,30 @@ import type { QuestLinks, QuestWithContext, ProofMethod } from "@/types/db";
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** First available social link — Socials is a single landing page, never a
- *  per-network button grid. There is no `socials_url` column yet, so we pick the
- *  best-available social link; the DB pass can add a proper single field. */
+/** Socials is a single landing page (Linktree/Linkme style), never a
+ *  per-network button grid. Canonical key is `links.socials_url`; legacy
+ *  per-platform keys are only a fallback for old demo content. */
 function resolveSocialsUrl(links: QuestLinks | undefined): string | null {
   if (!links) return null;
   return (
+    links.socials_url ||
     links.instagram_url ||
     links.tiktok_url ||
     links.x_url ||
     links.facebook_url ||
     null
   );
+}
+
+/** Human label for a $-sign price tier, shown as the card's secondary line. */
+function priceRangeNote(priceRange: string | null | undefined): string | null {
+  switch (priceRange) {
+    case "$":    return "Budget-friendly";
+    case "$$":   return "Moderate";
+    case "$$$":  return "Upscale";
+    case "$$$$": return "Luxury";
+    default:     return null;
+  }
 }
 
 function proofMethodLabel(method: ProofMethod | null | undefined): string {
@@ -390,7 +402,9 @@ export default function QuestDetail() {
 
   // --- Derived display values ----------------------------------------------
 
-  const businessName = quest.partner?.name ?? quest.venue?.name ?? null;
+  // The venue is the customer-facing business (partners are the B2B account
+  // shell and may own several venue brands), so prefer the venue's name.
+  const businessName = quest.venue?.name ?? quest.partner?.name ?? null;
 
   const venueLabel = quest.venue
     ? [quest.venue.name, quest.venue.city].filter(Boolean).join(" · ")
@@ -405,7 +419,8 @@ export default function QuestDetail() {
   const ProofIcon = proofMethodIcon(proofMethod);
 
   const websiteUrl = quest.links?.website_url ?? null;
-  const reviewsUrl = quest.links?.google_reviews_url ?? null;
+  const reviewsUrl =
+    quest.links?.reviews_url ?? quest.links?.google_reviews_url ?? null;
   const socialsUrl = resolveSocialsUrl(quest.links);
 
   return (
@@ -415,6 +430,7 @@ export default function QuestDetail() {
         imageUrl={quest.image_url}
         title={quest.title}
         businessName={businessName}
+        logoUrl={quest.venue?.logo_url}
         category={quest.category}
         difficulty={quest.difficulty}
         estimatedTime={quest.estimated_time}
@@ -486,8 +502,12 @@ export default function QuestDetail() {
 
         {/* ── 6. Information cards ── */}
         <InfoCards
-          neighborhood={quest.venue?.city ?? null}
-          city={quest.venue?.address ?? null}
+          hours={quest.venue?.hours ?? null}
+          hoursNote={quest.venue?.hours_note ?? null}
+          priceRange={quest.venue?.price_range ?? null}
+          priceNote={priceRangeNote(quest.venue?.price_range)}
+          neighborhood={quest.venue?.neighborhood ?? quest.venue?.city ?? null}
+          city={quest.venue?.neighborhood ? (quest.venue?.city ?? null) : null}
         />
 
         {/* ── 7. Community Notes ── */}

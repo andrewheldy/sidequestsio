@@ -139,6 +139,16 @@ export interface Venue {
   latitude: number | null;
   longitude: number | null;
   status: EntityStatus;
+  /** Business logo shown as the circular avatar on the quest hero (0014). */
+  logo_url?: string | null;
+  /** Human neighborhood name, e.g. "Wynwood"; city remains the secondary line (0014). */
+  neighborhood?: string | null;
+  /** Display hours string, e.g. "7:00 AM – 9:00 PM" (0014). */
+  hours?: string | null;
+  /** Secondary hours line, e.g. "Daily" or "Closed Mondays" (0014). */
+  hours_note?: string | null;
+  /** Price tier as dollar signs: $, $$, $$$ or $$$$ (0014). */
+  price_range?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -354,9 +364,20 @@ export interface AuditLog {
 
 /** Optional external links attached to a quest by a partner/host.
  *  Not every quest is a restaurant — all fields are optional.
- *  Stored as a JSONB column or separate table in the backend. */
+ *  Stored in the quests.links JSONB column.
+ *
+ *  Canonical shape (import path + new content):
+ *    { website_url, reviews_url, reviews_source, socials_url, socials_source }
+ *  The remaining keys are legacy — still readable (the UI falls back to them)
+ *  but not written by the content importer. */
 export interface QuestLinks {
   website_url?: string | null;
+  /** Canonical reviews link (Google, Yelp, …). */
+  reviews_url?: string | null;
+  reviews_source?: "google" | "yelp" | "other" | null;
+  /** ONE external landing page (Linktree/Linkme style) — never per-platform. */
+  socials_url?: string | null;
+  socials_source?: "linktree" | "linkme" | "other" | null;
   instagram_url?: string | null;
   tiktok_url?: string | null;
   x_url?: string | null;

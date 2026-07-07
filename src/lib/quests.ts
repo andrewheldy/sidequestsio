@@ -23,6 +23,8 @@ export interface Quest {
   lng: number;
   /** Street address — populated for CRM-backed quests. */
   address?: string;
+  /** Venue business name — populated when the quest is linked to a `venues` row. */
+  venueName?: string;
   /** The playful real-world action the user must complete at the venue. */
   funky_action?: string | null;
   proof_method?: string | null;

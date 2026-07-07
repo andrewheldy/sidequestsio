@@ -1,54 +1,264 @@
-# SideQuests.io — Engineering Roadmap
+# SideQuests Development Roadmap
 
-**Last updated:** 2026-07-06
+**Last Updated:** 2026-07-06
 
-This roadmap is derived only from the confirmed state in `docs/SYSTEM_STATE.md` and the underlying audits (`docs/audits/2026-07-06-codex-production-audit.md`, `docs/audits/2026-07-06-mcp-production-verification.md`). It does not introduce new findings. Phase 1 and Phase 2 items are known, verified issues; Phase 3 is directional, not committed; Phase 4 is explicitly out of scope per `docs/PRODUCT_DIRECTION.md`.
+---
 
-This is a roadmap, not a project plan — it does not assign owners, dates, or sequencing beyond the phase grouping.
+# Purpose
 
-## Phase 1 — Launch Blockers
+This roadmap defines the engineering priorities for SideQuests based on the verified production state of the application.
 
-Issues that prevent a credible public MVP launch. Sourced from `docs/SYSTEM_STATE.md` §14 ("Known Production Blockers").
+It is intentionally grounded in audited reality rather than aspirational planning.
 
-- **Supabase anon read grants** — live anon reads on `partners`, `venues`, `quests`, `qr_codes`, `rewards`, `community_notes`, and `community_notes_with_author` returned permission-denied per the Codex audit, despite RLS intending public access. Not yet re-verified against a live anon client.
-- **Auth/profile bootstrap migration-order trap** — two differently-behaved definitions of `handle_new_auth_user()` exist across migrations (`0006_game_schema.sql` vs. `0003_functions.sql`); whichever ran last on the live database determines whether new signups get a `profiles` row.
-- **Missing Fable quest schema fields** — `src/types/db.ts` and `QuestDetail.tsx` expect `funky_action`, `action_type`, `proof_method`, `social_share_prompt`, `staff_phrase`, `estimated_time`, and `links` on `quests`; no checked-in migration creates these columns.
-- **Missing `proofs` storage bucket** — proof-photo uploads target a bucket that doesn't exist; upload failures are currently swallowed rather than surfaced.
-- **Public profile visibility field mismatch** — Settings writes `profiles.is_public`; the `public_profiles` view filters on `is_profile_public`.
-- **Unreachable but linked routes** — `/partner`, `/admin`, `/app/wallet`, `/app/rewards`, `/app/leaderboard`, `/app/history` are linked from mounted pages but not mounted in `src/App.tsx`.
-- **Broken auth `next`-redirect** — the quest-completion → sign-in → back-to-quest flow drops the intended destination.
-- **Non-`venue_code` completions are trust-the-client** — `complete_quest` marks `qr`/`nfc`/`gps`/`staff` verification types as verified without independent server-side checks. Whether this needs hardening before launch, or is an acceptable MVP trust model, is a product decision, not purely an engineering one.
+This document describes what needs to happen, not who will do it or when.
 
-## Phase 2 — MVP Polish
+---
 
-Issues that reduce launch quality but do not block a launch. Sourced from `docs/SYSTEM_STATE.md` §15 ("Known Technical Debt") and the Codex audit's P1/P2 findings.
+# Roadmap Principles
 
-- **Unify quest data model** — reconcile the two parallel quest shapes (`Quest` in `src/lib/quests.ts` vs. `QuestWithContext` in `src/types/db.ts`) that currently have no shared mapping layer.
-- **Resolve demo/live inconsistency** — `/app/explore`, `/app/map`, and the public `/quests` marketing page still render static demo data unconditionally, while `/app/quests` and `/quests/:questId` read live Supabase data. There is no single, stated policy for which mounted surfaces are live vs. demo.
-- **Fix duplicated `AppLayout` shell** — two separately-named layout components (`src/pages/app/AppLayout.tsx` and `src/components/app/AppLayout.tsx`) cause duplicated bottom-nav/wrapper rendering on some mounted pages.
-- **Lint cleanup** — the Codex audit found `npm run lint` failing (26 errors, 14 warnings); not yet re-run or fixed.
-- **Dependency audit** — `npm audit --omit=dev` reported 10 production vulnerabilities at audit time, including high-severity React Router advisories; not yet re-run or addressed.
-- **Stale `ARCHITECTURE.md`** — references migration filenames and mounted routes that no longer match reality.
-- **Bundle size** — main chunk (~1.1 MB minified) and Mapbox chunk (~1.8 MB minified) both exceed Vite's 500 KB warning threshold; no code-splitting/`manualChunks` configuration exists yet.
-- **Supabase Auth hardening** — enable leaked-password protection; review the `SECURITY DEFINER` RPCs currently callable by `anon`/`authenticated` without restriction, and the public `avatars` bucket's broad listing policy.
+Engineering priorities should always follow this order:
 
-## Phase 3 — Growth
+1. Launch a reliable MVP.
+2. Improve the player experience.
+3. Increase measurable value for partner businesses.
+4. Scale only after product-market fit is demonstrated.
 
-Infrastructure that supports expansion once the MVP has validated engagement, repeat usage, and business ROI in Miami. These are directional, not committed or scheduled.
+Avoid adding new product scope until the core quest loop is stable and enjoyable.
 
-- **Creator tooling** — support for creators building and managing quest lines, per the go-to-market role defined in `docs/PRODUCT_DIRECTION.md`.
-- **Partnership dashboards** — a working partner portal (the codebase already has partner pages under `src/pages/partner/`, currently unmounted) so businesses can self-serve analytics and quest management instead of requiring manual setup.
-- **Analytics improvements** — deeper partner/platform reporting beyond the current `partner_analytics`/`platform_analytics` RPCs.
-- **Stronger verification** — real QR/GPS/staff-approval validation to replace the current trust-the-client model, if/when reward value justifies the investment.
-- **Performance optimization** — bundle splitting, chunk size reduction, and general frontend performance work once there's real traffic to optimize for.
+---
 
-## Phase 4 — Future Exploration
+# Phase 1 — Launch Blockers
 
-Ideas intentionally postponed per `docs/PRODUCT_DIRECTION.md`. These are not commitments — they are recorded here so they aren't rediscovered or re-debated prematurely.
+These issues prevent a credible public MVP launch.
 
-- Token economy / crypto rewards.
-- Wallet-chain (Solana) integration.
-- Crypto/NFT wallet functionality.
-- AR spatial anchors.
-- Advanced gamification mechanics beyond the current XP/points/leaderboard/rewards loop.
-- Large-scale infrastructure work (e.g., a dedicated backend service, multi-region deployment) — not justified until the current Vite-SPA-plus-Supabase architecture has actually been outgrown.
+## Authentication & Profiles
+
+Resolve inconsistencies that prevent reliable account creation.
+
+Goals:
+
+- New users always receive a profile.
+- Authentication redirects correctly.
+- Users return to their intended destination after signing in.
+
+## Public Data Access
+
+Ensure publicly available quest and business information is accessible through the intended anonymous client without compromising security.
+
+## Quest Schema Alignment
+
+Unify the database schema, application types, and UI so that every quest shares one consistent structure.
+
+This includes fields such as:
+
+- funky_action
+- action_type
+- proof_method
+- estimated_time
+- business links
+- social prompts
+
+## Media Uploads
+
+Ensure proof-photo uploads function correctly.
+
+Goals:
+
+- Storage bucket exists.
+- Permissions are correct.
+- Upload failures are surfaced to users.
+
+## Profile Visibility
+
+Use one consistent visibility model across profiles and public views.
+
+## Navigation
+
+Remove or mount every linked route.
+
+Users should never encounter dead navigation.
+
+## Quest Verification
+
+Determine the MVP verification model.
+
+Current options include:
+
+- Trust the client for low-value rewards.
+- Introduce stronger verification where reward value justifies the added complexity.
+
+The chosen approach should balance security with a smooth player experience.
+
+---
+
+# Phase 2 — MVP Polish
+
+Once the platform is functionally complete, improve consistency and usability.
+
+## Data Consistency
+
+Unify demo and live data behavior.
+
+Every surface should clearly follow one defined policy.
+
+## UI Consistency
+
+Remove duplicate layouts.
+
+Ensure navigation and page structure remain consistent throughout the application.
+
+## Code Quality
+
+Resolve:
+
+- lint errors
+- dependency issues
+- outdated documentation
+
+The codebase should be stable enough for new contributors to understand quickly.
+
+## Performance
+
+Improve:
+
+- bundle size
+- route loading
+- image optimization
+- Map rendering
+
+Performance work should focus on improving perceived responsiveness on mobile devices.
+
+## Security Hardening
+
+Review:
+
+- Authentication settings
+- Storage permissions
+- RPC permissions
+- Public access policies
+
+The goal is a secure public launch without unnecessary complexity.
+
+---
+
+# Phase 3 — Scale
+
+Once the Miami MVP demonstrates repeat engagement and business value, begin expanding the platform.
+
+## Community Guide Program
+
+Develop curated quest collections in collaboration with trusted community members.
+
+Examples include:
+
+- Food creators
+- Neighborhood experts
+- Historians
+- Artists
+- Fitness communities
+- University ambassadors
+- Festival organizers
+
+Community Guides do not independently publish quests.
+
+Instead, SideQuests collaborates with guides to design, review, and launch high-quality quest lines that meet the platform's standards.
+
+Purpose:
+
+- Leverage trusted local expertise.
+- Maintain consistent quest quality.
+- Strengthen community engagement.
+- Expand organically through authentic local voices.
+
+## Partnership Dashboard
+
+Expand the partner portal.
+
+Businesses should be able to:
+
+- View analytics.
+- Update business information.
+- Manage rewards.
+- Review quest performance.
+
+Quest publishing remains a collaborative workflow with SideQuests.
+
+## Analytics Expansion
+
+Provide richer reporting for:
+
+- Businesses
+- Community Guides
+- Internal product decisions
+
+Focus on actionable insights rather than vanity metrics.
+
+## Verification Improvements
+
+As rewards become more valuable, introduce stronger verification where appropriate.
+
+Possible improvements include:
+
+- Enhanced QR validation
+- GPS confirmation
+- Staff approval workflows
+
+These enhancements should be driven by real fraud risk rather than assumptions.
+
+## Performance Optimization
+
+As usage grows:
+
+- Split large bundles.
+- Optimize asset loading.
+- Improve map performance.
+- Reduce page load times.
+
+Optimize based on real production usage rather than theoretical scale.
+
+---
+
+# Phase 4 — Future Exploration
+
+The following ideas are intentionally outside the current roadmap.
+
+They should not influence MVP engineering decisions.
+
+Examples include:
+
+- Advanced AR experiences
+- Large-scale gamification systems
+- Dedicated backend services
+- Multi-region deployments
+- Enterprise infrastructure beyond current operational needs
+
+These ideas may be revisited after sustained product-market fit.
+
+---
+
+# Release Criteria
+
+The MVP is considered launch-ready when a user can:
+
+1. Create an account.
+2. Discover nearby quests.
+3. Visit a partner location.
+4. Scan a QR code.
+5. Complete the quest objective.
+6. Capture proof of completion.
+7. Earn XP and Points.
+8. View the completion in their Adventure Log.
+9. Leave a Community Note.
+10. Generate measurable engagement for the partner business.
+
+Partner businesses should simultaneously be able to measure meaningful customer engagement through the platform.
+
+---
+
+# Development North Star
+
+Every engineering decision should strengthen the core SideQuests loop:
+
+**Discover → Visit → Scan → Experience → Capture → Progress → Share → Return**
+
+If a feature does not improve this loop, improve partner value, or strengthen long-term product quality, it should remain in the backlog until the core experience has been perfected.
