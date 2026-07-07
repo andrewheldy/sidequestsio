@@ -129,6 +129,11 @@ interface AuthResult {
 interface AuthContextValue {
   isConfigured: boolean;
   loading: boolean;
+  /**
+   * True while the signed-in user's profile row is being fetched (or repaired).
+   * Guards must not treat `profile === null` as "missing" until this is false.
+   */
+  profileLoading: boolean;
   /** True when the user is signed in. Alias for `!!user`. */
   isAuthenticated: boolean;
   /** Basic role derived from user metadata; defaults to 'user'. */
@@ -153,21 +158,59 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (u: User) => {
     if (!supabase) return;
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-    if (!error && data) {
-      setProfile(data as Profile);
-    } else {
-      setProfile(null);
+    setProfileLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', u.id)
+        .maybeSingle();
+      if (data) {
+        setProfile(data as Profile);
+        return;
+      }
+      if (error) {
+        setProfile(null);
+        return;
+      }
+
+      // Signed in but no profiles row: accounts created while the signup
+      // trigger was missing its profiles insert (pre-0010_auth_bootstrap).
+      // Self-heal with the same values the trigger would have written.
+      // ignoreDuplicates makes the write race-safe against the trigger.
+      const fallbackName =
+        (u.user_metadata?.display_name as string | undefined)?.trim() ||
+        u.email?.split('@')[0] ||
+        null;
+      const { data: repaired } = await supabase
+        .from('profiles')
+        .upsert(
+          { user_id: u.id, display_name: fallbackName },
+          { onConflict: 'user_id', ignoreDuplicates: true },
+        )
+        .select()
+        .maybeSingle();
+      if (repaired) {
+        setProfile(repaired as Profile);
+        return;
+      }
+
+      // Conflict-skipped (row appeared concurrently) — read it back.
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', u.id)
+        .maybeSingle();
+      setProfile((existing as Profile) ?? null);
+    } finally {
+      setProfileLoading(false);
     }
   }, []);
 
@@ -185,7 +228,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       if (data.session?.user) {
-        fetchProfile(data.session.user.id).finally(() => active && setLoading(false));
+        fetchProfile(data.session.user).finally(() => active && setLoading(false));
       } else {
         setLoading(false);
       }
@@ -196,7 +239,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(newSession?.user ?? null);
       if (newSession?.user) {
         // Defer the Supabase call to avoid deadlocks inside the callback.
-        setTimeout(() => fetchProfile(newSession.user.id), 0);
+        setTimeout(() => fetchProfile(newSession.user), 0);
       } else {
         setProfile(null);
       }
@@ -237,7 +280,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshProfile = useCallback(async () => {
-    if (user) await fetchProfile(user.id);
+    if (user) await fetchProfile(user);
   }, [user, fetchProfile]);
 
   const updateProfile = useCallback<AuthContextValue['updateProfile']>(
@@ -255,7 +298,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error.code === '23505') return { error: 'That username is already taken.' };
         return { error: error.message };
       }
-      await fetchProfile(user.id);
+      await fetchProfile(user);
       return { error: null };
     },
     [user, fetchProfile],
@@ -269,22 +312,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const energy =
         EXPLORER_STYLES.find((s) => s.id === selections.explorerStyle)?.energy ?? null;
 
+      // Upsert instead of update so a user whose profiles row is missing
+      // (accounts pre-dating 0010_auth_bootstrap) is repaired right here
+      // instead of silently updating zero rows.
       const { error } = await supabase
         .from('profiles')
-        .update({
-          interests: selections.vibes,
-          quest_style: selections.explorerStyle,
-          quest_energy: energy,
-          starting_area: selections.neighborhood,
-          xp: 100,
-          level: 1,
-          streak: 1,
-          onboarding_completed: true,
-        })
-        .eq('user_id', user.id);
+        .upsert(
+          {
+            user_id: user.id,
+            interests: selections.vibes,
+            quest_style: selections.explorerStyle,
+            quest_energy: energy,
+            starting_area: selections.neighborhood,
+            xp: 100,
+            level: 1,
+            streak: 1,
+            onboarding_completed: true,
+          },
+          { onConflict: 'user_id' },
+        );
 
       if (error) return { error: error.message };
-      await fetchProfile(user.id);
+      await fetchProfile(user);
       return { error: null };
     },
     [user, fetchProfile],
@@ -298,6 +347,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     isConfigured: isSupabaseConfigured,
     loading: demoActive ? false : loading,
+    profileLoading: demoActive ? false : profileLoading,
     isAuthenticated: demoActive ? true : !!user,
     role: demoActive ? 'user' : role,
     user: demoActive ? DEMO_USER : user,

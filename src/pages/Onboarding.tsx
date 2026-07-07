@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -29,14 +29,21 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { safeNextPath } from '@/lib/navigation';
 
 const TOTAL_STEPS = 6;
 const stepAnim = 'animate-in fade-in slide-in-from-bottom-4 duration-500';
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { user, profile, loading, completeOnboarding } = useAuth();
+
+  // Auth/guards pass the interrupted destination (e.g. a scanned quest page)
+  // via state so the QR → sign-in → onboarding → quest flow isn't dropped.
+  const rawNext = safeNextPath((location.state as { next?: string } | null)?.next);
+  const nextDest = rawNext && rawNext !== '/onboarding' ? rawNext : '/app';
 
   const [step, setStep] = useState(1);
   const [selections, setSelections] = useState<OnboardingSelections>(emptyOnboarding);
@@ -63,7 +70,7 @@ const Onboarding = () => {
   if (loading || !hydrated) return <LoadingScreen label="Preparing your adventure…" />;
 
   // Signed-in users who already finished should never see onboarding again.
-  if (user && profile?.onboarding_completed) return <Navigate to="/app" replace />;
+  if (user && profile?.onboarding_completed) return <Navigate to={nextDest} replace />;
 
   const toggleVibe = (id: string) =>
     setSelections((s) => ({
@@ -96,7 +103,7 @@ const Onboarding = () => {
     }
     clearGuestOnboarding();
     toast({ title: 'You’re all set! 🎉', description: 'Your first quest is waiting.' });
-    navigate('/app');
+    navigate(nextDest);
   };
 
   return (

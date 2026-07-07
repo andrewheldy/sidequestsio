@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Loader2, Mail, Lock, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -7,13 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { LoadingScreen } from '@/components/LoadingScreen';
+import { safeNextPath } from '@/lib/navigation';
 import dotlingLogo from '@/assets/dotling-logo.jpg';
 
 type Mode = 'signin' | 'signup';
 
 const Auth = () => {
-  const { user, profile, loading, isConfigured, signIn, signUp } = useAuth();
+  const { user, profile, loading, profileLoading, isConfigured, signIn, signUp } = useAuth();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
   const [mode, setMode] = useState<Mode>('signin');
@@ -29,8 +32,22 @@ const Auth = () => {
 
   // Redirect already-signed-in users away from the auth screen.
   if (!loading && user) {
-    if (profile && !profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
-    const dest = (location.state as { from?: string } | null)?.from ?? '/app';
+    // Don't decide onboarding-vs-destination until the profile is known —
+    // right after sign-in there is a moment where it hasn't loaded yet.
+    if (!profile && profileLoading) return <LoadingScreen />;
+
+    // QR/deep-link flows arrive as /auth?next=…; in-app guards pass
+    // state.from. Both funnel to the same validated destination.
+    const dest =
+      safeNextPath(searchParams.get('next')) ??
+      safeNextPath((location.state as { from?: string } | null)?.from ?? null) ??
+      '/app';
+
+    // Missing profile (legacy account) or unfinished onboarding → onboarding,
+    // carrying the destination so it isn't lost after the final step.
+    if (!profile || !profile.onboarding_completed) {
+      return <Navigate to="/onboarding" replace state={{ next: dest }} />;
+    }
     return <Navigate to={dest} replace />;
   }
 

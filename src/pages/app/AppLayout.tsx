@@ -12,11 +12,16 @@ import { LoadingScreen } from '@/components/LoadingScreen';
  * onboarding are routed there first.
  */
 export function AppLayout() {
-  const { loading, user, profile } = useAuth();
+  const { loading, profileLoading, user, profile } = useAuth();
 
   if (loading) return <LoadingScreen />;
 
-  if (user && profile && !profile.onboarding_completed) {
+  // Signed in but profile not yet known — wait, don't misroute.
+  if (user && !profile && profileLoading) return <LoadingScreen />;
+
+  // Missing profile row (legacy account) or unfinished onboarding both route
+  // to onboarding, which creates/repairs the row on completion.
+  if (user && (!profile || !profile.onboarding_completed)) {
     return <Navigate to="/onboarding" replace />;
   }
 
