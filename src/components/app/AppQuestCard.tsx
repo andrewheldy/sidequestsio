@@ -3,6 +3,7 @@ import { Clock, Heart, MapPin, Zap } from 'lucide-react';
 import type { Quest } from '@/lib/quests';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import QuestImage from '@/components/QuestImage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useSignInPrompt } from '@/contexts/SignInPromptContext';
@@ -37,11 +38,11 @@ export function AppQuestCard({ quest }: { quest: Quest }) {
         className="glass-card hover-lift group cursor-pointer overflow-hidden"
       >
         <div className="relative h-40 overflow-hidden">
-          <img
+          <QuestImage
             src={quest.image}
             alt={quest.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            category={quest.category}
+            className="transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
           <Badge className="absolute left-3 top-3 bg-primary text-primary-foreground">

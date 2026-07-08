@@ -2,6 +2,26 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-07-07 — Image fallbacks + asset-candidate sourcing sheet (no DB writes)
+
+- Frontend: quest images can no longer render as broken `<img>` elements — matters because all 62
+  Miami quests import image-less until assets are approved. New shared
+  `src/components/QuestImage.tsx` (category-emoji gradient fallback, mirroring the QuestHero
+  treatment, plus `onError` swap for dead URLs) now backs `AppQuestCard` (Explore/Favorites) and
+  the marketing `QuestCard` (`/quests`); `BusinessAvatar` falls back to initials when a
+  `venues.logo_url` fails to load, not only when it is absent (stale "no logo_url column yet"
+  comment refreshed — 0014 is live).
+- New `npm run assets:candidates` (`scripts/generate-asset-candidates.ts`): joins
+  `quest_assets.csv` with `miami-crm.csv` and writes `data/generated/miami/asset_candidates.csv` —
+  one row per permission-safe sourcing lead (official_website ×124, official_instagram ×122,
+  royalty_free hero fallback ×62 = 308 rows covering all 124 missing assets). Offline and
+  deterministic: fetches nothing, downloads nothing, writes nowhere else;
+  `candidate_image_url`/`approved` are human-only columns. Approval workflow documented in
+  `docs/CRM_IMPORT_RUNBOOK.md` §10 (candidate → manual review → approved → user-run Storage
+  upload → CSV update → re-import).
+- Runbook §5 prerequisite note synced with reality (0014 verified applied live 2026-07-07,
+  evening gate audit). No Supabase writes; `miami-crm.csv` untouched.
+
 ## 2026-07-07 — Miami launch dataset generated from verified venue workbook (import NOT yet run)
 
 - Added the verified Miami venue workbook at `data/imports/miami/SideQuests_Venue_Database.xlsx`

@@ -29,7 +29,7 @@ you're doing.
 ### Layer 1 — Always read (before any meaningful work)
 - [`docs/PROJECT_CONSTITUTION.md`](docs/PROJECT_CONSTITUTION.md) — foundational principles.
 - [`docs/MASTER_CONTEXT.md`](docs/MASTER_CONTEXT.md) — product vision, MVP scope, user journey.
-- [`docs/SYSTEM_STATE.md`](docs/SYSTEM_STATE.md) — the verified current state of the deployed system.
+- [`docs/engineering/SYSTEM_STATE.md`](docs/enginerring/SYSTEM_STATE.md) — the verified current state of the deployed system.
 
 ### Layer 2 — Read when relevant
 **Product work**
@@ -51,10 +51,10 @@ you're doing.
 - [`docs/engineering/ANALYTICS_SPEC.md`](docs/engineering/ANALYTICS_SPEC.md)
 
 **Operational / current work**
-- [`docs/PRODUCTION_SPRINT_PLAN.md`](docs/PRODUCTION_SPRINT_PLAN.md) — evidence-tagged execution plan.
+- [`docs/engineering/PRODUCTION_SPRINT_PLAN.md`](docs/engineering/PRODUCTION_SPRINT_PLAN.md) — evidence-tagged execution plan.
 - [`docs/QUEST_CONTENT_IMPORT.md`](docs/QUEST_CONTENT_IMPORT.md) — quest content import workflow.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — planned work (if still current).
-- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — notable operational & code changes.
+- [`docs/engineering/ROADMAP.md`](docs/engineering/ROADMAP.md) — planned work (if still current).
+- [`docs/engineering/CHANGELOG.md`](docs/engineering/CHANGELOG.md) — notable operational & code changes.
 - [`docs/legal/`](docs/legal/) — canonical source for all legal/policy documents, rendered live at
   `/privacy`, `/terms`, `/community-guidelines`, `/cookies`, `/delete-account`, `/partner-terms`;
   see `docs/legal/README.md` for the versioning/rendering/consent-mapping process.
@@ -250,8 +250,8 @@ backend; the browser talks to it directly.
 - **One authoritative document per topic.** Update that document; do not copy the same fact into
   several files.
 - **Update docs when implementation intentionally changes.** Map the change to its owner:
-  - System/deployment reality → `docs/SYSTEM_STATE.md`
-  - Notable change (code or ops) → `docs/CHANGELOG.md`
+  - System/deployment reality → `docs/engineering/SYSTEM_STATE.md`
+  - Notable change (code or ops) → `docs/engineering/CHANGELOG.md`
   - A standing decision → `docs/DECISIONS.md` (append-only), or `PRODUCT_DECISION_LOG.md` /
     `ARCHITECTURE_DECISION_RECORD.md` for product/architecture decisions
   - Scope or priority shift → the roadmap

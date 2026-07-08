@@ -3,6 +3,7 @@ import { MapPin, Clock, Users, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Badge } from '@/components/ui/badge';
+import QuestImage from '@/components/QuestImage';
 
 interface QuestCardProps {
   title: string;
@@ -57,10 +58,11 @@ export function QuestCard({
       >
         {/* Image */}
         <div className="relative h-48 overflow-hidden">
-          <img
+          <QuestImage
             src={image}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            category={category}
+            className="transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
           <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">

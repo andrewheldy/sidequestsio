@@ -89,8 +89,8 @@ Any error anywhere fails the whole run before anything is written.
 ```bash
 # 0. Prerequisites (one-time per project):
 #    - supabase/migrations/0014_venue_business_profile.sql applied
-#      (verified NOT yet applied on live as of 2026-07-07 — run it first;
-#       the emitted SQL guards for this and aborts if missing)
+#      (verified APPLIED on live 2026-07-07, evening gate audit; the emitted
+#       SQL still guards for this and aborts if missing)
 #    - anon grants live (0009) — verified applied on 2026-07-07
 
 # 1. DRY RUN (default) — validates + prints the full plan; writes nothing
@@ -189,3 +189,50 @@ adapts to the schema; no schema changes were made:
   semantics make that a safe follow-up).
 - If human-readable quest URLs ever matter, add a real `slug` column +
   unique index; the importer's slugs would map onto it directly.
+
+## 10. Asset sourcing & approval workflow (hero images + venue logos)
+
+`data/generated/miami/quest_assets.csv` lists every missing launch asset
+(62 hero images → `quests.image_url`, 62 venue logos → `venues.logo_url`).
+Assets are sourced through a human-approval sheet — never scraped:
+
+```bash
+npm run assets:candidates   # writes data/generated/miami/asset_candidates.csv
+```
+
+The generator (`scripts/generate-asset-candidates.ts`) is offline and
+deterministic: it joins the asset manifest with the CRM workbook and emits one
+row per (asset × permission-safe sourcing lead) — the venue's own website, its
+official Instagram when the workbook has one, and, for hero images only, a
+royalty-free search fallback (a logo can only legitimately come from the venue
+itself). It never fetches a URL, never downloads an image, and never touches
+Supabase. `candidate_image_url` and `approved` start empty on every row — they
+are the human reviewer's columns.
+
+Pipeline — every step after generation is manual, by design:
+
+1. **candidate** — `npm run assets:candidates` (re-running overwrites the
+   sheet; do review work in a copy or spreadsheet, not in the generated file).
+2. **manual review** — per `quest_id` + `asset_type`, pick ONE winning row:
+   paste the exact image URL into `candidate_image_url` and set
+   `approved=yes`. Rights gates: `venue_owned_needs_permission` rows need the
+   venue's permission recorded (fold into partner onboarding);
+   `license_review_required` rows need the individual photo's license checked
+   for commercial use.
+3. **approved → upload to Supabase Storage** — download the approved files by
+   hand and upload them to a public storage bucket, then use the bucket
+   public URLs (don't hotlink venue sites — URLs rot and steal their
+   bandwidth). ⚠️ No quest-media bucket exists yet (live buckets `avatars`
+   and `proofs` are for user content) — creating one is a small user-run
+   migration/dashboard step before upload.
+4. **update the import CSV** — heroes: paste storage URLs into
+   `miami-crm.csv` → `hero_image_url` and re-run `import:crm` (§6 update
+   semantics make this safe before or after the main import). Logos:
+   `import:crm` has no logo column — apply them with the content importer
+   (`npm run import:quests`) using a CSV of `quest_id,profile_image_url`
+   (→ `venues.logo_url`; see `docs/QUEST_CONTENT_IMPORT.md`).
+
+Until an asset lands, the app degrades gracefully: quest cards and the quest
+hero render a category-gradient fallback and the business avatar renders
+initials (`src/components/QuestImage.tsx`,
+`src/components/app/quest-detail/{QuestHero,BusinessAvatar}.tsx`).

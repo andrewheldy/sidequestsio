@@ -1,13 +1,13 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
  * Circular business logo that floats over the quest hero image — the "profile
  * picture" of the real-world adventure. Falls back to the business initials on
- * a light disc when no logo image is available.
+ * a light disc when no logo image is available or the logo URL fails to load.
  *
- * Note: there is no `logo_url` on the quest/partner/venue schema yet, so callers
- * currently only pass `name`. The optional `src` is wired now so the second
- * pass (DB alignment) can drop a real logo in with zero UI changes.
+ * `src` comes from `venues.logo_url` (migration 0014); most venues have no
+ * logo yet, so the initials fallback is the common case at launch.
  */
 export function BusinessAvatar({
   name,
@@ -19,6 +19,7 @@ export function BusinessAvatar({
   className?: string;
 }) {
   const initials = deriveInitials(name);
+  const [failed, setFailed] = useState(false);
 
   return (
     <div
@@ -27,8 +28,13 @@ export function BusinessAvatar({
         className,
       )}
     >
-      {src ? (
-        <img src={src} alt={name ?? "Business logo"} className="h-full w-full object-cover" />
+      {src && !failed ? (
+        <img
+          src={src}
+          alt={name ?? "Business logo"}
+          onError={() => setFailed(true)}
+          className="h-full w-full object-cover"
+        />
       ) : (
         <span className="px-1 text-center font-poppins font-bold uppercase leading-none tracking-tight text-charcoal">
           {initials}
