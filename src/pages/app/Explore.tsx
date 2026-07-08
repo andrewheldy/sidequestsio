@@ -1,20 +1,22 @@
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { QUEST_CATEGORIES } from '@/lib/quests';
-import { DEMO_QUESTS } from '@/data/demo/demoQuests';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import AppQuestCard from '@/components/app/AppQuestCard';
+import { Loading, EmptyState } from '@/components/app/ui';
+import { useActiveQuests } from '@/hooks/useActiveQuests';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Explore = () => {
   const { profile } = useAuth();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('All');
+  const { quests: allQuests, isLoading, isError } = useActiveQuests();
 
   const quests = useMemo(
     () =>
-      DEMO_QUESTS.filter((q) => {
+      allQuests.filter((q) => {
         const matchesCategory = category === 'All' || q.category === category;
         const q_ = query.toLowerCase();
         const matchesQuery =
@@ -24,7 +26,7 @@ const Explore = () => {
           (q.address ?? '').toLowerCase().includes(q_);
         return matchesCategory && matchesQuery;
       }),
-    [query, category],
+    [allQuests, query, category],
   );
 
   return (
@@ -63,7 +65,14 @@ const Explore = () => {
         ))}
       </div>
 
-      {quests.length > 0 ? (
+      {isLoading ? (
+        <Loading />
+      ) : isError ? (
+        <EmptyState
+          title="Couldn't load quests"
+          description="We're having trouble reaching the server. Please try again shortly."
+        />
+      ) : quests.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
           {quests.map((q) => (
             <AppQuestCard key={q.id} quest={q} />

@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import CTASection from '@/components/CTASection';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { NearbyQuestsMapSection } from '@/components/map';
-import { DEMO_QUESTS } from '@/data/demo/demoQuests';
+import { Loading, EmptyState } from '@/components/app/ui';
+import { useActiveQuests } from '@/hooks/useActiveQuests';
 
 const CATEGORY_FILTERS = ['All', 'Foodie', 'Culture', 'Nightlife', 'Hidden Gems', 'Wellness', 'Outdoor', 'Community'] as const;
 type CategoryFilter = typeof CATEGORY_FILTERS[number];
@@ -17,15 +18,16 @@ const Quests = () => {
   const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const { quests, isLoading, isError } = useActiveQuests();
 
-  const filteredQuests = DEMO_QUESTS.filter((quest) => {
+  const filteredQuests = quests.filter((quest) => {
     const matchesCategory = activeCategory === 'All' || quest.category === activeCategory;
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       !q ||
       quest.title.toLowerCase().includes(q) ||
       quest.neighborhood.toLowerCase().includes(q) ||
-      quest.address.toLowerCase().includes(q);
+      (quest.address ?? '').toLowerCase().includes(q);
     return matchesCategory && matchesSearch;
   });
 
@@ -64,7 +66,7 @@ const Quests = () => {
         <div className="container">
           <AnimatedSection>
             <NearbyQuestsMapSection
-              quests={DEMO_QUESTS}
+              quests={quests}
               title="Explore the Map"
               subtitle="Quests are live across Miami. Tap any pin to preview — use ⊕ to find ones near you."
               height="420px"
@@ -99,27 +101,37 @@ const Quests = () => {
           </AnimatedSection>
 
           {/* Quest Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredQuests.map((quest, index) => (
-              <QuestCard
-                key={quest.id}
-                questId={quest.id}
-                title={quest.title}
-                location={quest.address}
-                category={quest.category}
-                concept={quest.concept}
-                xp={quest.xp}
-                physicalReward={quest.physicalReward}
-                image={quest.image}
-                delay={index * 80}
-              />
-            ))}
-          </div>
+          {isLoading ? (
+            <Loading />
+          ) : isError ? (
+            <EmptyState
+              title="Couldn't load quests"
+              description="We're having trouble reaching the server. Please try again shortly."
+            />
+          ) : (
+            <>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredQuests.map((quest, index) => (
+                  <QuestCard
+                    key={quest.id}
+                    questId={quest.id}
+                    title={quest.title}
+                    location={quest.address ?? quest.neighborhood}
+                    category={quest.category}
+                    concept={quest.description ?? ''}
+                    xp={quest.xp}
+                    image={quest.image}
+                    delay={index * 80}
+                  />
+                ))}
+              </div>
 
-          {filteredQuests.length === 0 && (
-            <div className="py-20 text-center">
-              <p className="text-lg text-muted-foreground">{t.quests.noResults}</p>
-            </div>
+              {filteredQuests.length === 0 && (
+                <div className="py-20 text-center">
+                  <p className="text-lg text-muted-foreground">{t.quests.noResults}</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

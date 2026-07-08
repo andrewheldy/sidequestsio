@@ -2,6 +2,35 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-07-07 — Miami launch dataset generated from verified venue workbook (import NOT yet run)
+
+- Added the verified Miami venue workbook at `data/imports/miami/SideQuests_Venue_Database.xlsx`
+  (immutable canonical source; sha256 `7848b68b…59520`) and generated the full import-ready
+  dataset into `data/generated/miami/`: `miami-crm.csv` (the `npm run import:crm` input, 64 rows),
+  plus review artifacts `partners.csv`/`venues.csv`/`quests.csv` (62 each, deterministic UUIDs
+  matching the importer), `quest_assets.csv` (124 missing hero/logo assets with sourcing leads),
+  and `validation_report.md` (full accounting, data-quality findings, gate checklist).
+- Quest content: 62 hand-written quests grounded only in workbook-verified facts per
+  `QUEST_DESIGN_GUIDE.md` — tiers exactly easy 50/25 (30) and medium 150/75 (32), all 8 categories
+  used, no purchases/staff-interaction required. 2 rows held back as `manual_review`
+  (Miami Supercar Rooms: members-only; Beachwalk: no address/coords by the workbook's own rule).
+  35 missing coordinates resolved via Nominatim geocoding (28 high / 5 medium confidence,
+  provenance in `venues.csv`); nothing was fabricated for the workbook's empty columns.
+- Dry run verified: 64 parsed, 62 eligible, 2 skipped, **0 errors**; all 122 warnings are the two
+  expected missing-hero/missing-hours classes. **No database writes** — production import stays
+  gated behind `0014_venue_business_profile.sql` + explicit approval per the validation report.
+
+## 2026-07-07 — Demo data removed from production surfaces (Explore/Favorites//quests → Supabase)
+
+- `src/pages/app/Explore.tsx`, `src/pages/app/Favorites.tsx` and the public `src/pages/Quests.tsx` now read live repository data via a new shared hook `src/hooks/useActiveQuests.ts` (one cached `['active-quests']` query → `listQuests({status:'active'})` → `questsWithContextToFlatQuests`), replacing the hardcoded `DEMO_QUESTS`/`MIAMI_QUESTS` catalogues. Loading/error/empty states added using the existing `Loading`/`EmptyState` components; search, category chips, and card visuals unchanged.
+- Deleted the orphaned demo modules: `src/data/demo/demoQuests.ts`, `src/data/miami/{toQuest.ts,index.ts,funkyActions.json}`, and the dead static `QUESTS` catalogue + `getQuestById` in `src/lib/quests.ts` (the flat `Quest` type and `QUEST_CATEGORIES` remain — they're the render contract). The `src/data/miami/miamiQuestLocations*.json` files stay (used by the `geocode:miami` scripts); `src/data/mock/` stays (dev-only `MockRepository`, `isDemoMode = import.meta.env.DEV` by design). Flat `Quest` gained optional `description` (mapped from `quests.description`) so the public quest cards keep their concept line.
+- Verified: typecheck, lint (touched files), production build all clean; drove the built app against live Supabase — `/quests` renders all 9 live quests (cards + map pins) and `/app/explore` renders live data; `/app/favorites` correctly guards to `/auth`; zero console errors. Remaining placeholder surfaces: `CheckIn.tsx` (deliberate placeholder UX) and the dev-only mock repository.
+
+## 2026-07-07 — CRM launch-content import pipeline (Miami workbook → production)
+
+- Added `scripts/import-crm.ts` (`npm run import:crm -- <csv>`): reusable importer that turns a verified flat CRM workbook into partners → venues → quests → qr_codes in dependency order. Single column→field mapping object; eligibility filtering on `import_decision`/`business_status`/`verification_status` (research/QA columns are never persisted — fail-safe refusal when no positive signal); URL/coordinate/enum/integer/required/cross-row validation; deterministic UUIDv5 identity from slugs (idempotent upserts, no duplicates, status is insert-only so manual pauses survive re-imports). Dry-run by default; `--emit-sql` writes import + `.verify.sql` + `.rollback.sql` (archive-based, non-destructive) for the SQL-editor workflow; `--apply` uses the service-role key via PostgREST. Template: `scripts/templates/miami-crm.template.csv`; runbook incl. schema-discrepancy log: `docs/CRM_IMPORT_RUNBOOK.md`. No schema or app-code changes.
+- Verified live (read-only MCP, 2026-07-07): anon `SELECT` grants are now live on `quests`/`venues`/`partners`/`qr_codes` — the `0009_grants.sql` blocker is resolved. `0014_venue_business_profile.sql` is verified **not yet applied** on live (`venues` still has only its 8 base columns) — it must be run before any CRM import; the emitted import SQL guards for it and aborts if missing.
+
 ## 2026-07-07 — Legal, compliance & consent foundation (migration authored, not yet applied)
 
 - Added `docs/legal/` — initial legal drafts (AI-assisted, verified against the live product; flagged for attorney review before relying on them at scale) for Privacy Policy, Terms of Service, Community Guidelines, Cookie Policy, Delete Account, and Partner Terms & Conditions, plus `Legal-Version-History.md` (public changelog) and `README.md` (engineering reference for versioning/rendering/consent-mapping — see that file for the full system explanation).

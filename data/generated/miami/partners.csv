@@ -1,0 +1,63 @@
+partner_id,name,type,status,contact_email
+b7a5c65e-0674-54c8-9e2f-c17fe6402861,Panther Coffee,venue,active,info@panthercoffee.com
+17fd3975-dc00-523d-be6e-6eee84d5714d,Vice City Bean,venue,active,hello@vicecitybean.com
+ec81a30a-4798-5e3f-ab15-130b8a9504d3,The Salty Donut,venue,active,media@saltydonut.com
+38947068-093a-5074-8308-fb73e9368cb7,Threefold Cafe,venue,active,info@threefoldcafe.com
+f1b3973c-4035-58cb-a3b2-6a1326842801,Imperial Moto,venue,active,hello@imperialmoto.com
+2f64ad78-af59-54c1-897e-9ae076b0fbeb,Brewing Buddha Cafe & Arthouse,venue,active,brewingbuddha@gmail.com
+8b5e8dfd-4d3a-5e78-b0db-a018c6ba2068,Sweat Records,venue,active,info@sweatrecordsmiami.com
+410e40e4-eaec-57a2-948f-5a54e18284f0,Books & Books,venue,active,events@booksandbooks.com
+013760c2-e7bc-5bc6-8226-a0887e82c453,Rosetta Bakery,venue,active,info@rosettabakery.com
+fed2dca2-9985-578d-bbda-5e2c59018af9,Under the Mango Tree,venue,active,hello@mangotreemiami.com
+34dbd889-65bc-584c-84e8-4ccd262de7da,Dasher & Crank,venue,active,info@dasherandcrank.com
+63bbc92f-9faa-55d5-b68a-0ac653f0ad1c,Midorie Miami,venue,active,hello@midoriemiami.com
+042a4a79-469b-55b5-b06a-ec5d012aa167,The Corner,venue,active,info@thecornermiami.com
+a29163be-6b51-5842-9d44-b0d0deb646f6,Miam Café,venue,active,info@miamcafe.com
+6c739246-f141-592a-b037-fa7e59f617cc,El Carajo International Tapas & Wine,venue,active,info@el-carajo.com
+0c17f4b2-fe1e-5e95-8790-628c66f31a5a,Pasión del Cielo Coffee,venue,active,info@pasiondelcielo.com
+94351bfa-6108-526e-afc3-cdf02a54a8a2,Wynwood Walls,venue,active,info@thewynwoodwalls.com
+499e378f-6144-5a1a-878d-b9c8193b3544,Pérez Art Museum Miami,venue,active,info@pamm.org
+df3058d3-c3a4-5322-bdf2-2c5ed6bb64f8,"Institute of Contemporary Art, Miami",venue,active,hello@icamiami.org
+617044a3-282a-5211-bf44-49065ab56969,Bachour,venue,active,info@antoniobachour.com
+5474f431-39f5-5368-ae3c-087317e8bafb,The Temple House,venue,active,info@thetemplehouse.com
+856c13bf-067d-51ad-b3d0-90a47254fead,E11EVEN Miami,venue,active,info@11miami.com
+7822bca9-8c50-549d-8a93-a8cee544a19d,Sugar,venue,active,sugar@easthotels.com
+ab1faa46-f085-5e74-96b1-13091b98a1e6,Lagniappe House,venue,active,info@lagniappehouse.com
+7fe7ecdd-5738-50cf-b188-9dd31c746ba4,Dante's HiFi,venue,active,info@danteshifi.com
+4419365c-e6be-59ab-b81a-8c46e679f909,Superblue Miami,venue,active,info@superblue.com
+f34c4834-f4f2-558a-b365-02eb6494393c,"The Standard Spa, Miami Beach",venue,active,spa.miami@standardhotels.com
+8397b449-800f-5c57-b5b3-c492219c5e57,Komodo Miami,venue,active,info@groothospitality.com
+b7dec364-dff7-5da4-a66c-b8b127afe2dc,Joia Beach,venue,active,info@joiabeachmiami.com
+af6b0db8-0e00-5f33-8e85-870f037269a4,Sexy Fish Miami,venue,active,info@sexyfishmiami.com
+b3e6fae9-38f7-52e0-a4c3-17d2e88ef2f9,The Bass,venue,active,info@thebass.org
+d7487d41-d93b-5ef5-ba8a-381866d6b5a0,Ball & Chain,venue,active,info@ballandchainmiami.com
+919575e4-6804-5009-88a5-7deb8ee68e11,Rubell Museum,venue,active,info@rubellmuseum.org
+cc5bcf3c-8768-582d-9857-4b8bd0521b32,Brickell City Centre,venue,active,info@brickellcitycentre.com
+a8368acf-f984-5d35-bd3a-c283875d5706,Bayside Marketplace,venue,active,info@baysidemarketplace.com
+8723bb30-c43e-5dd1-9c7b-a55541c17b41,1-800-Lucky,venue,active,info@1-800-lucky.com
+fd491c98-f9f9-55df-bdd2-524064c0cf50,Lummus Park,venue,active,parks@miamibeachfl.gov
+7ccaef07-9288-5d31-8b40-0061bc3ddf10,Miami Design District,venue,active,info@miamidesigndistrict.net
+636d6c24-dd1c-57b7-9b79-94481e239b2b,Miami Worldcenter,venue,active,info@miamiworldcenter.com
+a20285f9-cb39-5da1-8882-a597e5158d0c,Miracle Mile,venue,active,info@coralgableschamber.org
+5e937cc3-c9da-52d6-9aa4-833b48cd20be,Kaseya Center (AT&T East Plaza),venue,active,info@kaseyacenter.com
+dce8d898-6e8d-554a-9922-17d2c1326c0e,Jungle Island,venue,active,info@jungleisland.com
+06b8dc6d-d62d-5853-87de-600cf264d3d2,Giralda Plaza,venue,active,info@giraldaplaza.com
+208abc78-1331-5ded-a5d6-a252c9974594,Jungle Plaza,venue,active,events@miamidesigndistrict.net
+0e518098-b8c2-5a78-af0f-1b4a38cb4d45,Citizens MiamiCentral,venue,active,info@gobrightline.com
+a2bdfb29-2728-54f6-8142-de371f679c40,Maurice A. Ferré Park,venue,active,parks@miamigov.com
+833529ce-a8c6-5ed7-8bf4-4fe76647d01d,Española Way,venue,active,info@visitespanolaway.com
+0c3a609b-ca93-5a1f-bc05-cbe8f0ebb0dc,Regatta Harbour,venue,active,info@regattaharbour.com
+a116f926-5af7-523b-a23c-7b0131e64f83,Government Center Station,venue,active,transit@miamidade.gov
+33a05f27-fd32-5bff-9c25-4d95cf230f25,Tea Room,venue,active,tearoom@easthotels.com
+36c08d29-1d66-5b07-922e-847467d4fa43,The Kampong,venue,active,kampong@ntbg.org
+ae760d8b-3bca-5a36-bc31-a602bad4b7d4,Dale Zine,venue,active,hello@dalezine.com
+d25ce94f-cf6b-5252-af8c-6e8e5526f06a,Naomi's Garden Restaurant & Lounge,venue,active,naomisgardencafe@gmail.com
+e3910d7b-7879-5b99-91f5-b802abb6f486,Broken Shaker,venue,active,shaker.miami@freehandhotels.com
+c52d5929-de1b-5d2c-bc9d-84564c78a487,Mac's Club Deuce,venue,active,macsclubdeuce@gmail.com
+eae8f3ad-d463-5c4a-95a1-4bdb0aca1474,Plant the Future,venue,active,info@plantthefuture.com
+111a4bb7-ae6b-574d-b49b-f742f1d7a1b4,Coral Gables Congregational United Church of Christ,venue,active,info@gablesucc.org
+a0e58b54-b8ed-5125-a4e8-387091622757,Over Under,venue,active,hello@overundermiami.com
+7b017967-7fa7-5e64-b5b4-74f32f680a17,Lost Boy & Co.,venue,active,info@lostboyandco.com
+54a6f74c-377f-5032-a65f-022be3d507fd,Fairchild Tropical Botanic Garden,venue,active,info@fairchildgarden.org
+3b919211-a15b-5f8e-8280-4abffe96d876,Bodega Taqueria y Tequila,venue,active,info@bodegataqueria.com
+05815fa9-244a-54eb-8b42-8aaacfa1a829,Miami Circle at Brickell Point,venue,active,parks@miamigov.com

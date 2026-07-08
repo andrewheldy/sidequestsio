@@ -54,6 +54,7 @@ export function questWithContextToFlatQuest(q: QuestWithContext): FlatQuest | nu
     lng,
     address: venue?.address || undefined,
     venueName: venue?.name || undefined,
+    description: q.description || undefined,
     funky_action: q.funky_action,
     proof_method: q.proof_method,
     social_share_prompt: q.social_share_prompt,

@@ -1,5 +1,9 @@
 # Quest Content Import — Sprint 2 (Quest Detail data alignment)
 
+> **Creating new businesses/quests from a CRM workbook?** Use the full
+> pipeline instead: `npm run import:crm` — see `docs/CRM_IMPORT_RUNBOOK.md`.
+> This document covers updating content on *existing* quests by UUID.
+
 Goal: populate the 9 live Supabase quests with the content the redesigned
 Quest Detail page (commit `72fb929`) renders, using one CSV maintained in
 Excel/Sheets. UI reads everything through the existing repository — no query

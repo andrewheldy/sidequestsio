@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-import { MIAMI_QUESTS } from '@/data/miami/toQuest';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { Button } from '@/components/ui/button';
 import AppQuestCard from '@/components/app/AppQuestCard';
+import { Loading, EmptyState } from '@/components/app/ui';
+import { useActiveQuests } from '@/hooks/useActiveQuests';
 
 const Favorites = () => {
   const { favorites } = useFavorites();
-  const saved = MIAMI_QUESTS.filter((q) => favorites.includes(q.id));
+  const { quests, isLoading, isError } = useActiveQuests();
+  const saved = quests.filter((q) => favorites.includes(q.id));
 
   return (
     <div className="space-y-5">
@@ -16,7 +18,14 @@ const Favorites = () => {
         <p className="text-sm text-muted-foreground">Quests you've saved for later.</p>
       </header>
 
-      {saved.length > 0 ? (
+      {isLoading ? (
+        <Loading />
+      ) : isError ? (
+        <EmptyState
+          title="Couldn't load your favorites"
+          description="We're having trouble reaching the server. Please try again shortly."
+        />
+      ) : saved.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
           {saved.map((q) => (
             <AppQuestCard key={q.id} quest={q} />
