@@ -43,6 +43,7 @@ import Settings from "./pages/app/Settings";
 import QuestBrowser from "./pages/app/QuestBrowser";
 import AppCommunityNotes from "./pages/app/AppCommunityNotes";
 import CheckIn from "./pages/app/CheckIn";
+import ReadinessBrief from "./pages/ReadinessBrief";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,7 @@ const App = () => (
                       <Route path="/cookie-preferences" element={<CookiePreferences />} />
                       <Route path="/delete-account" element={<DeleteAccountPolicy />} />
                       <Route path="/partner-terms" element={<PartnerTerms />} />
+                      <Route path="/readiness" element={<ReadinessBrief />} />
 
                       {/* Auth + onboarding */}
                       <Route path="/auth" element={<Auth />} />

@@ -1,0 +1,115 @@
+{
+  "spec_id": "readiness-menu-disclosure",
+  "date": "2026-08-12",
+  "owner": "Sidequests",
+  "brief_ref": "docs/design/readiness/DESIGN_BRIEF.md",
+  "registry_entries_used": ["motion-intelligence", "motion"],
+  "objective": "Show and remove the compact section menu without losing the relationship to the rightmost hamburger trigger or trapping keyboard focus.",
+  "semantic_purpose": "reveal-relationship",
+  "surface": "editorial",
+  "trigger": {
+    "interaction": "click-or-tap",
+    "frequency": "occasional",
+    "input_methods": ["pointer", "touch", "keyboard", "assistive-technology"]
+  },
+  "elements": [
+    {
+      "target": "#readiness-menu",
+      "properties": ["opacity", "transform: translateY"],
+      "role": "container"
+    }
+  ],
+  "spatial_relationship": "The menu appears six pixels below its final position directly beneath the rightmost trigger and exits toward that trigger.",
+  "engine": "motion-react",
+  "selection_rationale": {
+    "escalation_reason": "The menu must animate while React removes it from the DOM, so AnimatePresence supplies the unmount lifecycle that a plain CSS transition cannot own reliably.",
+    "rejected_alternatives": [
+      {
+        "engine": "none",
+        "why_not": "Pointer users benefit from a brief relationship cue between the trigger and the detached menu surface."
+      },
+      {
+        "engine": "css-transition",
+        "why_not": "React unmounts the closed menu, so an authored exit transition would need additional retained-state lifecycle code."
+      },
+      {
+        "engine": "waapi",
+        "why_not": "Imperative animation and cancellation would duplicate lifecycle behavior already provided by AnimatePresence."
+      }
+    ],
+    "new_dependency": false
+  },
+  "sequence": [
+    {
+      "step": 1,
+      "target": "#readiness-menu",
+      "change": "pointer path: opacity 0 to 1 and translateY -6px to 0px; keyboard path: instant final state"
+    }
+  ],
+  "timing": {
+    "duration_ms": 180,
+    "delay_ms": 0,
+    "derivation": "The surface travels only six pixels and responds to a direct control, so it must complete well below 300ms and never delay the committed menu state."
+  },
+  "easing": {
+    "kind": "cubic-bezier",
+    "curve": "cubic-bezier(0.22, 0.78, 0.22, 1)",
+    "exit_curve": "cubic-bezier(0.4, 0, 1, 1)",
+    "character": "Fast and precise with no bounce, preserving the menu's utilitarian reading behavior."
+  },
+  "interruption": {
+    "behavior": "reverse-from-current",
+    "notes": "A single keyed AnimatePresence child owns the current menu surface and retargets on repeated pointer toggles."
+  },
+  "responsive": {
+    "mobile": "The panel width is capped to the viewport and travel remains six pixels.",
+    "tablet": "The panel remains right aligned below the trigger.",
+    "desktop": "The panel remains right aligned below the trigger.",
+    "orientation_or_input_notes": "Keyboard activation suppresses motion and moves focus to the first menu link; pointer activation leaves focus on the trigger."
+  },
+  "reduced_motion": {
+    "strategy": "instant-state-change",
+    "end_state_preserved": true,
+    "implementation": "MotionConfig reducedMotion user and the menuMotion guard set the transition duration to one millisecond.",
+    "vestibular_review": "Only a six-pixel local translation exists; reduced motion and keyboard activation remove it completely."
+  },
+  "keyboard_and_focus": {
+    "runs_on_keyboard_trigger": false,
+    "focus_behavior": "Keyboard open focuses the first section link; Escape closes the menu and returns visible focus to the hamburger trigger."
+  },
+  "ssr": {
+    "renders_on_server": false,
+    "hydration_notes": "The standalone Vite site is client-rendered; the menu is closed in the initial render and therefore has no pre-animation flash.",
+    "client_boundary": "ReadinessBrief"
+  },
+  "cleanup": {
+    "on_unmount": "AnimatePresence and Motion cancel the active menu animation when the component unmounts.",
+    "listeners_and_observers": "The effect registers Escape and outside-pointer listeners only while open, then removes both in the useEffect cleanup.",
+    "route_change_notes": "The standalone site has no client routes; section-link activation closes the menu before native anchor navigation."
+  },
+  "performance_budget": {
+    "compositor_only": true,
+    "target_fps": 60,
+    "cls_contribution": "None because the panel is absolutely positioned outside document flow.",
+    "inp_notes": "React state commits before the animation; no measurement or awaited work runs in the click handler.",
+    "notes": "The menu reuses the existing Framer dependency and animates only one small compositor layer."
+  },
+  "verification": {
+    "method": "playwright-script",
+    "required_checks": ["RM-1", "RM-2", "A11Y-1", "A11Y-2", "A11Y-4", "PERF-1", "CON-1", "VP-1", "VP-2", "VP-3", "OVF-1", "CLS-1", "INT-1", "INT-2", "CLEAN-1", "SSR-1"],
+    "viewports": ["320x812", "375x812", "768x1024", "1440x900"],
+    "evidence_path": "docs/design/readiness/VERIFICATION.md"
+  },
+  "acceptance_criteria": [
+    "The hamburger is the rightmost control at every tested viewport.",
+    "Pointer open and close complete within 180 milliseconds without a visual jump.",
+    "Keyboard open is instant and places focus on the first section link.",
+    "Escape closes the menu and returns focus to the hamburger button.",
+    "Ten rapid toggles leave exactly one correct open or closed state."
+  ],
+  "expected_failure_modes": [
+    "Focus remains on a removed menu link after Escape.",
+    "Rapid toggles create duplicate menu panels.",
+    "The right-aligned panel causes horizontal overflow at 320 pixels."
+  ]
+}

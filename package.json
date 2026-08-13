@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:readiness": "vite build --config vite.readiness.config.ts && node scripts/package-readiness-export.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -52,6 +53,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^13.1.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
     "mapbox-gl": "^3.24.0",

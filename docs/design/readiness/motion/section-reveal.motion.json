@@ -1,0 +1,117 @@
+{
+  "spec_id": "readiness-section-reveal",
+  "date": "2026-08-12",
+  "owner": "Sidequests",
+  "brief_ref": "docs/design/readiness/DESIGN_BRIEF.md",
+  "registry_entries_used": ["motion-intelligence", "motion"],
+  "objective": "Help readers retain their place while long-form audit sections enter the viewport during a normal document scroll.",
+  "semantic_purpose": "orient",
+  "surface": "editorial",
+  "trigger": {
+    "interaction": "scroll",
+    "frequency": "occasional",
+    "input_methods": ["pointer", "touch", "keyboard", "assistive-technology"]
+  },
+  "elements": [
+    {
+      "target": "Reveal component wrappers below the hero",
+      "properties": ["opacity", "transform: translateY"],
+      "role": "container"
+    }
+  ],
+  "spatial_relationship": "Content begins twelve pixels below its reserved final position and settles in the document flow.",
+  "engine": "motion-react",
+  "selection_rationale": {
+    "escalation_reason": "The product owner explicitly requires Framer scroll animation for this deliverable; the effect stays inside the already selected React motion layer and does not introduce a second engine.",
+    "rejected_alternatives": [
+      {
+        "engine": "none",
+        "why_not": "It would not meet the explicit request for a Framer-animated scroll experience."
+      },
+      {
+        "engine": "css-transition",
+        "why_not": "It still needs visibility lifecycle state and would duplicate the motion layer already required by the deliverable."
+      },
+      {
+        "engine": "waapi",
+        "why_not": "It would create a second imperative lifecycle path for an effect already owned by the React component tree."
+      }
+    ],
+    "new_dependency": true
+  },
+  "sequence": [
+    {
+      "step": 1,
+      "target": "Reveal component wrappers below the hero",
+      "change": "opacity 0.01 to 1; translateY 12px to 0px"
+    }
+  ],
+  "timing": {
+    "duration_ms": 360,
+    "delay_ms": 0,
+    "stagger_ms": 0,
+    "derivation": "The travel distance is only twelve pixels and the content is read once, so 360ms provides orientation without delaying comprehension or making every block feel staged."
+  },
+  "easing": {
+    "kind": "cubic-bezier",
+    "curve": "cubic-bezier(0.22, 0.78, 0.22, 1)",
+    "exit_curve": "cubic-bezier(0.4, 0, 1, 1)",
+    "character": "Quiet deceleration that feels editorial and controlled rather than springy or decorative."
+  },
+  "interruption": {
+    "behavior": "cancel-and-snap",
+    "notes": "Viewport animations run once; rapid scrolling may cancel an unseen entrance while the readable final state is retained."
+  },
+  "responsive": {
+    "mobile": "Use the same twelve-pixel maximum travel with no viewport-relative distance.",
+    "tablet": "Use the same reserved-space opacity and transform effect.",
+    "desktop": "Use the same reserved-space opacity and transform effect.",
+    "orientation_or_input_notes": "No hover behavior or scroll interception is used; native touch and keyboard scrolling remain intact."
+  },
+  "reduced_motion": {
+    "strategy": "opacity-only",
+    "end_state_preserved": true,
+    "implementation": "MotionConfig reducedMotion user removes transforms, while useReducedMotion selects a 120ms opacity-only state.",
+    "vestibular_review": "No parallax, zoom, spin, scroll hijacking or large-area travel is present; the reduced branch removes all translation."
+  },
+  "keyboard_and_focus": {
+    "runs_on_keyboard_trigger": false,
+    "focus_behavior": "The wrappers never take or move focus, and focus indicators remain visible and outside the animated properties."
+  },
+  "ssr": {
+    "renders_on_server": false,
+    "hydration_notes": "The standalone Vite build is client-rendered; the hero is not wrapped in Reveal and remains visible before any below-fold effect begins.",
+    "client_boundary": "ReadinessBrief"
+  },
+  "cleanup": {
+    "on_unmount": "Motion owns and cancels its viewport animations when React unmounts each component.",
+    "listeners_and_observers": "Motion owns the viewport observer and scroll subscription; no manual listener or observer is created by Reveal.",
+    "route_change_notes": "The standalone site has no client-side routes; the main app route unmounts the page normally."
+  },
+  "performance_budget": {
+    "compositor_only": true,
+    "added_bytes_gz": 0,
+    "target_fps": 45,
+    "cls_contribution": "None expected because every wrapper reserves its final document space and only opacity and transform animate.",
+    "notes": "Framer Motion was already added for the original deliverable; the standalone bundle delta is measured in the verification report."
+  },
+  "verification": {
+    "method": "playwright-script",
+    "required_checks": ["RM-1", "RM-2", "A11Y-1", "A11Y-2", "PERF-1", "CON-1", "VP-1", "VP-2", "VP-3", "OVF-1", "CLS-1", "SCR-1", "SCR-2", "SCR-3", "CLEAN-1", "SSR-1"],
+    "viewports": ["320x812", "375x812", "768x1024", "1440x900"],
+    "evidence_path": "docs/design/readiness/VERIFICATION.md"
+  },
+  "acceptance_criteria": [
+    "Above-the-fold hero text is visible immediately on every cold load.",
+    "Every below-fold Reveal reaches opacity one after entering the viewport.",
+    "Reduced motion removes translateY while preserving every content end state.",
+    "No viewport from 320 to 1440 pixels shows horizontal document overflow.",
+    "No new console errors or animation-related warnings occur during five reload and navigation cycles."
+  ],
+  "expected_failure_modes": [
+    "Below-fold content remains near-transparent when reduced motion is enabled.",
+    "Large groups reveal together and create a visible frame drop on mobile.",
+    "A fixed top bar overlaps an anchored heading at narrow widths."
+  ],
+  "notes": "The user-required Framer layer is a documented exception to the lowest-engine preference. No smooth-scroll library is enabled."
+}

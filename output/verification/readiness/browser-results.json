@@ -1,0 +1,244 @@
+{
+  "url": "http://localhost:4174/",
+  "timestamp": "2026-08-12T07:13:13.520Z",
+  "checks": [
+    {
+      "id": "VP-320x812-content",
+      "pass": true,
+      "detail": "10477 visible text characters"
+    },
+    {
+      "id": "OVF-320x812",
+      "pass": true,
+      "detail": "{\"scrollWidth\":320,\"innerWidth\":320}"
+    },
+    {
+      "id": "THEME-320x812-default",
+      "pass": true,
+      "detail": "default theme is light"
+    },
+    {
+      "id": "MENU-320x812-position",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "TARGET-320x812",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "A11Y-320x812-semantics",
+      "pass": true,
+      "detail": "{\"main\":1,\"h1\":1,\"unnamedButtons\":0,\"duplicateIds\":[],\"emptyLinks\":0}"
+    },
+    {
+      "id": "CONTRAST-320x812-primary",
+      "pass": true,
+      "detail": "{\"color\":\"rgb(255, 253, 248)\",\"background\":\"rgb(13, 19, 33)\"}"
+    },
+    {
+      "id": "VP-375x812-content",
+      "pass": true,
+      "detail": "10477 visible text characters"
+    },
+    {
+      "id": "OVF-375x812",
+      "pass": true,
+      "detail": "{\"scrollWidth\":375,\"innerWidth\":375}"
+    },
+    {
+      "id": "THEME-375x812-default",
+      "pass": true,
+      "detail": "default theme is light"
+    },
+    {
+      "id": "MENU-375x812-position",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "TARGET-375x812",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "A11Y-375x812-semantics",
+      "pass": true,
+      "detail": "{\"main\":1,\"h1\":1,\"unnamedButtons\":0,\"duplicateIds\":[],\"emptyLinks\":0}"
+    },
+    {
+      "id": "CONTRAST-375x812-primary",
+      "pass": true,
+      "detail": "{\"color\":\"rgb(255, 253, 248)\",\"background\":\"rgb(13, 19, 33)\"}"
+    },
+    {
+      "id": "VP-768x1024-content",
+      "pass": true,
+      "detail": "10477 visible text characters"
+    },
+    {
+      "id": "OVF-768x1024",
+      "pass": true,
+      "detail": "{\"scrollWidth\":768,\"innerWidth\":768}"
+    },
+    {
+      "id": "THEME-768x1024-default",
+      "pass": true,
+      "detail": "default theme is light"
+    },
+    {
+      "id": "MENU-768x1024-position",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "TARGET-768x1024",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "A11Y-768x1024-semantics",
+      "pass": true,
+      "detail": "{\"main\":1,\"h1\":1,\"unnamedButtons\":0,\"duplicateIds\":[],\"emptyLinks\":0}"
+    },
+    {
+      "id": "CONTRAST-768x1024-primary",
+      "pass": true,
+      "detail": "{\"color\":\"rgb(255, 253, 248)\",\"background\":\"rgb(13, 19, 33)\"}"
+    },
+    {
+      "id": "VP-1440x900-content",
+      "pass": true,
+      "detail": "10487 visible text characters"
+    },
+    {
+      "id": "OVF-1440x900",
+      "pass": true,
+      "detail": "{\"scrollWidth\":1440,\"innerWidth\":1440}"
+    },
+    {
+      "id": "THEME-1440x900-default",
+      "pass": true,
+      "detail": "default theme is light"
+    },
+    {
+      "id": "MENU-1440x900-position",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "TARGET-1440x900",
+      "pass": true,
+      "detail": "{\"rightmost\":true,\"menuWidth\":44,\"menuHeight\":44}"
+    },
+    {
+      "id": "A11Y-1440x900-semantics",
+      "pass": true,
+      "detail": "{\"main\":1,\"h1\":1,\"unnamedButtons\":0,\"duplicateIds\":[],\"emptyLinks\":0}"
+    },
+    {
+      "id": "CONTRAST-1440x900-primary",
+      "pass": true,
+      "detail": "{\"color\":\"rgb(255, 253, 248)\",\"background\":\"rgb(13, 19, 33)\"}"
+    },
+    {
+      "id": "A11Y-1-keyboard-open",
+      "pass": true,
+      "detail": "open=true, focusInMenu=true"
+    },
+    {
+      "id": "A11Y-4-keyboard-instant",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "id": "A11Y-1-escape-return",
+      "pass": true,
+      "detail": "focus returned=true"
+    },
+    {
+      "id": "INT-1-rapid-toggle",
+      "pass": true,
+      "detail": "ten toggles ended closed with no duplicate panel"
+    },
+    {
+      "id": "INT-2-pointer-open",
+      "pass": true,
+      "detail": "one pointer-open panel"
+    },
+    {
+      "id": "THEME-dark-toggle",
+      "pass": true,
+      "detail": "dark theme applied"
+    },
+    {
+      "id": "THEME-dark-persist",
+      "pass": true,
+      "detail": "dark theme persisted after reload"
+    },
+    {
+      "id": "ARCH-state",
+      "pass": true,
+      "detail": "risk seam state visible"
+    },
+    {
+      "id": "COST-state",
+      "pass": true,
+      "detail": "launch range visible"
+    },
+    {
+      "id": "XP-calculator",
+      "pass": true,
+      "detail": "100 XP resolves to LEVEL 2"
+    },
+    {
+      "id": "RM-1-reveal",
+      "pass": true,
+      "detail": "{\"opacity\":1,\"transform\":\"none\"}"
+    },
+    {
+      "id": "RM-2-reveal",
+      "pass": true,
+      "detail": "{\"opacity\":1,\"transform\":\"none\"}"
+    },
+    {
+      "id": "RM-2-menu",
+      "pass": true,
+      "detail": "menu end state reached under reduced motion"
+    },
+    {
+      "id": "THEME-dark-tab-persist",
+      "pass": true,
+      "detail": "dark choice persists through reload in the current tab"
+    },
+    {
+      "id": "THEME-new-tab-light",
+      "pass": true,
+      "detail": "new tab starts in light mode"
+    },
+    {
+      "id": "PERF-1",
+      "pass": true,
+      "detail": "p95=18.20ms, frames>33ms=0/72"
+    },
+    {
+      "id": "CLS-1",
+      "pass": true,
+      "detail": "CLS=0.0000"
+    },
+    {
+      "id": "CLEAN-1-CON-1",
+      "pass": true,
+      "detail": "[]"
+    }
+  ],
+  "metrics": {
+    "p95FrameMs4xCpu": 18.199999999254942,
+    "framesOver33ms": 0,
+    "maxLongTaskMs": 72,
+    "cls": 0,
+    "bundledJsGzipBytes": 103667
+  },
+  "console": []
+}
