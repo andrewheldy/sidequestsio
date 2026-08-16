@@ -10,7 +10,6 @@ if (!MAPBOX_TOKEN) {
   console.error(
     '[SideQuests] VITE_MAPBOX_PUBLIC_TOKEN is not set — the map will not render.\n' +
     '  • Local dev:   add it to your .env file\n' +
-    '  • Lovable:     open Settings → Secrets, add VITE_MAPBOX_PUBLIC_TOKEN\n' +
     '  • Vercel:      Project Settings → Environment Variables, then redeploy\n' +
     '  Docs: https://account.mapbox.com/access-tokens/'
   );

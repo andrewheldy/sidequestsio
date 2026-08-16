@@ -32,6 +32,17 @@ export async function getRepository(): Promise<Repository> {
     }
   }
 
+  if (!import.meta.env.DEV) {
+    // A deployed build should always talk to Supabase. Falling back here means
+    // VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY were missing at build time —
+    // the app will show in-browser sample data, not real quests.
+    console.error(
+      "[SideQuests] Supabase is not configured — falling back to LocalRepository (sample data).\n" +
+        "  Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel (Production AND Preview) and redeploy.\n" +
+        "  Vite inlines VITE_* vars at build time, so adding them after a build has no effect.",
+    );
+  }
+
   instance = new LocalRepository();
   return instance;
 }

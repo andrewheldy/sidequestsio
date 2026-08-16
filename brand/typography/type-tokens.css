@@ -1,0 +1,43 @@
+:root {
+  --font-primary: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  --font-secondary: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-primary);
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --type-display-size: clamp(3rem, 7vw, 6.5rem);
+  --type-display-line: .94;
+  --type-h1-size: clamp(2.5rem, 5vw, 4.75rem);
+  --type-h1-line: .98;
+  --type-h2-size: clamp(2rem, 3.4vw, 3.5rem);
+  --type-h2-line: 1.04;
+  --type-h3-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  --type-h3-line: 1.12;
+  --type-h4-size: clamp(1.125rem, 1.5vw, 1.5rem);
+  --type-h4-line: 1.2;
+  --type-body-lg-size: 1.125rem;
+  --type-body-size: 1rem;
+  --type-body-sm-size: .875rem;
+  --type-caption-size: .75rem;
+  --type-overline-size: .6875rem;
+  --type-stat-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+.type-display,.type-h1,.type-h2,.type-h3,.type-h4 {
+  font-family: var(--font-primary);
+  font-weight: 750;
+  text-wrap: balance;
+}
+.type-display { font-size: var(--type-display-size); line-height: var(--type-display-line); letter-spacing: -.055em; }
+.type-h1 { font-size: var(--type-h1-size); line-height: var(--type-h1-line); letter-spacing: -.045em; }
+.type-h2 { font-size: var(--type-h2-size); line-height: var(--type-h2-line); letter-spacing: -.035em; }
+.type-h3 { font-size: var(--type-h3-size); line-height: var(--type-h3-line); letter-spacing: -.025em; }
+.type-h4 { font-size: var(--type-h4-size); line-height: var(--type-h4-line); letter-spacing: -.015em; }
+.type-body-lg { font: 450 var(--type-body-lg-size)/1.6 var(--font-secondary); letter-spacing: -.01em; }
+.type-body { font: 450 var(--type-body-size)/1.55 var(--font-secondary); }
+.type-body-sm { font: 450 var(--type-body-sm-size)/1.5 var(--font-secondary); }
+.type-caption { font: 550 var(--type-caption-size)/1.35 var(--font-secondary); letter-spacing: .01em; }
+.type-overline { font: 750 var(--type-overline-size)/1.2 var(--font-secondary); letter-spacing: .14em; text-transform: uppercase; }
+.type-button { font: 700 .875rem/1 var(--font-primary); letter-spacing: -.005em; }
+.type-stat { font: 750 var(--type-stat-size)/1 var(--font-primary); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.type-counter { font: 700 .875rem/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.type-nav { font: 700 .75rem/1.2 var(--font-primary); letter-spacing: .01em; }

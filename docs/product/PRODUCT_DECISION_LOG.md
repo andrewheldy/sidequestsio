@@ -24,6 +24,32 @@ Ideas should earn their place through evidence rather than novelty.
 
 ---
 
+# Visual Experience Direction (2026-08-15)
+
+## Decision
+
+SideQuests should feel like a **playable field guide**: editorial, tactile, and grounded in real Miami
+places. The visual signature is a threshold or doorway that frames photography and suggests crossing
+from the familiar city into an unexpected experience.
+
+Motion is supporting evidence, not decoration. It may reveal the path through a page, clarify state,
+or add a small sense of discovery, but must remain brief, optional, and subordinate to the content.
+
+### Why
+
+The product is asking people to leave the screen and notice the physical world. A calm field-guide
+system makes curated quests feel intentional and trustworthy while the threshold motif provides a
+distinctive sense of possibility. This direction reinforces the existing core loop without adding a
+new feature, currency, publishing model, or navigation surface.
+
+### Expected outcome
+
+Users should understand what SideQuests is, why a quest is worth a detour, and what happens after they
+arrive. Partners should see a curated experience product rather than a coupon marketplace or generic
+local directory.
+
+---
+
 # Product Vision
 
 ## Decision

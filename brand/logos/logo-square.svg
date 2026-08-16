@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title">
+  <title id="title">sidequests square lockup</title>
+  <rect width="640" height="640" rx="112" fill="#0D1321"/>
+  <g transform="translate(195 72) scale(3.8)"><path fill="#F8F3E8" fill-rule="evenodd" d="M14 51V24C14 13.507 22.507 5 33 5s19 8.507 19 19v27h-7V24c0-6.627-5.373-12-12-12s-12 5.373-12 12v27h-7Z"/><path fill="#F2B94B" d="m32.7 20 1.86 3.94L38.5 25.8l-3.94 1.86-1.86 3.94-1.86-3.94-3.94-1.86 3.94-1.86L32.7 20Z"/><path fill="#F8F3E8" d="M31.5 31.5 39 36l-6.1 4.2 6.4 4.8-5.8 4.3L47 59H17l12.4-10.2-6.2-4.9 6.2-4.3-6.8-4.1 8.9-4Z"/></g>
+  <text x="320" y="506" fill="#F8F3E8" font-family="Manrope, Arial, sans-serif" font-size="64" font-weight="750" letter-spacing="-3" text-anchor="middle">sidequests</text>
+</svg>

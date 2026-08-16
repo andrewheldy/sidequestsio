@@ -73,27 +73,36 @@ const QuestMap = ({
       setMapReady(true);
     });
 
-    // Catch auth errors (domain allowlist mismatch, expired token, etc.)
+    // Catch auth errors (revoked token, domain allowlist mismatch, etc.)
     map.on('error', (e) => {
-      if (errorFired) return;
-      const status = (e.error as any)?.status;
-      const msg: string = (e.error as any)?.message ?? '';
-      if (
+      const mapError = e.error as (Error & { status?: number }) | undefined;
+      const status = mapError?.status;
+      const msg = mapError?.message ?? '';
+      const lower = msg.toLowerCase();
+      const isAuth =
         status === 401 || status === 403 ||
-        msg.toLowerCase().includes('unauthorized') ||
-        msg.toLowerCase().includes('forbidden') ||
-        msg.toLowerCase().includes('not allowed')
-      ) {
-        errorFired = true;
-        console.error('[SideQuests] Mapbox auth error:', e.error);
-        // Destroy the map before triggering a re-render so the container div
-        // removal doesn't leave a zombie Mapbox instance trying to access a
-        // detached DOM node.
-        map.remove();
-        mapRef.current = null;
-        setMapReady(false);
-        setMapError('domain-restriction');
+        lower.includes('unauthorized') ||
+        lower.includes('forbidden') ||
+        lower.includes('not allowed');
+
+      if (!isAuth) {
+        // Non-fatal (tile fetch hiccups, style warnings) — log for diagnosis
+        // but keep the map alive.
+        console.error('[SideQuests] Mapbox error:', e.error);
+        return;
       }
+      if (errorFired) return;
+      errorFired = true;
+      console.error('[SideQuests] Mapbox auth error:', e.error);
+      // Destroy the map before triggering a re-render so the container div
+      // removal doesn't leave a zombie Mapbox instance trying to access a
+      // detached DOM node.
+      map.remove();
+      mapRef.current = null;
+      setMapReady(false);
+      // 401 = token invalid/revoked; 403 = token valid but this domain is
+      // blocked by its Allowed URLs list.
+      setMapError(status === 401 ? 'invalid-token' : 'domain-restriction');
     });
 
     return () => {
@@ -240,9 +249,26 @@ const QuestMap = ({
         <span className="text-2xl">{isAuthError ? '🗺️' : '📍'}</span>
         <div className="px-6 space-y-2 max-w-xs">
           <p className="font-semibold text-foreground">
-            {isAuthError ? 'Mapbox token domain restriction' : 'Map token not configured'}
+            {mapError === 'invalid-token'
+              ? 'Mapbox token invalid or revoked'
+              : isAuthError
+                ? 'Mapbox token domain restriction'
+                : 'Map token not configured'}
           </p>
-          {isAuthError ? (
+          {mapError === 'invalid-token' ? (
+            <div className="text-xs text-muted-foreground leading-relaxed space-y-2 text-left">
+              <p>
+                Mapbox rejected this build&apos;s token (401). It was likely rotated or
+                deleted after this deployment was built.
+              </p>
+              <p>
+                Update <span className="font-mono">VITE_MAPBOX_PUBLIC_TOKEN</span> in Vercel
+                with a current token from{' '}
+                <span className="font-mono text-foreground/70">account.mapbox.com/access-tokens</span>,
+                then redeploy — tokens are baked in at build time.
+              </p>
+            </div>
+          ) : isAuthError ? (
             <div className="text-xs text-muted-foreground leading-relaxed space-y-2 text-left">
               <p>Your Mapbox token does not allow requests from this domain.</p>
               <p>

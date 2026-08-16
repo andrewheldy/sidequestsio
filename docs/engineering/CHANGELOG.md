@@ -2,6 +2,26 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-08-15 — Design-intelligence rebuild, phase 1 (not deployed)
+
+- Established the product's new visual direction: **a playable Miami field guide** with a quiet
+  editorial base, threshold-shaped photography, stronger content hierarchy, and a Midnight / Ocean /
+  Sand / Palm / Gold / Coral palette. Added the design-intelligence connection record, design brief,
+  reusable findings, and machine-readable motion specifications under `docs/design/`.
+- Rebuilt the global type, color, focus, card, button, header, footer, and public layout foundations;
+  replaced the previous glow/gradient-heavy presentation with the approved brand system. The landing
+  page, sign-in/sign-up, partnerships, Explore, app shell/navigation, and Quest Detail now share this
+  system while preserving the existing routes, repository boundaries, consent behavior, auth flow,
+  quest-completion flow, and analytics calls.
+- Added restrained progressive-enhancement motion: below-fold sections reveal over 220 ms and quest
+  cards lift 2 px on hover-capable devices. Content is visible without JavaScript, the hero is static,
+  and `prefers-reduced-motion: reduce` disables reveals and hover transforms.
+- Verification: TypeScript and production build pass; Playwright viewport checks pass at 1440 px,
+  375 px, and 320 px with no horizontal overflow or console errors on the rebuilt routes. Keyboard
+  focus, mobile navigation, reveal behavior, hover reset, and reduced-motion behavior were exercised.
+  No deployment or backend/database change was made. Remaining public and secondary app routes are
+  intentionally queued for the next rebuild phase.
+
 ## 2026-07-07 — Image fallbacks + asset-candidate sourcing sheet (no DB writes)
 
 - Frontend: quest images can no longer render as broken `<img>` elements — matters because all 62

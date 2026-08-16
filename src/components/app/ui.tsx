@@ -78,8 +78,8 @@ export function EmptyState({
 
 export function Loading({ label = "Loading…" }: { label?: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 py-12 text-muted-foreground">
-      <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    <div className="flex items-center justify-center gap-3 py-12 text-muted-foreground" role="status">
+      <div className="h-2.5 w-2.5 rounded-full bg-[hsl(var(--ocean-500))]" />
       <span className="text-sm">{label}</span>
     </div>
   );

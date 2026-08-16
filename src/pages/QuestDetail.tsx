@@ -441,27 +441,21 @@ export default function QuestDetail() {
       />
 
       {/* ── Content ─────────────────────────────────────────────────────── */}
-      <div className="mx-auto w-full max-w-md space-y-5 px-4 pt-5">
+      <div className="mx-auto w-full max-w-2xl space-y-5 px-5 pt-5">
 
         {/* ── 2. Quest summary ── */}
-        <section>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <h1 className="font-poppins text-3xl font-bold leading-tight text-foreground">
-                {quest.title}
-              </h1>
-              {venueLabel && (
-                <div className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground/80">
-                  <MapPin className="h-4 w-4 shrink-0 text-primary" />
-                  <span className="truncate">{venueLabel}</span>
-                </div>
-              )}
+        <section className="space-y-4">
+          <RewardCard xp={quest.xp_reward} points={quest.points_reward} />
+
+          {venueLabel && (
+            <div className="flex items-center gap-1.5 text-sm font-medium text-foreground/80">
+              <MapPin className="h-4 w-4 shrink-0 text-[hsl(var(--ocean-500))]" />
+              <span className="truncate">{venueLabel}</span>
             </div>
-            <RewardCard xp={quest.xp_reward} points={quest.points_reward} />
-          </div>
+          )}
 
           {quest.description && (
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            <p className="text-base leading-relaxed text-muted-foreground">
               {quest.description}
             </p>
           )}
@@ -478,7 +472,7 @@ export default function QuestDetail() {
             <button
               onClick={handleCompleteClick}
               disabled={busy}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-[hsl(280_75%_60%)] py-4 font-poppins text-base font-bold uppercase tracking-wide text-white shadow-[0_10px_30px_-8px_hsl(6_89%_68%/0.6)] transition-transform active:scale-[0.98] disabled:opacity-60"
+              className="flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl bg-[hsl(var(--midnight-900))] px-6 font-display text-base font-bold text-white disabled:opacity-60"
             >
               {isAuthenticated ? "Complete Quest" : "Sign in to complete"}
               <QrCode className="h-5 w-5" />
@@ -520,17 +514,17 @@ export default function QuestDetail() {
 
       {/* ── Completion Sheet ── */}
       <Sheet open={showCompletionSheet} onOpenChange={setShowCompletionSheet}>
-        <SheetContent side="bottom" className="rounded-t-2xl pb-8">
+        <SheetContent side="bottom" className="rounded-t-3xl border-border bg-background px-5 pb-[max(2rem,env(safe-area-inset-bottom))]">
           <SheetHeader className="mb-4">
-            <SheetTitle className="font-poppins text-lg">
+            <SheetTitle className="font-display text-xl">
               Ready to complete this quest?
             </SheetTitle>
           </SheetHeader>
 
           {/* Objective reminder */}
-          <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              Your Side Quest
+          <div className="mb-4 rounded-2xl border border-[hsl(var(--midnight-900)/0.12)] bg-[hsl(var(--sand-200))] p-4">
+            <p className="sq-overline mb-2 text-[hsl(var(--ocean-700))]">
+              Your quest
             </p>
             <p className="text-sm leading-relaxed text-foreground">{objective}</p>
           </div>
@@ -567,7 +561,7 @@ export default function QuestDetail() {
             size="lg"
           >
             {busy ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              <span className="h-2.5 w-2.5 rounded-full bg-current" />
             ) : (
               <CheckCircle2 className="h-5 w-5" />
             )}
@@ -607,9 +601,9 @@ function CompletedCard({
   const [showShare, setShowShare] = useState(false);
 
   return (
-    <div className="glass-card flex flex-col items-center gap-2 p-6 text-center glow-turquoise">
-      <Trophy className="h-10 w-10 text-secondary" />
-      <h2 className="font-poppins text-xl font-bold text-foreground">
+    <div className="flex flex-col items-center gap-2 rounded-2xl border border-[hsl(var(--palm-500)/0.24)] bg-[hsl(var(--palm-500)/0.08)] p-6 text-center">
+      <Trophy className="h-10 w-10 text-[hsl(var(--palm-500))]" />
+      <h2 className="font-display text-xl font-bold text-foreground">
         Quest complete!
       </h2>
       {result?.ok && (
@@ -670,7 +664,7 @@ function CompletedCard({
 function ShellWithLoader() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div className="h-3 w-3 rounded-full bg-[hsl(var(--ocean-500))]" />
       <p className="text-sm text-muted-foreground">Loading quest…</p>
     </div>
   );
