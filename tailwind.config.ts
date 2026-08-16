@@ -18,8 +18,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        poppins: ['Poppins', 'system-ui', 'sans-serif'],
+        display: ['Manrope', 'system-ui', 'sans-serif'],
+        manrope: ['Manrope', 'system-ui', 'sans-serif'],
+        poppins: ['Manrope', 'system-ui', 'sans-serif'],
         inter: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -101,15 +104,15 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(20px)" },
+          from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "fade-in-left": {
-          from: { opacity: "0", transform: "translateX(-20px)" },
+          from: { opacity: "0", transform: "translateX(-8px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
         "fade-in-right": {
-          from: { opacity: "0", transform: "translateX(20px)" },
+          from: { opacity: "0", transform: "translateX(8px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
         "scale-in": {
@@ -136,14 +139,14 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.6s ease-out forwards",
-        "fade-in-left": "fade-in-left 0.6s ease-out forwards",
-        "fade-in-right": "fade-in-right 0.6s ease-out forwards",
-        "scale-in": "scale-in 0.5s ease-out forwards",
-        "slide-up": "slide-up 0.5s ease-out forwards",
-        "slide-down": "slide-down 0.5s ease-out forwards",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        float: "float 3s ease-in-out infinite",
+        "fade-in": "fade-in 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-in-left": "fade-in-left 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-in-right": "fade-in-right 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "scale-in": "scale-in 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "slide-up": "slide-up 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "slide-down": "slide-down 140ms cubic-bezier(0.4, 0, 1, 1) forwards",
+        "pulse-glow": "none",
+        float: "none",
       },
       // Maps prose (rendered markdown — see src/components/legal/LegalDocPage.tsx)
       // onto the app's own CSS-variable palette instead of Tailwind Typography's

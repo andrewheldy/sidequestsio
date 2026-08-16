@@ -1,29 +1,17 @@
-/**
- * The reward the quester earns — XP and points, side by side. Rendered as a
- * bordered card that sits to the right of the quest title, echoing the mockup.
- */
 export function RewardCard({ xp, points }: { xp: number; points: number }) {
   return (
-    <div className="shrink-0 rounded-2xl border border-border/70 bg-card/40 px-4 py-3 text-center">
-      <p className="mb-1.5 text-[11px] font-bold uppercase tracking-widest text-primary">
-        Reward
-      </p>
-      <div className="flex items-center gap-3">
-        <div className="leading-none">
-          <span className="font-poppins text-2xl font-bold text-primary">{xp}</span>{" "}
-          <span className="font-poppins text-sm font-bold text-secondary">XP</span>
-        </div>
-        <span className="h-6 w-px bg-border/70" aria-hidden />
-        <div className="leading-none">
-          <span className="font-poppins text-2xl font-bold text-[hsl(140_65%_55%)]">
-            {points}
-          </span>{" "}
-          <span className="font-poppins text-sm font-bold text-[hsl(140_55%_60%)]">
-            PTS
-          </span>
-        </div>
+    <section aria-label="Quest rewards" className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="p-4">
+        <p className="sq-overline text-[hsl(var(--ocean-700))]">Progress</p>
+        <p className="sq-mono mt-2 text-xl font-bold text-[hsl(var(--ocean-700))]">+{xp} XP</p>
+        <p className="mt-1 text-xs text-muted-foreground">Builds your level</p>
       </div>
-    </div>
+      <div className="border-l border-border p-4">
+        <p className="sq-overline text-[hsl(var(--gold-700))]">Spendable</p>
+        <p className="sq-mono mt-2 text-xl font-bold text-[hsl(var(--gold-700))]">+{points} Points</p>
+        <p className="mt-1 text-xs text-muted-foreground">Use on rewards</p>
+      </div>
+    </section>
   );
 }
 

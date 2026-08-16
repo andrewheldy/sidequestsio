@@ -12,6 +12,7 @@ import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { DemoBanner } from "@/components/DemoBanner";
+import { BackendFallbackBanner } from "@/components/BackendFallbackBanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import Index from "./pages/Index";
 import Quests from "./pages/Quests";
@@ -61,6 +62,7 @@ const App = () => (
                 <SignInPromptProvider>
                   <CookieConsentProvider>
                     <DemoBanner />
+                    <BackendFallbackBanner />
                     <ScrollToTop />
                     <Routes>
                       {/* Marketing site */}

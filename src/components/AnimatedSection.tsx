@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
@@ -18,6 +18,11 @@ export function AnimatedSection({
   threshold = 0.1,
 }: AnimatedSectionProps) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>({ threshold });
+  const [motionReady, setMotionReady] = useState(false);
+
+  useEffect(() => {
+    setMotionReady(true);
+  }, []);
 
   const directionClasses = {
     up: 'reveal',
@@ -29,8 +34,13 @@ export function AnimatedSection({
   return (
     <div
       ref={ref}
-      className={cn(directionClasses[direction], isVisible && 'visible', className)}
-      style={{ transitionDelay: `${delay}ms` }}
+      className={cn(
+        directionClasses[direction],
+        motionReady && 'motion-ready',
+        isVisible && 'visible',
+        className,
+      )}
+      style={{ transitionDelay: `${Math.min(delay, 160)}ms` }}
     >
       {children}
     </div>

@@ -2,308 +2,300 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SideQuests.io Design System */
+/* sidequests production design system — implemented from brand/design-system.md */
 
 @layer base {
   :root {
-    /* Brand Colors */
-    --coral: 6 89% 68%;
-    --coral-glow: 6 100% 75%;
-    --indigo: 230 35% 14%;
-    --indigo-light: 230 30% 22%;
-    --turquoise: 174 100% 45%;
-    --turquoise-glow: 174 100% 55%;
-    --sandstone: 32 70% 81%;
-    --sandstone-light: 32 80% 90%;
-    --charcoal: 0 0% 8%;
-    
-    /* Semantic Tokens */
-    --background: 230 35% 14%;
-    --foreground: 32 80% 90%;
+    /* Brand primitives kept as HSL for Tailwind compatibility. */
+    --midnight-950: 215 63% 7%;
+    --midnight-900: 222 43% 9%;
+    --midnight-800: 218 37% 15%;
+    --ocean-700: 222 78% 41%;
+    --ocean-500: 221 83% 53%;
+    --ocean-400: 221 85% 65%;
+    --sand-50: 40 54% 97%;
+    --sand-100: 39 53% 94%;
+    --sand-200: 39 53% 89%;
+    --palm-500: 153 46% 34%;
+    --gold-700: 39 92% 34%;
+    --gold-500: 40 87% 62%;
+    --coral-600: 5 79% 59%;
+    --coral-500: 5 100% 69%;
+    --neutral-0: 0 0% 100%;
+    --neutral-50: 220 23% 97%;
+    --neutral-100: 216 21% 94%;
+    --neutral-200: 218 18% 88%;
+    --neutral-300: 217 16% 78%;
+    --neutral-500: 216 14% 46%;
+    --neutral-600: 217 17% 35%;
+    --neutral-800: 216 27% 18%;
 
-    --card: 230 30% 18%;
-    --card-foreground: 32 80% 90%;
+    /* Backward-compatible aliases for existing components. */
+    --coral: var(--coral-500);
+    --coral-glow: var(--coral-500);
+    --indigo: var(--midnight-900);
+    --indigo-light: var(--midnight-800);
+    --turquoise: var(--ocean-500);
+    --turquoise-glow: var(--ocean-400);
+    --sandstone: var(--sand-200);
+    --sandstone-light: var(--sand-100);
+    --charcoal: var(--midnight-900);
 
-    --popover: 230 30% 16%;
-    --popover-foreground: 32 80% 90%;
-
-    --primary: 6 89% 68%;
-    --primary-foreground: 0 0% 8%;
-
-    --secondary: 174 100% 45%;
-    --secondary-foreground: 0 0% 8%;
-
-    --muted: 230 30% 22%;
-    --muted-foreground: 32 50% 70%;
-
-    --accent: 32 70% 81%;
-    --accent-foreground: 0 0% 8%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 230 25% 25%;
-    --input: 230 25% 25%;
-    --ring: 6 89% 68%;
-
+    /* shadcn semantic tokens — warm light theme is the default. */
+    --background: var(--sand-50);
+    --foreground: var(--midnight-900);
+    --card: var(--neutral-0);
+    --card-foreground: var(--midnight-900);
+    --popover: var(--neutral-0);
+    --popover-foreground: var(--midnight-900);
+    --primary: var(--midnight-900);
+    --primary-foreground: var(--sand-50);
+    --secondary: var(--ocean-500);
+    --secondary-foreground: var(--neutral-0);
+    --muted: var(--neutral-100);
+    --muted-foreground: var(--neutral-600);
+    --accent: var(--sand-200);
+    --accent-foreground: var(--midnight-900);
+    --destructive: 3 62% 53%;
+    --destructive-foreground: var(--neutral-0);
+    --border: var(--neutral-200);
+    --input: var(--neutral-300);
+    --ring: var(--ocean-400);
     --radius: 0.75rem;
 
-    /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(var(--indigo)) 0%, hsl(var(--indigo-light)) 100%);
-    --gradient-coral: linear-gradient(135deg, hsl(var(--coral)) 0%, hsl(var(--coral-glow)) 100%);
-    --gradient-turquoise: linear-gradient(135deg, hsl(var(--turquoise)) 0%, hsl(var(--turquoise-glow)) 100%);
-    --gradient-glass: linear-gradient(135deg, hsla(230, 30%, 22%, 0.8) 0%, hsla(230, 30%, 18%, 0.6) 100%);
-    
-    /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsla(0, 0%, 0%, 0.3);
-    --shadow-glow-coral: 0 0 40px hsla(6, 89%, 68%, 0.3);
-    --shadow-glow-turquoise: 0 0 40px hsla(174, 100%, 45%, 0.3);
-    
-    /* Motion */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--midnight-900)), hsl(var(--midnight-800)));
+    --gradient-coral: linear-gradient(135deg, hsl(var(--coral-600)), hsl(var(--coral-500)));
+    --gradient-turquoise: linear-gradient(135deg, hsl(var(--ocean-700)), hsl(var(--ocean-500)));
+    --gradient-glass: linear-gradient(135deg, hsl(var(--neutral-0) / 0.96), hsl(var(--sand-50) / 0.9));
 
-    /* Sidebar (keeping for compatibility) */
-    --sidebar-background: 230 35% 12%;
-    --sidebar-foreground: 32 80% 90%;
-    --sidebar-primary: 6 89% 68%;
-    --sidebar-primary-foreground: 0 0% 8%;
-    --sidebar-accent: 230 30% 22%;
-    --sidebar-accent-foreground: 32 80% 90%;
-    --sidebar-border: 230 25% 25%;
-    --sidebar-ring: 6 89% 68%;
+    --shadow-soft: 0 18px 60px -36px hsl(var(--midnight-900) / 0.38);
+    --shadow-card: 0 24px 60px -44px hsl(var(--midnight-900) / 0.46);
+    --shadow-glow-coral: none;
+    --shadow-glow-turquoise: none;
+
+    --motion-instant: 80ms;
+    --motion-fast: 140ms;
+    --motion-base: 220ms;
+    --motion-slow: 420ms;
+    --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --transition-fast: var(--motion-fast) var(--ease-standard);
+    --transition-base: var(--motion-base) var(--ease-enter);
+    --transition-slow: var(--motion-slow) var(--ease-enter);
+
+    --sidebar-background: var(--sand-50);
+    --sidebar-foreground: var(--midnight-900);
+    --sidebar-primary: var(--midnight-900);
+    --sidebar-primary-foreground: var(--sand-50);
+    --sidebar-accent: var(--sand-200);
+    --sidebar-accent-foreground: var(--midnight-900);
+    --sidebar-border: var(--neutral-200);
+    --sidebar-ring: var(--ocean-400);
   }
 
   .dark {
-    /* Dark mode is default for SideQuests */
+    --background: var(--midnight-950);
+    --foreground: var(--sand-50);
+    --card: var(--midnight-800);
+    --card-foreground: var(--sand-50);
+    --popover: var(--midnight-800);
+    --popover-foreground: var(--sand-50);
+    --primary: var(--sand-100);
+    --primary-foreground: var(--midnight-950);
+    --muted: 218 29% 19%;
+    --muted-foreground: var(--neutral-300);
+    --accent: 218 29% 23%;
+    --accent-foreground: var(--sand-50);
+    --border: 218 27% 25%;
+    --input: 218 25% 31%;
+    --ring: var(--gold-500);
   }
-}
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
-  html {
-    scroll-behavior: smooth;
-  }
+  html { color-scheme: light; }
 
   body {
     @apply bg-background text-foreground antialiased;
+    min-width: 320px;
     font-family: 'Inter', system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', system-ui, sans-serif;
-    @apply font-bold tracking-tight;
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  p { text-wrap: pretty; }
+
+  ::selection {
+    color: hsl(var(--midnight-900));
+    background: hsl(var(--gold-500));
+  }
+
+  :focus-visible {
+    outline: 3px solid hsl(var(--ring)) !important;
+    outline-offset: 3px !important;
   }
 }
 
 @layer components {
-  /* Glassmorphism card */
+  .sq-container {
+    width: min(100% - 2.5rem, 75rem);
+    margin-inline: auto;
+  }
+
+  .sq-overline {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .sq-display {
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    font-weight: 750;
+    letter-spacing: -0.055em;
+    line-height: 0.94;
+    text-wrap: balance;
+  }
+
+  .sq-section-title {
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: clamp(2rem, 4.2vw, 3.5rem);
+    font-weight: 750;
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+  }
+
+  .sq-mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  .sq-button-transition { transition-timing-function: var(--ease-standard); }
+
   .glass-card {
-    @apply bg-card/60 backdrop-blur-xl border border-border/50 rounded-2xl;
-    box-shadow: var(--shadow-soft);
+    @apply rounded-2xl border border-border bg-card;
+    box-shadow: var(--shadow-card);
   }
 
-  /* Gradient text */
-  .text-gradient-coral {
-    @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-coral);
-  }
-
+  .text-gradient-coral,
   .text-gradient-turquoise {
-    @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-turquoise);
+    color: inherit;
+    background: none;
+    -webkit-text-fill-color: currentColor;
   }
 
-  /* Glow effects */
-  .glow-coral {
-    box-shadow: var(--shadow-glow-coral);
-  }
+  .glow-coral,
+  .glow-turquoise { box-shadow: var(--shadow-card); }
 
-  .glow-turquoise {
-    box-shadow: var(--shadow-glow-turquoise);
-  }
+  .hover-lift { transition: none; }
 
-  /* Hover lift */
-  .hover-lift {
-    @apply transition-all duration-300;
-  }
-  .hover-lift:hover {
-    @apply -translate-y-1;
-    box-shadow: var(--shadow-soft);
-  }
-
-  /* Scroll reveal animations */
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  }
-
-  .reveal.visible {
-    opacity: 1;
+  .quest-card {
     transform: translateY(0);
+    transition: none;
   }
 
-  .reveal-left {
-    opacity: 0;
-    transform: translateX(-30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  .quest-card__image { transform: scale(1); transition: none; }
+
+  /* Visible is the static default. JS only opts below-fold sections into motion. */
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale { opacity: 1; transform: none; }
+
+  .stagger-children > * { opacity: 1; transform: none; }
+
+  .tagline-enter,
+  .tagline-exit,
+  .subheadline-enter,
+  .subheadline-exit,
+  .cta-pulse { opacity: 1; transform: none; }
+
+  .sq-threshold {
+    border-radius: min(28vw, 16rem) min(28vw, 16rem) 1.5rem 1.5rem;
+    overflow: hidden;
   }
 
-  .reveal-left.visible {
-    opacity: 1;
-    transform: translateX(0);
+  .sq-route-line {
+    position: absolute;
+    inset-inline-start: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: hsl(var(--midnight-900) / 0.16);
   }
 
-  .reveal-right {
-    opacity: 0;
-    transform: translateX(30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  @media (min-width: 768px) {
+    .sq-container { width: min(100% - 4rem, 75rem); }
   }
 
-  .reveal-right.visible {
-    opacity: 1;
-    transform: translateX(0);
+  @media (min-width: 1280px) {
+    .sq-container { width: min(100% - 6rem, 75rem); }
   }
 
-  .reveal-scale {
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-  }
-
-  .reveal-scale.visible {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* Stagger children */
-  .stagger-children > * {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-  }
-
-  .stagger-children.visible > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
-  .stagger-children.visible > *:nth-child(2) { transition-delay: 100ms; opacity: 1; transform: translateY(0); }
-  .stagger-children.visible > *:nth-child(3) { transition-delay: 200ms; opacity: 1; transform: translateY(0); }
-  .stagger-children.visible > *:nth-child(4) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
-  .stagger-children.visible > *:nth-child(5) { transition-delay: 400ms; opacity: 1; transform: translateY(0); }
-  .stagger-children.visible > *:nth-child(6) { transition-delay: 500ms; opacity: 1; transform: translateY(0); }
-
-  /* Hero Tagline Animations - 21st.dev inspired */
-  .tagline-enter {
-    animation: tagline-enter 450ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  .tagline-exit {
-    animation: tagline-exit 350ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
-  }
-
-  .subheadline-enter {
-    animation: tagline-enter 400ms cubic-bezier(0.22, 1, 0.36, 1) 80ms forwards;
-    opacity: 0;
-  }
-
-  .subheadline-exit {
-    animation: tagline-exit 350ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
-  }
-
-  .cta-pulse {
-    animation: cta-pulse 180ms ease-out;
-  }
-
-  @keyframes tagline-enter {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes tagline-exit {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-8px);
-    }
-  }
-
-  @keyframes cta-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-  }
-}
-
-/* ── Mapbox GL overrides ────────────────────────────────────────────────── */
-
-/* Keep Mapbox attribution on-brand */
-.mapboxgl-ctrl-attrib {
-  background: transparent !important;
-  font-size: 10px !important;
-}
-
-.mapboxgl-ctrl-attrib a,
-.mapboxgl-ctrl-attrib-inner {
-  color: hsl(var(--muted-foreground) / 0.7) !important;
-}
-
-.mapboxgl-ctrl-logo {
-  opacity: 0.5;
-}
-
-/* Remove default canvas focus ring — we handle focus styling ourselves */
-.mapboxgl-canvas {
-  outline: none !important;
-}
-
-/* Quest map popup slide-up entrance */
-@keyframes map-popup-enter {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.map-popup-enter {
-  animation: map-popup-enter 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@layer utilities {
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .map-popup-enter {
-      animation: none;
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .hover-lift,
+    .quest-card {
+      transition: transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard);
     }
 
-    .reveal,
-    .reveal-left,
-    .reveal-right,
-    .reveal-scale,
-    .stagger-children > *,
-    .tagline-enter,
-    .tagline-exit,
-    .subheadline-enter,
-    .subheadline-exit,
-    .cta-pulse {
+    .hover-lift:hover,
+    .quest-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .quest-card__image {
+      transition: transform var(--motion-fast) var(--ease-standard);
+    }
+
+    .quest-card:hover .quest-card__image { transform: scale(1.015); }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-ready.reveal,
+    .motion-ready.reveal-left,
+    .motion-ready.reveal-right,
+    .motion-ready.reveal-scale {
+      opacity: 0.01;
+      transform: translateY(8px);
+      transition: opacity var(--motion-base) var(--ease-enter), transform var(--motion-base) var(--ease-enter);
+    }
+
+    .motion-ready.reveal.visible,
+    .motion-ready.reveal-left.visible,
+    .motion-ready.reveal-right.visible,
+    .motion-ready.reveal-scale.visible {
       opacity: 1;
       transform: none;
-      transition: none;
-      animation: none;
     }
   }
+}
+
+/* Mapbox GL overrides */
+.mapboxgl-ctrl-attrib { background: transparent !important; font-size: 10px !important; }
+.mapboxgl-ctrl-attrib a,
+.mapboxgl-ctrl-attrib-inner { color: hsl(var(--muted-foreground) / 0.78) !important; }
+.mapboxgl-ctrl-logo { opacity: 0.55; }
+.mapboxgl-canvas:focus-visible { outline: 3px solid hsl(var(--ring)) !important; outline-offset: -3px; }
+
+@keyframes map-popup-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.map-popup-enter { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .map-popup-enter { animation: map-popup-enter var(--motion-base) var(--ease-enter) forwards; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto; }
 }

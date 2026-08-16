@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 210" role="img" aria-labelledby="title desc">
+  <title id="title">sidequests</title>
+  <desc id="desc">Custom lowercase geometric wordmark with rounded terminals and a distinctive q tail.</desc>
+  <g fill="none" stroke="#0D1321" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 91c0-22 18-34 48-34 22 0 39 6 52 17M33 132c13 14 30 21 51 21 29 0 47-12 47-33 0-45-98-16-98-55"/>
+    <path d="M171 65v87"/><path d="M171 30h.2"/>
+    <path d="M287 26v126M287 106c0-30-19-49-48-49-31 0-50 20-50 49 0 28 19 47 50 47 29 0 48-18 48-47Z"/>
+    <path d="M323 108h83c0-31-17-51-43-51-28 0-46 20-46 49 0 30 20 47 50 47 17 0 31-5 42-15"/>
+    <path d="M522 106c0-30-19-49-48-49-31 0-50 20-50 49 0 28 19 47 50 47 29 0 48-18 48-47Zm0-42v117l22-18"/>
+    <path d="M567 64v54c0 23 14 35 36 35 25 0 42-17 42-42V64m0 0v88"/>
+    <path d="M681 108h83c0-31-17-51-43-51-28 0-46 20-46 49 0 30 20 47 50 47 17 0 31-5 42-15"/>
+    <path d="M784 91c0-22 18-34 48-34 22 0 39 6 52 17m-99 58c13 14 30 21 51 21 29 0 47-12 47-33 0-45-98-16-98-55"/>
+    <path d="M919 34v89c0 20 10 30 29 30 10 0 19-3 26-8M900 65h68"/>
+    <path d="M988 91c0-22 15-34 38-34 10 0 19 2 27 6m-64 69c11 14 25 21 42 21 19 0 31-12 31-31 0-41-73-17-73-54"/>
+  </g>
+</svg>

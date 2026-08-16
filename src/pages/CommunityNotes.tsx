@@ -7,7 +7,7 @@ import CommunityNoteCard from '@/components/cards/CommunityNoteCard';
 import FeatureCard from '@/components/cards/FeatureCard';
 import CTASection from '@/components/CTASection';
 import { Button } from '@/components/ui/button';
-import communityNotesMascot from '@/assets/community-notes-mascot.jpg';
+import communityNotesIllustration from '../../brand/illustrations/invite-friends.svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const stepIcons: LucideIcon[] = [Sparkles, Quote, Shield, Users];
@@ -87,8 +87,8 @@ const CommunityNotes = () => {
             <AnimatedSection direction="right">
               <div className="relative">
                 <img
-                  src={communityNotesMascot}
-                  alt="Community Notes Mascot"
+                  src={communityNotesIllustration}
+                  alt="Two explorers sharing a discovery"
                   className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                 />
                 <div className="absolute -bottom-6 -left-6 w-48 h-48 bg-turquoise/20 rounded-full blur-2xl" />

@@ -1,84 +1,82 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Mail } from 'lucide-react';
-import dotlingLogo from '@/assets/dotling-logo.jpg';
-import AnimatedSection from '@/components/AnimatedSection';
-import ContactForm from '@/components/ContactForm';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { toast } from '@/hooks/use-toast';
+import { ArrowUpRight, Mail } from 'lucide-react';
+import logoReverse from '../../../brand/logos/logo-reverse.svg';
+
+const footerGroups = [
+  {
+    title: 'Explore',
+    links: [
+      ['Quests', '/quests'],
+      ['Map', '/app/map'],
+      ['Community Notes', '/community-notes'],
+      ['Sign in', '/auth'],
+    ],
+  },
+  {
+    title: 'Partners',
+    links: [
+      ['Become a partner', '/partnerships'],
+      ['For hosts', '/hosts'],
+      ['Partner terms', '/partner-terms'],
+    ],
+  },
+  {
+    title: 'Trust',
+    links: [
+      ['Privacy', '/privacy'],
+      ['Terms', '/terms'],
+      ['Community guidelines', '/community-guidelines'],
+      ['Cookie choices', '/cookie-preferences'],
+      ['Delete account', '/delete-account'],
+    ],
+  },
+];
 
 export function Footer() {
-  const { t } = useLanguage();
-
-  const handleSocial = (network: string) => () =>
-    toast({ title: `${network} coming soon`, description: 'Follow us at launch.' });
-
   return (
-    <AnimatedSection>
-      {/* Contact Section */}
-      <section className="bg-gradient-to-b from-transparent to-muted/30 py-16">
-        <div className="container">
-          <div className="max-w-md mx-auto text-center">
-            <h3 className="font-poppins font-bold text-xl text-foreground mb-2">{t.footer.newsletter.title}</h3>
-            <p className="text-muted-foreground text-sm mb-6">{t.footer.description}</p>
-            <ContactForm variant="compact" />
+    <footer className="bg-[hsl(var(--midnight-900))] text-[hsl(var(--sand-50))]">
+      <div className="sq-container py-16 md:py-20">
+        <div className="grid gap-12 border-b border-white/15 pb-14 lg:grid-cols-[1.35fr_2fr]">
+          <div className="max-w-sm">
+            <img src={logoReverse} alt="sidequests" className="mb-6 h-auto w-[168px]" />
+            <p className="text-lg leading-relaxed text-white/68">
+              A reason to take the side street, try the unfamiliar door, and remember the place you found.
+            </p>
+            <a
+              href="mailto:hello@miamisidequests.io"
+              className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[hsl(var(--gold-500))] hover:text-white"
+            >
+              <Mail className="h-4 w-4" />
+              hello@miamisidequests.io
+            </a>
           </div>
-        </div>
-      </section>
 
-      <footer className="bg-muted/30 border-t border-border/50">
-        <div className="container py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="col-span-2 md:col-span-1">
-              <Link to="/" className="flex items-center gap-3 mb-4">
-                <img src={dotlingLogo} alt="sidequests" className="w-10 h-10 rounded-lg object-cover" />
-                <span className="font-poppins font-bold text-lg bg-gradient-to-r from-coral via-primary to-turquoise bg-clip-text text-transparent">sidequests</span>
-              </Link>
-              <p className="text-sm text-muted-foreground mb-4">{t.footer.description}</p>
-              <div className="flex gap-3">
-                <button type="button" aria-label="Instagram" onClick={handleSocial('Instagram')} className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Instagram className="w-4 h-4" /></button>
-                <button type="button" aria-label="Twitter" onClick={handleSocial('Twitter')} className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Twitter className="w-4 h-4" /></button>
-                <a href="mailto:support@miamisidequests.io" aria-label="Email" className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-colors"><Mail className="w-4 h-4" /></a>
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+            {footerGroups.map((group) => (
+              <div key={group.title}>
+                <h2 className="sq-overline mb-4 text-white/45">{group.title}</h2>
+                <ul className="space-y-1">
+                  {group.links.map(([label, href]) => (
+                    <li key={href}>
+                      <Link to={href} className="inline-flex min-h-10 items-center text-sm font-medium text-white/72 hover:text-white">
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-
-            <div>
-              <h4 className="font-poppins font-semibold text-foreground mb-4">{t.footer.explore}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/quests" className="text-muted-foreground hover:text-primary">{t.footer.links.quests}</Link></li>
-                <li><Link to="/community-notes" className="text-muted-foreground hover:text-primary">{t.footer.links.communityNotes}</Link></li>
-                <li><Link to="/verticals" className="text-muted-foreground hover:text-primary">{t.footer.links.verticals}</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-poppins font-semibold text-foreground mb-4">{t.footer.company}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/partnerships" className="text-muted-foreground hover:text-primary">{t.footer.links.partnerships}</Link></li>
-                <li><Link to="/hosts" className="text-muted-foreground hover:text-primary">{t.footer.links.about}</Link></li>
-                <li><Link to="/partnerships" className="text-muted-foreground hover:text-primary">{t.footer.links.contact}</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-poppins font-semibold text-foreground mb-4">{t.footer.legal}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/privacy" className="text-muted-foreground hover:text-primary">{t.footer.links.privacy}</Link></li>
-                <li><Link to="/terms" className="text-muted-foreground hover:text-primary">{t.footer.links.terms}</Link></li>
-                <li><Link to="/community-guidelines" className="text-muted-foreground hover:text-primary">{t.footer.links.communityGuidelines}</Link></li>
-                <li><Link to="/cookies" className="text-muted-foreground hover:text-primary">{t.footer.links.cookies}</Link></li>
-                <li><Link to="/cookie-preferences" className="text-muted-foreground hover:text-primary">{t.footer.links.cookiePreferences}</Link></li>
-                <li><Link to="/delete-account" className="text-muted-foreground hover:text-primary">{t.footer.links.deleteAccount}</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-border/50 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">{t.footer.copyright}</p>
-            <p className="text-sm text-muted-foreground">{t.footer.tagline}</p>
+            ))}
           </div>
         </div>
-      </footer>
-    </AnimatedSection>
+
+        <div className="flex flex-col gap-4 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
+          <p>© 2026 sidequests. Built for curious people in Miami.</p>
+          <Link to="/partnerships" className="inline-flex items-center gap-1 font-bold text-white/72 hover:text-white">
+            Turn your place into a quest <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+    </footer>
   );
 }
 

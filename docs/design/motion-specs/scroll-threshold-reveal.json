@@ -1,0 +1,77 @@
+{
+  "spec_id": "section-threshold-reveal",
+  "date": "2026-08-15",
+  "owner": "Andrew Heldy",
+  "brief_ref": "DESIGN_BRIEF.md",
+  "registry_entries_used": ["emil-design-skills", "motion-intelligence"],
+  "objective": "Readers need a clear sense that each newly visible section is the next stop on one continuous exploration path.",
+  "semantic_purpose": "orient",
+  "surface": "marketing",
+  "trigger": { "interaction": "scroll", "frequency": "occasional", "input_methods": ["pointer", "touch", "keyboard", "assistive-technology"] },
+  "elements": [
+    { "target": "AnimatedSection .sq-reveal-inner", "properties": ["opacity", "transform"], "role": "container" }
+  ],
+  "spatial_relationship": "The next section settles upward by eight pixels as it crosses the reading threshold, matching forward page travel.",
+  "engine": "css-transition",
+  "selection_rationale": {
+    "escalation_reason": "Tier zero would remove useful orientation between visually distinct editorial sections; a two-state CSS transition fully expresses the change.",
+    "rejected_alternatives": [
+      { "engine": "none", "why_not": "Distinct sections would snap into view without reinforcing their sequence on the exploration path." }
+    ],
+    "new_dependency": false
+  },
+  "sequence": [
+    { "step": 1, "target": "AnimatedSection .sq-reveal-inner", "change": "opacity 0.01 to 1 and translateY(8px) to 0" }
+  ],
+  "timing": {
+    "duration_ms": 220,
+    "delay_ms": 0,
+    "stagger_ms": 0,
+    "derivation": "The container travels only eight pixels and is encountered occasionally while reading, so the approved base duration is enough to orient without slowing scroll comprehension."
+  },
+  "easing": {
+    "kind": "cubic-bezier",
+    "curve": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "exit_curve": "cubic-bezier(0.4, 0, 1, 1)",
+    "character": "A quick, quiet settle that feels like arriving at the next stop rather than an animated presentation."
+  },
+  "interruption": { "behavior": "cancel-and-snap", "notes": "The effect runs once; fast scrolling leaves the section in its readable end state." },
+  "responsive": {
+    "mobile": "Same eight-pixel travel with no stagger; content remains fully laid out before the transition.",
+    "tablet": "Same behavior.",
+    "desktop": "Same behavior; no increased travel distance.",
+    "orientation_or_input_notes": "Keyboard scrolling never delays focus targets or hides content."
+  },
+  "reduced_motion": {
+    "strategy": "instant-state-change",
+    "end_state_preserved": true,
+    "implementation": "Static visible state is the default; transition and initial offset exist only inside prefers-reduced-motion: no-preference.",
+    "vestibular_review": "Small local movement only; no parallax, zoom, pinning, smooth-scroll replacement, or large-area travel."
+  },
+  "keyboard_and_focus": {
+    "runs_on_keyboard_trigger": false,
+    "focus_behavior": "Focus remains untouched and its indicator is immediately visible; focused controls are never translated or delayed."
+  },
+  "ssr": { "renders_on_server": false, "initial_state": "Content is visible before JavaScript and when IntersectionObserver is unavailable.", "hydration_strategy": "Client adds the motion-ready attribute only after mount." },
+  "cleanup": { "unmount_behavior": "IntersectionObserver disconnects in the hook cleanup.", "route_change_behavior": "Each route mounts fresh observers and disconnects them on unmount.", "instances_expected_after_unmount": 0 },
+  "performance_budget": {
+    "compositor_only": true,
+    "added_bytes_gz": 0,
+    "frame_rate_floor": 45,
+    "cls_contribution": "None; every section occupies its final layout space before revealing.",
+    "inp_notes": "No click handler or navigation waits on the transition."
+  },
+  "verification": {
+    "method": "playwright-mcp",
+    "required_checks": ["RM-1", "RM-2", "A11Y-1", "A11Y-2", "PERF-1", "CON-1", "VP-1", "VP-2", "VP-3", "OVF-1", "CLS-1", "NAV-1", "NAV-2", "CLEAN-1", "CLEAN-2", "SCR-1", "SCR-2", "SCR-3"],
+    "viewport_matrix": ["375x812", "768x1024", "1440x900"],
+    "preference_matrix": ["no-preference", "reduce"]
+  },
+  "acceptance_criteria": [
+    "The section is readable before JavaScript and in reduced-motion mode.",
+    "Only opacity and transform animate for 220 milliseconds.",
+    "Rapid scrolling cannot leave content hidden.",
+    "No horizontal overflow or layout shift appears at the verification viewports."
+  ]
+}
+
