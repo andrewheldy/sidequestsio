@@ -1,0 +1,36 @@
+/*
+ * THE FEED — Pulse identity color tokens.
+ * Single CSS source of truth, mirrored by src/brand/tokens.ts (guarded by a unit test).
+ * Palette locked by docs/brand/THE_FEED_BRAND_IDENTITY.md §5 — do not add brand colors.
+ */
+:root {
+  /* Core brand */
+  --feed-pulse-lime: #cdef40;
+  --feed-black: #050706;
+  --feed-carbon: #111411;
+  --feed-graphite: #262a27;
+  --feed-signal-white: #f4f5f1;
+  --feed-static-gray: #a7aca7;
+  --feed-dark-lime: #64761e;
+
+  /* Semantic system colors — functional only, never brand accents */
+  --feed-success: #3ad17a;
+  --feed-warning: #f1c84a;
+  --feed-error: #f05d5e;
+  --feed-info: #61a9ff;
+
+  /* Derived surfaces (opacity mixes of the core palette only) */
+  --feed-lime-glow: rgba(205, 239, 64, 0.14);
+  --feed-lime-soft: rgba(205, 239, 64, 0.08);
+  --feed-border: rgba(167, 172, 167, 0.18);
+  --feed-border-strong: rgba(167, 172, 167, 0.34);
+  --feed-scrim: rgba(5, 7, 6, 0.72);
+}
+
+/* High-contrast mode (accessibility panel) — brightens text and borders only */
+html[data-contrast='high'] {
+  --feed-static-gray: #c9cec9;
+  --feed-border: rgba(201, 206, 201, 0.42);
+  --feed-border-strong: rgba(244, 245, 241, 0.6);
+  --feed-lime-glow: rgba(205, 239, 64, 0.22);
+}

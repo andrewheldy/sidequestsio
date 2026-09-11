@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+@import '../brand/tokens.css';
+
+@theme inline {
+  --color-pulse-lime: var(--feed-pulse-lime);
+  --color-feed-black: var(--feed-black);
+  --color-carbon: var(--feed-carbon);
+  --color-graphite: var(--feed-graphite);
+  --color-signal-white: var(--feed-signal-white);
+  --color-static-gray: var(--feed-static-gray);
+  --color-dark-lime: var(--feed-dark-lime);
+  --color-success: var(--feed-success);
+  --color-warning: var(--feed-warning);
+  --color-error: var(--feed-error);
+  --color-info: var(--feed-info);
+  --color-lime-glow: var(--feed-lime-glow);
+  --color-lime-soft: var(--feed-lime-soft);
+  --color-border-thin: var(--feed-border);
+  --color-border-strong: var(--feed-border-strong);
+  --color-scrim: var(--feed-scrim);
+
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Inter Variable', 'Helvetica Neue', Arial, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--feed-black);
+  color: var(--feed-signal-white);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Larger-text accessibility mode: scales rem-based type ~12% */
+html[data-text-scale='large'] {
+  font-size: 112.5%;
+}
+
+/* Focus visibility — keyboard and assistive tech */
+:focus-visible {
+  outline: 2px solid var(--feed-pulse-lime);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--feed-pulse-lime);
+  color: var(--feed-black);
+}
+
+/* Scrollable content areas keep a subtle, dark scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--feed-graphite) transparent;
+}
+
+/* ---- Motion ---- */
+
+@keyframes feed-pulse-draw {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -640;
+  }
+}
+
+@keyframes feed-eq {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes feed-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes feed-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes feed-drift {
+  0% {
+    transform: translate3d(-2%, 0, 0) scale(1.04);
+  }
+  50% {
+    transform: translate3d(2%, -1%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-2%, 0, 0) scale(1.04);
+  }
+}
+
+@keyframes feed-live-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.anim-fade-up {
+  animation: feed-fade-up 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-fade-in {
+  animation: feed-fade-in 300ms ease-out both;
+}
+
+/* Reduced motion: system preference OR in-app accessibility setting */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
