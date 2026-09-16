@@ -67,7 +67,7 @@ export function AvatarUploader({ userId, value, name, onUploaded }: AvatarUpload
           {shown ? (
             <AvatarImage src={shown} alt="" className="object-cover" />
           ) : null}
-          <AvatarFallback className="rounded-3xl bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
+          <AvatarFallback className="rounded-3xl bg-navy text-3xl font-bold text-sand-soft">
             {initial}
           </AvatarFallback>
         </Avatar>
@@ -75,7 +75,7 @@ export function AvatarUploader({ userId, value, name, onUploaded }: AvatarUpload
         {/* Camera affordance / loading overlay */}
         <span
           className={cn(
-            'absolute inset-0 flex items-center justify-center rounded-3xl bg-charcoal/45 transition-opacity',
+            'absolute inset-0 flex items-center justify-center rounded-3xl bg-navy/45 transition-opacity',
             uploading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100',
           )}
         >

@@ -2,7 +2,7 @@
  * QuestMap — interactive Mapbox map for quest discovery.
  *
  * Designed for mobile-first use:
- *   • Markers are ≥44×44px touch targets with emoji category icons
+ *   • Markers are ≥44×44px touch targets shaped as the sidequests doorway
  *   • Location is requested only on explicit user tap (never on mount)
  *   • Selected quest appears as a slide-up bottom sheet overlay
  *   • Map CSS is imported here so it only loads with this lazy chunk
@@ -10,7 +10,8 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { MAPBOX_TOKEN, getCategoryColor, getCategoryEmoji } from '@/lib/mapbox';
+import { Map as MapIcon, MapPin } from 'lucide-react';
+import { MAPBOX_TOKEN, buildMarkerSvg } from '@/lib/mapbox';
 import type { Quest } from '@/lib/quests';
 import QuestMapPopup from './QuestMapPopup';
 import UserLocationButton from './UserLocationButton';
@@ -37,6 +38,8 @@ const QuestMap = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  /** questId → marker element, so selection can repaint just that pin. */
+  const markerElsRef = useRef<Map<string, HTMLElement>>(new Map());
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   const [mapReady, setMapReady] = useState(false);
@@ -122,45 +125,40 @@ const QuestMap = ({
     // Remove stale markers
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
+    markerElsRef.current.clear();
 
     quests.forEach((quest) => {
-      const color = getCategoryColor(quest.category);
-      const emoji = getCategoryEmoji(quest.category);
-
       const el = document.createElement('button');
       el.setAttribute('type', 'button');
       el.setAttribute('aria-label', quest.title);
-      // Inline styles keep the element self-contained and avoid CSS class conflicts
+      // Inline styles keep the element self-contained and avoid CSS class conflicts.
+      // The box stays a 44px touch target while the doorway artwork sits inside it.
       el.style.cssText = [
         'width:44px',
-        'height:44px',
-        'border-radius:50%',
-        `background:${color}`,
-        'border:2.5px solid rgba(255,255,255,0.9)',
+        'height:54px',
+        'padding:0',
+        'border:none',
+        'background:transparent',
         'display:flex',
         'align-items:center',
         'justify-content:center',
         'cursor:pointer',
-        'font-size:20px',
-        'line-height:1',
-        'box-shadow:0 3px 10px rgba(0,0,0,0.45)',
-        'transition:transform 0.15s ease,box-shadow 0.15s ease',
+        'filter:drop-shadow(0 3px 8px rgba(13,19,33,0.45))',
+        'transition:transform 0.15s ease',
         'touch-action:manipulation',
         '-webkit-tap-highlight-color:transparent',
         'outline:none',
       ].join(';');
-      el.textContent = emoji;
+      el.innerHTML = buildMarkerSvg(quest.category);
 
       el.addEventListener('pointerdown', () => {
         el.style.transform = 'scale(0.9)';
       });
       el.addEventListener('pointerup', () => {
         el.style.transform = 'scale(1)';
-        el.style.boxShadow = `0 4px 16px ${color}80`;
       });
       el.addEventListener('pointerleave', () => {
         el.style.transform = 'scale(1)';
-        el.style.boxShadow = '0 3px 10px rgba(0,0,0,0.45)';
       });
       el.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -174,11 +172,12 @@ const QuestMap = ({
         });
       });
 
-      const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
         .setLngLat([quest.lng, quest.lat])
         .addTo(map);
 
       markersRef.current.push(marker);
+      markerElsRef.current.set(quest.id, el);
     });
 
     // Fit the viewport to show all quest pins
@@ -190,6 +189,16 @@ const QuestMap = ({
       map.flyTo({ center: [quests[0].lng, quests[0].lat], zoom: 14, duration: 800 });
     }
   }, [quests, mapReady]);
+
+  // ── Selected marker ────────────────────────────────────────────────────────
+  useEffect(() => {
+    markerElsRef.current.forEach((el, questId) => {
+      const quest = quests.find((q) => q.id === questId);
+      if (!quest) return;
+      el.innerHTML = buildMarkerSvg(quest.category, quest.id === selectedQuest?.id);
+      el.setAttribute('aria-pressed', String(quest.id === selectedQuest?.id));
+    });
+  }, [selectedQuest, quests, mapReady]);
 
   // ── User location dot ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -207,9 +216,9 @@ const QuestMap = ({
       'width:14px',
       'height:14px',
       'border-radius:50%',
-      'background:#3B82F6',
-      'border:3px solid white',
-      'box-shadow:0 0 0 5px rgba(59,130,246,0.25)',
+      'background:#2563EB',
+      'border:3px solid #F2E8D5',
+      'box-shadow:0 0 0 5px rgba(37,99,235,0.22)',
     ].join(';');
 
     userMarkerRef.current = new mapboxgl.Marker({ element: el, anchor: 'center' })
@@ -243,10 +252,12 @@ const QuestMap = ({
         style={{
           height,
           background: 'hsl(var(--card))',
-          borderColor: isAuthError ? '#F59E0B55' : 'hsl(var(--border))',
+          borderColor: isAuthError ? 'hsl(var(--reward) / 0.5)' : 'hsl(var(--border))',
         }}
       >
-        <span className="text-2xl">{isAuthError ? '🗺️' : '📍'}</span>
+        <span className="text-muted-foreground" aria-hidden="true">
+          {isAuthError ? <MapIcon className="h-7 w-7" /> : <MapPin className="h-7 w-7" />}
+        </span>
         <div className="px-6 space-y-2 max-w-xs">
           <p className="font-semibold text-foreground">
             {mapError === 'invalid-token'

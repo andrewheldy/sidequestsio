@@ -30,16 +30,20 @@
     --neutral-600: 217 17% 35%;
     --neutral-800: 216 27% 18%;
 
-    /* Backward-compatible aliases for existing components. */
+    /* Brand-role scales. These are the names to reach for in new work — the
+       Tailwind config exposes them as `navy`, `ocean`, `sand`, `palm`, `gold`
+       and `coral`. */
+    --navy: var(--midnight-900);
+    --navy-light: var(--midnight-800);
+    --ocean: var(--ocean-500);
+    --ocean-strong: var(--ocean-700);
+    --ocean-soft: var(--ocean-400);
+    --sand: var(--sand-200);
+    --sand-soft: var(--sand-100);
+    --palm: var(--palm-500);
+    --gold: var(--gold-500);
+    --gold-strong: var(--gold-700);
     --coral: var(--coral-500);
-    --coral-glow: var(--coral-500);
-    --indigo: var(--midnight-900);
-    --indigo-light: var(--midnight-800);
-    --turquoise: var(--ocean-500);
-    --turquoise-glow: var(--ocean-400);
-    --sandstone: var(--sand-200);
-    --sandstone-light: var(--sand-100);
-    --charcoal: var(--midnight-900);
 
     /* shadcn semantic tokens — warm light theme is the default. */
     --background: var(--sand-50);
@@ -58,20 +62,24 @@
     --accent-foreground: var(--midnight-900);
     --destructive: 3 62% 53%;
     --destructive-foreground: var(--neutral-0);
+    /* Palm Green = verified, completed, positive. Gold = XP, rewards, unlocks.
+       Coral = attention/discovery highlights, used sparingly. */
+    --success: var(--palm-500);
+    --success-foreground: var(--neutral-0);
+    --reward: var(--gold-500);
+    --reward-foreground: var(--midnight-900);
+    --highlight: var(--coral-500);
+    --highlight-foreground: var(--midnight-900);
     --border: var(--neutral-200);
     --input: var(--neutral-300);
     --ring: var(--ocean-400);
     --radius: 0.75rem;
 
     --gradient-hero: linear-gradient(135deg, hsl(var(--midnight-900)), hsl(var(--midnight-800)));
-    --gradient-coral: linear-gradient(135deg, hsl(var(--coral-600)), hsl(var(--coral-500)));
-    --gradient-turquoise: linear-gradient(135deg, hsl(var(--ocean-700)), hsl(var(--ocean-500)));
     --gradient-glass: linear-gradient(135deg, hsl(var(--neutral-0) / 0.96), hsl(var(--sand-50) / 0.9));
 
     --shadow-soft: 0 18px 60px -36px hsl(var(--midnight-900) / 0.38);
     --shadow-card: 0 24px 60px -44px hsl(var(--midnight-900) / 0.46);
-    --shadow-glow-coral: none;
-    --shadow-glow-turquoise: none;
 
     --motion-instant: 80ms;
     --motion-fast: 140ms;
@@ -110,6 +118,14 @@
     --border: 218 27% 25%;
     --input: 218 25% 31%;
     --ring: var(--gold-500);
+    --secondary: var(--ocean-400);
+    --secondary-foreground: var(--midnight-950);
+    --success: 153 46% 52%;
+    --success-foreground: var(--midnight-950);
+    --reward: var(--gold-500);
+    --reward-foreground: var(--midnight-950);
+    --highlight: var(--coral-500);
+    --highlight-foreground: var(--midnight-950);
   }
 
   * { @apply border-border; }
@@ -183,16 +199,6 @@
     @apply rounded-2xl border border-border bg-card;
     box-shadow: var(--shadow-card);
   }
-
-  .text-gradient-coral,
-  .text-gradient-turquoise {
-    color: inherit;
-    background: none;
-    -webkit-text-fill-color: currentColor;
-  }
-
-  .glow-coral,
-  .glow-turquoise { box-shadow: var(--shadow-card); }
 
   .hover-lift { transition: none; }
 

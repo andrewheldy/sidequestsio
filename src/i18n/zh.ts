@@ -29,7 +29,7 @@ export const zh: Translations = {
         { main: "通过人发现地方，而非信息流", sub: "面包屑是真实访客留下的简短笔记——没有关注者，没有噪音。" },
         { main: "没有流量的社区", sub: "没有点赞。没有排名。只有与真实地点相关的共享发现。" },
         { main: "留下痕迹。帮助下一位探索者。", sub: "每次任务后留下一条面包屑——一个提示，一个瞬间，一段记忆。" },
-        { main: "多探索。少刷屏。", sub: "SideQuests奖励现实世界的好奇心，而非屏幕时间。" },
+        { main: "多探索。少刷屏。", sub: "sidequests奖励现实世界的好奇心，而非屏幕时间。" },
         { main: "将现实世界变成可玩的冒险", sub: "扫描二维码，签到，通过去不同地方升级。" },
         { main: "不是信息流。是一条路径。", sub: "每个任务都有自己活跃的留言板——由探索者塑造。" },
         { main: "最好的地方不是热门话题", sub: "它们被发现，悄悄分享，通过面包屑传递。" },
@@ -71,7 +71,7 @@ export const zh: Translations = {
     },
     hosts: {
       title: '为你的社区创建任务',
-      description: '你是场地所有者、活动组织者或当地专家吗？与 SideQuests 合作。',
+      description: '你是场地所有者、活动组织者或当地专家吗？与 sidequests 合作。',
       cta: '成为主办方',
     },
   },
@@ -96,7 +96,7 @@ export const zh: Translations = {
     },
   },
   communityNotesPage: {
-    badge: 'SideQuests 的核心',
+    badge: 'sidequests 的核心',
     title: '留下痕迹，',
     titleHighlight: '帮助他人发现',
     description: '面包屑是探索者在任务地点留下的简短笔记和照片。它们是匿名的、有帮助的，完全不受社交媒体动态影响。',
@@ -160,14 +160,14 @@ export const zh: Translations = {
     },
     cta: {
       title: '找不到你的领域？',
-      description: '我们一直在扩展。有一个还不存在的分类？让我们知道，帮助塑造 SideQuests 的未来。',
+      description: '我们一直在扩展。有一个还不存在的分类？让我们知道，帮助塑造 sidequests 的未来。',
       button: '联系我们',
     },
   },
   partnerships: {
     badge: '合作伙伴',
     title: '与',
-    titleHighlight: 'SideQuests',
+    titleHighlight: 'sidequests',
     description: '加入不断增长的场地、品牌和社区网络，相信真实发现而非算法推广。',
     whoTitle: '谁与我们合作',
     types: {
@@ -231,7 +231,7 @@ export const zh: Translations = {
       completionsLabel: '完成',
     },
     benefits: {
-      title: '为什么在 SideQuests 主办',
+      title: '为什么在 sidequests 主办',
       items: [
         { title: '免费开始', description: '创建和主办任务完全免费。没有隐藏费用。' },
         { title: '简单仪表板', description: '一目了然地跟踪完成、面包屑和参与度。' },

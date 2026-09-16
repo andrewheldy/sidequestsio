@@ -78,7 +78,7 @@ function buildCaption(quest: QuestWithContext): string {
     '',
     ['@SideQuestsIO', partnerHandle].filter(Boolean).join(' '),
     '',
-    [`#SideQuests`, `#${tag}`, city ? `#${city.replace(/\s+/g, '')}` : '']
+    [`#sidequests`, `#${tag}`, city ? `#${city.replace(/\s+/g, '')}` : '']
       .filter(Boolean)
       .join(' '),
   ];
@@ -157,17 +157,18 @@ async function renderOverlay(
   ctx.fillStyle = botGrad;
   ctx.fillRect(0, H - botH, W, botH);
 
-  // -- Top-left: "SideQuests" wordmark
+  // -- Top-left: the wordmark. Lowercase is the brand's own spelling, and
+  // Manrope is the app's display face (Poppins was the old identity's).
   const logoSize = Math.max(14, Math.round(W * 0.036));
-  ctx.font = `bold ${logoSize}px Poppins, system-ui, sans-serif`;
+  ctx.font = `800 ${logoSize}px Manrope, system-ui, sans-serif`;
   ctx.fillStyle = '#FFFFFF';
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
-  ctx.fillText('SideQuests', 18, 34);
+  ctx.fillText('sidequests', 18, 34);
 
   // -- Top-right: quest title (truncated to fit)
   const titleSize = Math.max(12, Math.round(W * 0.030));
-  ctx.font = `600 ${titleSize}px Poppins, system-ui, sans-serif`;
+  ctx.font = `700 ${titleSize}px Manrope, system-ui, sans-serif`;
   ctx.fillStyle = 'rgba(255,255,255,0.90)';
   ctx.textAlign = 'right';
   const maxTitleW = W - 160;
@@ -212,11 +213,11 @@ async function renderOverlay(
 
   const pillGrad = ctx.createLinearGradient(bX, 0, bX + bW, 0);
   pillGrad.addColorStop(0, 'hsl(6, 89%, 68%)');   // coral
-  pillGrad.addColorStop(1, 'hsl(174, 100%, 45%)'); // turquoise
+  pillGrad.addColorStop(1, 'hsl(221, 83%, 53%)'); // Ocean Blue
   ctx.fillStyle = pillGrad;
   fillRoundRect(ctx, bX, bY, bW, bH, bH / 2);
 
-  ctx.fillStyle = '#0E1428';
+  ctx.fillStyle = '#0D1321'; // Midnight Navy
   ctx.textAlign = 'center';
   ctx.fillText(badgeLabel, bX + bW / 2, bY + bH / 2);
   ctx.textAlign = 'left';
@@ -423,7 +424,7 @@ export function QuestProofCamera({ quest, result, onDone }: QuestProofCameraProp
     if (navigator.canShare?.({ files: [shareFile] })) {
       try {
         await navigator.share({
-          title: `SideQuests: ${quest.title}`,
+          title: `sidequests: ${quest.title}`,
           text: caption,
           files: [shareFile],
         });
@@ -439,7 +440,7 @@ export function QuestProofCamera({ quest, result, onDone }: QuestProofCameraProp
       }
     } else if (navigator.share) {
       try {
-        await navigator.share({ title: `SideQuests: ${quest.title}`, text: caption });
+        await navigator.share({ title: `sidequests: ${quest.title}`, text: caption });
         track('proof_shared', {
           quest_id: quest.id,
           user_id: user?.id,
@@ -542,7 +543,7 @@ export function QuestProofCamera({ quest, result, onDone }: QuestProofCameraProp
   }, [user, quest.id, caption, composedBlob]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-charcoal">
+    <div className="fixed inset-0 z-50 flex flex-col bg-navy">
       {step === 'capture' && (
         <CaptureStep
           videoRef={videoRef}
@@ -621,10 +622,10 @@ function CaptureStep({
   return (
     <div className="relative flex h-full flex-col">
       {/* Top bar */}
-      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pb-4 pt-safe-top bg-gradient-to-b from-charcoal/80 to-transparent" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pb-4 pt-safe-top bg-gradient-to-b from-navy/80 to-transparent" style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}>
         <button
           onClick={onSkip}
-          className="flex items-center gap-1.5 rounded-full bg-charcoal/60 px-3 py-1.5 text-sm text-white/80 backdrop-blur"
+          className="flex items-center gap-1.5 rounded-full bg-navy/60 px-3 py-1.5 text-sm text-white/80 backdrop-blur"
           aria-label="Skip"
         >
           <X className="h-4 w-4" /> Skip
@@ -680,7 +681,7 @@ function CaptureStep({
 
       {/* Bottom controls */}
       <div
-        className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-charcoal/90 to-transparent px-8"
+        className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-navy/90 to-transparent px-8"
         style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))', paddingTop: '16px' }}
       >
         {/* Gallery picker */}
@@ -768,7 +769,7 @@ function PreviewStep({ composedUrl, isVideo, composing, onRetake, onProceed }: P
         {composing ? (
           <div className="flex h-full items-center justify-center gap-3 flex-col">
             <Loader2 className="h-10 w-10 animate-spin text-white/60" />
-            <p className="text-sm text-white/50">Applying SideQuests overlay…</p>
+            <p className="text-sm text-white/50">Applying the sidequests overlay…</p>
           </div>
         ) : composedUrl ? (
           isVideo ? (
@@ -782,7 +783,7 @@ function PreviewStep({ composedUrl, isVideo, composing, onRetake, onProceed }: P
           ) : (
             <img
               src={composedUrl}
-              alt="Your quest proof with SideQuests overlay"
+              alt="Your quest proof with the sidequests overlay"
               className="h-full w-full object-contain"
             />
           )
@@ -791,7 +792,7 @@ function PreviewStep({ composedUrl, isVideo, composing, onRetake, onProceed }: P
 
       {/* Bottom controls */}
       <div
-        className="flex gap-3 bg-charcoal px-4"
+        className="flex gap-3 bg-navy px-4"
         style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))', paddingTop: '16px' }}
       >
         <Button
@@ -802,7 +803,7 @@ function PreviewStep({ composedUrl, isVideo, composing, onRetake, onProceed }: P
           <Camera className="h-4 w-4" /> Retake
         </Button>
         <Button
-          className="flex-1 gap-2 bg-gradient-to-r from-coral to-turquoise font-semibold text-charcoal"
+          className="flex-1 gap-2 bg-reward font-semibold text-reward-foreground hover:bg-sand"
           onClick={onProceed}
           disabled={composing || !composedUrl}
         >
@@ -872,7 +873,7 @@ function ShareStep({
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         {/* Quest complete banner */}
-        <div className="mb-4 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-coral/20 to-turquoise/20 p-4">
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-reward/30 bg-reward/12 p-4">
           <Trophy className="h-8 w-8 shrink-0 text-secondary" />
           <div>
             <p className="font-poppins font-bold text-foreground">Quest Complete!</p>
@@ -904,7 +905,7 @@ function ShareStep({
             ) : (
               <img
                 src={composedUrl}
-                alt="Quest proof with SideQuests overlay"
+                alt="Quest proof with the sidequests overlay"
                 className="aspect-[3/4] w-full object-cover"
               />
             )}
@@ -927,7 +928,7 @@ function ShareStep({
         {/* Primary share button */}
         <Button
           onClick={canNativeShare ? onNativeShare : onCopyCaption}
-          className="mb-3 w-full gap-2 bg-gradient-to-r from-coral to-turquoise font-semibold text-charcoal"
+          className="mb-3 w-full gap-2 bg-reward font-semibold text-reward-foreground hover:bg-sand"
           size="lg"
         >
           <Share2 className="h-5 w-5" />
@@ -957,7 +958,7 @@ function ShareStep({
           <PlatformButton
             label="SMS"
             emoji="💬"
-            style={{ background: '#22c55e' }}
+            style={{ background: 'hsl(153 46% 34%)' }} /* Palm Green */
             onClick={() => onShareTo('sms')}
           />
         </div>
@@ -1011,7 +1012,7 @@ function ShareStep({
 
         {/* Note about platform sharing */}
         <p className="mt-4 text-center text-[11px] leading-relaxed text-white/30">
-          SideQuests never posts on your behalf.
+          sidequests never posts on your behalf.
           <br />
           All sharing happens through your own apps.
         </p>

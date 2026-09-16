@@ -8,14 +8,13 @@ Production system for the approved “Unexpected” direction: a doorway into hi
 2. Use `logos/logo-horizontal.svg` as the default marketing header logo and `logos/icon-small.svg` below 32 px.
 3. Use `icons/*.svg` with CSS `color`; the SVGs inherit `currentColor`.
 4. Use `illustrations/*.svg` only for empty, loading, success, and onboarding states.
-5. Use raster exports in `favicon/`, `social/`, and `assets/` for platforms that do not accept SVG.
+5. Use raster exports in `social/` and `assets/` for platforms that do not accept SVG. Browser and app icons are generated into `public/` — see "Favicon and app installation".
 6. Read `design-system.md` before translating the system into Tailwind or shadcn tokens.
 
 ## Folder map
 
 - `logos/` — custom vector wordmark, primary lockups, compact marks, monochrome, reverse, outlined, and embossed versions.
 - `icons/` — 27 product icons on a unified 24 px construction grid.
-- `favicon/` — favicon SVG/ICO, mask icon, Apple touch icon, Android icons, app source icon, and manifest.
 - `typography/` — font recommendations, responsive scale, and CSS type utilities.
 - `colors/` — machine-readable HEX/RGB/HSL data and CSS primitives/semantic aliases.
 - `illustrations/` — ten production SVG states plus illustration rules.
@@ -37,8 +36,8 @@ Production system for the approved “Unexpected” direction: a doorway into hi
 | UI icon 16–24 px | `logos/icon-small.svg` | 16 px |
 | One-color printing | `logos/logo-monochrome.svg` | 32 mm wide |
 | Dark photography | `logos/logo-reverse.svg` | 148 px wide |
-| App stores | `favicon/app-icon-1024.png` | source only |
-| Browser | `favicon/favicon.svg` and `favicon/favicon.ico` | native |
+| App stores | `logos/app-icon.svg` | source only |
+| Browser | `public/favicon.svg` and `public/favicon.ico` (generated) | native |
 | Social profile | `social/social-avatar.png` | platform crop safe |
 
 The clear-space unit is the width of the spark. Keep at least 2 units around the horizontal logo and 1.5 units around the icon. Do not rotate the mark, place it in a generic map pin, add glow, alter the path, recolor individual parts outside approved lockups, or combine it with the old Dotling/mascot artwork.
@@ -53,15 +52,21 @@ The clear-space unit is the width of the spark. Keep at least 2 units around the
 
 - XP: Ocean.
 - Points: Reward Gold.
-- Rewards: Coral, used sparingly.
+- Rewards: Reward Gold for the earned value; Coral only to draw attention to it.
 - Verified/success: Palm.
-- Achievement: Violet, reserved for earned milestones.
+- Achievement: Reward Gold, reserved for earned milestones.
 
 Never communicate status by color alone. Text labels and icons remain required.
 
 ## Favicon and app installation
 
-Copy the contents of `brand/favicon/` into the public asset directory, preserving names. Reference the SVG favicon first, then ICO fallback, Apple icon, mask icon, manifest, and theme color `#0D1321`. Do not round `app-icon-1024.png` again on platforms that apply their own mask.
+`brand/logos/app-icon.svg` (rounded square), `app-icon-maskable.svg` (full-bleed, 80% safe zone) and `mask-icon.svg` (flat silhouette) are the only sources. Everything the site serves is generated from them:
+
+```
+node scripts/generate-brand-assets.mjs
+```
+
+That writes `favicon.ico`, `favicon.svg`, `favicon-16/32.png`, `apple-touch-icon.png`, `icon-192/512.png`, `icon-maskable-512.png`, `mask-icon.svg` and `og-image.png` into `public/`. Edit the SVG source and re-run — never hand-edit the rasters, or the set drifts apart again. `index.html` references the SVG favicon first with the ICO as fallback, and the theme color is `#0D1321`.
 
 ## Social usage
 

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getCategoryEmoji } from '@/lib/mapbox';
+import { CategoryIcon } from '@/components/brand/CategoryIcon';
 
 /**
  * Quest photo that never renders as a broken <img>: when the quest has no
  * image URL (every quest imported before its hero asset is approved) or the
- * URL fails to load, it falls back to the same gradient treatment as the
- * QuestHero fallback, anchored by the category emoji.
+ * URL fails to load, it falls back to a Midnight Navy surface anchored by the
+ * quest's category glyph.
  */
 export function QuestImage({
   src,
@@ -26,11 +26,9 @@ export function QuestImage({
       <div
         role="img"
         aria-label={alt}
-        className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/30 to-secondary/20"
+        className="flex h-full w-full items-center justify-center bg-navy"
       >
-        <span className="text-4xl opacity-80" aria-hidden="true">
-          {getCategoryEmoji(category)}
-        </span>
+        <CategoryIcon category={category} className="h-10 w-10 text-reward/70" strokeWidth={1.4} />
       </div>
     );
   }

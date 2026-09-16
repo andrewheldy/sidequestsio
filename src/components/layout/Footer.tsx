@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Mail } from 'lucide-react';
-import logoReverse from '../../../brand/logos/logo-reverse.svg';
+import { Logo } from '@/components/brand/Logo';
 
 const footerGroups = [
   {
@@ -38,7 +38,7 @@ export function Footer() {
       <div className="sq-container py-16 md:py-20">
         <div className="grid gap-12 border-b border-white/15 pb-14 lg:grid-cols-[1.35fr_2fr]">
           <div className="max-w-sm">
-            <img src={logoReverse} alt="sidequests" className="mb-6 h-auto w-[168px]" />
+            <Logo tone="reverse" className="mb-6 w-[168px]" />
             <p className="text-lg leading-relaxed text-white/68">
               A reason to take the side street, try the unfamiliar door, and remember the place you found.
             </p>

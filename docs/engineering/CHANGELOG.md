@@ -2,6 +2,51 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-16 — Brand migration, phase 2: shipped assets, metadata, and the last legacy surfaces
+
+- **Fixed a production-facing asset gap.** `index.html` and `site.webmanifest` referenced
+  `/apple-touch-icon.png`, `/og-image.png`, `/icon-192.png` and `/icon-512.png`, none of which
+  existed in `public/` — social shares rendered with no image and PWA install had no icon. The
+  shipped `favicon.ico` was still the Lovable default heart. All of them are now generated from the
+  brand vectors by `scripts/generate-brand-assets.mjs` (headless Chromium over CDP, no new npm
+  dependency), which writes `favicon.ico` (16/32/48), `favicon.svg`, `favicon-16/32.png`,
+  `apple-touch-icon.png`, `icon-192/512.png`, `icon-maskable-512.png`, `mask-icon.svg` and a
+  1200 × 630 `og-image.png` built from `scripts/brand/og-image.html`.
+- **Metadata.** `theme-color` and the manifest's `theme_color`/`background_color` moved from Ocean
+  Blue to Midnight Navy `#0D1321`; added SVG favicon + 16/32 PNG + Safari mask-icon links, Apple
+  web-app meta, `og:locale`, `og:image:{type,width,height,alt}`, `twitter:image:alt`, and `image` on
+  the Organization JSON-LD. Manifest gained `id`, `scope`, `lang`, `categories` and a maskable icon.
+  `start_url` deliberately unchanged. The `@SideQuestsIO` handle was already established and is kept.
+- **Logo usage is centralized** in `src/components/brand/Logo.tsx` (`<Logo>` lockup, `<LogoMark>`
+  symbol). Five files previously imported brand SVGs by relative path; the homepage recoloured the
+  navy mark with a `brightness-0 invert` filter, which is now the real reverse artwork
+  (`brand/logos/icon-reverse.svg`). The winding-path glyph was redrawn as one continuous switchback
+  ribbon to match the supplied artwork, applied across all 22 brand SVGs.
+- **Removed the last of the previous identity.** The in-app header and app home rendered the
+  wordmark as italic all-caps `SIDEQUESTS` on a coral gradient — replaced with the real lockup. Map
+  markers were seven rainbow hex colours with emoji glyphs; they are now Midnight Navy doorway pins
+  with lucide category glyphs in Reward Gold, Ocean Blue when selected. Also migrated: the
+  coral→turquoise gradient CTAs and avatars, the generic-purple gradient chip (dead code, deleted),
+  the onboarding blur-blob background and its emoji pickers, and the `#0E1428` / `#22c55e` /
+  `#3B82F6` hardcoded hexes.
+- **Tokens.** `src/index.css` gained brand-role variables (`--navy`, `--ocean`, `--sand`, `--palm`,
+  `--gold`, `--coral`) and semantic `--success` / `--reward` / `--highlight` pairs, wired through
+  `tailwind.config.ts` as `navy`/`ocean`/`sand`/`palm`/`gold`/`coral`/`success`/`reward`/`highlight`.
+  The legacy `turquoise`/`indigo`/`sandstone`/`charcoal` aliases, the `gradient-coral` /
+  `gradient-turquoise` recipes, the no-op `text-gradient-*` / `glow-*` classes and the `pulse-glow`
+  keyframe were removed once nothing referenced them.
+- **Wordmark spelling.** User-visible copy now reads `sidequests`, including the wordmark composited
+  into every shared quest photo (`ctx.fillText`, and its font moved from Poppins to Manrope). 64
+  occurrences across the eight locale files and the local seed data. Developer console prefixes
+  (`[SideQuests]`) are unchanged.
+- Removed obsolete duplicates: `brand/favicon/` (a stale parallel icon set with its own manifest,
+  referenced by nothing), `public/site 2.webmanifest`, `src/components/BackendFallbackBanner 2.tsx`,
+  and the ` 2` copies of the brand docs. Off-palette "achievement Violet" is gone from the brand docs.
+- Verification: `npx tsc -p tsconfig.app.json --noEmit` clean; production build passes; `npm run lint`
+  unchanged from baseline (36 pre-existing problems, none in the migrated code). Ten routes were
+  screenshotted at 1440 px and 390 px against a local production build. No schema, RPC, auth, routing
+  or business-logic change.
+
 ## 2026-08-15 — Design-intelligence rebuild, phase 1 (not deployed)
 
 - Established the product's new visual direction: **a playable Miami field guide** with a quiet

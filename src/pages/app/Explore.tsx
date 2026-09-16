@@ -8,7 +8,7 @@ import AppQuestCard from '@/components/app/AppQuestCard';
 import { EmptyState } from '@/components/app/ui';
 import { useActiveQuests } from '@/hooks/useActiveQuests';
 import { useAuth } from '@/contexts/AuthContext';
-import logoHorizontal from '../../../brand/logos/logo-horizontal.svg';
+import { Logo } from '@/components/brand/Logo';
 
 const Explore = () => {
   const { profile } = useAuth();
@@ -34,7 +34,7 @@ const Explore = () => {
   return (
     <div className="space-y-7">
       <header className="flex items-center justify-between pt-1">
-        <Link to="/" aria-label="sidequests home"><img src={logoHorizontal} alt="sidequests" className="w-[136px]" /></Link>
+        <Link to="/" aria-label="sidequests home"><Logo decorative className="w-[136px]" /></Link>
         <Link to="/app/map" className="flex h-11 items-center gap-2 rounded-xl border border-border bg-card px-3 text-sm font-bold">
           <Map className="h-4 w-4 text-[hsl(var(--ocean-500))]" /> Map
         </Link>

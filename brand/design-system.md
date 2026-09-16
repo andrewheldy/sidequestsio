@@ -197,7 +197,7 @@ Recommended: do not add a route solely to satisfy a conventional sitemap. During
 
 Current reality: the profile is mounted and contains progression and linked operational destinations; system-state documentation notes some linked partner/admin routes may be unreachable.
 
-Recommended: treat the profile as an Adventure Log cover: avatar/name/level, XP progress, Points balance, completed quest count, recent memories, achievements, then settings. Remove dashboard-like metric grids where one strong stat and an editorial memory grid can work. Use Ocean for XP, Gold for Points, and achievement Violet sparingly. Keep personal media central. Do not visually promote unreachable partner/admin links.
+Recommended: treat the profile as an Adventure Log cover: avatar/name/level, XP progress, Points balance, completed quest count, recent memories, achievements, then settings. Remove dashboard-like metric grids where one strong stat and an editorial memory grid can work. Use Ocean for XP and Gold for Points, both sparingly. Keep personal media central. Do not visually promote unreachable partner/admin links.
 
 ### Rewards — source exists, route not mounted
 

@@ -16,7 +16,12 @@ interface CTASectionProps {
     label: string;
     href: string;
   };
-  variant?: 'coral' | 'turquoise';
+  /**
+   * `sand` is the warm editorial break between light sections; `navy` is the
+   * full-strength branded moment. The previous coral/turquoise gradient washes
+   * belonged to the old identity.
+   */
+  variant?: 'sand' | 'navy';
   icon?: ReactNode;
   className?: string;
 }
@@ -26,59 +31,57 @@ export function CTASection({
   description,
   primaryAction,
   secondaryAction,
-  variant = 'coral',
+  variant = 'sand',
   icon,
   className,
 }: CTASectionProps) {
+  const isNavy = variant === 'navy';
+
   return (
     <AnimatedSection>
       <section
         className={cn(
-          'relative py-20 md:py-28 overflow-hidden',
-          variant === 'coral'
-            ? 'bg-gradient-to-br from-coral/20 via-coral/10 to-transparent'
-            : 'bg-gradient-to-br from-turquoise/20 via-turquoise/10 to-transparent',
-          className
+          'relative overflow-hidden py-20 md:py-28',
+          isNavy ? 'bg-navy text-sand-soft' : 'bg-sand text-foreground',
+          className,
         )}
       >
-        {/* Background decoration */}
+        {/* A single doorway arch, echoing the mark without competing with the type. */}
         <div
+          aria-hidden
           className={cn(
-            'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-20',
-            variant === 'coral' ? 'bg-coral' : 'bg-turquoise'
+            'pointer-events-none absolute left-1/2 top-0 h-[420px] w-[340px] -translate-x-1/2 rounded-t-full border-x border-t',
+            isNavy ? 'border-white/10' : 'border-navy/10',
           )}
         />
 
-        <div className="container relative">
-          <div className="max-w-3xl mx-auto text-center">
-            {icon && (
-              <div className="mb-6 flex justify-center">
-                {icon}
-              </div>
-            )}
+        <div className="sq-container relative">
+          <div className="mx-auto max-w-3xl text-center">
+            {icon && <div className="mb-6 flex justify-center">{icon}</div>}
 
-            <h2 className="font-poppins font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-6">
-              {title}
-            </h2>
+            <h2 className="sq-section-title mx-auto max-w-[16ch]">{title}</h2>
 
-            <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
+            <p
+              className={cn(
+                'mx-auto mt-6 max-w-2xl text-lg leading-relaxed',
+                isNavy ? 'text-sand-soft/75' : 'text-muted-foreground',
+              )}
+            >
               {description}
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
                 asChild
                 size="lg"
                 className={cn(
-                  'font-semibold px-8 group',
-                  variant === 'coral'
-                    ? 'bg-primary hover:bg-primary/90'
-                    : 'bg-turquoise hover:bg-turquoise/90 text-primary-foreground'
+                  'group px-8 font-semibold',
+                  isNavy && 'bg-reward text-reward-foreground hover:bg-sand',
                 )}
               >
                 <Link to={primaryAction.href}>
                   {primaryAction.label}
-                  <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
 
@@ -87,7 +90,7 @@ export function CTASection({
                   asChild
                   variant="outline"
                   size="lg"
-                  className="border-border hover:bg-muted"
+                  className={cn(isNavy && 'border-white/25 text-white hover:border-white/45 hover:bg-white/10')}
                 >
                   <Link to={secondaryAction.href}>{secondaryAction.label}</Link>
                 </Button>

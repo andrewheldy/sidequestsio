@@ -21,16 +21,18 @@
 
 ## Browser and application
 
-- `favicon/favicon.svg`
-- `favicon/favicon.ico`
-- `favicon/favicon-64.png`
-- `favicon/apple-touch-icon.png`
-- `favicon/android-chrome-192x192.png`
-- `favicon/android-chrome-512x512.png`
-- `favicon/mask-icon.svg`
-- `favicon/app-icon.svg`
-- `favicon/app-icon-1024.png`
-- `favicon/site.webmanifest`
+Browser and app icons are not exported by hand. `node scripts/generate-brand-assets.mjs`
+renders them from `logos/app-icon.svg`, `logos/app-icon-maskable.svg` and
+`logos/mask-icon.svg` straight into `public/`:
+
+- `public/favicon.ico` (16/32/48)
+- `public/favicon.svg`
+- `public/favicon-16.png`, `public/favicon-32.png`
+- `public/apple-touch-icon.png` (180)
+- `public/icon-192.png`, `public/icon-512.png`
+- `public/icon-maskable-512.png`
+- `public/mask-icon.svg`
+- `public/og-image.png` (1200 × 630)
 - `assets/app-splash.svg/.png`
 - `assets/loading-animation.svg`
 

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="./fonts.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    background: #0D1321;
+    font-family: Inter, system-ui, sans-serif;
+    display: grid;
+    grid-template-columns: 1fr 496px;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Left: brand + message ─────────────────────────────────────────── */
+  .copy {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 64px 40px 58px 72px;
+  }
+
+  .message { align-self: center; }
+
+  .lockup { height: 56px; }
+  .lockup img { height: 100%; width: auto; display: block; }
+
+  .overline {
+    color: #F2B94B;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+
+  h1 {
+    font-family: Manrope, system-ui, sans-serif;
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    color: #F8F3E8;
+    max-width: 9.2ch;
+  }
+
+  .domain {
+    color: #F2E8D5;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── Right: arched doorway photo, bleeding off the canvas edge ──────── */
+  .arch {
+    position: relative;
+    margin: 26px -0px -0px 0;
+    border-radius: 248px 248px 0 0;
+    overflow: hidden;
+    background: #26344C;
+    box-shadow: 0 0 0 5px #F2E8D5;
+  }
+  .arch img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% 46%;
+    display: block;
+  }
+  /* Warm the photo toward the brand and keep the arch reading as a doorway. */
+  .arch::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(13,19,33,0.30) 0%, rgba(13,19,33,0) 42%);
+  }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <div class="lockup"><img src="./logo-reverse.svg" alt="sidequests" /></div>
+    <div class="message">
+      <p class="overline">Miami Field Guide</p>
+      <h1>Miami has a hidden side. Go find it.</h1>
+    </div>
+    <p class="domain">miamisidequests.io</p>
+  </div>
+  <div class="arch"><img src="./doorway.png" alt="" /></div>
+</body>
+</html>

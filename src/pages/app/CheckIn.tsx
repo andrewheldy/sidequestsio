@@ -33,11 +33,11 @@ export default function CheckIn() {
       <AppHeader title="Check In" />
       <div className="mt-4">
       <div className="glass-card mt-2 flex flex-col items-center gap-3 p-6 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-coral text-primary-foreground glow-coral">
+        <span className="flex h-16 w-16 items-end justify-center rounded-t-[1.75rem] rounded-b-md bg-navy pb-3 text-reward">
           <QrCode className="h-8 w-8" />
         </span>
         <p className="text-sm text-muted-foreground">
-          Scan a SideQuests code at a venue, or enter it manually below.
+          Scan a sidequests code at a venue, or enter it manually below.
         </p>
         <form onSubmit={go} className="flex w-full gap-2">
           <Input

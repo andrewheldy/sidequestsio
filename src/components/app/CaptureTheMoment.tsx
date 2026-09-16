@@ -107,17 +107,18 @@ async function renderMomentOverlay(
   ctx.fillStyle = botGrad;
   ctx.fillRect(0, H - botH, W, botH);
 
-  // SideQuests wordmark (top-left)
+  // -- Top-left: the wordmark. Lowercase is the brand's own spelling, and
+  // Manrope is the app's display face (Poppins was the old identity's).
   const logoSize = Math.max(14, Math.round(W * 0.036));
-  ctx.font = `bold ${logoSize}px Poppins, system-ui, sans-serif`;
+  ctx.font = `800 ${logoSize}px Manrope, system-ui, sans-serif`;
   ctx.fillStyle = '#FFFFFF';
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
-  ctx.fillText('SideQuests', 18, 34);
+  ctx.fillText('sidequests', 18, 34);
 
   // Quest title (top-right)
   const titleSize = Math.max(12, Math.round(W * 0.030));
-  ctx.font = `600 ${titleSize}px Poppins, system-ui, sans-serif`;
+  ctx.font = `700 ${titleSize}px Manrope, system-ui, sans-serif`;
   ctx.fillStyle = 'rgba(255,255,255,0.90)';
   ctx.textAlign = 'right';
   const maxTitleW = W - 160;
@@ -139,7 +140,7 @@ async function renderMomentOverlay(
   }
   ctx.font = `400 ${smallSize}px system-ui, sans-serif`;
   ctx.fillStyle = 'rgba(255,255,255,0.60)';
-  ctx.fillText('#SideQuests', 18, H - 36);
+  ctx.fillText('#sidequests', 18, H - 36);
 
   // "CAPTURE THE MOMENT" badge pill (bottom-right)
   const badgeLabel = 'CAPTURE THE MOMENT';
@@ -160,7 +161,7 @@ async function renderMomentOverlay(
   ctx.fillStyle = pillGrad;
   fillRoundRect(ctx, bX, bY, bW, bH, bH / 2);
 
-  ctx.fillStyle = '#0E1428';
+  ctx.fillStyle = '#0D1321'; // Midnight Navy
   ctx.textAlign = 'center';
   ctx.fillText(badgeLabel, bX + bW / 2, bY + bH / 2);
   ctx.textAlign = 'left';
@@ -199,7 +200,7 @@ export function CaptureTheMoment({
   const [copied, setCopied] = useState(false);
 
   const [caption, setCaption] = useState(
-    `I just completed "${questTitle}"${venueName ? ` at ${venueName}` : ''} on SideQuests. 🗺️\n@SideQuestsIO #SideQuests`,
+    `I just completed "${questTitle}"${venueName ? ` at ${venueName}` : ''} on sidequests. 🗺️\n@SideQuestsIO #sidequests`,
   );
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -464,7 +465,7 @@ export function CaptureTheMoment({
           </div>
           {xp && (
             <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-black/50 px-3 py-1.5 backdrop-blur">
-              <Zap className="h-3.5 w-3.5 text-turquoise" />
+              <Zap className="h-3.5 w-3.5 text-gold-strong" />
               <span className="text-xs font-bold text-white">+{xp} XP</span>
             </div>
           )}
@@ -517,7 +518,7 @@ export function CaptureTheMoment({
                   </div>
                   <div className="flex flex-col items-end gap-0.5">
                     {xp && (
-                      <span className="flex items-center gap-0.5 text-xs font-bold text-turquoise">
+                      <span className="flex items-center gap-0.5 text-xs font-bold text-gold-strong">
                         <Zap className="h-3 w-3" /> +{xp} XP
                       </span>
                     )}

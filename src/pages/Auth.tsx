@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { safeNextPath } from '@/lib/navigation';
-import logoHorizontal from '../../brand/logos/logo-horizontal.svg';
+import { Logo } from '@/components/brand/Logo';
 import heroImage from '../../brand/mockups/photography-hero-reference.png';
 
 type Mode = 'signin' | 'signup';
@@ -110,7 +110,7 @@ const Auth = () => {
         </Link>
 
         <div className="mb-8">
-          <img src={logoHorizontal} alt="sidequests" className="mb-8 h-auto w-[164px]" />
+          <Logo className="mb-8 w-[164px]" />
           <p className="sq-overline mb-3 text-[hsl(var(--ocean-700))]">Your next detour</p>
           <h1 className="font-display text-4xl font-bold leading-none tracking-[-0.05em]">
             {mode === 'signin' ? 'Welcome back.' : 'Make Miami your field guide.'}

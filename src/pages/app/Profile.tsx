@@ -126,8 +126,8 @@ export default function Profile() {
         </div>
         <Progress value={lvl.progress * 100} className="mt-2 h-2" />
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <StatTile label="Points" value={effectiveProfile?.points_balance_cache ?? 0} accent="coral" />
-          <StatTile label="Quests" value={effectiveProfile?.completed_quests_count ?? 0} accent="turquoise" />
+          <StatTile label="Points" value={effectiveProfile?.points_balance_cache ?? 0} accent="reward" />
+          <StatTile label="Quests" value={effectiveProfile?.completed_quests_count ?? 0} accent="ocean" />
           <StatTile label="Notes" value={effectiveProfile?.community_notes_count ?? 0} />
         </div>
       </div>

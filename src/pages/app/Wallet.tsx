@@ -16,7 +16,7 @@ export default function Wallet() {
 
   return (
     <AppLayout title="Wallet">
-      <div className="glass-card mt-2 p-6 text-center glow-coral">
+      <div className="mt-2 rounded-2xl border border-border bg-card p-6 text-center">
         <Star className="mx-auto h-8 w-8 text-primary" />
         <p className="mt-2 text-sm text-muted-foreground">Points balance</p>
         <p className="font-poppins text-4xl font-bold text-secondary">

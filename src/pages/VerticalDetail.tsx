@@ -210,7 +210,7 @@ const VerticalDetail = () => {
         title={`Ready to Explore ${data.title}?`}
         description="Start your first quest in this category and leave a community note for the next explorer."
         primaryAction={{ label: 'Find a Quest', href: '/quests' }}
-        variant="coral"
+        variant="sand"
       />
     </Layout>
   );

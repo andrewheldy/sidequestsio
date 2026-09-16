@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">sidequests doorway icon, reversed</title>
+  <desc id="desc">An open doorway with a winding path and discovery spark, in white for dark surfaces.</desc>
+  <path fill="#FFFFFF" fill-rule="evenodd" d="M14 51V24C14 13.507 22.507 5 33 5s19 8.507 19 19v27h-7V24c0-6.627-5.373-12-12-12s-12 5.373-12 12v27h-7Z"/>
+  <path fill="#FFFFFF" d="m32.7 20 1.86 3.94L38.5 25.8l-3.94 1.86-1.86 3.94-1.86-3.94-3.94-1.86 3.94-1.86L32.7 20Z"/>
+  <path fill="#FFFFFF" d="M29.8 33 23.5 38l10.2 5.5L21.4 49l5.1 5L17 59h30l-9.5-5-6.9-5 10.7-5.5L29.5 38l4.7-5h-4.4Z"/>
+</svg>

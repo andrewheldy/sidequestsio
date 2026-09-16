@@ -352,7 +352,7 @@ export default function QuestDetail() {
       user_id: user?.id ?? null,
       props: { platform },
     });
-    const caption = quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #SideQuests`;
+    const caption = quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #sidequests`;
     if (platform === "x") {
       window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(caption)}`, "_blank", "noopener");
     } else if (platform === "instagram" || platform === "tiktok") {

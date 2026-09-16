@@ -18,11 +18,11 @@ const Hosts = () => {
         <div className="container">
           <AnimatedSection>
             <div className="text-center max-w-3xl mx-auto">
-              <span className="text-turquoise font-semibold text-sm uppercase tracking-wide mb-4 block">
+              <span className="sq-overline mb-4 block text-ocean-strong">
                 {t.hosts.badge}
               </span>
               <h1 className="font-poppins font-bold text-4xl md:text-5xl text-foreground mb-6">
-                {t.hosts.title} <span className="text-gradient-turquoise">{t.hosts.titleHighlight}</span>
+                {t.hosts.title} <span className="text-ocean-strong">{t.hosts.titleHighlight}</span>
               </h1>
               <p className="text-lg text-muted-foreground">
                 {t.hosts.description}
@@ -140,7 +140,7 @@ const Hosts = () => {
               return (
                 <AnimatedSection key={benefit.title} delay={index * 100}>
                   <div className="glass-card p-8 text-center hover-lift h-full">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-turquoise/10 flex items-center justify-center text-turquoise">
+                    <div className="mx-auto mb-4 flex h-16 w-14 items-end justify-center rounded-t-[2rem] rounded-b-md bg-navy pb-3 text-reward">
                       <Icon className="w-8 h-8" />
                     </div>
                     <h3 className="font-poppins font-semibold text-xl text-foreground mb-3">{benefit.title}</h3>
@@ -158,7 +158,7 @@ const Hosts = () => {
         title={t.hosts.cta.title}
         description={t.hosts.cta.description}
         primaryAction={{ label: t.hosts.cta.button, href: '/partnerships' }}
-        variant="turquoise"
+        variant="navy"
       />
     </Layout>
   );

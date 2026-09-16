@@ -121,7 +121,7 @@ export function ProfileEditDialog({ profile, open, onOpenChange }: ProfileEditDi
       <DialogContent className="max-h-[92vh] gap-0 overflow-y-auto sm:max-w-md">
         <DialogHeader className="text-left">
           <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>Update how you show up across SideQuests.</DialogDescription>
+          <DialogDescription>Update how you show up across sidequests.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-2">
