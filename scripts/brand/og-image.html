@@ -18,14 +18,24 @@
   /* ── Left: brand + message ─────────────────────────────────────────── */
   .copy {
     display: grid;
+    /* An explicit rhythm. The wordmark sits on a baseline near the top, the
+       message block owns the middle, the domain closes it out — rather than
+       three things floating in a 1fr gap. */
     grid-template-rows: auto 1fr auto;
-    padding: 64px 40px 58px 72px;
+    row-gap: 44px;
+    padding: 62px 40px 58px 72px;
   }
 
-  .message { align-self: center; }
+  /*
+   * The wordmark alone, no doorway mark.
+   * The mark's winding path needs ~90px to resolve — at the ~30px a lockup
+   * gives it here it collapses into a smudge. On a social card recognition
+   * lives in the wordmark anyway, so this is the treatment that reproduces
+   * cleanly. See brand/README.md on mark-vs-lockup usage.
+   */
+  .wordmark { height: 62px; width: auto; display: block; }
 
-  .lockup { height: 56px; }
-  .lockup img { height: 100%; width: auto; display: block; }
+  .message { align-self: center; }
 
   .overline {
     color: #F2B94B;
@@ -43,10 +53,13 @@
     line-height: 1.02;
     letter-spacing: -0.045em;
     color: #F8F3E8;
-    max-width: 9.2ch;
+    /* Explicit breaks. A `ch`-based max-width made the three-line wrap a
+       coincidence of the measure — any copy edit re-wrapped it unpredictably. */
+    text-wrap: nowrap;
   }
 
   .domain {
+    align-self: end;
     color: #F2E8D5;
     font-size: 22px;
     font-weight: 500;
@@ -56,34 +69,42 @@
   /* ── Right: arched doorway photo, bleeding off the canvas edge ──────── */
   .arch {
     position: relative;
-    margin: 26px -0px -0px 0;
+    margin-top: 26px;
+    /* A real border, not a box-shadow spread: a spread can't follow a
+       border-radius that the canvas edge clips, so it rendered as a flat
+       cream stripe down the left side instead of tracing the arch. */
+    border: 5px solid #F2E8D5;
+    border-bottom: 0;
     border-radius: 248px 248px 0 0;
     overflow: hidden;
     background: #26344C;
-    box-shadow: 0 0 0 5px #F2E8D5;
   }
   .arch img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 62% 46%;
+    /* Both figures whole, doorway centred — 50% bisected the right-hand one. */
+    object-position: 68% 46%;
     display: block;
+    /* The source frame is dusk-dark on its left third, which sank into the
+       navy background and lost the arch silhouette. */
+    filter: brightness(1.28) contrast(1.04) saturate(1.06);
   }
-  /* Warm the photo toward the brand and keep the arch reading as a doorway. */
+  /* Vignette the base, not the crown — the crown was already the dark end. */
   .arch::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(13,19,33,0.30) 0%, rgba(13,19,33,0) 42%);
+    background: linear-gradient(0deg, rgba(13,19,33,0.45) 0%, rgba(13,19,33,0) 38%);
   }
 </style>
 </head>
 <body>
   <div class="copy">
-    <div class="lockup"><img src="./logo-reverse.svg" alt="sidequests" /></div>
+    <img class="wordmark" src="./wordmark-reverse.svg" alt="sidequests" />
     <div class="message">
       <p class="overline">Miami Field Guide</p>
-      <h1>Miami has a hidden side. Go find it.</h1>
+      <h1>Miami has a<br />hidden side.<br />Go find it.</h1>
     </div>
     <p class="domain">miamisidequests.io</p>
   </div>

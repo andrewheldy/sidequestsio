@@ -17,7 +17,7 @@
  * the kit can't drift from the vectors the way it did before.
  */
 import {
-  mkdirSync, mkdtempSync, copyFileSync, readFileSync, writeFileSync, rmSync,
+  existsSync, mkdirSync, mkdtempSync, copyFileSync, readFileSync, writeFileSync, rmSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -154,8 +154,16 @@ async function main() {
     console.log('\nOpen Graph card — scripts/brand/og-image.html');
     await buildFontCss();
     copyFileSync(join(root, 'scripts/brand/og-image.html'), join(work, 'og-image.html'));
-    copyFileSync(join(root, 'brand/logos/logo-reverse.svg'), join(work, 'logo-reverse.svg'));
-    copyFileSync(join(root, 'brand/mockups/photography-hero-reference.png'), join(work, 'doorway.png'));
+    for (const [src, dest] of [
+      ['brand/logos/wordmark-reverse.svg', 'wordmark-reverse.svg'],
+      ['brand/mockups/photography-hero-reference.png', 'doorway.png'],
+    ]) {
+      // Fail loudly: a missing source silently produced a card with a blank
+      // panel or no wordmark, which is worse than no card at all.
+      const from = join(root, src);
+      if (!existsSync(from)) throw new Error(`OG card source missing: ${src}`);
+      copyFileSync(from, join(work, dest));
+    }
     const og = await browser.shot(`file://${join(work, 'og-image.html')}`, { width: 1200, height: 630, settleMs: 600 });
     writeFileSync(join(publicDir, 'og-image.png'), og);
     console.log('  ✓ public/og-image.png (1200×630)');
