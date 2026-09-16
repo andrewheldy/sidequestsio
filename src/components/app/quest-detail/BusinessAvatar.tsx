@@ -36,7 +36,7 @@ export function BusinessAvatar({
           className="h-full w-full object-cover"
         />
       ) : (
-        <span className="px-1 text-center font-poppins font-bold uppercase leading-none tracking-tight text-charcoal">
+        <span className="px-1 text-center font-display font-bold uppercase leading-none tracking-tight text-navy">
           {initials}
         </span>
       )}

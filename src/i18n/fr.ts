@@ -29,7 +29,7 @@ export const fr: Translations = {
         { main: "Découvrez des lieux à travers les gens, pas les feeds", sub: "Les miettes sont de courtes notes laissées par de vrais visiteurs — sans followers, sans bruit." },
         { main: "Communauté sans influence", sub: "Pas de likes. Pas de classements. Juste des découvertes partagées liées à de vrais lieux." },
         { main: "Laissez une trace. Aidez le prochain explorateur.", sub: "Déposez une Miette après chaque quête — un conseil, un moment, un souvenir." },
-        { main: "Explorez plus. Scrollez moins.", sub: "SideQuests récompense la curiosité dans le monde réel, pas le temps d'écran." },
+        { main: "Explorez plus. Scrollez moins.", sub: "sidequests récompense la curiosité dans le monde réel, pas le temps d'écran." },
         { main: "Transformez le monde réel en aventure jouable", sub: "Scannez les QR codes, enregistrez-vous et montez de niveau en allant sur place." },
         { main: "Pas un feed. Une piste.", sub: "Chaque quête a son propre tableau de messages vivant — façonné par les explorateurs." },
         { main: "Les meilleurs endroits ne sont pas tendance", sub: "Ils sont découverts, partagés discrètement et transmis via les Miettes." },
@@ -71,7 +71,7 @@ export const fr: Translations = {
     },
     hosts: {
       title: 'Créez des Quêtes pour Votre Communauté',
-      description: "Êtes-vous propriétaire d'un lieu, organisateur d'événements ou expert local? Associez-vous à SideQuests pour amener des explorateurs à votre porte.",
+      description: "Êtes-vous propriétaire d'un lieu, organisateur d'événements ou expert local? Associez-vous à sidequests pour amener des explorateurs à votre porte.",
       cta: 'Devenir Hôte',
     },
   },
@@ -96,7 +96,7 @@ export const fr: Translations = {
     },
   },
   communityNotesPage: {
-    badge: 'Le Cœur de SideQuests',
+    badge: 'Le Cœur de sidequests',
     title: 'Laissez une Trace,',
     titleHighlight: 'Aidez les Autres à Trouver',
     description: 'Les miettes sont de courtes notes et photos laissées par les explorateurs aux emplacements des quêtes. Elles sont anonymes, utiles et complètement libres des dynamiques des réseaux sociaux.',
@@ -160,14 +160,14 @@ export const fr: Translations = {
     },
     cta: {
       title: 'Vous Ne Trouvez Pas Votre Niche?',
-      description: 'Nous sommes toujours en expansion. Avez-vous une catégorie en tête qui n\'existe pas encore? Dites-le nous et aidez à façonner l\'avenir de SideQuests.',
+      description: 'Nous sommes toujours en expansion. Avez-vous une catégorie en tête qui n\'existe pas encore? Dites-le nous et aidez à façonner l\'avenir de sidequests.',
       button: 'Contactez-nous',
     },
   },
   partnerships: {
     badge: 'Partenariats',
     title: 'Partenariat avec',
-    titleHighlight: 'SideQuests',
+    titleHighlight: 'sidequests',
     description: 'Rejoignez un réseau croissant de lieux, marques et communautés qui croient en la découverte authentique plutôt que la promotion algorithmique.',
     whoTitle: 'Qui S\'associe avec Nous',
     types: {
@@ -231,7 +231,7 @@ export const fr: Translations = {
       completionsLabel: 'complétions',
     },
     benefits: {
-      title: 'Pourquoi Être Hôte sur SideQuests',
+      title: 'Pourquoi Être Hôte sur sidequests',
       items: [
         { title: 'Gratuit pour Commencer', description: 'Créer et héberger des quêtes est totalement gratuit. Pas de coûts cachés.' },
         { title: 'Tableau de Bord Simple', description: 'Suivez les complétions, miettes et engagement en un coup d\'œil.' },

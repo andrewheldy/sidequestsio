@@ -118,7 +118,7 @@ interface LegalDocPageProps {
 export default function LegalDocPage({ title, content }: LegalDocPageProps) {
   useEffect(() => {
     const previous = document.title;
-    document.title = `${title} · SideQuests`;
+    document.title = `${title} · sidequests`;
     return () => {
       document.title = previous;
     };
@@ -139,7 +139,7 @@ export default function LegalDocPage({ title, content }: LegalDocPageProps) {
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to SideQuests
+          Back to sidequests
         </Link>
 
         <article className="prose prose-sm sm:prose-base max-w-none">

@@ -12,18 +12,19 @@ export function StatTile({
   label: string;
   value: ReactNode;
   sub?: string;
-  accent?: "coral" | "turquoise" | "foreground";
+  /** `reward` is Gold (XP, points, achievements); `ocean` is the interactive blue. */
+  accent?: "reward" | "ocean" | "foreground";
 }) {
   const color =
-    accent === "coral"
-      ? "text-primary"
-      : accent === "turquoise"
-        ? "text-secondary"
+    accent === "reward"
+      ? "text-gold-strong"
+      : accent === "ocean"
+        ? "text-ocean-strong"
         : "text-foreground";
   return (
     <div className="flex flex-col">
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className={cn("font-poppins text-2xl font-bold", color)}>{value}</span>
+      <span className={cn("font-display text-2xl font-bold tracking-[-0.02em]", color)}>{value}</span>
       {sub && <span className="text-xs text-muted-foreground">{sub}</span>}
     </div>
   );
@@ -42,14 +43,14 @@ export function SectionHeader({
 }) {
   return (
     <div className="mb-3 flex items-center justify-between">
-      <h2 className="font-poppins text-lg font-bold text-foreground">
+      <h2 className="font-display text-lg font-bold tracking-[-0.02em] text-foreground">
         {title}
-        {accent && <span className="ml-2 text-sm font-medium text-secondary">{accent}</span>}
+        {accent && <span className="ml-2 text-sm font-medium text-ocean-strong">{accent}</span>}
       </h2>
       {href && (
         <Link
           to={href}
-          className="flex items-center gap-1 text-sm text-secondary hover:underline"
+          className="flex items-center gap-1 text-sm font-semibold text-ocean-strong hover:underline"
         >
           {hrefLabel} <ArrowRight className="h-4 w-4" />
         </Link>
@@ -68,8 +69,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="glass-card flex flex-col items-center gap-2 p-8 text-center">
-      <p className="font-poppins font-semibold text-foreground">{title}</p>
+    <div className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-8 text-center">
+      <p className="font-display font-bold tracking-[-0.02em] text-foreground">{title}</p>
       {description && <p className="text-sm text-muted-foreground">{description}</p>}
       {action}
     </div>
@@ -79,7 +80,7 @@ export function EmptyState({
 export function Loading({ label = "Loading…" }: { label?: string }) {
   return (
     <div className="flex items-center justify-center gap-3 py-12 text-muted-foreground" role="status">
-      <div className="h-2.5 w-2.5 rounded-full bg-[hsl(var(--ocean-500))]" />
+      <div className="h-2.5 w-2.5 rounded-full bg-ocean" />
       <span className="text-sm">{label}</span>
     </div>
   );

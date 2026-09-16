@@ -141,7 +141,7 @@ const Quests = () => {
         title={t.quests.cta.title}
         description={t.quests.cta.description}
         primaryAction={{ label: t.quests.cta.button, href: '/hosts' }}
-        variant="turquoise"
+        variant="navy"
       />
     </Layout>
   );

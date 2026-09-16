@@ -1,3 +1,23 @@
+import {
+  Building2,
+  Dices,
+  Gem,
+  Landmark,
+  Leaf,
+  Moon,
+  Music,
+  Palette,
+  Sailboat,
+  ShoppingBag,
+  Sparkles,
+  Trees,
+  Trophy,
+  Users,
+  UtensilsCrossed,
+  Waves,
+  type LucideIcon,
+} from 'lucide-react';
+
 /**
  * Shared onboarding data + helpers.
  *
@@ -8,13 +28,13 @@
 
 export interface VibeOption {
   id: string;
-  emoji: string;
+  icon: LucideIcon;
   label: string;
 }
 
 export interface ExplorerStyle {
   id: string;
-  emoji: string;
+  icon: LucideIcon;
   label: string;
   description: string;
   /** Maps the playful archetype to a quest-energy bucket stored on the profile. */
@@ -23,45 +43,45 @@ export interface ExplorerStyle {
 
 export interface Neighborhood {
   id: string;
-  emoji: string;
+  icon: LucideIcon;
   label: string;
 }
 
 export const VIBES: VibeOption[] = [
-  { id: 'foodie', emoji: '🍔', label: 'Foodie' },
-  { id: 'nightlife', emoji: '🎵', label: 'Nightlife' },
-  { id: 'wellness', emoji: '🏃', label: 'Wellness' },
-  { id: 'culture', emoji: '🎨', label: 'Culture' },
-  { id: 'outdoor', emoji: '🌴', label: 'Outdoor' },
-  { id: 'community', emoji: '🤝', label: 'Community' },
-  { id: 'hidden-gems', emoji: '💎', label: 'Hidden Gems' },
+  { id: 'foodie', icon: UtensilsCrossed, label: 'Foodie' },
+  { id: 'nightlife', icon: Moon, label: 'Nightlife' },
+  { id: 'wellness', icon: Sparkles, label: 'Wellness' },
+  { id: 'culture', icon: Palette, label: 'Culture' },
+  { id: 'outdoor', icon: Trees, label: 'Outdoor' },
+  { id: 'community', icon: Users, label: 'Community' },
+  { id: 'hidden-gems', icon: Gem, label: 'Hidden Gems' },
 ];
 
 export const EXPLORER_STYLES: ExplorerStyle[] = [
   {
     id: 'relaxed',
-    emoji: '🌿',
+    icon: Leaf,
     label: 'Relaxed Explorer',
     description: 'Slow mornings, scenic strolls, no pressure.',
     energy: 'chill',
   },
   {
     id: 'social',
-    emoji: '🥂',
+    icon: Users,
     label: 'Social Adventurer',
     description: 'Bring friends, meet locals, share the moment.',
     energy: 'social',
   },
   {
     id: 'competitive',
-    emoji: '🏆',
+    icon: Trophy,
     label: 'Competitive Hunter',
     description: 'Chase XP, climb leaderboards, win streaks.',
     energy: 'competitive',
   },
   {
     id: 'chaos',
-    emoji: '😈',
+    icon: Dices,
     label: 'Chaos Goblin',
     description: 'Unpredictable detours and gloriously bad ideas.',
     energy: 'chaotic-good',
@@ -69,14 +89,14 @@ export const EXPLORER_STYLES: ExplorerStyle[] = [
 ];
 
 export const NEIGHBORHOODS: Neighborhood[] = [
-  { id: 'south-beach', emoji: '🏖️', label: 'South Beach' },
-  { id: 'wynwood', emoji: '🎨', label: 'Wynwood' },
-  { id: 'brickell', emoji: '🏙️', label: 'Brickell' },
-  { id: 'downtown', emoji: '🌆', label: 'Downtown' },
-  { id: 'little-havana', emoji: '🇨🇺', label: 'Little Havana' },
-  { id: 'design-district', emoji: '🛍️', label: 'Design District' },
-  { id: 'coconut-grove', emoji: '🌳', label: 'Coconut Grove' },
-  { id: 'fort-lauderdale', emoji: '⛵', label: 'Fort Lauderdale' },
+  { id: 'south-beach', icon: Waves, label: 'South Beach' },
+  { id: 'wynwood', icon: Palette, label: 'Wynwood' },
+  { id: 'brickell', icon: Building2, label: 'Brickell' },
+  { id: 'downtown', icon: Landmark, label: 'Downtown' },
+  { id: 'little-havana', icon: Music, label: 'Little Havana' },
+  { id: 'design-district', icon: ShoppingBag, label: 'Design District' },
+  { id: 'coconut-grove', icon: Trees, label: 'Coconut Grove' },
+  { id: 'fort-lauderdale', icon: Sailboat, label: 'Fort Lauderdale' },
 ];
 
 export interface OnboardingSelections {
@@ -127,7 +147,6 @@ export interface GeneratedQuest {
   distance: string;
   time: string;
   category: string;
-  emoji: string;
 }
 
 /**
@@ -147,7 +166,6 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
       distance: '0.7 miles',
       time: '25 minutes',
       category: 'Foodie',
-      emoji: '🌮',
     },
     nightlife: {
       title: `${neighborhood} After-Dark Soundwalk`,
@@ -156,7 +174,6 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
       distance: '0.9 miles',
       time: '30 minutes',
       category: 'Nightlife',
-      emoji: '🎶',
     },
     wellness: {
       title: `${neighborhood} Sunrise Reset`,
@@ -165,7 +182,6 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
       distance: '0.5 miles',
       time: '20 minutes',
       category: 'Wellness',
-      emoji: '🧘',
     },
     culture: {
       title: `${neighborhood} Mural & Gallery Hunt`,
@@ -174,7 +190,6 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
       distance: '0.8 miles',
       time: '35 minutes',
       category: 'Culture',
-      emoji: '🖼️',
     },
     outdoor: {
       title: `${neighborhood} Bayfront Loop`,
@@ -183,7 +198,6 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
       distance: '1.2 miles',
       time: '30 minutes',
       category: 'Outdoor',
-      emoji: '🌴',
     },
     community: {
       title: `${neighborhood} Local Legends Quest`,
@@ -192,7 +206,6 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
       distance: '0.6 miles',
       time: '25 minutes',
       category: 'Community',
-      emoji: '🤝',
     },
     'hidden-gems': {
       title: `Hidden ${neighborhood} Coffee Crawl`,
@@ -201,7 +214,6 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
       distance: '0.6 miles',
       time: '20 minutes',
       category: 'Hidden Gems',
-      emoji: '💎',
     },
   };
 

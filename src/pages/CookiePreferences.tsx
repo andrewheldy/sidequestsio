@@ -15,16 +15,16 @@ export default function CookiePreferences() {
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to SideQuests
+          Back to sidequests
         </Link>
 
         <header className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-2">
-            SideQuests
+            sidequests
           </p>
           <h1 className="text-3xl font-bold mb-2">Cookie Preferences</h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Choose what SideQuests is allowed to use in your browser. These choices are saved on
+            Choose what sidequests is allowed to use in your browser. These choices are saved on
             this device only. See our{" "}
             <Link to="/cookies" className="underline underline-offset-2">
               Cookie Policy

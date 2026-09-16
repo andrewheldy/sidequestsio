@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import logoHorizontal from '../../../brand/logos/logo-horizontal.svg';
+import { Logo } from '@/components/brand/Logo';
 
 const navLinks = [
   { href: '/quests', label: 'Explore Miami' },
@@ -38,7 +38,7 @@ export function Header() {
       >
         <div className="sq-container flex h-full items-center justify-between gap-6">
           <Link to="/" className="inline-flex shrink-0 items-center" aria-label="sidequests home">
-            <img src={logoHorizontal} alt="sidequests" className="h-auto w-[150px]" />
+            <Logo decorative />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">

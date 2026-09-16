@@ -32,23 +32,47 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        coral: {
-          DEFAULT: "hsl(var(--coral))",
-          glow: "hsl(var(--coral-glow))",
+        // ── SideQuests brand palette (brand/README.md) ──────────────────
+        // Midnight Navy — primary brand colour: navigation, dark surfaces,
+        // footers, primary type.
+        navy: {
+          DEFAULT: "hsl(var(--navy))",
+          light: "hsl(var(--navy-light))",
         },
-        indigo: {
-          DEFAULT: "hsl(var(--indigo))",
-          light: "hsl(var(--indigo-light))",
+        // Ocean Blue — the interactive colour: links, active nav, selection.
+        ocean: {
+          DEFAULT: "hsl(var(--ocean))",
+          strong: "hsl(var(--ocean-strong))",
+          soft: "hsl(var(--ocean-soft))",
         },
-        turquoise: {
-          DEFAULT: "hsl(var(--turquoise))",
-          glow: "hsl(var(--turquoise-glow))",
+        // Warm Sand — the warm neutral: page and editorial surfaces.
+        sand: {
+          DEFAULT: "hsl(var(--sand))",
+          soft: "hsl(var(--sand-soft))",
         },
-        sandstone: {
-          DEFAULT: "hsl(var(--sandstone))",
-          light: "hsl(var(--sandstone-light))",
+        // Palm Green — verified, completed, positive.
+        palm: "hsl(var(--palm))",
+        // Reward Gold — XP, rewards, achievements. Used sparingly, on purpose.
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          strong: "hsl(var(--gold-strong))",
         },
-        charcoal: "hsl(var(--charcoal))",
+        // Coral — highlights and discovery moments. Used sparingly.
+        coral: "hsl(var(--coral))",
+
+        // Semantic roles, so status is never a raw brand colour at the callsite.
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        reward: {
+          DEFAULT: "hsl(var(--reward))",
+          foreground: "hsl(var(--reward-foreground))",
+        },
+        highlight: {
+          DEFAULT: "hsl(var(--highlight))",
+          foreground: "hsl(var(--highlight-foreground))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -129,10 +153,6 @@ export default {
           from: { transform: "translateY(-100%)" },
           to: { transform: "translateY(0)" },
         },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsla(6, 89%, 68%, 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsla(6, 89%, 68%, 0.5)" },
-        },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
@@ -147,7 +167,6 @@ export default {
         "scale-in": "scale-in 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "slide-up": "slide-up 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "slide-down": "slide-down 140ms cubic-bezier(0.4, 0, 1, 1) forwards",
-        "pulse-glow": "none",
         float: "none",
       },
       // Maps prose (rendered markdown — see src/components/legal/LegalDocPage.tsx)

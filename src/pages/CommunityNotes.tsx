@@ -55,18 +55,18 @@ const CommunityNotes = () => {
     <Layout>
       {/* Hero with Mascot */}
       <section className="py-16 md:py-24 relative overflow-hidden">
-        <div className="absolute top-1/4 -right-32 w-96 h-96 bg-turquoise/10 rounded-full blur-3xl" />
+        
 
         <div className="container relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <AnimatedSection direction="left">
               <div>
-                <span className="text-turquoise font-semibold text-sm uppercase tracking-wide mb-4 block">
+                <span className="sq-overline mb-4 block text-ocean-strong">
                   {t.communityNotesPage.badge}
                 </span>
                 <h1 className="font-poppins font-bold text-4xl md:text-5xl lg:text-6xl text-foreground mb-6 leading-tight">
                   {t.communityNotesPage.title}{' '}
-                  <span className="text-gradient-turquoise">{t.communityNotesPage.titleHighlight}</span>
+                  <span className="text-ocean-strong">{t.communityNotesPage.titleHighlight}</span>
                 </h1>
                 <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                   {t.communityNotesPage.description}
@@ -74,7 +74,7 @@ const CommunityNotes = () => {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-turquoise hover:bg-turquoise/90 text-primary-foreground font-semibold"
+                  className="font-semibold"
                 >
                   <Link to="/quests">
                     {t.home.hero.cta}
@@ -91,7 +91,7 @@ const CommunityNotes = () => {
                   alt="Two explorers sharing a discovery"
                   className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                 />
-                <div className="absolute -bottom-6 -left-6 w-48 h-48 bg-turquoise/20 rounded-full blur-2xl" />
+                
                 <div className="absolute -top-6 -right-6 w-32 h-32 bg-coral/20 rounded-full blur-2xl" />
               </div>
             </AnimatedSection>
@@ -189,7 +189,7 @@ const CommunityNotes = () => {
         title={t.communityNotesPage.cta.title}
         description={t.communityNotesPage.cta.description}
         primaryAction={{ label: t.communityNotesPage.cta.button, href: '/quests' }}
-        variant="turquoise"
+        variant="navy"
       />
     </Layout>
   );

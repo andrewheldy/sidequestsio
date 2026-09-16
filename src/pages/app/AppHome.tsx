@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Flame, Star, Sparkles } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import AppLayout from "@/components/app/AppLayout";
 import { SectionHeader, StatTile, Loading } from "@/components/app/ui";
 import { Progress } from "@/components/ui/progress";
@@ -34,10 +35,8 @@ export default function AppHome() {
         {/* Greeting */}
         <div className="flex items-start justify-between">
           <div>
-            <span className="font-poppins text-xl font-extrabold italic text-gradient-coral">
-              SIDEQUESTS
-            </span>
-            <h1 className="mt-3 font-poppins text-2xl font-bold text-foreground">
+            <Logo decorative className="w-[128px]" />
+            <h1 className="mt-3 font-display text-2xl font-bold tracking-[-0.03em] text-foreground">
               Hey {profile?.display_name ?? (user?.user_metadata?.display_name as string | undefined) ?? "Quester"}! 👋
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -49,9 +48,9 @@ export default function AppHome() {
         {/* Stats */}
         <div className="glass-card mt-5 p-4">
           <div className="grid grid-cols-4 gap-2">
-            <StatTile label="Level" value={lvl.level} accent="coral" sub={`${lvl.xpToNext} XP to L${lvl.level + 1}`} />
-            <StatTile label="Quests" value={profile?.completed_quests_count ?? 0} accent="turquoise" sub="Completed" />
-            <StatTile label="Points" value={profile?.points_balance_cache ?? 0} accent="coral" sub="Balance" />
+            <StatTile label="Level" value={lvl.level} accent="reward" sub={`${lvl.xpToNext} XP to L${lvl.level + 1}`} />
+            <StatTile label="Quests" value={profile?.completed_quests_count ?? 0} accent="ocean" sub="Completed" />
+            <StatTile label="Points" value={profile?.points_balance_cache ?? 0} accent="reward" sub="Balance" />
             <StatTile
               label="Streak"
               value={<span className="flex items-center gap-1"><Flame className="h-5 w-5 text-orange-400" />7</span>}
@@ -63,10 +62,10 @@ export default function AppHome() {
 
         {/* Rewards ecosystem */}
         <Link to="/app/rewards" className="mt-4 block">
-          <div className="glass-card relative overflow-hidden p-5 text-center glow-coral">
+          <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 text-center">
             <Badge className="absolute left-4 top-4 bg-secondary text-secondary-foreground">NEW</Badge>
-            <h2 className="font-poppins text-lg font-bold text-secondary">
-              THE REWARDS ECOSYSTEM
+            <h2 className="font-display text-lg font-bold tracking-[-0.03em] text-foreground">
+              The rewards ecosystem
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
               Your adventures. Real rewards. Real impact.

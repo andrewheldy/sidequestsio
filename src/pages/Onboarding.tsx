@@ -13,6 +13,7 @@ import {
   Trophy,
   Zap,
 } from 'lucide-react';
+import { CategoryIcon } from '@/components/brand/CategoryIcon';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   EXPLORER_STYLES,
@@ -107,9 +108,12 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-br from-indigo via-indigo-light to-background">
-      <div className="absolute -right-32 top-0 h-96 w-96 rounded-full bg-coral/20 blur-3xl" />
-      <div className="absolute -left-32 bottom-0 h-96 w-96 rounded-full bg-turquoise/10 blur-3xl" />
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
+      {/* A single doorway arch instead of the old identity's colour blurs. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 left-1/2 h-[560px] w-[420px] -translate-x-1/2 rounded-t-full border-x border-t border-navy/8"
+      />
 
       {/* Progress + back */}
       <div className="relative z-10 mx-auto flex w-full max-w-md items-center gap-3 px-6 pt-6">
@@ -144,13 +148,14 @@ const Onboarding = () => {
         {/* STEP 1 — Welcome */}
         {step === 1 && (
           <div key="s1" className={cn('flex flex-1 flex-col items-center justify-center text-center', stepAnim)}>
-            <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-primary/15 text-primary">
-              <Compass className="h-12 w-12" />
+            {/* The doorway, at the moment someone steps through it. */}
+            <div className="mb-8 flex h-28 w-24 items-end justify-center rounded-t-[3rem] rounded-b-lg bg-navy pb-5 text-reward">
+              <Compass className="h-9 w-9" strokeWidth={1.75} aria-hidden />
             </div>
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
-              Welcome to SideQuests
+            <p className="sq-overline mb-3 text-ocean-strong">
+              Your Miami field guide
             </p>
-            <h1 className="mb-4 font-poppins text-3xl font-bold leading-tight sm:text-4xl">
+            <h1 className="mb-4 font-display text-3xl font-bold leading-tight tracking-[-0.035em] sm:text-4xl">
               The city is full of hidden adventures.
             </h1>
             <p className="mb-10 text-base text-muted-foreground">
@@ -168,12 +173,16 @@ const Onboarding = () => {
           <div key="s2" className={cn('flex flex-1 flex-col', stepAnim)}>
             <StepHeader title="Choose your vibe" subtitle="Pick as many as you like — we’ll tailor your quests." />
             <div className="grid grid-cols-2 gap-3">
-              {VIBES.map((v) => {
-                const active = selections.vibes.includes(v.id);
+              {VIBES.map(({ id, icon: Icon, label }) => {
+                const active = selections.vibes.includes(id);
                 return (
-                  <SelectCard key={v.id} active={active} onClick={() => toggleVibe(v.id)}>
-                    <span className="text-3xl">{v.emoji}</span>
-                    <span className="font-medium">{v.label}</span>
+                  <SelectCard key={id} active={active} onClick={() => toggleVibe(id)}>
+                    <Icon
+                      className={cn('h-7 w-7', active ? 'text-ocean-strong' : 'text-muted-foreground')}
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                    <span className="font-medium">{label}</span>
                   </SelectCard>
                 );
               })}
@@ -187,23 +196,31 @@ const Onboarding = () => {
           <div key="s3" className={cn('flex flex-1 flex-col', stepAnim)}>
             <StepHeader title="What kind of explorer are you?" subtitle="There are no wrong answers. Probably." />
             <div className="flex flex-col gap-3">
-              {EXPLORER_STYLES.map((s) => {
-                const active = selections.explorerStyle === s.id;
+              {EXPLORER_STYLES.map(({ id, icon: Icon, label, description }) => {
+                const active = selections.explorerStyle === id;
                 return (
                   <button
-                    key={s.id}
-                    onClick={() => setSelections((prev) => ({ ...prev, explorerStyle: s.id }))}
+                    key={id}
+                    onClick={() => setSelections((prev) => ({ ...prev, explorerStyle: id }))}
                     className={cn(
                       'flex items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-200',
                       active
-                        ? 'border-primary bg-primary/10 glow-coral'
+                        ? 'border-primary bg-primary/10'
                         : 'border-border bg-card/50 hover:border-primary/50',
                     )}
                   >
-                    <span className="text-3xl">{s.emoji}</span>
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'flex h-12 w-10 flex-shrink-0 items-end justify-center rounded-t-[1.25rem] rounded-b-md pb-2.5',
+                        active ? 'bg-navy text-reward' : 'bg-muted text-muted-foreground',
+                      )}
+                    >
+                      <Icon className="h-5 w-5" strokeWidth={1.75} />
+                    </span>
                     <div className="flex-1">
-                      <p className="font-poppins font-semibold">{s.label}</p>
-                      <p className="text-sm text-muted-foreground">{s.description}</p>
+                      <p className="font-display font-bold tracking-[-0.02em]">{label}</p>
+                      <p className="text-sm text-muted-foreground">{description}</p>
                     </div>
                     <span
                       className={cn(
@@ -226,16 +243,20 @@ const Onboarding = () => {
           <div key="s4" className={cn('flex flex-1 flex-col', stepAnim)}>
             <StepHeader title="Where should we start?" subtitle="Choose your home base in Miami." />
             <div className="grid grid-cols-2 gap-3">
-              {NEIGHBORHOODS.map((n) => {
-                const active = selections.neighborhood === n.id;
+              {NEIGHBORHOODS.map(({ id, icon: Icon, label }) => {
+                const active = selections.neighborhood === id;
                 return (
                   <SelectCard
-                    key={n.id}
+                    key={id}
                     active={active}
-                    onClick={() => setSelections((prev) => ({ ...prev, neighborhood: n.id }))}
+                    onClick={() => setSelections((prev) => ({ ...prev, neighborhood: id }))}
                   >
-                    <span className="text-3xl">{n.emoji}</span>
-                    <span className="text-center text-sm font-medium">{n.label}</span>
+                    <Icon
+                      className={cn('h-7 w-7', active ? 'text-ocean-strong' : 'text-muted-foreground')}
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                    <span className="text-center text-sm font-medium">{label}</span>
                   </SelectCard>
                 );
               })}
@@ -249,19 +270,19 @@ const Onboarding = () => {
           <div key="s5" className={cn('flex flex-1 flex-col justify-center', stepAnim)}>
             <StepHeader title="Build your first quest" subtitle="Personalized just for you." center />
             <div className="glass-card overflow-hidden">
-              <div className="flex items-center justify-between bg-gradient-to-r from-coral/30 to-turquoise/20 p-5">
-                <span className="text-4xl">{firstQuest.emoji}</span>
-                <span className="rounded-full bg-background/40 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground">
+              <div className="flex items-center justify-between bg-navy p-5 text-sand-soft">
+                <CategoryIcon category={firstQuest.category} className="h-9 w-9 text-reward" strokeWidth={1.5} />
+                <span className="rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sand-soft">
                   {firstQuest.category}
                 </span>
               </div>
               <div className="space-y-4 p-5">
-                <h2 className="font-poppins text-xl font-bold">{firstQuest.title}</h2>
+                <h2 className="font-display text-xl font-bold tracking-[-0.02em]">{firstQuest.title}</h2>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <QuestStat icon={<Gift className="h-4 w-4 text-coral" />} label="Reward" value={firstQuest.reward} />
-                  <QuestStat icon={<Zap className="h-4 w-4 text-turquoise" />} label="XP" value={`${firstQuest.xp} XP`} />
-                  <QuestStat icon={<MapPin className="h-4 w-4 text-coral" />} label="Distance" value={firstQuest.distance} />
-                  <QuestStat icon={<Star className="h-4 w-4 text-turquoise" />} label="Time" value={firstQuest.time} />
+                  <QuestStat icon={<Gift className="h-4 w-4 text-gold-strong" />} label="Reward" value={firstQuest.reward} />
+                  <QuestStat icon={<Zap className="h-4 w-4 text-gold-strong" />} label="XP" value={`${firstQuest.xp} XP`} />
+                  <QuestStat icon={<MapPin className="h-4 w-4 text-ocean-strong" />} label="Distance" value={firstQuest.distance} />
+                  <QuestStat icon={<Star className="h-4 w-4 text-ocean-strong" />} label="Time" value={firstQuest.time} />
                 </div>
               </div>
             </div>
@@ -276,11 +297,11 @@ const Onboarding = () => {
         {step === 6 && (
           <div key="s6" className={cn('flex flex-1 flex-col justify-center', stepAnim)}>
             <div className="mb-6 text-center">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-coral to-turquoise text-3xl">
-                🧭
+              <div className="mx-auto mb-4 flex h-20 w-16 items-end justify-center rounded-t-[2rem] rounded-b-md bg-navy pb-4 text-reward">
+                <Compass className="h-7 w-7" aria-hidden />
               </div>
               <p className="text-sm font-semibold uppercase tracking-widest text-primary">Level 1 Explorer</p>
-              <h2 className="font-poppins text-2xl font-bold">
+              <h2 className="font-display text-2xl font-bold tracking-[-0.03em]">
                 {profile?.display_name || user?.email?.split('@')[0] || 'Your'} adventure begins
               </h2>
             </div>
@@ -293,7 +314,7 @@ const Onboarding = () => {
                   <span className="text-muted-foreground">100 / 250</span>
                 </div>
                 <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted/50">
-                  <div className="h-full w-2/5 rounded-full bg-gradient-to-r from-coral to-turquoise" />
+                  <div className="h-full w-2/5 rounded-full bg-ocean" />
                 </div>
               </div>
 
@@ -320,9 +341,10 @@ const Onboarding = () => {
                       return (
                         <span
                           key={id}
-                          className="inline-flex items-center gap-1 rounded-full bg-muted/50 px-3 py-1 text-sm"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-3 py-1 text-sm"
                         >
-                          {v.emoji} {v.label}
+                          <v.icon className="h-3.5 w-3.5" aria-hidden />
+                          {v.label}
                         </span>
                       );
                     })}
@@ -391,7 +413,7 @@ function SelectCard({
       className={cn(
         'relative flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl border p-4 transition-all duration-200',
         active
-          ? 'scale-[1.02] border-primary bg-primary/10 glow-coral'
+          ? 'scale-[1.02] border-primary bg-primary/10'
           : 'border-border bg-card/50 hover:border-primary/50 hover:bg-card/80',
       )}
     >

@@ -14,7 +14,7 @@ import Layout from '@/components/layout/Layout';
 import AnimatedSection from '@/components/AnimatedSection';
 import QuestCard from '@/components/cards/QuestCard';
 import heroImage from '../../brand/mockups/photography-hero-reference.png';
-import doorwayIcon from '../../brand/logos/icon.svg';
+import { LogoMark } from '@/components/brand/Logo';
 
 const featuredQuests = [
   {
@@ -65,7 +65,7 @@ const Index = () => (
       <div className="sq-container grid min-h-[calc(100svh-72px)] items-center gap-10 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:py-16">
         <div className="relative z-10 max-w-xl">
           <div className="mb-7 flex items-center gap-3">
-            <img src={doorwayIcon} alt="" className="h-9 w-9 brightness-0 invert" aria-hidden />
+            <LogoMark tone="reverse" decorative className="w-9" />
             <p className="sq-overline text-[hsl(var(--gold-500))]">Miami field guide · issue 01</p>
           </div>
 

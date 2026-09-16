@@ -44,7 +44,7 @@ export const en = {
           main: "Leave a trail. Help the next explorer.",
           sub: "Drop a Community Note after each quest — a tip, a moment, a memory.",
         },
-        { main: "Explore more. Scroll less.", sub: "SideQuests rewards curiosity in the real world, not screen time." },
+        { main: "Explore more. Scroll less.", sub: "sidequests rewards curiosity in the real world, not screen time." },
         {
           main: "Turn the real world into a playable adventure",
           sub: "Scan QR codes, check in, and level up by going places.",
@@ -106,7 +106,7 @@ export const en = {
     hosts: {
       title: "Create Quests for Your Community",
       description:
-        "Are you a venue owner, event organizer, or local expert? Partner with SideQuests to bring explorers to your doorstep.",
+        "Are you a venue owner, event organizer, or local expert? Partner with sidequests to bring explorers to your doorstep.",
       cta: "Become a Host",
     },
   },
@@ -136,7 +136,7 @@ export const en = {
 
   // Community Notes page
   communityNotesPage: {
-    badge: "The Heart of SideQuests",
+    badge: "The Heart of sidequests",
     title: "Leave a Trail,",
     titleHighlight: "Help Others Find",
     description:
@@ -240,7 +240,7 @@ export const en = {
     cta: {
       title: "Can't Find Your Niche?",
       description:
-        "We're always expanding. Have a vertical in mind that doesn't exist yet? Let us know and help shape the future of SideQuests.",
+        "We're always expanding. Have a vertical in mind that doesn't exist yet? Let us know and help shape the future of sidequests.",
       button: "Contact Us",
     },
   },
@@ -249,7 +249,7 @@ export const en = {
   partnerships: {
     badge: "Partnerships",
     title: "Partner With",
-    titleHighlight: "SideQuests",
+    titleHighlight: "sidequests",
     description:
       "Join a growing network of venues, brands, and communities that believe in authentic discovery over algorithmic promotion.",
     whoTitle: "Who Partners With Us",
@@ -363,7 +363,7 @@ export const en = {
       completionsLabel: "completions",
     },
     benefits: {
-      title: "Why Host on SideQuests",
+      title: "Why Host on sidequests",
       items: [
         { title: "Free to Start", description: "Creating and hosting quests is completely free. No hidden costs." },
         { title: "Simple Dashboard", description: "Track completions, community notes, and engagement at a glance." },

@@ -69,7 +69,7 @@ export function buildSeed(): DbSnapshot {
       {
         id: "user-admin",
         email: "admin@sidequests.io",
-        display_name: "SideQuests Admin",
+        display_name: "sidequests Admin",
         avatar_url: null,
         role: "admin",
         created_at: now,
@@ -403,7 +403,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Stand in front of your favorite piece and say 'I feel seen' with complete sincerity",
         action_type: "social",
         proof_method: "camera",
-        social_share_prompt: "Just stood in front of my favorite mural at Wynwood Walls and said 'I feel seen' 🎨 #SideQuests #WynwoodWalls #Miami",
+        social_share_prompt: "Just stood in front of my favorite mural at Wynwood Walls and said 'I feel seen' 🎨 #sidequests #WynwoodWalls #Miami",
         estimated_time: "5 min",
       },
       {
@@ -429,7 +429,7 @@ export function buildSeed(): DbSnapshot {
         action_type: "taste",
         staff_phrase: "SUNRISE",
         proof_method: "staff_phrase",
-        social_share_prompt: "Ordered coffee at Vice City Beans and described it using only geography ☕ #SideQuests #ViceCityBeans #Miami",
+        social_share_prompt: "Ordered coffee at Vice City Beans and described it using only geography ☕ #sidequests #ViceCityBeans #Miami",
         estimated_time: "5 min",
       },
       {
@@ -454,7 +454,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Spread your arms out wide when you reach the park and face the horizon",
         action_type: "explore",
         proof_method: "camera",
-        social_share_prompt: "Arms out wide at South Pointe Park, soaking in the Miami sunset 🌅 #SideQuests #SouthPointe #Miami",
+        social_share_prompt: "Arms out wide at South Pointe Park, soaking in the Miami sunset 🌅 #sidequests #SouthPointe #Miami",
         estimated_time: "2 min",
       },
 
@@ -480,7 +480,7 @@ export function buildSeed(): DbSnapshot {
         action_type: "taste",
         staff_phrase: "BINCHO",
         proof_method: "staff_phrase",
-        social_share_prompt: "Ordered the chef's secret pick at KYU Miami and it was absolutely fire 🔥 #SideQuests #KYUMiami #Wynwood",
+        social_share_prompt: "Ordered the chef's secret pick at KYU Miami and it was absolutely fire 🔥 #sidequests #KYUMiami #Wynwood",
         estimated_time: "10 min",
       },
       {
@@ -504,7 +504,7 @@ export function buildSeed(): DbSnapshot {
         action_type: "taste",
         staff_phrase: "CORTADO",
         proof_method: "staff_phrase",
-        social_share_prompt: "Described my Panther Coffee order using only geography and honestly... it worked ☕ #SideQuests #PantherCoffee #Wynwood",
+        social_share_prompt: "Described my Panther Coffee order using only geography and honestly... it worked ☕ #sidequests #PantherCoffee #Wynwood",
         estimated_time: "5 min",
       },
       {
@@ -527,7 +527,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Clink your glass against the brewery's logo sign before your first sip",
         action_type: "social",
         proof_method: "camera",
-        social_share_prompt: "Clinked my glass against the Boxelder sign before my first sip 🍺 #SideQuests #Boxelder #Wynwood",
+        social_share_prompt: "Clinked my glass against the Boxelder sign before my first sip 🍺 #sidequests #Boxelder #Wynwood",
         estimated_time: "5 min",
       },
       {
@@ -550,7 +550,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Nod your head to the beat for 30 solid seconds before logging the genre",
         action_type: "social",
         proof_method: "manual",
-        social_share_prompt: "Nodded to the beat at Gramps for 30 whole seconds and I'm not ashamed 🎵 #SideQuests #Gramps #Wynwood",
+        social_share_prompt: "Nodded to the beat at Gramps for 30 whole seconds and I'm not ashamed 🎵 #sidequests #Gramps #Wynwood",
         estimated_time: "1 min",
       },
       {
@@ -573,7 +573,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Announce your spice level to the table before ordering — no take-backs",
         action_type: "social",
         proof_method: "manual",
-        social_share_prompt: "Announced my spice level at Coyo Taco and held my ground 🌶️ #SideQuests #CoyoTaco #Wynwood",
+        social_share_prompt: "Announced my spice level at Coyo Taco and held my ground 🌶️ #sidequests #CoyoTaco #Wynwood",
         estimated_time: "2 min",
       },
       {
@@ -596,7 +596,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Swirl your natural wine and say 'it's giving terroir' whether you know what that means or not",
         action_type: "taste",
         proof_method: "manual",
-        social_share_prompt: "Said 'it's giving terroir' at Wood Tavern and honestly I was right 🍷 #SideQuests #WoodTavern #Wynwood",
+        social_share_prompt: "Said 'it's giving terroir' at Wood Tavern and honestly I was right 🍷 #sidequests #WoodTavern #Wynwood",
         estimated_time: "2 min",
       },
       // ── Museums & landmarks ────────────────────────────────────────────
@@ -620,7 +620,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Stand in front of the painting for 60 seconds without looking at your phone",
         action_type: "art",
         proof_method: "manual",
-        social_share_prompt: "Stood in front of a painting at PAMM for 60 full seconds. No phone. Just vibes 🎨 #SideQuests #PAMM #Miami",
+        social_share_prompt: "Stood in front of a painting at PAMM for 60 full seconds. No phone. Just vibes 🎨 #sidequests #PAMM #Miami",
         estimated_time: "1 min",
       },
       {
@@ -643,7 +643,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Press your hand flat on the tank glass and count to five",
         action_type: "explore",
         proof_method: "camera",
-        social_share_prompt: "Put my hand on the Frost Science aquarium glass and the fish looked back at me 🐟 #SideQuests #FrostScience #Miami",
+        social_share_prompt: "Put my hand on the Frost Science aquarium glass and the fish looked back at me 🐟 #sidequests #FrostScience #Miami",
         estimated_time: "2 min",
       },
       {
@@ -666,7 +666,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Salute the stone barge before you photograph it",
         action_type: "explore",
         proof_method: "camera",
-        social_share_prompt: "Saluted the stone barge at Vizcaya like the sea captain I was born to be ⛵ #SideQuests #Vizcaya #Miami",
+        social_share_prompt: "Saluted the stone barge at Vizcaya like the sea captain I was born to be ⛵ #sidequests #Vizcaya #Miami",
         estimated_time: "3 min",
       },
       {
@@ -689,7 +689,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Gasp audibly when you find the most provocative piece",
         action_type: "art",
         proof_method: "manual",
-        social_share_prompt: "Gasped audibly at the Bass Museum and I have zero regrets 😮 #SideQuests #BassMuseum #MiamiBeach",
+        social_share_prompt: "Gasped audibly at the Bass Museum and I have zero regrets 😮 #sidequests #BassMuseum #MiamiBeach",
         estimated_time: "15 min",
       },
       {
@@ -712,7 +712,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Look up and down Ocean Drive slowly before you sit, like you're sizing it up",
         action_type: "explore",
         proof_method: "camera",
-        social_share_prompt: "Sizing up Ocean Drive like I own it 🌴 #SideQuests #ArtDeco #SouthBeach #Miami",
+        social_share_prompt: "Sizing up Ocean Drive like I own it 🌴 #sidequests #ArtDeco #SouthBeach #Miami",
         estimated_time: "5 min",
       },
       {
@@ -735,7 +735,7 @@ export function buildSeed(): DbSnapshot {
         funky_action: "Point dramatically at the Miami skyline and say 'that's mine'",
         action_type: "social",
         proof_method: "camera",
-        social_share_prompt: "Pointed at the Miami skyline and said 'that's mine' with full conviction 🏙️ #SideQuests #BrickellKey #Miami",
+        social_share_prompt: "Pointed at the Miami skyline and said 'that's mine' with full conviction 🏙️ #sidequests #BrickellKey #Miami",
         estimated_time: "2 min",
       },
     ],
