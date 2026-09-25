@@ -38,7 +38,7 @@ export function Footer() {
       <div className="sq-container py-16 md:py-20">
         <div className="grid gap-12 border-b border-white/15 pb-14 lg:grid-cols-[1.35fr_2fr]">
           <div className="max-w-sm">
-            <Logo tone="reverse" className="mb-6 w-[168px]" />
+            <Logo tone="reverse" size="lg" className="mb-6" />
             <p className="text-lg leading-relaxed text-white/68">
               A reason to take the side street, try the unfamiliar door, and remember the place you found.
             </p>

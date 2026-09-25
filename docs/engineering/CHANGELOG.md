@@ -2,6 +2,27 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-25 — Header lockup: mark and wordmark sized separately
+
+- **The header mark was a smudge, and the brand spec is why.** `logo-horizontal.svg` fixes the mark
+  at ~15% of the lockup's width, so the site header's 150px lockup rendered it ~23px tall and the
+  app header's 128px one ~20px. `brand/README.md`'s own selection table sets `icon.svg`'s minimum at
+  32px while prescribing a 148px horizontal lockup — which yields ~23px. The two rows disagree;
+  nothing was being misused.
+- **`Logo` now composes the lockup** from `icon.svg` + `wordmark.svg` at independent sizes
+  (`sm`/`md`/`lg`), instead of scaling the fixed horizontal file. `md` puts the mark ink at 32px.
+  No artwork changed — this is an arrangement of the existing files. `logo-horizontal.svg` remains
+  the signature for marketing, print and export.
+- **Callers size by step, not width.** The six `<Logo>` sites dropped their `w-[…]` classes for
+  `size`. App chrome uses `sm`, which lands the mark at ~28px: under the 32px floor, but it has to
+  share a 320px header with the bell and avatar, and `icon-small.svg` can't stand in because it
+  paints with `currentColor`, which an `<img>` cannot inherit.
+- **Trade-off recorded:** the wordmark holds at 0.74× the mark's box, leaving the mark's wall ~11%
+  heavier than the wordmark's stroke. Equal weight would need a ~205px lockup. Documented under
+  "Screen lockup" in `brand/README.md`.
+- Verified against the built app over CDP at 320/375/390/1280px: site header, auth, footer (reverse
+  on Midnight Navy) and the app header all clear their neighbours at 320px.
+
 ## 2026-09-16 — Brand migration, phase 2: shipped assets, metadata, and the last legacy surfaces
 
 - **Fixed a production-facing asset gap.** `index.html` and `site.webmanifest` referenced

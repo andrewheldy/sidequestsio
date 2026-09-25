@@ -35,7 +35,7 @@ export default function AppHome() {
         {/* Greeting */}
         <div className="flex items-start justify-between">
           <div>
-            <Logo decorative className="w-[128px]" />
+            <Logo decorative size="sm" />
             <h1 className="mt-3 font-display text-2xl font-bold tracking-[-0.03em] text-foreground">
               Hey {profile?.display_name ?? (user?.user_metadata?.display_name as string | undefined) ?? "Quester"}! 👋
             </h1>

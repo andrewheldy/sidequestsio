@@ -16,7 +16,7 @@ export default function AppHeader({ title, subtitle }: AppHeaderProps) {
   return (
     <header className="flex items-center justify-between gap-3 pt-2">
       <Link to="/app" className="flex flex-col gap-1" aria-label="sidequests home">
-        <Logo decorative className="w-[128px]" />
+        <Logo decorative size="sm" />
         {title && (
           <span className="font-display text-lg font-bold tracking-[-0.035em] text-foreground">
             {title}

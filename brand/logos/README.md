@@ -5,3 +5,5 @@
 `logo-light.svg` is Midnight artwork for light surfaces. `logo-dark.svg` includes a Midnight preview field and Sand artwork. `logo-reverse.svg` is white artwork with no background. `logo-monochrome.svg` is black. `logo-outlined.svg` is for large editorial/wayfinding use only. `logo-embossed.svg` previews a physical effect; supply `logo-solid.svg` to the fabricator as the die shape.
 
 Never typeset the primary signature. Live font text in campaign templates is editable copy, not the wordmark.
+
+On product screens the lockup is composed from `icon.svg` and `wordmark.svg` at separate sizes rather than scaled from `logo-horizontal.svg`, which would put the mark below its 32 px minimum. See "Screen lockup" in `brand/README.md`.
