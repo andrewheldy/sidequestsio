@@ -110,7 +110,7 @@ const Auth = () => {
         </Link>
 
         <div className="mb-8">
-          <Logo className="mb-8 w-[164px]" />
+          <Logo className="mb-8" />
           <p className="sq-overline mb-3 text-[hsl(var(--ocean-700))]">Your next detour</p>
           <h1 className="font-display text-4xl font-bold leading-none tracking-[-0.05em]">
             {mode === 'signin' ? 'Welcome back.' : 'Make Miami your field guide.'}

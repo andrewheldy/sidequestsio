@@ -2,6 +2,27 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-25 — Header lockup: mark and wordmark sized separately
+
+- **The header mark was a smudge, and the brand spec is why.** `logo-horizontal.svg` fixes the mark
+  at ~15% of the lockup's width, so the site header's 150px lockup rendered it ~23px tall and the
+  app header's 128px one ~20px. `brand/README.md`'s own selection table sets `icon.svg`'s minimum at
+  32px while prescribing a 148px horizontal lockup — which yields ~23px. The two rows disagree;
+  nothing was being misused.
+- **`Logo` now composes the lockup** from `icon.svg` + `wordmark.svg` at independent sizes
+  (`sm`/`md`/`lg`), instead of scaling the fixed horizontal file. `md` puts the mark ink at 32px.
+  No artwork changed — this is an arrangement of the existing files. `logo-horizontal.svg` remains
+  the signature for marketing, print and export.
+- **Callers size by step, not width.** The six `<Logo>` sites dropped their `w-[…]` classes for
+  `size`. App chrome uses `sm`, which lands the mark at ~28px: under the 32px floor, but it has to
+  share a 320px header with the bell and avatar, and `icon-small.svg` can't stand in because it
+  paints with `currentColor`, which an `<img>` cannot inherit.
+- **Trade-off recorded:** the wordmark holds at 0.74× the mark's box, leaving the mark's wall ~11%
+  heavier than the wordmark's stroke. Equal weight would need a ~205px lockup. Documented under
+  "Screen lockup" in `brand/README.md`.
+- Verified against the built app over CDP at 320/375/390/1280px: site header, auth, footer (reverse
+  on Midnight Navy) and the app header all clear their neighbours at 320px.
+
 ## 2026-09-16 — Brand migration, phase 2: shipped assets, metadata, and the last legacy surfaces
 
 - **Fixed a production-facing asset gap.** `index.html` and `site.webmanifest` referenced
@@ -42,6 +63,24 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
 - Removed obsolete duplicates: `brand/favicon/` (a stale parallel icon set with its own manifest,
   referenced by nothing), `public/site 2.webmanifest`, `src/components/BackendFallbackBanner 2.tsx`,
   and the ` 2` copies of the brand docs. Off-palette "achievement Violet" is gone from the brand docs.
+- **OG card fixes (follow-up within the same migration).** The first pass shipped a card with
+  several defects: the doorway mark rendered at ~30px in the lockup, where its winding path
+  collapses into a smudge (the mark needs ~90px to resolve, in both positive and reverse); the
+  arch's cream outline used a `box-shadow` spread, which cannot follow a border-radius the canvas
+  clips and so rendered as a flat vertical stripe; the photo crop bisected the right-hand figure and
+  its dark side sank into the navy background; the headline's three-line wrap was a coincidence of a
+  `ch`-based measure; and the layout left a dead gap between the wordmark and the overline. The card
+  now uses the **wordmark alone** (recognition on a social card lives in the wordmark, and it
+  reproduces cleanly at any size), a real `border` that traces the arch, a lifted 68% crop with both
+  figures whole, explicit line breaks, and an explicit three-row rhythm. The generator now fails
+  loudly if an OG source file is missing instead of emitting a blank panel.
+- Fixed a pre-existing clip in `brand/logos/wordmark.svg`: its ink runs to x=1076 but the viewBox was
+  1050 wide, cutting 26 units off the final "s". Never visible before because nothing rendered the
+  wordmark standalone — the app uses `logo-horizontal.svg`. Widened to 1094 and added
+  `wordmark-reverse.svg` for dark surfaces.
+- `brand/logos/icon-small.svg` and `logo-small.svg` (the 16–24px reduced-detail variants) were missed
+  by the glyph redraw because they live in a 24-unit space rather than the 64-unit one the
+  replacement matched. Ported, so the whole kit now carries one glyph.
 - Verification: `npx tsc -p tsconfig.app.json --noEmit` clean; production build passes; `npm run lint`
   unchanged from baseline (36 pre-existing problems, none in the migrated code). Ten routes were
   screenshotted at 1440 px and 390 px against a local production build. No schema, RPC, auth, routing

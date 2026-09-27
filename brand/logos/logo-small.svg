@@ -1,4 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="title">
   <title id="title">sidequests small-size optimized doorway icon</title>
+  <!-- Reduced-detail mark for 16-24 px. Same switchback design as icon.svg,
+       redrawn in 24-unit space; `currentColor` so it inherits the text colour. -->
   <path fill="currentColor" fill-rule="evenodd" d="M4 19V9a8 8 0 0 1 16 0v10h-3V9A5 5 0 0 0 7 9v10H4Z"/>
-  <path fill="currentColor" d="m12 7 .8 1.5 1.5.8-1.5.8-.8 1.5-.8-1.5-1.5-.8 1.5-.8L12 7Zm-.5 4.7 3 1.8-2.2 1.5 2.4 1.8-2 1.4 3.3 2.3H8l3-2.4-2-1.6 2.1-1.5-2.3-1.4 2.7-1.9Z"/></svg>
+  <path fill="currentColor" d="m12 7 .8 1.5 1.5.8-1.5.8-.8 1.5-.8-1.5-1.5-.8 1.5-.8L12 7Z"/>
+  <path fill="currentColor" d="M11.2 11.5 9 13.5l3.8 2L8.4 18l1.9 1.9-3.8 1.6h11l-3.6-1.9-2.6-1.9 4-2L11 13.5l1.8-2h-1.6Z"/>
+</svg>

@@ -5,7 +5,7 @@ Production system for the approved “Unexpected” direction: a doorway into hi
 ## Quick start
 
 1. Import `colors/tokens.css`, `typography/type-tokens.css`, `ui/ui-tokens.css`, and `assets/motion.css` once at the application root.
-2. Use `logos/logo-horizontal.svg` as the default marketing header logo and `logos/icon-small.svg` below 32 px.
+2. Use `logos/logo-horizontal.svg` as the default marketing header logo and `logos/icon-small.svg` below 32 px. Product screens use the composed lockup instead — see "Screen lockup".
 3. Use `icons/*.svg` with CSS `color`; the SVGs inherit `currentColor`.
 4. Use `illustrations/*.svg` only for empty, loading, success, and onboarding states.
 5. Use raster exports in `social/` and `assets/` for platforms that do not accept SVG. Browser and app icons are generated into `public/` — see "Favicon and app installation".
@@ -27,7 +27,8 @@ Production system for the approved “Unexpected” direction: a doorway into hi
 
 | Context | Asset | Minimum size |
 |---|---|---:|
-| Website header | `logos/logo-horizontal.svg` | 148 px wide |
+| Marketing/print header | `logos/logo-horizontal.svg` | 148 px wide |
+| Product screens (web app) | composed lockup — see "Screen lockup" | mark 28 px tall |
 | Narrow footer or sponsor row | `logos/wordmark.svg` | 112 px wide |
 | Stacked composition | `logos/logo-vertical.svg` | 180 px wide |
 | Square editorial tile | `logos/logo-square.svg` | 96 px |
@@ -41,6 +42,22 @@ Production system for the approved “Unexpected” direction: a doorway into hi
 | Social profile | `social/social-avatar.png` | platform crop safe |
 
 The clear-space unit is the width of the spark. Keep at least 2 units around the horizontal logo and 1.5 units around the icon. Do not rotate the mark, place it in a generic map pin, add glow, alter the path, recolor individual parts outside approved lockups, or combine it with the old Dotling/mascot artwork.
+
+## Screen lockup
+
+`logo-horizontal.svg` fixes the mark at about 15% of the lockup's width. At the 148 px minimum above that leaves the mark roughly 23 px tall — below the 32 px this same table sets as `icon.svg`'s minimum. The two rows disagree, and on screen the smaller one wins: the mark loses its switchbacks and reads as a smudge.
+
+Product screens therefore compose the lockup from `icon.svg` and `wordmark.svg` at separate sizes, rather than scaling the fixed one. Sizes live in `src/components/brand/Logo.tsx`:
+
+| Step | Mark | Wordmark | Mark ink | Use |
+|---|--:|--:|--:|---|
+| `sm` | 33 px | 24 px | ~28 px | App chrome, which shares a 320 px header with other controls |
+| `md` | 38 px | 28 px | ~32 px | Site header, auth |
+| `lg` | 46 px | 34 px | ~39 px | Footer, branded screens |
+
+Heights are the `<img>` box; both files carry padding inside their viewBox, so the ink is shorter. The wordmark holds at 0.74× the mark's box, which leaves the mark's wall ~11% heavier than the wordmark's stroke — the cost of giving the mark its own scale. Matching the weights exactly would mean a ~205 px lockup, which is the width this arrangement exists to avoid.
+
+The artwork is untouched: this is an arrangement of the existing mark and wordmark files, not a redraw. Clear space is unchanged — 2 spark widths, which is ~14 px at `md`. `logo-horizontal.svg` remains the signature for marketing, print, and export.
 
 ## Wordmark status
 

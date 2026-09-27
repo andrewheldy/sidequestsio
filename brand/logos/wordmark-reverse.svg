@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1094 210" role="img" aria-labelledby="title desc">
   <title id="title">sidequests</title>
-  <desc id="desc">Custom lowercase geometric wordmark with rounded terminals and a distinctive q tail.</desc>
-  <g fill="none" stroke="#0D1321" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+  <desc id="desc">Custom lowercase geometric wordmark, in white for dark surfaces.</desc>
+  <g fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
     <path d="M32 91c0-22 18-34 48-34 22 0 39 6 52 17M33 132c13 14 30 21 51 21 29 0 47-12 47-33 0-45-98-16-98-55"/>
     <path d="M171 65v87"/><path d="M171 30h.2"/>
     <path d="M287 26v126M287 106c0-30-19-49-48-49-31 0-50 20-50 49 0 28 19 47 50 47 29 0 48-18 48-47Z"/>
