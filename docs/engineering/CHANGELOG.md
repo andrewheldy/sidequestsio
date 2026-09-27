@@ -2,6 +2,25 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-27 — Database schema snapshot and live-schema dump script
+
+- **Added `docs/architecture/DATABASE_SCHEMA_SNAPSHOT.md`**, a dated, derived reference of the
+  schema after migrations 0001–0015: Mermaid ER diagram, consolidated DDL, triggers, RPCs, an
+  RLS/grant matrix, storage buckets and known pitfalls. Built to paste into another LLM. The
+  migrations stay authoritative.
+- **Added `scripts/schema-snapshot.sql`**, a read-only query that dumps the live `public` schema
+  (columns, constraints, policies, grants, functions, triggers, indexes, buckets, row counts) as one
+  JSON document for diffing against the snapshot.
+- **Verification:** all 15 migrations were applied in order to a local Postgres 16 with stubbed
+  `auth`/`storage` schemas. They applied cleanly and matched the snapshot (20 tables, 2 views,
+  19 enums, 42 FKs). The live database was not inspected: the session's Supabase MCP was not
+  authenticated.
+- **Pitfalls surfaced, not fixed** (reproduced locally as `anon`): `quests.verification_secret` is
+  readable by anon (P1); `community_notes_with_author` returns non-approved notes (P2); and
+  `is_admin()`/`owns_partner()` run as the caller, so any draft quest makes anon `SELECT` on
+  `quests` fail with `permission denied for table users` (P10). Each needs a live check before a
+  migration is written.
+
 ## 2026-09-25 — Header lockup: mark and wordmark sized separately
 
 - **The header mark was a smudge, and the brand spec is why.** `logo-horizontal.svg` fixes the mark
