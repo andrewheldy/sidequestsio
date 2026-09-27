@@ -29,6 +29,7 @@ import type {
   Quest,
   QuestAttempt,
   QuestCompletion,
+  QuestInstance,
   QuestWithContext,
   QrCode,
   Reward,
@@ -44,6 +45,7 @@ import type {
   CreateNoteInput,
   CreateNoteResult,
   QuestFilter,
+  QuestOffer,
   RecordScanInput,
   RedeemRewardInput,
   RedeemRewardResult,
@@ -269,12 +271,36 @@ export class SupabaseRepository implements Repository {
     if (error) throw error;
     return (count ?? 0) > 0;
   }
+  async getQuestOffer(userId: string, questId: string): Promise<QuestOffer> {
+    const { data, error } = await this.sb.rpc("generate_quest_instance", { p_quest_id: questId });
+    if (error) {
+      // Until 0017_quest_frameworks.sql is applied the RPC does not exist:
+      // fall back to the static quest and the once-ever rule.
+      const done = await this.hasCompleted(userId, questId);
+      return { status: done ? "already_completed" : "available", instance: null };
+    }
+    const res = data as {
+      ok: boolean;
+      error?: string;
+      instance?: QuestInstance | null;
+      availableAt?: string;
+    };
+    if (res.ok) return { status: "available", instance: res.instance ?? null };
+    if (res.error === "already_completed" || res.error === "cooldown") {
+      return { status: res.error, instance: null, availableAt: res.availableAt ?? null };
+    }
+    // Inactive/expired/not found: show the static quest; completeQuest reports why.
+    return { status: "available", instance: null };
+  }
   async completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult> {
     const { data, error } = await this.sb.rpc("complete_quest", {
       p_quest_id: input.questId,
       p_verification_method: input.verificationMethod,
       p_venue_code: input.venueCode ?? null,
       p_source_scan_id: input.sourceScanId ?? null,
+      // Sent only with an instance, which only exists once 0017 is applied, so
+      // the call still matches the 4-argument function before then.
+      ...(input.instanceId ? { p_instance_id: input.instanceId } : {}),
     });
     if (error) throw error;
     return data as CompleteQuestResult;

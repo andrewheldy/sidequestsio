@@ -197,6 +197,23 @@ Completing a quest awards:
 
 Completion creates a permanent entry in the user's Adventure Log.
 
+By default a user completes a quest once. A quest can instead allow repeats after a cooldown (for example 7 days), which pairs with generated quests below.
+
+---
+
+## Generated Quests
+
+A quest can carry one or more curator-written frameworks. When a signed-in user opens the quest, a fresh objective is generated for them from a framework:
+
+- Frameworks are templates with `{slot}` placeholders and a list of approved options per slot. Generation only picks from those options; it never writes new text.
+- The objective stays the same for that visit (refreshing does not change it) until it is completed or expires after 24 hours.
+- The next visit prefers a different framework, so the same objective does not come up twice in a row.
+- A framework can override the quest's XP and Points; otherwise the quest's rewards apply.
+- Generated quests only happen at partner venues, verified by the venue's existing QR code.
+- Signed-out visitors see the quest's standard objective.
+
+Explore's "Featured detour" also rotates per user each day and skips quests the user can't do right now.
+
 ---
 
 ## Capture the Moment
@@ -404,7 +421,7 @@ The following are intentionally excluded from the MVP:
 - Marketplace trading
 - Complex moderation tools
 - AR features
-- AI-generated quest creation
+- AI-written quest content (on-the-spot generation from curated frameworks is in scope; see Generated Quests)
 - Dynamic QR generation
 - Cryptocurrency or blockchain integrations
 

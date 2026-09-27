@@ -2,7 +2,7 @@
 --
 -- Run after applying each migration batch (Supabase SQL editor, or via the
 -- read-only MCP). Returns one row per check with pass = true/false.
--- Expected: every row passes once migrations 0009–0013 and 0016 are applied.
+-- Expected: every row passes once migrations 0009–0013, 0016 and 0017 are applied.
 -- This script mutates nothing.
 
 with checks (ord, check_name, pass, details) as (
@@ -149,6 +149,29 @@ with checks (ord, check_name, pass, details) as (
   union all
   select 20, '0016: notes author view applies moderation filter',
     pg_get_viewdef('public.community_notes_with_author'::regclass, true) ilike '%where%moderation_status%',
+    null
+
+  -- ── 0017 quest frameworks ────────────────────────────────────────────────
+  union all
+  select 21, '0017: framework + instance tables exist, instances private',
+    to_regclass('public.quest_frameworks') is not null
+      and case when to_regclass('public.quest_instances') is null then false
+               else not has_table_privilege('anon', 'public.quest_instances', 'SELECT') end,
+    null
+  union all
+  select 22, '0017: complete_quest takes p_instance_id; generate_quest_instance exists',
+    exists (select 1 from pg_proc
+             where pronamespace = 'public'::regnamespace and proname = 'complete_quest'
+               and pg_get_function_identity_arguments(oid) like '%p_instance_id%')
+      and exists (select 1 from pg_proc
+                   where pronamespace = 'public'::regnamespace and proname = 'generate_quest_instance'),
+    (select string_agg(pg_get_function_identity_arguments(oid), ' | ')
+       from pg_proc where pronamespace = 'public'::regnamespace and proname = 'complete_quest')
+  union all
+  select 23, '0017: repeatable completions (unique user+quest dropped)',
+    not exists (select 1 from pg_constraint
+                 where conrelid = 'public.quest_completions'::regclass
+                   and pg_get_constraintdef(oid) = 'UNIQUE (user_id, quest_id)'),
     null
 
   -- ── content readiness (informational; passes after T-CONTENT-1) ─────────

@@ -32,6 +32,7 @@ import type {
   Quest,
   QuestAttempt,
   QuestCompletion,
+  QuestInstance,
   QuestWithContext,
   QrCode,
   Reward,
@@ -70,11 +71,15 @@ export interface CompleteQuestInput {
   /** Required when the quest uses `venue_code` verification. */
   venueCode?: string;
   sourceScanId?: string | null;
+  /** The generated instance being completed; fixes the rewards paid. */
+  instanceId?: string | null;
 }
 
 export type CompleteQuestError =
   | "not_found"
   | "already_completed"
+  | "cooldown"
+  | "instance_invalid"
   | "quest_inactive"
   | "quest_expired"
   | "verification_failed";
@@ -87,6 +92,20 @@ export interface CompleteQuestResult {
   pointsAwarded?: number;
   newLevel?: number;
   leveledUp?: boolean;
+  /** Set with `cooldown`: when the quest can be done again. */
+  availableAt?: string;
+}
+
+/**
+ * What a signed-in user can do with a quest right now. `instance` is the
+ * objective generated for them (null when the quest has no frameworks, so the
+ * static quest applies).
+ */
+export interface QuestOffer {
+  status: "available" | "already_completed" | "cooldown";
+  instance: QuestInstance | null;
+  /** Set with `cooldown`: when the quest can be done again. */
+  availableAt?: string | null;
 }
 
 export interface RedeemRewardInput {
@@ -178,6 +197,8 @@ export interface Repository {
   // --- Attempts & completion --------------------------------------------
   startQuest(userId: string, questId: string): Promise<QuestAttempt>;
   hasCompleted(userId: string, questId: string): Promise<boolean>;
+  /** Generates (or returns the open) objective for this user's visit. */
+  getQuestOffer(userId: string, questId: string): Promise<QuestOffer>;
   completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult>;
   listCompletions(userId: string): Promise<QuestCompletion[]>;
 

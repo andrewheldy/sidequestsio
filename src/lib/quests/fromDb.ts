@@ -60,6 +60,7 @@ export function questWithContextToFlatQuest(q: QuestWithContext): FlatQuest | nu
     social_share_prompt: q.social_share_prompt,
     staff_phrase: q.staff_phrase,
     estimated_time: q.estimated_time,
+    repeatCooldownDays: q.repeat_cooldown_days ?? null,
   };
 }
 

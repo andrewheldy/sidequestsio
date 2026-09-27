@@ -2,6 +2,40 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-27 — Quests generated on the spot from curated frameworks
+
+- **Scope change (product owner):** quests may now be generated per user when they open a quest.
+  Recorded in `PRODUCT_DECISION_LOG.md` ("Generated Quests"), `DECISIONS.md` and `PRODUCT_SPEC.md`.
+  Guardrails: curator-written frameworks and templates (no AI), partner venues only, repeatable
+  only after a cooldown the quest opts into.
+- **Added `supabase/migrations/0017_quest_frameworks.sql` (not applied; apply after 0016):**
+  - New tables `quest_frameworks` (templates with `{slot}` placeholders, validated by trigger)
+    and `quest_instances` (one generated objective per visit, stable until completed or 24h).
+  - `generate_quest_instance()` prefers a different framework than the user's last visit.
+  - `quests.repeat_cooldown_days` added. NULL keeps the once-ever rule.
+  - `complete_quest()` takes `p_instance_id` and enforces the repeat rule under an advisory lock.
+    It replaces the dropped `unique (user_id, quest_id)`.
+  - `scripts/verify-db.sql` gains checks 21–23.
+- **App:**
+  - `Repository.getQuestOffer()` is implemented in the Supabase, Local and Mock repositories.
+    The Supabase version falls back to the static quest until 0017 is applied.
+  - The quest page shows the generated objective, instructions, staff phrase and rewards, sends
+    the instance on completion, and says when a new version unlocks.
+  - Explore's "Featured detour" now rotates per user per day (`src/lib/quests/rotation.ts`) and
+    skips quests the user can't do right now.
+  - The local seed gives Wynwood Walls and Gramps frameworks and a 7-day cooldown. The local
+    store version bumps to 5, so local sample data reseeds.
+- **Verification:**
+  - Local Postgres 16 with 0001–0017, including a re-run of 0017 to confirm it is idempotent.
+    Generation, refresh stability, framework rotation, and single-framework slot re-draws all
+    checked out (0 repeats in 12 pairs). So did the cooldown and once-ever rules, instance
+    ownership, a concurrent double-complete (second one got `cooldown`), the old 4-argument
+    call, and private instance reads.
+  - LocalRepository was exercised in Node with the same scenarios.
+  - The Explore rotation had 0 back-to-back repeats over 365 days and spreads evenly across users.
+  - Quest page rendering was checked in a browser against a stubbed instance.
+  - Typecheck and build pass. Lint on the touched files shows no new errors (18 pre-existing).
+
 ## 2026-09-27 — Database schema snapshot, live-schema dump script, RLS hardening migration
 
 - **Added `docs/architecture/DATABASE_SCHEMA_SNAPSHOT.md`**, a dated, derived reference of the

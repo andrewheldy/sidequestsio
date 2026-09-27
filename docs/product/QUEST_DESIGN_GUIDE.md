@@ -406,6 +406,44 @@ The quest should sound like an invitation from a knowledgeable local.
 
 ---
 
+# Quest Frameworks
+
+A framework lets one quest produce a different objective on each visit. Write it like a normal quest, then mark the parts that can vary as `{slots}` and list the options for each.
+
+## Writing a good framework
+
+- Every combination of options must pass the Quest Quality Checklist on its own. Read a few out loud before publishing.
+- Keep options interchangeable: each one should fit the sentence and take about the same effort.
+- Two or three frameworks per quest, with three to five options per slot, is plenty. The next visit always prefers a different framework.
+- Only use actions the venue has agreed to. A framework changes what the user does at the partner's venue, so the partner should approve it the same way they approve the quest.
+- Leave reward overrides empty unless a framework is clearly harder or easier than the quest's default.
+
+## Example
+
+```sql
+-- Let the quest repeat weekly, then add a framework to it.
+update public.quests set repeat_cooldown_days = 7 where id = '<quest id>';
+
+insert into public.quest_frameworks
+  (quest_id, name, objective_template, prompt_template, proof_method,
+   staff_phrase_template, share_template, estimated_time, slots)
+values (
+  '<quest id>',
+  'Secret order',
+  'Order a {drink} and ask for it {style}',
+  'Walk up to the counter and order a {drink}, {style}. Snap it before the first sip.',
+  'staff_phrase',
+  'One {drink}, {style}, for the quest',
+  'Ordered a {drink} {style} on a SideQuest ☕ #sidequests',
+  '10 min',
+  '{"drink": ["cortado", "cold brew", "cafecito"], "style": ["in Spanish", "with extra foam"]}'
+);
+```
+
+The database rejects a framework whose templates use a `{slot}` that has no options. Frameworks are authored in the Supabase SQL editor until the partner portal supports them.
+
+---
+
 # The SideQuests Test
 
 Before approving any quest, ask one question:

@@ -10,7 +10,8 @@
 > stubbed `auth`/`storage` schemas. 0006 stops at one statement (P11); the statements it then
 > skips are re-done by 0004, 0010 and 0011, so the end state matched this file (20 tables,
 > 2 views, 19 enums). P1, P2 and P10 below were reproduced there.
-> **Pending:** `0016_rls_hardening.sql` fixes P1, P2 and P10 and is **not yet applied**; see §11.
+> **Pending (not yet applied):** `0016_rls_hardening.sql` fixes P1, P2 and P10 (§11);
+> `0017_quest_frameworks.sql` adds on-the-spot generated quests (§12).
 > **Live verification:** not performed. The applied-migration ledger has drifted (CLAUDE.md §9). Run `scripts/schema-snapshot.sql` in the Supabase SQL editor to dump
 > the live schema and diff it against this file.
 >
@@ -533,3 +534,51 @@ verification queries and a rollback. `scripts/verify-db.sql` checks 18–20 cove
   value into `quest_secrets`. `complete_quest()` reads the code from `quest_secrets`.
 - `community_notes_with_author` is recreated with `security_barrier` and
   `where moderation_status = 'approved' or user_id = auth.uid() or is_admin()`.
+
+## 12. Pending: `0017_quest_frameworks.sql` (authored, not applied; apply after 0016)
+
+Generated quests from curated frameworks (product decision 2026-09-27). `scripts/verify-db.sql`
+checks 21–23 cover it. Once applied:
+
+```sql
+alter table quests add column repeat_cooldown_days int check (repeat_cooldown_days > 0);
+  -- NULL = once ever (unchanged default); N = may repeat N days after last completion
+
+create table quest_frameworks (             -- curator templates; partners manage via owns_partner
+  id uuid pk,
+  quest_id uuid not null references quests(id) on delete cascade,
+  name text not null, action_type text,
+  objective_template text not null, prompt_template text, proof_method text,
+  staff_phrase_template text, share_template text, estimated_time text,
+  slots jsonb not null default '{}',        -- { "slot": ["option", ...] }, validated by trigger
+  xp_reward int, points_reward int,         -- NULL = use the quest's rewards
+  status entity_status not null default 'active',
+  created_at now
+);
+
+create table quest_instances (              -- one generated objective per user visit; self-read only
+  id uuid pk,
+  user_id uuid not null references users(id) on delete cascade,
+  quest_id uuid not null references quests(id) on delete cascade,
+  framework_id uuid references quest_frameworks(id) on delete set null,
+  slot_values jsonb not null, objective text not null, prompt text, proof_method text,
+  staff_phrase text, share_prompt text, estimated_time text,
+  xp_reward int not null, points_reward int not null,
+  created_at now, expires_at timestamptz not null default now() + interval '1 day',
+  completed_at timestamptz
+);
+
+alter table quest_completions add column instance_id uuid references quest_instances(id) on delete set null;
+  -- unique (instance_id) where not null; unique (user_id, quest_id) is DROPPED
+```
+
+- `generate_quest_instance(p_quest_id) → jsonb` (SECURITY DEFINER): returns the user's open
+  instance, or draws a new one preferring a framework other than last time's; `{instance: null}`
+  when the quest has no frameworks; `{ok:false, error:'already_completed'|'cooldown', availableAt}`
+  when the user can't do it now.
+- `complete_quest(..., p_instance_id uuid default null)`: the 4-argument version is dropped (a
+  defaulted 5th argument would be an ambiguous overload for PostgREST). Enforces the repeat rule
+  under a per-user+quest advisory lock, pays the instance's rewards, and returns new errors
+  `cooldown` and `instance_invalid`.
+- Triggers: `quest_frameworks_validate` (every `{token}` must be a slot with non-blank options).
+

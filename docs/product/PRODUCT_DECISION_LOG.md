@@ -326,3 +326,23 @@ When a major product decision is made, record:
 - The expected outcome
 
 Future contributors should understand not only what SideQuests does, but why it was designed that way.
+
+# Generated Quests (2026-09-27)
+
+## Decision
+
+Quests may be generated for each user at the moment they open a quest, from curator-written frameworks. This overturns the exclusion of generated quests in "MVP Scope" above; the rest of that exclusion list stands.
+
+Guardrails chosen by the product owner:
+
+- **Frameworks and templates, not AI.** Curators write each framework: templates with `{slot}` placeholders and the approved options for every slot. Generation only fills those slots. An AI-written variant was considered and not chosen.
+- **Partner venues only.** A framework belongs to an existing quest, so the venue's QR code still proves the visit and the partner stays in control of what happens at their venue.
+- **Repeatable after a cooldown.** A quest can opt in to repeat completions after N days (`repeat_cooldown_days`). Quests that don't opt in keep the once-ever rule.
+
+### Why
+
+Users should not get the same quest twice in a row. Rotating curated objectives keeps return visits fresh without giving up curation, presence verification or partner trust.
+
+Implementation: `supabase/migrations/0017_quest_frameworks.sql`; authoring guide in `docs/product/QUEST_DESIGN_GUIDE.md` ("Quest Frameworks").
+
+---

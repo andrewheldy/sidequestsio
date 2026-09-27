@@ -23,6 +23,7 @@ import type {
   Quest,
   QuestAttempt,
   QuestCompletion,
+  QuestInstance,
   QuestWithContext,
   QrCode,
   Reward,
@@ -35,6 +36,7 @@ import type {
 import type {
   CompleteQuestInput,
   CompleteQuestResult,
+  QuestOffer,
   CreateNoteInput,
   CreateNoteResult,
   QuestFilter,
@@ -454,18 +456,40 @@ export class LocalRepository implements Repository {
     );
   }
 
+  async getQuestOffer(userId: string, questId: string): Promise<QuestOffer> {
+    return mutate((db) => {
+      const quest = db.quests.find((q) => q.id === questId);
+      if (!quest) return { status: "available" as const, instance: null };
+
+      const blocked = repeatBlock(db, userId, quest);
+      if (blocked) {
+        return { status: blocked.error, instance: null, availableAt: blocked.availableAt };
+      }
+
+      // Newest first, by insertion order (timestamps can tie within a millisecond).
+      const mine = db.instances
+        .filter((i) => i.user_id === userId && i.quest_id === questId)
+        .reverse();
+      const open = mine.find((i) => !i.completed_at && i.expires_at > nowIso());
+      if (open) return { status: "available" as const, instance: open };
+
+      const instance = drawInstance(db, userId, quest, mine[0] ?? null);
+      if (instance) db.instances.push(instance);
+      return { status: "available" as const, instance };
+    });
+  }
+
   async completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult> {
     return mutate((db) => {
       const quest = db.quests.find((q) => q.id === input.questId);
       if (!quest) return { ok: false, error: "not_found" as const };
 
-      // Already completed? Prevent duplicate awards / reward farming.
-      if (
-        db.completions.some(
-          (c) => c.user_id === input.userId && c.quest_id === input.questId,
-        )
-      ) {
-        return { ok: false, error: "already_completed" as const };
+      // Repeat rule: once ever, or again after the quest's cooldown.
+      const blocked = repeatBlock(db, input.userId, quest);
+      if (blocked) {
+        return blocked.error === "cooldown"
+          ? { ok: false, error: "cooldown" as const, availableAt: blocked.availableAt }
+          : { ok: false, error: "already_completed" as const };
       }
 
       // Quest lifecycle checks.
@@ -496,8 +520,25 @@ export class LocalRepository implements Repository {
         return { ok: false, error: "verification_failed" as const };
       }
 
+      // A generated instance fixes this completion's rewards.
+      let instance: QuestInstance | null = null;
+      if (input.instanceId) {
+        instance =
+          db.instances.find(
+            (i) =>
+              i.id === input.instanceId &&
+              i.user_id === input.userId &&
+              i.quest_id === quest.id &&
+              !i.completed_at,
+          ) ?? null;
+        if (!instance) return { ok: false, error: "instance_invalid" as const };
+      }
+      const xp = instance?.xp_reward ?? quest.xp_reward;
+      const points = instance?.points_reward ?? quest.points_reward;
+
       // Award.
       const completedAt = nowIso();
+      if (instance) instance.completed_at = completedAt;
       const completion: QuestCompletion = {
         id: `completion-${nanoid(10)}`,
         user_id: input.userId,
@@ -505,9 +546,10 @@ export class LocalRepository implements Repository {
         venue_id: quest.venue_id,
         partner_id: quest.partner_id,
         completed_at: completedAt,
-        xp_awarded: quest.xp_reward,
-        points_awarded: quest.points_reward,
+        xp_awarded: xp,
+        points_awarded: points,
         source_scan_id: input.sourceScanId ?? null,
+        instance_id: instance?.id ?? null,
       };
       db.completions.push(completion);
 
@@ -517,12 +559,12 @@ export class LocalRepository implements Repository {
         user_id: input.userId,
         transaction_type: "earn",
         source: "quest_completion",
-        points_amount: quest.points_reward,
-        xp_amount: quest.xp_reward,
+        points_amount: points,
+        xp_amount: xp,
         quest_id: quest.id,
         reward_id: null,
         partner_id: quest.partner_id,
-        metadata: { verification: input.verificationMethod },
+        metadata: { verification: input.verificationMethod, instance_id: instance?.id ?? null },
         created_at: completedAt,
       };
       db.ledger.push(ledger);
@@ -552,9 +594,9 @@ export class LocalRepository implements Repository {
       let leveledUp = false;
       if (profile) {
         const prevLevel = profile.level;
-        profile.xp += quest.xp_reward;
-        profile.points_balance_cache += quest.points_reward;
-        profile.lifetime_points += quest.points_reward;
+        profile.xp += xp;
+        profile.points_balance_cache += points;
+        profile.lifetime_points += points;
         profile.completed_quests_count += 1;
         profile.level = levelForXp(profile.xp);
         newLevel = profile.level;
@@ -566,8 +608,8 @@ export class LocalRepository implements Repository {
       return {
         ok: true,
         completion,
-        xpAwarded: quest.xp_reward,
-        pointsAwarded: quest.points_reward,
+        xpAwarded: xp,
+        pointsAwarded: points,
         newLevel,
         leveledUp,
       };
@@ -971,6 +1013,78 @@ export class LocalRepository implements Repository {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Mirrors the 0017 repeat rule: NULL cooldown = once ever, N = again after N days. */
+function repeatBlock(
+  db: DbSnapshot,
+  userId: string,
+  quest: Quest,
+): { error: "already_completed" | "cooldown"; availableAt: string | null } | null {
+  const last = db.completions
+    .filter((c) => c.user_id === userId && c.quest_id === quest.id)
+    .reduce<string | null>((max, c) => (!max || c.completed_at > max ? c.completed_at : max), null);
+  if (!last) return null;
+  if (quest.repeat_cooldown_days == null) return { error: "already_completed", availableAt: null };
+  const availableAt = new Date(
+    new Date(last).getTime() + quest.repeat_cooldown_days * 86_400_000,
+  ).toISOString();
+  return availableAt > nowIso() ? { error: "cooldown", availableAt } : null;
+}
+
+function renderTemplate(template: string | null, values: Record<string, string>): string | null {
+  if (template == null) return null;
+  return Object.entries(values).reduce((out, [key, value]) => out.split(`{${key}}`).join(value), template);
+}
+
+const pickOne = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)];
+
+/**
+ * Mirrors generate_quest_instance(): prefer a framework other than last
+ * time's, and with a single framework re-draw slots (up to 5 tries) so two
+ * visits in a row differ. Returns null when the quest has no frameworks.
+ */
+function drawInstance(
+  db: DbSnapshot,
+  userId: string,
+  quest: Quest,
+  previous: QuestInstance | null,
+): QuestInstance | null {
+  const active = db.frameworks.filter((f) => f.quest_id === quest.id && f.status === "active");
+  if (active.length === 0) return null;
+  const fresh = active.filter((f) => f.id !== previous?.framework_id);
+  const framework = pickOne(fresh.length ? fresh : active);
+
+  let values: Record<string, string> = {};
+  for (let attempt = 0; attempt < 5; attempt++) {
+    values = Object.fromEntries(
+      Object.entries(framework.slots).map(([key, options]) => [key, pickOne(options)]),
+    );
+    const repeat =
+      previous?.framework_id === framework.id &&
+      JSON.stringify(previous.slot_values) === JSON.stringify(values);
+    if (!repeat) break;
+  }
+
+  const createdAt = nowIso();
+  return {
+    id: `instance-${nanoid(10)}`,
+    user_id: userId,
+    quest_id: quest.id,
+    framework_id: framework.id,
+    slot_values: values,
+    objective: renderTemplate(framework.objective_template, values)!,
+    prompt: renderTemplate(framework.prompt_template, values) ?? quest.action_prompt ?? null,
+    proof_method: framework.proof_method ?? quest.proof_method ?? null,
+    staff_phrase: renderTemplate(framework.staff_phrase_template, values) ?? quest.staff_phrase ?? null,
+    share_prompt: renderTemplate(framework.share_template, values) ?? quest.social_share_prompt ?? null,
+    estimated_time: framework.estimated_time ?? quest.estimated_time ?? null,
+    xp_reward: framework.xp_reward ?? quest.xp_reward,
+    points_reward: framework.points_reward ?? quest.points_reward,
+    created_at: createdAt,
+    expires_at: new Date(new Date(createdAt).getTime() + 86_400_000).toISOString(),
+    completed_at: null,
+  };
+}
 
 function verify(quest: Quest, input: CompleteQuestInput): boolean {
   switch (quest.verification_type) {

@@ -9,6 +9,7 @@ import type {
   RecordScanInput,
   CompleteQuestInput,
   CompleteQuestResult,
+  QuestOffer,
   RedeemRewardInput,
   RedeemRewardResult,
   CreateNoteInput,
@@ -316,6 +317,10 @@ export class MockRepository implements Repository {
 
   async hasCompleted(_userId: string, _questId: string): Promise<boolean> {
     return false;
+  }
+
+  async getQuestOffer(_userId: string, _questId: string): Promise<QuestOffer> {
+    return { status: "available", instance: null };
   }
 
   async completeQuest(_input: CompleteQuestInput): Promise<CompleteQuestResult> {

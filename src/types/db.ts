@@ -189,6 +189,51 @@ export interface Quest {
   staff_phrase?: string | null;
   /** Human-readable estimated time to complete, e.g. "5 min". */
   estimated_time?: string | null;
+  /** NULL = complete once, ever. N = may be completed again N days after the last completion. */
+  repeat_cooldown_days?: number | null;
+}
+
+/**
+ * Curator-written template a quest's objective is generated from. `{slot}`
+ * tokens in the templates are filled from `slots` (0017_quest_frameworks.sql).
+ */
+export interface QuestFramework {
+  id: string;
+  quest_id: string;
+  name: string;
+  action_type: string | null;
+  objective_template: string;
+  prompt_template: string | null;
+  proof_method: ProofMethod | null;
+  staff_phrase_template: string | null;
+  share_template: string | null;
+  estimated_time: string | null;
+  slots: Record<string, string[]>;
+  /** Reward overrides; NULL falls back to the quest's rewards. */
+  xp_reward: number | null;
+  points_reward: number | null;
+  status: EntityStatus;
+  created_at: string;
+}
+
+/** One objective generated for one user's visit, rendered from a framework. */
+export interface QuestInstance {
+  id: string;
+  user_id: string;
+  quest_id: string;
+  framework_id: string | null;
+  slot_values: Record<string, string>;
+  objective: string;
+  prompt: string | null;
+  proof_method: ProofMethod | null;
+  staff_phrase: string | null;
+  share_prompt: string | null;
+  estimated_time: string | null;
+  xp_reward: number;
+  points_reward: number;
+  created_at: string;
+  expires_at: string;
+  completed_at: string | null;
 }
 
 export interface QrCode {
@@ -247,6 +292,8 @@ export interface QuestCompletion {
   xp_awarded: number;
   points_awarded: number;
   source_scan_id: string | null;
+  /** The generated instance this completion fulfilled (NULL for static quests). */
+  instance_id?: string | null;
 }
 
 // ---------------------------------------------------------------------------
