@@ -2,7 +2,7 @@
 --
 -- Run after applying each migration batch (Supabase SQL editor, or via the
 -- read-only MCP). Returns one row per check with pass = true/false.
--- Expected: every row passes once migrations 0009–0013 are applied.
+-- Expected: every row passes once migrations 0009–0013 and 0016 are applied.
 -- This script mutates nothing.
 
 with checks (ord, check_name, pass, details) as (
@@ -128,6 +128,27 @@ with checks (ord, check_name, pass, details) as (
     (select count(*) = 4 from pg_policies
      where schemaname = 'storage' and tablename = 'objects'
        and (qual ilike '%proofs%' or with_check ilike '%proofs%')),
+    null
+
+  -- ── 0016 RLS hardening ───────────────────────────────────────────────────
+  union all
+  select 18, '0016: RLS helpers are SECURITY DEFINER (anon reads survive hidden rows)',
+    (select count(*) = 3 from pg_proc
+      where pronamespace = 'public'::regnamespace
+        and proname in ('is_admin', 'owns_partner', 'app_uid') and prosecdef),
+    null
+  union all
+  select 19, '0016: venue-code secrets are server-only',
+    case when to_regclass('public.quest_secrets') is null then false
+         else not has_table_privilege('anon', 'public.quest_secrets', 'SELECT')
+          and not has_table_privilege('authenticated', 'public.quest_secrets', 'SELECT')
+          and not exists (select 1 from quests where verification_secret is not null)
+    end,
+    (select count(*)::text || ' quests still carry a verification_secret'
+       from quests where verification_secret is not null)
+  union all
+  select 20, '0016: notes author view applies moderation filter',
+    pg_get_viewdef('public.community_notes_with_author'::regclass, true) ilike '%where%moderation_status%',
     null
 
   -- ── content readiness (informational; passes after T-CONTENT-1) ─────────

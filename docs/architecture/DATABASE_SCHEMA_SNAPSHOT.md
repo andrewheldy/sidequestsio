@@ -7,9 +7,11 @@
 >
 > **Snapshot date:** 2026-09-27 · **Built from:** migrations 0001–0015 (repo, not live DB).
 > **Verified:** all 15 migrations were applied in filename order to a local Postgres 16 with
-> stubbed `auth`/`storage` schemas; the result matched this file (20 tables, 2 views,
-> 19 enums) and P1, P2 and P10 below were reproduced. **Live verification:** not performed. The applied-migration ledger has
-> drifted (CLAUDE.md §9). Run `scripts/schema-snapshot.sql` in the Supabase SQL editor to dump
+> stubbed `auth`/`storage` schemas. 0006 stops at one statement (P11); the statements it then
+> skips are re-done by 0004, 0010 and 0011, so the end state matched this file (20 tables,
+> 2 views, 19 enums). P1, P2 and P10 below were reproduced there.
+> **Pending:** `0016_rls_hardening.sql` fixes P1, P2 and P10 and is **not yet applied**; see §11.
+> **Live verification:** not performed. The applied-migration ledger has drifted (CLAUDE.md §9). Run `scripts/schema-snapshot.sql` in the Supabase SQL editor to dump
 > the live schema and diff it against this file.
 >
 > **How to use with another LLM:** paste this whole file. It is self-contained: context,
@@ -473,22 +475,25 @@ A read needs **both** a grant and an RLS policy. No table has a DELETE grant.
 
 ## 10. Known pitfalls and drift (read before changing anything)
 
-These come from the migrations (P1, P2, P10 reproduced on a local build); confirm each live.
+These come from the migrations (P1, P2, P10, P11 reproduced on a local build); confirm each live.
+P1, P2 and P10 are fixed by `0016_rls_hardening.sql` once it is applied (§11).
 
 - **P10. Signed-out reads break when a non-public row exists.** `is_admin()`, `owns_partner()`
   and `app_uid()` are plain `SECURITY INVOKER` SQL functions that read `public.users`, and
   `anon` has no grant on `users`. Policies like `status = 'active' or owns_partner(partner_id)`
   fall through to `is_admin()` for any draft/paused quest (same for `qr_codes`, `rewards`, and
   non-approved `community_notes`), so the whole anon `SELECT` fails with
-  `permission denied for table users`. The usual fix is to make these helpers
-  `SECURITY DEFINER` with a pinned `search_path`.
+  `permission denied for table users`. **Fix in 0016:** the helpers become `SECURITY DEFINER`
+  with an empty `search_path`.
 
 - **P1. `quests.verification_secret` is readable by `anon`.** The table-level `SELECT` grant plus
   `quests_public_read` exposes every column of active quests, including the venue-code answer
   that `complete_quest()` checks. Anyone can read the secret with the public anon key.
+  **Fix in 0016:** secrets move to server-only `quest_secrets`.
 - **P2. `community_notes_with_author` bypasses note moderation.** It is a plain view (runs as
   owner), selects `n.*` with no `moderation_status` filter, and is granted to `anon`. Pending,
   rejected and flagged notes are readable through it unless the client filters.
+  **Fix in 0016:** the view's WHERE clause re-applies `notes_public_read`.
 - **P3. Two XP/level stores.** `complete_quest()` updates `user_profiles.xp/level`;
   `public_profiles` exposes `profiles.xp/level`, which no RPC updates.
 - **P4. `profiles.is_profile_public` is dead.** `is_public` is canonical (0011).
@@ -502,3 +507,29 @@ These come from the migrations (P1, P2, P10 reproduced on a local build); confir
   (leaderboard and analytics are computed on read by RPCs).
 - **P9. Ledger drift.** Some migrations were applied out-of-band; the 0012 Fable columns existed
   live before the migration. Always verify live state.
+- **P11. A fresh build stops inside 0006.** Run in filename order, 0006 line 434
+  (`create or replace view community_notes_with_author … n.*`) fails with
+  `cannot change name of view column "author_display_name" to "flag_count"`, because 0005 already
+  added `flag_count`. Everything after that line in 0006 is skipped (or the whole file rolls back,
+  if it runs in one transaction). Later migrations re-do what matters, but any automated
+  from-scratch build (`supabase db reset`, a branch) will stop here. Not fixed.
+
+## 11. Pending: `0016_rls_hardening.sql` (authored, not applied)
+
+Apply in the SQL editor after a backup; the file's header lists pre-checks and its footer has
+verification queries and a rollback. `scripts/verify-db.sql` checks 18–20 cover it. Once applied:
+
+- `is_admin()`, `owns_partner()`, `app_uid()` become `SECURITY DEFINER`, `search_path = ''`.
+- New table (RLS on, no policies, no `anon`/`authenticated` privileges):
+  ```sql
+  create table quest_secrets (
+    quest_id uuid primary key references quests(id) on delete cascade deferrable initially deferred,
+    verification_secret text not null check (char_length(trim(verification_secret)) > 0),
+    updated_at timestamptz not null default now()
+  );
+  ```
+- `quests.verification_secret` stays in the table but is always NULL: trigger
+  `quests_stash_secret` (before insert/update, `stash_quest_secret()`) moves any non-blank
+  value into `quest_secrets`. `complete_quest()` reads the code from `quest_secrets`.
+- `community_notes_with_author` is recreated with `security_barrier` and
+  `where moderation_status = 'approved' or user_id = auth.uid() or is_admin()`.

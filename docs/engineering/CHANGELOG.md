@@ -2,7 +2,7 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
-## 2026-09-27 — Database schema snapshot and live-schema dump script
+## 2026-09-27 — Database schema snapshot, live-schema dump script, RLS hardening migration
 
 - **Added `docs/architecture/DATABASE_SCHEMA_SNAPSHOT.md`**, a dated, derived reference of the
   schema after migrations 0001–0015: Mermaid ER diagram, consolidated DDL, triggers, RPCs, an
@@ -12,14 +12,27 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   (columns, constraints, policies, grants, functions, triggers, indexes, buckets, row counts) as one
   JSON document for diffing against the snapshot.
 - **Verification:** all 15 migrations were applied in order to a local Postgres 16 with stubbed
-  `auth`/`storage` schemas. They applied cleanly and matched the snapshot (20 tables, 2 views,
-  19 enums, 42 FKs). The live database was not inspected: the session's Supabase MCP was not
-  authenticated.
-- **Pitfalls surfaced, not fixed** (reproduced locally as `anon`): `quests.verification_secret` is
-  readable by anon (P1); `community_notes_with_author` returns non-approved notes (P2); and
+  `auth`/`storage` schemas. The end state matched the snapshot (20 tables, 2 views, 19 enums,
+  42 FKs). 0006 stops at line 434 on a fresh build (P11, below). The live database was not
+  inspected: the session's Supabase MCP was not authenticated.
+- **Pitfalls surfaced** (reproduced locally as `anon`): `quests.verification_secret` is readable
+  by anon (P1); `community_notes_with_author` returns non-approved notes (P2); and
   `is_admin()`/`owns_partner()` run as the caller, so any draft quest makes anon `SELECT` on
-  `quests` fail with `permission denied for table users` (P10). Each needs a live check before a
-  migration is written.
+  `quests` fail with `permission denied for table users` (P10).
+- **Added `supabase/migrations/0016_rls_hardening.sql` (not applied)**, which fixes P1, P2 and P10:
+  - RLS helpers become `SECURITY DEFINER` with an empty `search_path`.
+  - Venue-code secrets move to a server-only `quest_secrets` table. A trigger keeps
+    `quests.verification_secret` NULL so existing writers keep working, and `complete_quest()`
+    (0003's body, only the lookup changed) reads the secret from the new table.
+  - `community_notes_with_author` gets a WHERE clause restating `notes_public_read`.
+  - `scripts/verify-db.sql` gains checks 18–20. They fail on a 0001–0015 build and pass after 0016.
+  - Tested locally, including a re-run of 0016 to confirm it is idempotent. Anon quest reads work
+    with a draft present, the secret is hidden, and non-approved notes are hidden from anon and
+    other users but visible to their author and admins. Right code completes, wrong code fails,
+    and the trigger stores new secrets, ignores blank ones and updates changed ones.
+- **Found, not fixed (P11):** on a fresh build, 0006's `create or replace view
+  community_notes_with_author` fails because 0005 already added `flag_count`. Later migrations
+  re-do what 0006 skips, but any from-scratch build stops there.
 
 ## 2026-09-25 — Header lockup: mark and wordmark sized separately
 
