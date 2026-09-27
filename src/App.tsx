@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DemoSessionProvider } from "@/contexts/DemoSessionContext";
@@ -47,6 +48,9 @@ import CheckIn from "./pages/app/CheckIn";
 import ReadinessBrief from "./pages/ReadinessBrief";
 import NotFound from "./pages/NotFound";
 
+// Concept/pitch microsite: lazy so its fonts, styles and code stay out of the main bundle.
+const IIIPoints = lazy(() => import("./pages/IIIPoints"));
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -83,6 +87,14 @@ const App = () => (
                       <Route path="/delete-account" element={<DeleteAccountPolicy />} />
                       <Route path="/partner-terms" element={<PartnerTerms />} />
                       <Route path="/readiness" element={<ReadinessBrief />} />
+                      <Route
+                        path="/iiipoints"
+                        element={
+                          <Suspense fallback={<div className="min-h-screen" style={{ background: "#C9AEF4" }} />}>
+                            <IIIPoints />
+                          </Suspense>
+                        }
+                      />
 
                       {/* Auth + onboarding */}
                       <Route path="/auth" element={<Auth />} />
