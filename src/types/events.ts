@@ -40,7 +40,8 @@ export type AppEventName =
   | "capture_moment_video"
   | "capture_moment_share"
   | "capture_moment_download"
-  | "capture_moment_click";
+  | "capture_moment_click"
+  | "concept_interaction";  // demo interactions on pitch/concept pages (e.g. /iiipoints)
 
 /** Common envelope attached to every emitted event. */
 export interface AppEventContext {

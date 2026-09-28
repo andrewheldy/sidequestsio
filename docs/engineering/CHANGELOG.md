@@ -105,6 +105,25 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   community_notes_with_author` fails because 0005 already added `flag_count`. Later migrations
   re-do what 0006 skips, but any from-scratch build stops there.
 
+## 2026-09-27 — `/iiipoints`: unofficial III Points concept microsite (pitch prototype)
+
+- **New route `/iiipoints`**, a self-contained interactive pitch for the III Points team: quest feed,
+  three concept sponsor quests (Red Bull, Stella Artois, Playboy), a concept festival map, XP/profile,
+  the post-festival Miami continuation, three-sided value, a mock organizer dashboard and a final CTA.
+- **Not a product surface.** All state is session-only in the browser (`QuestState.tsx`); nothing
+  touches Supabase, the repository layer, or real quests/points. Quests, sponsor activations, map
+  and dashboard numbers are labelled as concept/fictional on the page, and the footer carries the
+  unofficial-concept disclaimer. Sponsor names are typeset, not their logo files.
+- **Isolated from the rest of the site.** The page is `React.lazy`-loaded (own ~19 KB gzip JS + ~10 KB
+  CSS chunk); its fonts (Anton, Space Grotesk, IBM Plex Mono), title, `theme-color` and a
+  `robots: noindex, nofollow` meta are added on mount and removed on unmount. Styles are scoped
+  under `.iii` in `src/components/iiipoints/iiipoints.css`.
+- **Analytics:** demo interactions emit one new typed event, `concept_interaction`
+  (`props.page = "iiipoints"`), through the existing `track()` sink.
+- Verified with typecheck + build and headless Chromium at 320/390/1440px: no horizontal overflow,
+  no page errors, and a full scripted play-through (quests, all three sponsor flows, map hidden door,
+  easter egg, level-up) with and without `prefers-reduced-motion`.
+
 ## 2026-09-25 — Header lockup: mark and wordmark sized separately
 
 - **The header mark was a smudge, and the brand spec is why.** `logo-horizontal.svg` fixes the mark
