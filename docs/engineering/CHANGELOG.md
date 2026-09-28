@@ -2,6 +2,14 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-28 — Prototype avatar removed; SideQuests explorer avatar
+
+- Removed `src/assets/prototype-avatar.webp`: the temporary personal photo from the quest-page work is gone.
+- Anyone without a profile photo (guests, or signed-in users who haven't uploaded one) now sees the
+  SideQuests explorer (`src/assets/sidequests-explorer-avatar.svg`) as the "You" avatar in the bottom nav.
+  - It is a brand-palette vector: bucket hat with the discovery sparkle, backpack straps, framed by the doorway.
+  - A broken avatar URL also falls back to it.
+
 ## 2026-09-28 — Migrations 0019/0020 applied; Frost quest SQL
 
 - **Applied to production:** `0019_venue_about.sql` and `0020_analytics_events.sql`, with post-checks passing (see `SYSTEM_STATE.md`).
