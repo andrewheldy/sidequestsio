@@ -118,6 +118,12 @@ export default function QuestDetail() {
 
   const scanParam = params.get("scan");
   const [scanId, setScanId] = useState<string | null>(scanParam);
+  // True when scanId came from a real venue code (/scan/<code>, QR or NFC),
+  // which QR/NFC quests need to complete. The server makes the final call.
+  const via = params.get("via");
+  const [scanVerified, setScanVerified] = useState(
+    !!scanParam && (via === "qr" || via === "nfc" || via === "scan"),
+  );
   const [venueCode, setVenueCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<CompleteQuestResult | null>(null);
@@ -211,6 +217,7 @@ export default function QuestDetail() {
     const pending = getPendingScan();
     if (pending && pending.questId === questId) {
       setScanId(pending.scanId);
+      setScanVerified(!!pending.verified);
       clearPendingScan();
     }
   }, [isAuthenticated, questId]);
@@ -228,6 +235,8 @@ export default function QuestDetail() {
   }
 
   const needsCode = quest.verification_type === "venue_code";
+  // QR/NFC quests unlock only from a scan of the venue's code (0018).
+  const needsScan = quest.verification_type === "qr" || quest.verification_type === "nfc";
   const isDone = (offer && offer.status !== "available") || result?.ok;
   const instance = offer?.instance ?? completedInstance;
   // The quest as this user sees it: the generated objective, instructions and
@@ -243,9 +252,10 @@ export default function QuestDetail() {
       user_id: user?.id ?? null,
     });
     if (!isAuthenticated || !user) {
-      if (scanId) setPendingScan({ questId: quest.id, scanId });
+      if (scanId) setPendingScan({ questId: quest.id, scanId, verified: scanVerified });
+      const via = scanVerified ? "&via=scan" : "";
       navigate(
-        `/auth?next=${encodeURIComponent(`/quests/${quest.id}?scan=${scanId ?? ""}`)}`,
+        `/auth?next=${encodeURIComponent(`/quests/${quest.id}?scan=${scanId ?? ""}${via}`)}`,
       );
       return;
     }
@@ -295,6 +305,7 @@ export default function QuestDetail() {
         already_completed: "You've already completed this quest.",
         cooldown: `You can do a new version of this quest on ${formatAvailableAt(res.availableAt)}.`,
         instance_invalid: "This quest refreshed. Reload the page to get your current objective.",
+        scan_required: "Scan the QR code or tap the NFC tag at the venue, then try again.",
         verification_failed: needsCode
           ? "That venue code didn't match. Ask staff and try again."
           : "Verification failed. Please try again.",
@@ -303,6 +314,10 @@ export default function QuestDetail() {
         not_found: "Quest not found.",
       };
       toast.error(errorMessages[res.error ?? ""] ?? "Could not complete quest.");
+      if (res.error === "scan_required") {
+        setScanVerified(false);
+        setShowCompletionSheet(false);
+      }
       return;
     }
 
@@ -478,7 +493,9 @@ export default function QuestDetail() {
         <QuestObjectiveCard objective={objective} />
 
         {/* ── 4. Primary CTA ── */}
-        {isDone ? (
+        {!isDone && needsScan && !scanVerified ? (
+          <ScanToUnlockCard businessName={businessName} />
+        ) : isDone ? (
           <CompletedCard
             result={result}
             quest={shown}
@@ -606,6 +623,22 @@ export default function QuestDetail() {
 // ---------------------------------------------------------------------------
 // Completed card — replaces the primary CTA once the quest is done
 // ---------------------------------------------------------------------------
+
+/** Shown on QR/NFC quests until the user scans the venue's code. */
+function ScanToUnlockCard({ businessName }: { businessName: string | null }) {
+  return (
+    <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4">
+      <QrCode className="mt-0.5 h-6 w-6 shrink-0 text-[hsl(var(--ocean-500))]" />
+      <div className="space-y-1">
+        <p className="font-display text-base font-bold text-foreground">Scan to unlock</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {businessName ? `At ${businessName}, scan` : "At the venue, scan"} the SideQuests QR code
+          or tap the NFC tag with your phone. That checks you in so you can complete this quest.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 /** Overlays a generated instance on the quest so the page renders it as-is. */
 function applyInstance(quest: QuestWithContext, instance: QuestInstance): QuestWithContext {

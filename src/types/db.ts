@@ -241,11 +241,13 @@ export interface QrCode {
   quest_id: string;
   venue_id: string | null;
   partner_id: string;
-  /** Short, URL-safe public code used in /scan/[code]. */
+  /** Short code carried in /scan/[code]. Server-only since 0018: it proves a visit. */
   code: string;
   destination_url: string;
   status: EntityStatus;
   created_at: string;
+  /** 'qr' = printed sticker, 'nfc' = NFC tag. Both encode /scan/<code>. */
+  kind?: "qr" | "nfc";
 }
 
 // ---------------------------------------------------------------------------
@@ -269,6 +271,8 @@ export interface ScanEvent {
   approximate_location: string | null;
   location_permission_granted: boolean;
   conversion_state: ScanConversionState;
+  /** True only for scans of a real venue code (record_code_scan, 0018). */
+  code_verified?: boolean;
 }
 
 export interface QuestAttempt {

@@ -2,6 +2,43 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-28 — QR/NFC quests require a real scan; NFC tags as venue codes
+
+- **Found while checking production (read-only, via the Supabase connector):**
+  - `record_scan()` has failed on every call since 0003, because of a missing enum cast. There
+    are zero scan rows, and `/scan/<code>` hangs.
+  - `complete_quest()` never checked QR scans, and venue codes were publicly readable.
+  - 9 active QR quests with one code each; 1 completion ever.
+- **Added `supabase/migrations/0018_scan_verification.sql`:**
+  - Venue codes get a `kind` (`qr` or `nfc`) and become private.
+  - `record_code_scan()` verifies a scanned code server-side.
+  - `record_scan()` is fixed.
+  - `complete_quest()` requires a recent, unused, code-verified scan for QR/NFC quests.
+  - `create_qr_code()` takes a kind.
+  - `scripts/verify-db.sql` gains checks 24–26.
+- **App:**
+  - `/scan/<code>` resolves through `Repository.recordCodeScan()`. The Supabase version falls back
+    to the old lookup until 0018 is applied.
+  - Scan failures now show an error instead of a spinner.
+  - The quest page shows "Scan to unlock" on QR/NFC quests until the user arrives from a scan,
+    and it keeps the scan through sign-in.
+  - The Local and Mock repositories mirror the rule.
+- **Docs:** `PARTNERSHIP_PLAYBOOK.md` has a new "Venue codes: QR stickers and NFC tags" section
+  (what URL to print, how to write and lock NFC tags, rotating a leaked code). The schema snapshot
+  adds P12, P13 and §13.
+- **Verification:**
+  - Local Postgres 16 with 0001–0018, including a re-run of 0018. All 23 scenarios behaved as
+    intended:
+    - codes are unreadable by anon and other users;
+    - bad, inactive, stale (3h), reused, other-user and other-quest scans are all rejected;
+    - an anonymous scan is claimed after sign-in;
+    - venue-code quests are unaffected;
+    - NFC codes are created and resolved;
+    - the old call signatures still work.
+  - LocalRepository was tested in Node.
+  - Quest page states were checked in a browser.
+  - Typecheck, build and lint pass.
+
 ## 2026-09-27 — Quests generated on the spot from curated frameworks
 
 - **Scope change (product owner):** quests may now be generated per user when they open a quest.

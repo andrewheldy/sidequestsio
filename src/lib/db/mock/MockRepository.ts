@@ -10,6 +10,8 @@ import type {
   CompleteQuestInput,
   CompleteQuestResult,
   QuestOffer,
+  RecordCodeScanInput,
+  RecordCodeScanResult,
   RedeemRewardInput,
   RedeemRewardResult,
   CreateNoteInput,
@@ -262,6 +264,7 @@ export class MockRepository implements Repository {
     questId: string;
     partnerId: string;
     venueId?: string | null;
+    kind?: "qr" | "nfc";
   }): Promise<QrCode> {
     throw new Error("Demo mode — writes disabled");
   }
@@ -286,6 +289,13 @@ export class MockRepository implements Repository {
       location_permission_granted: false,
       conversion_state: "scanned",
     };
+  }
+
+  async recordCodeScan(input: RecordCodeScanInput): Promise<RecordCodeScanResult> {
+    const qr = await this.getQrByCode(input.code);
+    if (!qr || qr.status !== "active") return { ok: false, error: "invalid_code" };
+    const scan = await this.recordScan({ ...input, questId: qr.quest_id, qrCodeId: qr.id });
+    return { ok: true, questId: qr.quest_id, codeKind: qr.kind ?? "qr", scan: { ...scan, code_verified: true } };
   }
 
   async markScanConverted(_scanId: string, _state: ScanEvent["conversion_state"]): Promise<void> {

@@ -46,6 +46,8 @@ import type {
   CreateNoteResult,
   QuestFilter,
   QuestOffer,
+  RecordCodeScanInput,
+  RecordCodeScanResult,
   RecordScanInput,
   RedeemRewardInput,
   RedeemRewardResult,
@@ -212,13 +214,21 @@ export class SupabaseRepository implements Repository {
     if (partnerId) q = q.eq("partner_id", partnerId);
     return this.many<QrCode>(q);
   }
-  async createQrCode(input: { questId: string; partnerId: string; venueId?: string | null }) {
+  async createQrCode(input: {
+    questId: string;
+    partnerId: string;
+    venueId?: string | null;
+    kind?: "qr" | "nfc";
+  }) {
     return (await this.one<QrCode>(
       this.sb
         .rpc("create_qr_code", {
           p_quest_id: input.questId,
           p_partner_id: input.partnerId,
           p_venue_id: input.venueId ?? null,
+          // p_kind exists from 0018; omitted for plain QR codes so older
+          // databases still match the 3-argument function.
+          ...(input.kind && input.kind !== "qr" ? { p_kind: input.kind } : {}),
         })
         .single(),
     ))!;
@@ -240,6 +250,32 @@ export class SupabaseRepository implements Repository {
         })
         .single(),
     ))!;
+  }
+  async recordCodeScan(input: RecordCodeScanInput): Promise<RecordCodeScanResult> {
+    const device = detectDevice();
+    const { data, error } = await this.sb.rpc("record_code_scan", {
+      p_code: input.code,
+      p_anonymous_session_id: input.anonymousSessionId,
+      p_device_type: device.device_type,
+      p_browser: device.browser,
+      p_operating_system: device.operating_system,
+      p_referrer: getReferrer(),
+    });
+    if (error && error.code === "PGRST202") {
+      // record_code_scan arrives with 0018_scan_verification.sql. Until then,
+      // resolve the code the old way (codes are still publicly readable).
+      const qr = await this.getQrByCode(input.code);
+      if (!qr || qr.status !== "active") return { ok: false, error: "invalid_code" };
+      const scan = await this.recordScan({
+        questId: qr.quest_id,
+        qrCodeId: qr.id,
+        userId: input.userId,
+        anonymousSessionId: input.anonymousSessionId,
+      });
+      return { ok: true, questId: qr.quest_id, codeKind: qr.kind ?? "qr", scan };
+    }
+    if (error) throw error;
+    return data as RecordCodeScanResult;
   }
   async markScanConverted(scanId: string, state: ScanEvent["conversion_state"]) {
     const { error } = await this.sb

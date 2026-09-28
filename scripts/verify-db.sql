@@ -2,7 +2,7 @@
 --
 -- Run after applying each migration batch (Supabase SQL editor, or via the
 -- read-only MCP). Returns one row per check with pass = true/false.
--- Expected: every row passes once migrations 0009–0013, 0016 and 0017 are applied.
+-- Expected: every row passes once migrations 0009–0013 and 0016–0018 are applied.
 -- This script mutates nothing.
 
 with checks (ord, check_name, pass, details) as (
@@ -172,6 +172,25 @@ with checks (ord, check_name, pass, details) as (
     not exists (select 1 from pg_constraint
                  where conrelid = 'public.quest_completions'::regclass
                    and pg_get_constraintdef(oid) = 'UNIQUE (user_id, quest_id)'),
+    null
+
+  -- ── 0018 scan verification ───────────────────────────────────────────────
+  union all
+  select 24, '0018: venue codes are private and point at /scan/<code>',
+    not has_table_privilege('anon', 'public.qr_codes', 'SELECT')
+      and not exists (select 1 from public.qr_codes where destination_url is distinct from '/scan/' || code),
+    (select count(*)::text || ' codes not pointing at /scan/<code>'
+       from public.qr_codes where destination_url is distinct from '/scan/' || code)
+  union all
+  select 25, '0018: record_code_scan exists; scans carry code_verified',
+    exists (select 1 from pg_proc where pronamespace = 'public'::regnamespace and proname = 'record_code_scan')
+      and exists (select 1 from information_schema.columns
+                   where table_schema = 'public' and table_name = 'scan_events' and column_name = 'code_verified'),
+    null
+  union all
+  select 26, '0018: complete_quest requires a verified scan for QR/NFC quests',
+    exists (select 1 from pg_proc where pronamespace = 'public'::regnamespace and proname = 'complete_quest'
+             and prosrc like '%scan_required%'),
     null
 
   -- ── content readiness (informational; passes after T-CONTENT-1) ─────────

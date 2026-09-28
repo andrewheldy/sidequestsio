@@ -11,7 +11,8 @@
 > skips are re-done by 0004, 0010 and 0011, so the end state matched this file (20 tables,
 > 2 views, 19 enums). P1, P2 and P10 below were reproduced there.
 > **Pending (not yet applied):** `0016_rls_hardening.sql` fixes P1, P2 and P10 (§11);
-> `0017_quest_frameworks.sql` adds on-the-spot generated quests (§12).
+> `0017_quest_frameworks.sql` adds on-the-spot generated quests (§12);
+> `0018_scan_verification.sql` makes QR/NFC quests require a real scan (§13).
 > **Live verification:** not performed. The applied-migration ledger has drifted (CLAUDE.md §9). Run `scripts/schema-snapshot.sql` in the Supabase SQL editor to dump
 > the live schema and diff it against this file.
 >
@@ -514,6 +515,12 @@ P1, P2 and P10 are fixed by `0016_rls_hardening.sql` once it is applied (§11).
   added `flag_count`. Everything after that line in 0006 is skipped (or the whole file rolls back,
   if it runs in one transaction). Later migrations re-do what matters, but any automated
   from-scratch build (`supabase db reset`, a branch) will stop here. Not fixed.
+- **P12. `record_scan()` has never worked.** Its `case … 'scanned' … end` is `text`, not
+  `scan_conversion_state`, so every insert into `scan_events` errors. Production has zero scan
+  rows (verified 2026-09-28), and `/scan/<code>` hangs on "Resolving your quest…". Fixed by 0018.
+- **P13. QR verification is not enforced.** `complete_quest()` passes every non-venue-code quest,
+  and venue codes are publicly readable, so any signed-in user can complete a QR quest remotely.
+  Fixed by 0018.
 
 ## 11. Pending: `0016_rls_hardening.sql` (authored, not applied)
 
@@ -581,4 +588,20 @@ alter table quest_completions add column instance_id uuid references quest_insta
   under a per-user+quest advisory lock, pays the instance's rewards, and returns new errors
   `cooldown` and `instance_invalid`.
 - Triggers: `quest_frameworks_validate` (every `{token}` must be a slot with non-blank options).
+
+## 13. Pending: `0018_scan_verification.sql` (authored, not applied; apply after 0017 and after the app ships)
+
+- `qr_codes.kind text not null default 'qr' check (kind in ('qr','nfc'))`: an NFC tag is a venue
+  code like a QR sticker; both encode `/scan/<code>`. `destination_url` is backfilled to that path.
+- Codes become private: `qr_public_read` is replaced by `qr_owner_read` (owners/admins) and the
+  `anon` SELECT grant is revoked.
+- `scan_events.code_verified boolean not null default false`.
+- `record_code_scan(p_code, p_anonymous_session_id, p_device_type, p_browser, p_operating_system,
+  p_referrer) → jsonb {ok, questId, codeKind, scan}` (SECURITY DEFINER, anon + authenticated):
+  resolves an active code and records a verified scan.
+- `record_scan()` gets its missing enum cast (P12) and no longer stores client-supplied code ids.
+- `create_qr_code(…, p_kind text default 'qr')` (3-argument version dropped).
+- `complete_quest()`: `qr`/`nfc` quests need a code-verified scan of the quest's code by this user
+  (or their own anonymous pre-sign-in scan, which is then claimed), from the last 2 hours, not used
+  by an earlier completion; otherwise `scan_required`. Checks 24–26 in `scripts/verify-db.sql`.
 

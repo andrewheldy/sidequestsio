@@ -64,6 +64,22 @@ export interface RecordScanInput {
   anonymousSessionId: string;
 }
 
+export interface RecordCodeScanInput {
+  /** The code from /scan/<code> (printed QR or NFC tag). */
+  code: string;
+  userId?: string | null;
+  anonymousSessionId: string;
+}
+
+export interface RecordCodeScanResult {
+  ok: boolean;
+  error?: "invalid_code";
+  questId?: string;
+  codeKind?: "qr" | "nfc";
+  /** A code-verified scan; QR/NFC quests need one to complete. */
+  scan?: ScanEvent;
+}
+
 export interface CompleteQuestInput {
   userId: string;
   questId: string;
@@ -80,6 +96,7 @@ export type CompleteQuestError =
   | "already_completed"
   | "cooldown"
   | "instance_invalid"
+  | "scan_required"
   | "quest_inactive"
   | "quest_expired"
   | "verification_failed";
@@ -187,10 +204,18 @@ export interface Repository {
   // --- QR codes ----------------------------------------------------------
   getQrByCode(code: string): Promise<QrCode | null>;
   listQrCodes(partnerId?: string): Promise<QrCode[]>;
-  createQrCode(input: { questId: string; partnerId: string; venueId?: string | null }): Promise<QrCode>;
+  createQrCode(input: {
+    questId: string;
+    partnerId: string;
+    venueId?: string | null;
+    kind?: "qr" | "nfc";
+  }): Promise<QrCode>;
 
   // --- Scans -------------------------------------------------------------
+  /** Unverified scan (page view, direct /q/ link). */
   recordScan(input: RecordScanInput): Promise<ScanEvent>;
+  /** Resolves a scanned venue code server-side and records a verified scan. */
+  recordCodeScan(input: RecordCodeScanInput): Promise<RecordCodeScanResult>;
   markScanConverted(scanId: string, state: ScanEvent["conversion_state"]): Promise<void>;
   listScans(filter?: { partnerId?: string; questId?: string; limit?: number }): Promise<ScanEvent[]>;
 

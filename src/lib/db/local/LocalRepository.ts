@@ -37,6 +37,8 @@ import type {
   CompleteQuestInput,
   CompleteQuestResult,
   QuestOffer,
+  RecordCodeScanInput,
+  RecordCodeScanResult,
   CreateNoteInput,
   CreateNoteResult,
   QuestFilter,
@@ -359,17 +361,20 @@ export class LocalRepository implements Repository {
     questId: string;
     partnerId: string;
     venueId?: string | null;
+    kind?: "qr" | "nfc";
   }): Promise<QrCode> {
     return mutate((db) => {
+      const code = shortCode(2, 4).replace("-", "");
       const qr: QrCode = {
         id: `qr-${nanoid(8)}`,
         quest_id: input.questId,
         venue_id: input.venueId ?? null,
         partner_id: input.partnerId,
-        code: shortCode(2, 4).replace("-", ""),
-        destination_url: `/q/${input.questId}`,
+        code,
+        destination_url: `/scan/${code}`,
         status: "active",
         created_at: nowIso(),
+        kind: input.kind ?? "qr",
       };
       db.qrCodes.push(qr);
       return qr;
@@ -401,6 +406,24 @@ export class LocalRepository implements Repository {
       db.scans.push(scan);
       return scan;
     });
+  }
+
+  /** Mirrors record_code_scan() (0018): only an active code yields a verified scan. */
+  async recordCodeScan(input: RecordCodeScanInput): Promise<RecordCodeScanResult> {
+    const needle = input.code.trim().toLowerCase();
+    const qr = loadDb().qrCodes.find((q) => q.code.toLowerCase() === needle && q.status === "active");
+    if (!qr) return { ok: false, error: "invalid_code" };
+    const scan = await this.recordScan({
+      questId: qr.quest_id,
+      qrCodeId: qr.id,
+      userId: input.userId,
+      anonymousSessionId: input.anonymousSessionId,
+    });
+    mutate((db) => {
+      const s = db.scans.find((x) => x.id === scan.id);
+      if (s) s.code_verified = true;
+    });
+    return { ok: true, questId: qr.quest_id, codeKind: qr.kind ?? "qr", scan: { ...scan, code_verified: true } };
   }
 
   async markScanConverted(
@@ -518,6 +541,22 @@ export class LocalRepository implements Repository {
           attempt.verification_method = input.verificationMethod;
         }
         return { ok: false, error: "verification_failed" as const };
+      }
+
+      // QR/NFC quests need a recent, unused, code-verified scan (mirrors 0018).
+      if (quest.verification_type === "qr" || quest.verification_type === "nfc") {
+        const scan = db.scans.find(
+          (x) =>
+            x.id === input.sourceScanId &&
+            x.quest_id === quest.id &&
+            x.code_verified &&
+            (x.user_id === input.userId || x.user_id == null) &&
+            Date.now() - new Date(x.timestamp).getTime() < 2 * 3_600_000,
+        );
+        if (!scan || db.completions.some((c) => c.source_scan_id === scan.id)) {
+          return { ok: false, error: "scan_required" as const };
+        }
+        scan.user_id = input.userId;
       }
 
       // A generated instance fixes this completion's rewards.
