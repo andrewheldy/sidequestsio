@@ -2,6 +2,16 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-28 — `/iiipoints` kept out of search indexes at the server
+
+- `vercel.json` now sends `X-Robots-Tag: noindex, nofollow, noarchive` for `/iiipoints` (and any
+  sub-path). The page's own `robots` meta only exists after JavaScript runs; the header reaches
+  every crawler on the first response.
+- Deliberately **not** listed in `robots.txt`: a `Disallow` would stop crawlers from fetching the
+  page and seeing `noindex` (so an externally linked URL could still be indexed), and it would
+  publish the path in a public file. The page stays unlinked from the site and out of any sitemap,
+  so it is reachable only by typing the address.
+
 ## 2026-09-27 — `/iiipoints`: unofficial III Points concept microsite (pitch prototype)
 
 - **New route `/iiipoints`**, a self-contained interactive pitch for the III Points team: quest feed,
