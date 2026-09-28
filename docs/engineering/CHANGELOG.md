@@ -2,15 +2,144 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
-## 2026-09-28 — `/iiipoints` kept out of search indexes at the server
+## 2026-09-28 — Migration 0018 applied; PR #40 live
 
-- `vercel.json` now sends `X-Robots-Tag: noindex, nofollow, noarchive` for `/iiipoints` (and any
-  sub-path). The page's own `robots` meta only exists after JavaScript runs; the header reaches
-  every crawler on the first response.
-- Deliberately **not** listed in `robots.txt`: a `Disallow` would stop crawlers from fetching the
-  page and seeing `noindex` (so an externally linked URL could still be indexed), and it would
-  publish the path in a public file. The page stays unlinked from the site and out of any sitemap,
-  so it is reachable only by typing the address.
+- PR #40 was merged to `main` (`a2d41b6`) and deployed to Vercel production. Then
+  `0018_scan_verification.sql` was applied to production (ledger `20260928031347`).
+- **All `scripts/verify-db.sql` checks 18–26 pass in production:**
+  - venue codes are private and point at `/scan/<code>` (9 QR codes backfilled);
+  - `record_code_scan()` exists and scans carry `code_verified`;
+  - `complete_quest()` requires a verified scan for QR/NFC quests.
+- **Rolled-back live test** (nothing persisted):
+  - `record_code_scan()` accepts a real code case-insensitively and records a verified scan;
+  - it rejects a bad code;
+  - `record_scan()` records again, which fixes P12.
+- **Action needed:** re-encode the 9 venue stickers (or write NFC tags) with
+  `https://miamisidequests.io/scan/<code>`. Stickers that encode the old `/q/<quest id>` link open
+  the quest but show "Scan to unlock". See `PARTNERSHIP_PLAYBOOK.md`, "Venue codes".
+
+## 2026-09-28 — Migrations 0016 and 0017 applied to production
+
+- Both were applied to `wvedvngtuzsttpavmgjw` with the Supabase connector's `apply_migration`.
+  The ledger records them as `20260928015058 0016_rls_hardening` and
+  `20260928031102 0017_quest_frameworks`. The ledger also lists 0001–0004; 0005–0015 were applied
+  out-of-band.
+- **Pre-checks passed:**
+  - The live `complete_quest` matched 0003.
+  - There were no venue-code secrets to move.
+  - There were no duplicate `(user_id, quest_id)` completions.
+- **Post-checks passed:**
+  - The RLS helpers are `SECURITY DEFINER`.
+  - `quest_secrets`, `quest_frameworks` and `quest_instances` are unreadable by anon.
+  - The notes view is moderation-filtered.
+  - `complete_quest` has the 5-argument signature.
+  - `unique (user_id, quest_id)` is gone.
+  - The one existing completion is intact.
+- **Still pending:** `0018_scan_verification.sql`. Apply it after the PR #40 app is deployed,
+  because the previous app can't produce verified scans.
+
+## 2026-09-28 — QR/NFC quests require a real scan; NFC tags as venue codes
+
+- **Found while checking production (read-only, via the Supabase connector):**
+  - `record_scan()` has failed on every call since 0003, because of a missing enum cast. There
+    are zero scan rows, and `/scan/<code>` hangs.
+  - `complete_quest()` never checked QR scans, and venue codes were publicly readable.
+  - 9 active QR quests with one code each; 1 completion ever.
+- **Added `supabase/migrations/0018_scan_verification.sql`:**
+  - Venue codes get a `kind` (`qr` or `nfc`) and become private.
+  - `record_code_scan()` verifies a scanned code server-side.
+  - `record_scan()` is fixed.
+  - `complete_quest()` requires a recent, unused, code-verified scan for QR/NFC quests.
+  - `create_qr_code()` takes a kind.
+  - `scripts/verify-db.sql` gains checks 24–26.
+- **App:**
+  - `/scan/<code>` resolves through `Repository.recordCodeScan()`. The Supabase version falls back
+    to the old lookup until 0018 is applied.
+  - Scan failures now show an error instead of a spinner.
+  - The quest page shows "Scan to unlock" on QR/NFC quests until the user arrives from a scan,
+    and it keeps the scan through sign-in.
+  - The Local and Mock repositories mirror the rule.
+- **Docs:** `PARTNERSHIP_PLAYBOOK.md` has a new "Venue codes: QR stickers and NFC tags" section
+  (what URL to print, how to write and lock NFC tags, rotating a leaked code). The schema snapshot
+  adds P12, P13 and §13.
+- **Verification:**
+  - Local Postgres 16 with 0001–0018, including a re-run of 0018. All 23 scenarios behaved as
+    intended:
+    - codes are unreadable by anon and other users;
+    - bad, inactive, stale (3h), reused, other-user and other-quest scans are all rejected;
+    - an anonymous scan is claimed after sign-in;
+    - venue-code quests are unaffected;
+    - NFC codes are created and resolved;
+    - the old call signatures still work.
+  - LocalRepository was tested in Node.
+  - Quest page states were checked in a browser.
+  - Typecheck, build and lint pass.
+
+## 2026-09-27 — Quests generated on the spot from curated frameworks
+
+- **Scope change (product owner):** quests may now be generated per user when they open a quest.
+  Recorded in `PRODUCT_DECISION_LOG.md` ("Generated Quests"), `DECISIONS.md` and `PRODUCT_SPEC.md`.
+  Guardrails: curator-written frameworks and templates (no AI), partner venues only, repeatable
+  only after a cooldown the quest opts into.
+- **Added `supabase/migrations/0017_quest_frameworks.sql` (not applied; apply after 0016):**
+  - New tables `quest_frameworks` (templates with `{slot}` placeholders, validated by trigger)
+    and `quest_instances` (one generated objective per visit, stable until completed or 24h).
+  - `generate_quest_instance()` prefers a different framework than the user's last visit.
+  - `quests.repeat_cooldown_days` added. NULL keeps the once-ever rule.
+  - `complete_quest()` takes `p_instance_id` and enforces the repeat rule under an advisory lock.
+    It replaces the dropped `unique (user_id, quest_id)`.
+  - `scripts/verify-db.sql` gains checks 21–23.
+- **App:**
+  - `Repository.getQuestOffer()` is implemented in the Supabase, Local and Mock repositories.
+    The Supabase version falls back to the static quest until 0017 is applied.
+  - The quest page shows the generated objective, instructions, staff phrase and rewards, sends
+    the instance on completion, and says when a new version unlocks.
+  - Explore's "Featured detour" now rotates per user per day (`src/lib/quests/rotation.ts`) and
+    skips quests the user can't do right now.
+  - The local seed gives Wynwood Walls and Gramps frameworks and a 7-day cooldown. The local
+    store version bumps to 5, so local sample data reseeds.
+- **Verification:**
+  - Local Postgres 16 with 0001–0017, including a re-run of 0017 to confirm it is idempotent.
+    Generation, refresh stability, framework rotation, and single-framework slot re-draws all
+    checked out (0 repeats in 12 pairs). So did the cooldown and once-ever rules, instance
+    ownership, a concurrent double-complete (second one got `cooldown`), the old 4-argument
+    call, and private instance reads.
+  - LocalRepository was exercised in Node with the same scenarios.
+  - The Explore rotation had 0 back-to-back repeats over 365 days and spreads evenly across users.
+  - Quest page rendering was checked in a browser against a stubbed instance.
+  - Typecheck and build pass. Lint on the touched files shows no new errors (18 pre-existing).
+
+## 2026-09-27 — Database schema snapshot, live-schema dump script, RLS hardening migration
+
+- **Added `docs/architecture/DATABASE_SCHEMA_SNAPSHOT.md`**, a dated, derived reference of the
+  schema after migrations 0001–0015: Mermaid ER diagram, consolidated DDL, triggers, RPCs, an
+  RLS/grant matrix, storage buckets and known pitfalls. Built to paste into another LLM. The
+  migrations stay authoritative.
+- **Added `scripts/schema-snapshot.sql`**, a read-only query that dumps the live `public` schema
+  (columns, constraints, policies, grants, functions, triggers, indexes, buckets, row counts) as one
+  JSON document for diffing against the snapshot.
+- **Verification:** all 15 migrations were applied in order to a local Postgres 16 with stubbed
+  `auth`/`storage` schemas. The end state matched the snapshot (20 tables, 2 views, 19 enums,
+  42 FKs). 0006 stops at line 434 on a fresh build (P11, below). The live database was not
+  inspected: the session's Supabase MCP was not authenticated.
+- **Pitfalls surfaced** (reproduced locally as `anon`): `quests.verification_secret` is readable
+  by anon (P1); `community_notes_with_author` returns non-approved notes (P2); and
+  `is_admin()`/`owns_partner()` run as the caller, so any draft quest makes anon `SELECT` on
+  `quests` fail with `permission denied for table users` (P10).
+- **Added `supabase/migrations/0016_rls_hardening.sql` (not applied)**, which fixes P1, P2 and P10:
+  - RLS helpers become `SECURITY DEFINER` with an empty `search_path`.
+  - Venue-code secrets move to a server-only `quest_secrets` table. A trigger keeps
+    `quests.verification_secret` NULL so existing writers keep working, and `complete_quest()`
+    (0003's body, only the lookup changed) reads the secret from the new table.
+  - `community_notes_with_author` gets a WHERE clause restating `notes_public_read`.
+  - `scripts/verify-db.sql` gains checks 18–20. They fail on a 0001–0015 build and pass after 0016.
+  - Tested locally, including a re-run of 0016 to confirm it is idempotent. Anon quest reads work
+    with a draft present, the secret is hidden, and non-approved notes are hidden from anon and
+    other users but visible to their author and admins. Right code completes, wrong code fails,
+    and the trigger stores new secrets, ignores blank ones and updates changed ones.
+- **Found, not fixed (P11):** on a fresh build, 0006's `create or replace view
+  community_notes_with_author` fails because 0005 already added `flag_count`. Later migrations
+  re-do what 0006 skips, but any from-scratch build stops there.
 
 ## 2026-09-27 — `/iiipoints`: unofficial III Points concept microsite (pitch prototype)
 

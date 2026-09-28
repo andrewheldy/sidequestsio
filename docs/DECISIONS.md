@@ -32,3 +32,6 @@ The immediate goal is a polished MVP launch with real Miami businesses, validati
 
 **2026-07-06 — Engineering favors shipping over premature optimization.**
 Decisions should optimize for launching, onboarding businesses, measuring engagement, and demonstrating ROI — not for hypothetical scale or enterprise requirements the product hasn't earned yet. See `docs/PRODUCT_DIRECTION.md`, "Engineering Principles."
+
+**2026-09-27 — Quests can be generated on the spot from curated frameworks.**
+Product-owner decision overturning the MVP exclusion of generated quests. Generation fills curator-written templates (no AI), only at partner venues, and a quest may be repeated after a cooldown it opts into. See "Generated Quests" in `docs/product/PRODUCT_DECISION_LOG.md` and `supabase/migrations/0017_quest_frameworks.sql`.

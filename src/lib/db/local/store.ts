@@ -16,6 +16,8 @@ import type {
   Quest,
   QuestAttempt,
   QuestCompletion,
+  QuestFramework,
+  QuestInstance,
   QrCode,
   Reward,
   RewardRedemption,
@@ -37,6 +39,8 @@ export interface DbSnapshot {
   scans: ScanEvent[];
   attempts: QuestAttempt[];
   completions: QuestCompletion[];
+  frameworks: QuestFramework[];
+  instances: QuestInstance[];
   ledger: PointsLedgerEntry[];
   rewards: Reward[];
   redemptions: RewardRedemption[];
@@ -46,7 +50,7 @@ export interface DbSnapshot {
 }
 
 const STORE_KEY = "sq.db";
-const STORE_VERSION = 4;
+const STORE_VERSION = 5; // 5: quest frameworks + instances
 const VERSION_KEY = "sq.db.version";
 
 let memory: DbSnapshot | null = null;

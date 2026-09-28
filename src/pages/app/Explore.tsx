@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ListFilter, Map, Search } from 'lucide-react';
 import { QUEST_CATEGORIES } from '@/lib/quests';
@@ -9,9 +10,11 @@ import { EmptyState } from '@/components/app/ui';
 import { useActiveQuests } from '@/hooks/useActiveQuests';
 import { useAuth } from '@/contexts/AuthContext';
 import { Logo } from '@/components/brand/Logo';
+import { getRepository } from '@/lib/db';
+import { rotateFeatured } from '@/lib/quests/rotation';
 
 const Explore = () => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('All');
   const { quests: allQuests, isLoading, isError } = useActiveQuests();
@@ -28,8 +31,17 @@ const Explore = () => {
     [allQuests, query, category],
   );
 
-  const featured = quests[0];
-  const nearby = quests.slice(1);
+  const { data: completions = [] } = useQuery({
+    queryKey: ['completions', user?.id],
+    queryFn: async () => (await getRepository()).listCompletions(user!.id),
+    enabled: !!user,
+  });
+
+  // Rotates per user per day and skips quests they can't do right now.
+  const { featured, rest: nearby } = useMemo(
+    () => rotateFeatured(quests, completions, user?.id ?? 'guest'),
+    [quests, completions, user?.id],
+  );
 
   return (
     <div className="space-y-7">

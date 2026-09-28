@@ -185,3 +185,53 @@ These are carried forward from the Codex production audit and have **not** been 
 - **Direct table update outside the RPC layer**: `SupabaseRepository`'s scan-conversion path (`markScanConverted`) updates `scan_events` directly rather than through an RPC, while RLS for that table has no corresponding update policy per the Codex audit — a potential silent-failure path, not re-verified this session.
 - **Multiple `SECURITY DEFINER` RPCs are broadly executable** by `anon`/`authenticated` without additional restriction (§4) — flagged by Supabase's own advisors, not addressed this session.
 - **Leaked-password protection is disabled** in Supabase Auth (§4).
+
+---
+
+## Update 2026-09-28 — Migrations 0016 and 0017 applied
+
+Verified against production (`wvedvngtuzsttpavmgjw`) through the Supabase connector:
+
+- **Applied `0016_rls_hardening.sql`** (ledger `20260928015058`):
+  - `is_admin()`, `owns_partner()` and `app_uid()` are `SECURITY DEFINER`.
+  - Venue-code secrets live in the server-only `quest_secrets` table.
+  - `community_notes_with_author` returns only approved notes, the viewer's own, or everything for
+    admins.
+- **Applied `0017_quest_frameworks.sql`** (ledger `20260928031102`):
+  - New `quest_frameworks` and `quest_instances` tables, plus `quests.repeat_cooldown_days`.
+  - `generate_quest_instance()`.
+  - `complete_quest(…, p_instance_id)` enforces the repeat rule; `unique (user_id, quest_id)` is
+    dropped.
+  - No frameworks are authored yet, so every quest still shows its static objective.
+- **Pending: `0018_scan_verification.sql`** (scan enforcement, NFC tags, `record_scan` fix). Apply it
+  after the PR #40 app is deployed.
+- **Live facts:**
+  - 9 active quests, all QR, one code each (`destination_url` `/q/<quest id>`).
+  - 7 auth users and 1 quest completion.
+  - **Zero `scan_events` rows ever**, because `record_scan()` fails on a missing enum cast (fixed
+    in 0018).
+  - 0 of 9 active quests have Fable content.
+- **Migration ledger:** records 0001–0004, 0016 and 0017. 0005–0015 were applied out-of-band;
+  `scripts/verify-db.sql` checks 1–16 all pass.
+- **Production-only policies (in no migration):**
+  - `profiles` "Public SideQuests profiles are viewable" (`is_public = true`).
+  - `user_profiles` "profiles_self_insert".
+
+---
+
+## Update 2026-09-28 (later) — Migration 0018 applied; PR #40 deployed
+
+- **PR #40 is live in production** (`main` `a2d41b6`). It adds generated quests, the Explore
+  rotation, and the QR/NFC scan flow with "Scan to unlock".
+- **Applied `0018_scan_verification.sql`** (ledger `20260928031347`):
+  - Venue codes have a `kind` (`qr` or `nfc`), are no longer publicly readable, and point at
+    `/scan/<code>`.
+  - `record_code_scan()` records verified scans.
+  - `record_scan()` works again (it had failed on every call since 0003).
+  - `complete_quest()` requires a recent, unused, code-verified scan for QR/NFC quests.
+- `scripts/verify-db.sql` checks 1–16 and 18–26 pass. Check 17 (Fable content authored) still
+  fails: 0 of 9 quests have it.
+- **Migration ledger:** 0001–0004, 0016, 0017, 0018.
+- **Operational follow-up:** the 9 physical codes must encode
+  `https://miamisidequests.io/scan/<code>`. Old `/q/<quest id>` stickers can't unlock a quest.
+

@@ -48,7 +48,7 @@ import {
 } from "@/components/app/quest-detail";
 import { toast } from "sonner";
 import type { CompleteQuestResult } from "@/lib/db/repository";
-import type { QuestLinks, QuestWithContext, ProofMethod } from "@/types/db";
+import type { QuestInstance, QuestLinks, QuestWithContext, ProofMethod } from "@/types/db";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -118,6 +118,12 @@ export default function QuestDetail() {
 
   const scanParam = params.get("scan");
   const [scanId, setScanId] = useState<string | null>(scanParam);
+  // True when scanId came from a real venue code (/scan/<code>, QR or NFC),
+  // which QR/NFC quests need to complete. The server makes the final call.
+  const via = params.get("via");
+  const [scanVerified, setScanVerified] = useState(
+    !!scanParam && (via === "qr" || via === "nfc" || via === "scan"),
+  );
   const [venueCode, setVenueCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<CompleteQuestResult | null>(null);
@@ -141,12 +147,16 @@ export default function QuestDetail() {
     staleTime: 30_000,
   });
 
-  const { data: completed } = useQuery({
-    queryKey: ["completed", questId, user?.id],
-    queryFn: async () =>
-      user ? (await getRepository()).hasCompleted(user.id, questId!) : false,
+  // What this user can do here, including the objective generated for this
+  // visit (stable until completed or expired; see 0017_quest_frameworks.sql).
+  const { data: offer } = useQuery({
+    queryKey: ["quest-offer", questId, user?.id],
+    queryFn: async () => (await getRepository()).getQuestOffer(user!.id, questId!),
     enabled: !!questId && !!user,
+    staleTime: 60_000,
   });
+  // Keeps the completed objective on screen after the offer refetches.
+  const [completedInstance, setCompletedInstance] = useState<QuestInstance | null>(null);
 
   // Timeout guard: never show the spinner forever
   useEffect(() => {
@@ -207,6 +217,7 @@ export default function QuestDetail() {
     const pending = getPendingScan();
     if (pending && pending.questId === questId) {
       setScanId(pending.scanId);
+      setScanVerified(!!pending.verified);
       clearPendingScan();
     }
   }, [isAuthenticated, questId]);
@@ -224,7 +235,13 @@ export default function QuestDetail() {
   }
 
   const needsCode = quest.verification_type === "venue_code";
-  const isDone = completed || result?.ok;
+  // QR/NFC quests unlock only from a scan of the venue's code (0018).
+  const needsScan = quest.verification_type === "qr" || quest.verification_type === "nfc";
+  const isDone = (offer && offer.status !== "available") || result?.ok;
+  const instance = offer?.instance ?? completedInstance;
+  // The quest as this user sees it: the generated objective, instructions and
+  // rewards replace the static ones when there is an instance.
+  const shown = instance ? applyInstance(quest, instance) : quest;
 
   // --- Event handlers ------------------------------------------------------
 
@@ -235,9 +252,10 @@ export default function QuestDetail() {
       user_id: user?.id ?? null,
     });
     if (!isAuthenticated || !user) {
-      if (scanId) setPendingScan({ questId: quest.id, scanId });
+      if (scanId) setPendingScan({ questId: quest.id, scanId, verified: scanVerified });
+      const via = scanVerified ? "&via=scan" : "";
       navigate(
-        `/auth?next=${encodeURIComponent(`/quests/${quest.id}?scan=${scanId ?? ""}`)}`,
+        `/auth?next=${encodeURIComponent(`/quests/${quest.id}?scan=${scanId ?? ""}${via}`)}`,
       );
       return;
     }
@@ -258,7 +276,7 @@ export default function QuestDetail() {
     track("proof_started", {
       quest_id: quest.id,
       user_id: user?.id ?? null,
-      props: { proof_method: quest.proof_method ?? "manual" },
+      props: { proof_method: shown.proof_method ?? "manual" },
     });
 
     setBusy(true);
@@ -273,6 +291,7 @@ export default function QuestDetail() {
       verificationMethod: quest.verification_type,
       venueCode: needsCode ? venueCode : undefined,
       sourceScanId: scanId,
+      instanceId: instance?.id ?? null,
     });
     setBusy(false);
 
@@ -284,6 +303,9 @@ export default function QuestDetail() {
       });
       const errorMessages: Record<string, string> = {
         already_completed: "You've already completed this quest.",
+        cooldown: `You can do a new version of this quest on ${formatAvailableAt(res.availableAt)}.`,
+        instance_invalid: "This quest refreshed. Reload the page to get your current objective.",
+        scan_required: "Scan the QR code or tap the NFC tag at the venue, then try again.",
         verification_failed: needsCode
           ? "That venue code didn't match. Ask staff and try again."
           : "Verification failed. Please try again.",
@@ -292,6 +314,10 @@ export default function QuestDetail() {
         not_found: "Quest not found.",
       };
       toast.error(errorMessages[res.error ?? ""] ?? "Could not complete quest.");
+      if (res.error === "scan_required") {
+        setScanVerified(false);
+        setShowCompletionSheet(false);
+      }
       return;
     }
 
@@ -305,7 +331,7 @@ export default function QuestDetail() {
     track("proof_submitted", {
       quest_id: quest.id,
       user_id: user!.id,
-      props: { proof_method: quest.proof_method ?? "manual" },
+      props: { proof_method: shown.proof_method ?? "manual" },
     });
     track("reward_viewed", {
       quest_id: quest.id,
@@ -314,9 +340,11 @@ export default function QuestDetail() {
     });
 
     setResult(res);
+    setCompletedInstance(instance);
     setShowCompletionSheet(false);
     await refresh();
-    qc.invalidateQueries({ queryKey: ["completed", questId, user!.id] });
+    qc.invalidateQueries({ queryKey: ["quest-offer", questId, user!.id] });
+    qc.invalidateQueries({ queryKey: ["completions", user!.id] });
     toast.success(`+${res.xpAwarded} XP · +${res.pointsAwarded} points!`);
     setShowProofCamera(true);
   };
@@ -352,7 +380,7 @@ export default function QuestDetail() {
       user_id: user?.id ?? null,
       props: { platform },
     });
-    const caption = quest.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #sidequests`;
+    const caption = shown.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #sidequests`;
     if (platform === "x") {
       window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(caption)}`, "_blank", "noopener");
     } else if (platform === "instagram" || platform === "tiktok") {
@@ -411,11 +439,11 @@ export default function QuestDetail() {
     : null;
 
   const objective =
-    quest.funky_action ??
+    shown.funky_action ??
     quest.description ??
     (businessName ? `Complete this quest at ${businessName}.` : "Complete this quest at the venue.");
 
-  const proofMethod = quest.proof_method as ProofMethod | null | undefined;
+  const proofMethod = shown.proof_method as ProofMethod | null | undefined;
   const ProofIcon = proofMethodIcon(proofMethod);
 
   const websiteUrl = quest.links?.website_url ?? null;
@@ -433,7 +461,7 @@ export default function QuestDetail() {
         logoUrl={quest.venue?.logo_url}
         category={quest.category}
         difficulty={quest.difficulty}
-        estimatedTime={quest.estimated_time}
+        estimatedTime={shown.estimated_time}
         isSaved={isFavorite(quest.id)}
         onBack={() => navigate(-1)}
         onShare={handleShare}
@@ -445,7 +473,7 @@ export default function QuestDetail() {
 
         {/* ── 2. Quest summary ── */}
         <section className="space-y-4">
-          <RewardCard xp={quest.xp_reward} points={quest.points_reward} />
+          <RewardCard xp={shown.xp_reward} points={shown.points_reward} />
 
           {venueLabel && (
             <div className="flex items-center gap-1.5 text-sm font-medium text-foreground/80">
@@ -465,8 +493,15 @@ export default function QuestDetail() {
         <QuestObjectiveCard objective={objective} />
 
         {/* ── 4. Primary CTA ── */}
-        {isDone ? (
-          <CompletedCard result={result} quest={quest} onShare={handleSocialShare} />
+        {!isDone && needsScan && !scanVerified ? (
+          <ScanToUnlockCard businessName={businessName} />
+        ) : isDone ? (
+          <CompletedCard
+            result={result}
+            quest={shown}
+            nextAvailableAt={offer?.status === "cooldown" ? offer.availableAt ?? null : null}
+            onShare={handleSocialShare}
+          />
         ) : (
           <div className="space-y-2">
             <button
@@ -533,8 +568,8 @@ export default function QuestDetail() {
           <div className="mb-4 flex items-start gap-3 rounded-xl bg-muted/50 p-3">
             <ProofIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {proofMethod === "staff_phrase" && quest.staff_phrase
-                ? `Tell staff: "${quest.staff_phrase}"`
+              {proofMethod === "staff_phrase" && shown.staff_phrase
+                ? `Tell staff: "${shown.staff_phrase}"`
                 : proofMethodLabel(proofMethod)}
             </p>
           </div>
@@ -573,7 +608,7 @@ export default function QuestDetail() {
       {/* Quest Proof Camera — shown after successful completion (proof system) */}
       {showProofCamera && result?.ok && quest && (
         <QuestProofCamera
-          quest={quest}
+          quest={shown}
           result={result}
           onDone={() => setShowProofCamera(false)}
         />
@@ -589,13 +624,52 @@ export default function QuestDetail() {
 // Completed card — replaces the primary CTA once the quest is done
 // ---------------------------------------------------------------------------
 
+/** Shown on QR/NFC quests until the user scans the venue's code. */
+function ScanToUnlockCard({ businessName }: { businessName: string | null }) {
+  return (
+    <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4">
+      <QrCode className="mt-0.5 h-6 w-6 shrink-0 text-[hsl(var(--ocean-500))]" />
+      <div className="space-y-1">
+        <p className="font-display text-base font-bold text-foreground">Scan to unlock</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {businessName ? `At ${businessName}, scan` : "At the venue, scan"} the SideQuests QR code
+          or tap the NFC tag with your phone. That checks you in so you can complete this quest.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Overlays a generated instance on the quest so the page renders it as-is. */
+function applyInstance(quest: QuestWithContext, instance: QuestInstance): QuestWithContext {
+  return {
+    ...quest,
+    funky_action: instance.objective,
+    action_prompt: instance.prompt ?? quest.action_prompt,
+    proof_method: instance.proof_method ?? quest.proof_method,
+    staff_phrase: instance.staff_phrase ?? quest.staff_phrase,
+    social_share_prompt: instance.share_prompt ?? quest.social_share_prompt,
+    estimated_time: instance.estimated_time ?? quest.estimated_time,
+    xp_reward: instance.xp_reward,
+    points_reward: instance.points_reward,
+  };
+}
+
+function formatAvailableAt(iso: string | null | undefined): string {
+  if (!iso) return "a later date";
+  return new Date(iso).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+}
+
 function CompletedCard({
   result,
   quest,
+  nextAvailableAt,
   onShare,
 }: {
   result: CompleteQuestResult | null;
   quest: QuestWithContext;
+  /** Set for repeatable quests: when a new version unlocks. */
+  nextAvailableAt: string | null;
   onShare: (platform: string) => void;
 }) {
   const [showShare, setShowShare] = useState(false);
@@ -614,6 +688,11 @@ function CompletedCard({
               · Level up to {result.newLevel}! 🎉
             </span>
           )}
+        </p>
+      )}
+      {nextAvailableAt && (
+        <p className="text-sm text-muted-foreground">
+          A new version of this quest unlocks on {formatAvailableAt(nextAvailableAt)}.
         </p>
       )}
       <div className="mt-2 flex flex-wrap justify-center gap-2">

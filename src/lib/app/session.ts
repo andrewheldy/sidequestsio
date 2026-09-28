@@ -26,6 +26,8 @@ export interface PendingScanContext {
   questId: string;
   scanId: string;
   code?: string;
+  /** The scan came from a real venue code (QR or NFC), not a page view. */
+  verified?: boolean;
 }
 
 /** Remember a scan so we can continue the completion flow after sign-in. */
