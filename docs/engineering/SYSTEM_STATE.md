@@ -217,3 +217,21 @@ Verified against production (`wvedvngtuzsttpavmgjw`) through the Supabase connec
   - `profiles` "Public SideQuests profiles are viewable" (`is_public = true`).
   - `user_profiles` "profiles_self_insert".
 
+---
+
+## Update 2026-09-28 (later) — Migration 0018 applied; PR #40 deployed
+
+- **PR #40 is live in production** (`main` `a2d41b6`). It adds generated quests, the Explore
+  rotation, and the QR/NFC scan flow with "Scan to unlock".
+- **Applied `0018_scan_verification.sql`** (ledger `20260928031347`):
+  - Venue codes have a `kind` (`qr` or `nfc`), are no longer publicly readable, and point at
+    `/scan/<code>`.
+  - `record_code_scan()` records verified scans.
+  - `record_scan()` works again (it had failed on every call since 0003).
+  - `complete_quest()` requires a recent, unused, code-verified scan for QR/NFC quests.
+- `scripts/verify-db.sql` checks 1–16 and 18–26 pass. Check 17 (Fable content authored) still
+  fails: 0 of 9 quests have it.
+- **Migration ledger:** 0001–0004, 0016, 0017, 0018.
+- **Operational follow-up:** the 9 physical codes must encode
+  `https://miamisidequests.io/scan/<code>`. Old `/q/<quest id>` stickers can't unlock a quest.
+

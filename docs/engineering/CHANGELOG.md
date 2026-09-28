@@ -2,6 +2,22 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-28 — Migration 0018 applied; PR #40 live
+
+- PR #40 was merged to `main` (`a2d41b6`) and deployed to Vercel production. Then
+  `0018_scan_verification.sql` was applied to production (ledger `20260928031347`).
+- **All `scripts/verify-db.sql` checks 18–26 pass in production:**
+  - venue codes are private and point at `/scan/<code>` (9 QR codes backfilled);
+  - `record_code_scan()` exists and scans carry `code_verified`;
+  - `complete_quest()` requires a verified scan for QR/NFC quests.
+- **Rolled-back live test** (nothing persisted):
+  - `record_code_scan()` accepts a real code case-insensitively and records a verified scan;
+  - it rejects a bad code;
+  - `record_scan()` records again, which fixes P12.
+- **Action needed:** re-encode the 9 venue stickers (or write NFC tags) with
+  `https://miamisidequests.io/scan/<code>`. Stickers that encode the old `/q/<quest id>` link open
+  the quest but show "Scan to unlock". See `PARTNERSHIP_PLAYBOOK.md`, "Venue codes".
+
 ## 2026-09-28 — Migrations 0016 and 0017 applied to production
 
 - Both were applied to `wvedvngtuzsttpavmgjw` with the Supabase connector's `apply_migration`.
