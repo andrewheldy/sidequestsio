@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Gift, Map, User } from 'lucide-react';
+import { Gift, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { track } from '@/lib/analytics/events';
 import type { AppEventName } from '@/types/events';
-// TEMPORARY prototype fallback: shown only for a signed-in user with no avatar
-// of their own. Remove before public launch (docs/engineering/CHANGELOG.md).
-import prototypeAvatar from '@/assets/prototype-avatar.webp';
+// Default "You" avatar: the SideQuests explorer, for anyone without a photo.
+import explorerAvatar from '@/assets/sidequests-explorer-avatar.svg';
 
 type Tab = 'rewards' | 'map' | 'profile';
 
@@ -35,7 +34,7 @@ const NAV_EVENT: Record<Tab, AppEventName> = {
  */
 export default function BottomNav() {
   const { pathname } = useLocation();
-  const { user, profile, isAuthenticated, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const active = tabForPath(pathname);
 
   const onNav = (tab: Tab) =>
@@ -64,7 +63,7 @@ export default function BottomNav() {
           <NavTab to="/app/profile" label="You" isActive={active === 'profile'} onClick={() => onNav('profile')}>
             <ProfileAvatar
               loading={loading}
-              src={profile?.avatar_url ?? (isAuthenticated ? prototypeAvatar : null)}
+              src={profile?.avatar_url ?? null}
               isActive={active === 'profile'}
             />
           </NavTab>
@@ -117,22 +116,17 @@ function ProfileAvatar({ src, loading, isActive }: { src: string | null; loading
   const ring = isActive ? 'ring-gold' : 'ring-sand-50/25';
 
   if (loading) return <span className={cn('sq-skeleton block h-9 w-9 rounded-full ring-2', ring)} />;
-  if (!src || failed === src) {
-    return (
-      <span className={cn('flex h-9 w-9 items-center justify-center rounded-full bg-midnight-800 ring-2', ring)}>
-        <User className="h-5 w-5" aria-hidden />
-      </span>
-    );
-  }
+  // No photo (guest, or signed in without one) or a broken URL → the explorer.
+  const shown = src && failed !== src ? src : explorerAvatar;
   return (
     <img
-      src={src}
+      src={shown}
       alt=""
       width={36}
       height={36}
       decoding="async"
       onError={() => setFailed(src)}
-      className={cn('h-9 w-9 rounded-full object-cover ring-2', ring)}
+      className={cn('h-9 w-9 rounded-full bg-midnight-800 object-cover ring-2', ring)}
     />
   );
 }
