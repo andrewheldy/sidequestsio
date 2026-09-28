@@ -10,9 +10,10 @@
 > stubbed `auth`/`storage` schemas. 0006 stops at one statement (P11); the statements it then
 > skips are re-done by 0004, 0010 and 0011, so the end state matched this file (20 tables,
 > 2 views, 19 enums). P1, P2 and P10 below were reproduced there.
-> **Pending (not yet applied):** `0016_rls_hardening.sql` fixes P1, P2 and P10 (§11);
-> `0017_quest_frameworks.sql` adds on-the-spot generated quests (§12);
-> `0018_scan_verification.sql` makes QR/NFC quests require a real scan (§13).
+> **Applied to production 2026-09-28:** `0016_rls_hardening.sql` (P1, P2, P10 fixed; §11) and
+> `0017_quest_frameworks.sql` (generated quests; §12).
+> **Pending:** `0018_scan_verification.sql` makes QR/NFC quests require a real scan (§13); apply it
+> after the app from PR #40 is deployed.
 > **Live verification:** not performed. The applied-migration ledger has drifted (CLAUDE.md §9). Run `scripts/schema-snapshot.sql` in the Supabase SQL editor to dump
 > the live schema and diff it against this file.
 >
@@ -522,7 +523,7 @@ P1, P2 and P10 are fixed by `0016_rls_hardening.sql` once it is applied (§11).
   and venue codes are publicly readable, so any signed-in user can complete a QR quest remotely.
   Fixed by 0018.
 
-## 11. Pending: `0016_rls_hardening.sql` (authored, not applied)
+## 11. `0016_rls_hardening.sql` (applied to production 2026-09-28)
 
 Apply in the SQL editor after a backup; the file's header lists pre-checks and its footer has
 verification queries and a rollback. `scripts/verify-db.sql` checks 18–20 cover it. Once applied:
@@ -542,7 +543,7 @@ verification queries and a rollback. `scripts/verify-db.sql` checks 18–20 cove
 - `community_notes_with_author` is recreated with `security_barrier` and
   `where moderation_status = 'approved' or user_id = auth.uid() or is_admin()`.
 
-## 12. Pending: `0017_quest_frameworks.sql` (authored, not applied; apply after 0016)
+## 12. `0017_quest_frameworks.sql` (applied to production 2026-09-28)
 
 Generated quests from curated frameworks (product decision 2026-09-27). `scripts/verify-db.sql`
 checks 21–23 cover it. Once applied:

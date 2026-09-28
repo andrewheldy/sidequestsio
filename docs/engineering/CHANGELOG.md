@@ -2,6 +2,26 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-28 — Migrations 0016 and 0017 applied to production
+
+- Both were applied to `wvedvngtuzsttpavmgjw` with the Supabase connector's `apply_migration`.
+  The ledger records them as `20260928015058 0016_rls_hardening` and
+  `20260928031102 0017_quest_frameworks`. The ledger also lists 0001–0004; 0005–0015 were applied
+  out-of-band.
+- **Pre-checks passed:**
+  - The live `complete_quest` matched 0003.
+  - There were no venue-code secrets to move.
+  - There were no duplicate `(user_id, quest_id)` completions.
+- **Post-checks passed:**
+  - The RLS helpers are `SECURITY DEFINER`.
+  - `quest_secrets`, `quest_frameworks` and `quest_instances` are unreadable by anon.
+  - The notes view is moderation-filtered.
+  - `complete_quest` has the 5-argument signature.
+  - `unique (user_id, quest_id)` is gone.
+  - The one existing completion is intact.
+- **Still pending:** `0018_scan_verification.sql`. Apply it after the PR #40 app is deployed,
+  because the previous app can't produce verified scans.
+
 ## 2026-09-28 — QR/NFC quests require a real scan; NFC tags as venue codes
 
 - **Found while checking production (read-only, via the Supabase connector):**
