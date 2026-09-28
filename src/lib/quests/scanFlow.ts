@@ -13,6 +13,7 @@ import type { QuestWithContext, ScanEvent } from "@/types/db";
 
 export type ScanError =
   | "invalid_qr"
+  | "scan_failed"
   | "quest_not_found"
   | "quest_inactive"
   | "quest_expired";
@@ -22,6 +23,8 @@ export interface ScanResolution {
   error?: ScanError;
   quest?: QuestWithContext;
   scan?: ScanEvent;
+  /** How the code was scanned, for venue codes: printed QR or NFC tag. */
+  codeKind?: "qr" | "nfc";
 }
 
 function questLifecycleError(quest: QuestWithContext): ScanError | null {
@@ -32,36 +35,39 @@ function questLifecycleError(quest: QuestWithContext): ScanError | null {
   return null;
 }
 
-/** Resolve a public QR code string (used by /scan/:code). */
+/**
+ * Resolve a scanned venue code (used by /scan/:code, which printed QR codes
+ * and NFC tags both open). The code is checked server-side and the resulting
+ * scan is what lets the user complete a QR/NFC quest.
+ */
 export async function resolveByCode(
   code: string,
   userId: string | null,
 ): Promise<ScanResolution> {
   const repo = await getRepository();
-  const qr = await repo.getQrByCode(code);
-  if (!qr || qr.status !== "active") return { ok: false, error: "invalid_qr" };
+  let res;
+  try {
+    res = await repo.recordCodeScan({ code, userId, anonymousSessionId: getAnonymousSessionId() });
+  } catch {
+    return { ok: false, error: "scan_failed" };
+  }
+  if (!res.ok || !res.questId) return { ok: false, error: "invalid_qr" };
 
-  const quest = await repo.getQuest(qr.quest_id);
+  const quest = await repo.getQuest(res.questId);
   if (!quest) return { ok: false, error: "quest_not_found" };
 
-  const scan = await repo.recordScan({
-    questId: quest.id,
-    qrCodeId: qr.id,
-    code,
-    userId,
-    anonymousSessionId: getAnonymousSessionId(),
-  });
   track("qr_scanned", {
     quest_id: quest.id,
-    qr_code_id: qr.id,
+    qr_code_id: res.scan?.qr_code_id ?? null,
     partner_id: quest.partner_id,
     venue_id: quest.venue_id,
     user_id: userId,
+    props: { code_kind: res.codeKind ?? "qr" },
   });
 
   const lifecycle = questLifecycleError(quest);
-  if (lifecycle) return { ok: false, error: lifecycle, quest, scan };
-  return { ok: true, quest, scan };
+  if (lifecycle) return { ok: false, error: lifecycle, quest, scan: res.scan, codeKind: res.codeKind };
+  return { ok: true, quest, scan: res.scan, codeKind: res.codeKind };
 }
 
 /** Record a scan for a direct quest link (used by /q/:questId and quest detail). */
@@ -92,8 +98,12 @@ export async function recordQuestScan(
 
 export const SCAN_ERROR_COPY: Record<ScanError, { title: string; body: string }> = {
   invalid_qr: {
-    title: "QR code not recognized",
-    body: "This code doesn't match an active quest. Double-check the sticker and try again.",
+    title: "Code not recognized",
+    body: "This QR code or NFC tag doesn't match an active quest. Double-check the sticker and try again.",
+  },
+  scan_failed: {
+    title: "Scan didn't go through",
+    body: "We couldn't record that scan. Check your connection, then scan the code or tap the tag again.",
   },
   quest_not_found: {
     title: "Quest not found",

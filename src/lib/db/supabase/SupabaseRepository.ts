@@ -29,6 +29,7 @@ import type {
   Quest,
   QuestAttempt,
   QuestCompletion,
+  QuestInstance,
   QuestWithContext,
   QrCode,
   Reward,
@@ -44,6 +45,9 @@ import type {
   CreateNoteInput,
   CreateNoteResult,
   QuestFilter,
+  QuestOffer,
+  RecordCodeScanInput,
+  RecordCodeScanResult,
   RecordScanInput,
   RedeemRewardInput,
   RedeemRewardResult,
@@ -210,13 +214,21 @@ export class SupabaseRepository implements Repository {
     if (partnerId) q = q.eq("partner_id", partnerId);
     return this.many<QrCode>(q);
   }
-  async createQrCode(input: { questId: string; partnerId: string; venueId?: string | null }) {
+  async createQrCode(input: {
+    questId: string;
+    partnerId: string;
+    venueId?: string | null;
+    kind?: "qr" | "nfc";
+  }) {
     return (await this.one<QrCode>(
       this.sb
         .rpc("create_qr_code", {
           p_quest_id: input.questId,
           p_partner_id: input.partnerId,
           p_venue_id: input.venueId ?? null,
+          // p_kind exists from 0018; omitted for plain QR codes so older
+          // databases still match the 3-argument function.
+          ...(input.kind && input.kind !== "qr" ? { p_kind: input.kind } : {}),
         })
         .single(),
     ))!;
@@ -238,6 +250,32 @@ export class SupabaseRepository implements Repository {
         })
         .single(),
     ))!;
+  }
+  async recordCodeScan(input: RecordCodeScanInput): Promise<RecordCodeScanResult> {
+    const device = detectDevice();
+    const { data, error } = await this.sb.rpc("record_code_scan", {
+      p_code: input.code,
+      p_anonymous_session_id: input.anonymousSessionId,
+      p_device_type: device.device_type,
+      p_browser: device.browser,
+      p_operating_system: device.operating_system,
+      p_referrer: getReferrer(),
+    });
+    if (error && error.code === "PGRST202") {
+      // record_code_scan arrives with 0018_scan_verification.sql. Until then,
+      // resolve the code the old way (codes are still publicly readable).
+      const qr = await this.getQrByCode(input.code);
+      if (!qr || qr.status !== "active") return { ok: false, error: "invalid_code" };
+      const scan = await this.recordScan({
+        questId: qr.quest_id,
+        qrCodeId: qr.id,
+        userId: input.userId,
+        anonymousSessionId: input.anonymousSessionId,
+      });
+      return { ok: true, questId: qr.quest_id, codeKind: qr.kind ?? "qr", scan };
+    }
+    if (error) throw error;
+    return data as RecordCodeScanResult;
   }
   async markScanConverted(scanId: string, state: ScanEvent["conversion_state"]) {
     const { error } = await this.sb
@@ -269,12 +307,36 @@ export class SupabaseRepository implements Repository {
     if (error) throw error;
     return (count ?? 0) > 0;
   }
+  async getQuestOffer(userId: string, questId: string): Promise<QuestOffer> {
+    const { data, error } = await this.sb.rpc("generate_quest_instance", { p_quest_id: questId });
+    if (error) {
+      // Until 0017_quest_frameworks.sql is applied the RPC does not exist:
+      // fall back to the static quest and the once-ever rule.
+      const done = await this.hasCompleted(userId, questId);
+      return { status: done ? "already_completed" : "available", instance: null };
+    }
+    const res = data as {
+      ok: boolean;
+      error?: string;
+      instance?: QuestInstance | null;
+      availableAt?: string;
+    };
+    if (res.ok) return { status: "available", instance: res.instance ?? null };
+    if (res.error === "already_completed" || res.error === "cooldown") {
+      return { status: res.error, instance: null, availableAt: res.availableAt ?? null };
+    }
+    // Inactive/expired/not found: show the static quest; completeQuest reports why.
+    return { status: "available", instance: null };
+  }
   async completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult> {
     const { data, error } = await this.sb.rpc("complete_quest", {
       p_quest_id: input.questId,
       p_verification_method: input.verificationMethod,
       p_venue_code: input.venueCode ?? null,
       p_source_scan_id: input.sourceScanId ?? null,
+      // Sent only with an instance, which only exists once 0017 is applied, so
+      // the call still matches the 4-argument function before then.
+      ...(input.instanceId ? { p_instance_id: input.instanceId } : {}),
     });
     if (error) throw error;
     return data as CompleteQuestResult;

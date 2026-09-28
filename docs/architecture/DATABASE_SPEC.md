@@ -12,6 +12,9 @@ The SQL migrations are the implementation.
 
 This document is the design reference.
 
+For the implemented end-state schema (columns, FKs, RLS, grants, RPCs, known pitfalls) in one
+LLM-shareable file, see [`DATABASE_SCHEMA_SNAPSHOT.md`](DATABASE_SCHEMA_SNAPSHOT.md).
+
 ---
 
 # Database Philosophy

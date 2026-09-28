@@ -195,9 +195,32 @@ Business profile
 
 Quest page
 
-QR code
+QR code (and, optionally, an NFC tag)
 
 Verify everything before launch.
+
+## Venue codes: QR stickers and NFC tags
+
+A quest is completed only after the player scans the venue's code on site (see
+`supabase/migrations/0018_scan_verification.sql`). Every code is a short secret. Both kinds
+carry the same link:
+
+`https://miamisidequests.io/scan/<code>`
+
+- **QR sticker.** Print that URL as a QR code. Never print the quest page link (`/quests/…` or
+  `/q/…`): it doesn't contain the code, so scanning it can't unlock the quest.
+- **NFC tag.** Write the same URL to an NTAG213 or NTAG215 sticker as a single NDEF URL record,
+  using any NFC writing app. **Lock the tag after writing it**, or anyone can overwrite it. Tapping
+  opens the link on iPhone (XS and newer) and Android with no app. Place it where a phone can rest
+  on it, away from metal surfaces.
+- Create codes in the Supabase SQL editor (or the partner portal once it's live):
+  `select code, destination_url from create_qr_code('<quest id>', '<partner id>', '<venue id>', 'nfc');`
+  Use `'qr'` for a sticker. Keep codes out of screenshots and marketing: a code that circulates
+  online lets people complete the quest without visiting. If that happens, set the code's
+  `status` to `'archived'` and issue a new one.
+
+Before launch, scan every sticker and tap every tag with a signed-in test account and confirm the
+quest shows **Complete Quest** rather than **Scan to unlock**.
 
 ---
 

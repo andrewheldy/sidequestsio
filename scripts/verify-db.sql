@@ -2,7 +2,7 @@
 --
 -- Run after applying each migration batch (Supabase SQL editor, or via the
 -- read-only MCP). Returns one row per check with pass = true/false.
--- Expected: every row passes once migrations 0009–0013 are applied.
+-- Expected: every row passes once migrations 0009–0013 and 0016–0018 are applied.
 -- This script mutates nothing.
 
 with checks (ord, check_name, pass, details) as (
@@ -128,6 +128,69 @@ with checks (ord, check_name, pass, details) as (
     (select count(*) = 4 from pg_policies
      where schemaname = 'storage' and tablename = 'objects'
        and (qual ilike '%proofs%' or with_check ilike '%proofs%')),
+    null
+
+  -- ── 0016 RLS hardening ───────────────────────────────────────────────────
+  union all
+  select 18, '0016: RLS helpers are SECURITY DEFINER (anon reads survive hidden rows)',
+    (select count(*) = 3 from pg_proc
+      where pronamespace = 'public'::regnamespace
+        and proname in ('is_admin', 'owns_partner', 'app_uid') and prosecdef),
+    null
+  union all
+  select 19, '0016: venue-code secrets are server-only',
+    case when to_regclass('public.quest_secrets') is null then false
+         else not has_table_privilege('anon', 'public.quest_secrets', 'SELECT')
+          and not has_table_privilege('authenticated', 'public.quest_secrets', 'SELECT')
+          and not exists (select 1 from quests where verification_secret is not null)
+    end,
+    (select count(*)::text || ' quests still carry a verification_secret'
+       from quests where verification_secret is not null)
+  union all
+  select 20, '0016: notes author view applies moderation filter',
+    pg_get_viewdef('public.community_notes_with_author'::regclass, true) ilike '%where%moderation_status%',
+    null
+
+  -- ── 0017 quest frameworks ────────────────────────────────────────────────
+  union all
+  select 21, '0017: framework + instance tables exist, instances private',
+    to_regclass('public.quest_frameworks') is not null
+      and case when to_regclass('public.quest_instances') is null then false
+               else not has_table_privilege('anon', 'public.quest_instances', 'SELECT') end,
+    null
+  union all
+  select 22, '0017: complete_quest takes p_instance_id; generate_quest_instance exists',
+    exists (select 1 from pg_proc
+             where pronamespace = 'public'::regnamespace and proname = 'complete_quest'
+               and pg_get_function_identity_arguments(oid) like '%p_instance_id%')
+      and exists (select 1 from pg_proc
+                   where pronamespace = 'public'::regnamespace and proname = 'generate_quest_instance'),
+    (select string_agg(pg_get_function_identity_arguments(oid), ' | ')
+       from pg_proc where pronamespace = 'public'::regnamespace and proname = 'complete_quest')
+  union all
+  select 23, '0017: repeatable completions (unique user+quest dropped)',
+    not exists (select 1 from pg_constraint
+                 where conrelid = 'public.quest_completions'::regclass
+                   and pg_get_constraintdef(oid) = 'UNIQUE (user_id, quest_id)'),
+    null
+
+  -- ── 0018 scan verification ───────────────────────────────────────────────
+  union all
+  select 24, '0018: venue codes are private and point at /scan/<code>',
+    not has_table_privilege('anon', 'public.qr_codes', 'SELECT')
+      and not exists (select 1 from public.qr_codes where destination_url is distinct from '/scan/' || code),
+    (select count(*)::text || ' codes not pointing at /scan/<code>'
+       from public.qr_codes where destination_url is distinct from '/scan/' || code)
+  union all
+  select 25, '0018: record_code_scan exists; scans carry code_verified',
+    exists (select 1 from pg_proc where pronamespace = 'public'::regnamespace and proname = 'record_code_scan')
+      and exists (select 1 from information_schema.columns
+                   where table_schema = 'public' and table_name = 'scan_events' and column_name = 'code_verified'),
+    null
+  union all
+  select 26, '0018: complete_quest requires a verified scan for QR/NFC quests',
+    exists (select 1 from pg_proc where pronamespace = 'public'::regnamespace and proname = 'complete_quest'
+             and prosrc like '%scan_required%'),
     null
 
   -- ── content readiness (informational; passes after T-CONTENT-1) ─────────
