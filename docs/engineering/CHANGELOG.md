@@ -8,7 +8,9 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   - There was no backup: both migrations only add schema.
 - **Added `supabase/frost_museum_quest.sql`:** an idempotent insert of the Frost Museum partner, venue, quest and one venue code.
   - The code is generated at run time and printed with its sticker URL.
-  - It passed a rolled-back dry run against production and has not been run yet.
+  - It passed a rolled-back dry run, then was **run on production**: the Frost quest is live at
+    `/quests/30000000-0000-0000-0000-000000000010`, with one QR code. Production now has 10 active quests.
+  - **Action needed:** print the Frost sticker with its `/scan/<code>` URL (shared with the owner).
 
 ## 2026-09-28 — Reusable quest page, three-tab nav, quest analytics
 

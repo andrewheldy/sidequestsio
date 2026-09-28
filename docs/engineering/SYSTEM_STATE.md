@@ -258,5 +258,8 @@ Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. T
   - It wrote a valid event, with the partner taken from the quest (a spoofed `partner_id` was ignored).
   - It skipped an invalid event name and clamped a bad timestamp.
   - The table still has 0 rows, and nothing writes to it until `VITE_ANALYTICS_SINK=supabase` is set.
-- **Frost Museum sample quest:** `supabase/frost_museum_quest.sql` is ready and passed a rolled-back dry run against production. It has **not** been run, so production still has 9 quests.
+- **Frost Museum quest is live:** `supabase/frost_museum_quest.sql` was run on production.
+  - It added partner `…0008`, venue `…0010` and quest `30000000-0000-0000-0000-000000000010` (status `active`), plus one QR venue code.
+  - Production now has **10 active quests**.
+  - Anon can read the quest and venue, but not the code; the code was shared with the owner out of band.
 
