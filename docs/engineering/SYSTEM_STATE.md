@@ -246,3 +246,17 @@ Verified against production (`wvedvngtuzsttpavmgjw`) through the Supabase connec
   - `0020_analytics_events.sql`: `analytics_events` plus `record_analytics_events()`. Nothing writes to it until `VITE_ANALYTICS_SINK=supabase` is set.
 - The Frost Museum sample quest exists only in dev/mock and LocalRepository data, not in production.
 
+## Update 2026-09-28 (later) — Migrations 0019 and 0020 applied
+
+Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. There was no backup: the owner chose to proceed because both migrations only add schema.
+
+- **Ledger:** `0019_venue_about` and `0020_analytics_events` are now recorded.
+- **0019:** `venues.description` and `venues.image_url` exist. They are empty on all 9 live venues.
+- **0020:** `analytics_events` exists with RLS on, and anon/authenticated cannot insert or read it directly.
+  - `record_analytics_events()` is `SECURITY DEFINER` and executable by anon.
+- **Rolled-back live test of the RPC, as anon:**
+  - It wrote a valid event, with the partner taken from the quest (a spoofed `partner_id` was ignored).
+  - It skipped an invalid event name and clamped a bad timestamp.
+  - The table still has 0 rows, and nothing writes to it until `VITE_ANALYTICS_SINK=supabase` is set.
+- **Frost Museum sample quest:** `supabase/frost_museum_quest.sql` is ready and passed a rolled-back dry run against production. It has **not** been run, so production still has 9 quests.
+
