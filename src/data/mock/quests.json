@@ -62,6 +62,15 @@
       "status": "active",
       "owner_user_id": null,
       "created_at": "2024-01-15T10:00:00Z"
+    },
+    {
+      "id": "partner-frost",
+      "name": "Frost Museum of Science",
+      "type": "nonprofit",
+      "contact_email": "info@frostscience.org",
+      "status": "active",
+      "owner_user_id": null,
+      "created_at": "2024-01-15T10:00:00Z"
     }
   ],
   "venues": [
@@ -154,9 +163,61 @@
       "latitude": 25.8025,
       "longitude": -80.1998,
       "status": "active"
+    },
+    {
+      "id": "venue-frost",
+      "partner_id": "partner-frost",
+      "name": "Frost Museum of Science",
+      "address": "1101 Biscayne Blvd, Miami, FL 33132",
+      "city": "Miami, FL",
+      "latitude": 25.7853,
+      "longitude": -80.188,
+      "status": "active",
+      "neighborhood": "Downtown Miami",
+      "description": "A leading science museum with interactive exhibitions, a planetarium, and an aquarium in the heart of Miami.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Water_is_wet%21.jpg/960px-Water_is_wet%21.jpg"
     }
   ],
   "quests": [
+    {
+      "id": "frost-museum-curiosity",
+      "partner_id": "partner-frost",
+      "venue_id": "venue-frost",
+      "status": "active",
+      "start_date": null,
+      "end_date": null,
+      "created_at": "2024-01-20T10:00:00Z",
+      "title": "Frost Museum: Spark of Curiosity",
+      "description": "Explore a universe of discovery at Miami's Frost Museum of Science. From the planetarium to the aquarium, this is curiosity in real life.",
+      "category": "culture",
+      "difficulty": "easy",
+      "xp_reward": 130,
+      "points_reward": 100,
+      "verification_type": "qr",
+      "verification_secret": null,
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Frost_Science.jpg/1280px-Frost_Science.jpg",
+      "funky_action": "Take a photo inside the Frost Museum",
+      "action_type": "explore",
+      "action_prompt": "Capture something that sparks your curiosity — an exhibit, view, or moment.",
+      "proof_method": "camera",
+      "social_share_prompt": "Found something that sparked my curiosity at the Frost Museum of Science 🔭 #sidequests #FrostScience #Miami",
+      "estimated_time": "45 min",
+      "links": {
+        "website_url": "https://www.frostscience.org",
+        "instagram_url": "https://www.instagram.com/frostscience/",
+        "tiktok_url": "https://www.tiktok.com/@frostscience",
+        "x_url": "https://x.com/FrostScience",
+        "reviews_url": "https://www.google.com/maps/search/?api=1&query=Phillip+and+Patricia+Frost+Museum+of+Science",
+        "reviews_source": "google",
+        "action_points": {
+          "instagram": 50,
+          "tiktok": 50,
+          "x": 25,
+          "google_review": 75,
+          "website": 25
+        }
+      }
+    },
     {
       "id": "wynwood-coffee-crawl",
       "partner_id": "partner-wynwood",
@@ -419,6 +480,16 @@
       "partner_id": "partner-wynwood",
       "code": "DEMO-WYNWOOD-SWEET-CAROLINE-KARAOKE",
       "destination_url": "/q/wynwood-sweet-caroline-karaoke",
+      "status": "active",
+      "created_at": "2024-01-20T10:00:00Z"
+    },
+    {
+      "id": "qr-frost-museum-curiosity",
+      "quest_id": "frost-museum-curiosity",
+      "venue_id": "venue-frost",
+      "partner_id": "partner-frost",
+      "code": "DEMO-FROST-MUSEUM",
+      "destination_url": "/q/frost-museum-curiosity",
       "status": "active",
       "created_at": "2024-01-20T10:00:00Z"
     }

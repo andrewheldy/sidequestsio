@@ -49,6 +49,15 @@ export default {
         sand: {
           DEFAULT: "hsl(var(--sand))",
           soft: "hsl(var(--sand-soft))",
+          50: "hsl(var(--sand-50))",
+          100: "hsl(var(--sand-100))",
+          200: "hsl(var(--sand-200))",
+        },
+        // Midnight scale for dark, immersive surfaces (quest pages, bottom nav).
+        midnight: {
+          800: "hsl(var(--midnight-800))",
+          900: "hsl(var(--midnight-900))",
+          950: "hsl(var(--midnight-950))",
         },
         // Palm Green — verified, completed, positive.
         palm: "hsl(var(--palm))",

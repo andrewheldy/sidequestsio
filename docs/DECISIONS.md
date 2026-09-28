@@ -35,3 +35,13 @@ Decisions should optimize for launching, onboarding businesses, measuring engage
 
 **2026-09-27 — Quests can be generated on the spot from curated frameworks.**
 Product-owner decision overturning the MVP exclusion of generated quests. Generation fills curator-written templates (no AI), only at partner venues, and a quest may be repeated after a cooldown it opts into. See "Generated Quests" in `docs/product/PRODUCT_DECISION_LOG.md` and `supabase/migrations/0017_quest_frameworks.sql`.
+
+**2026-09-28 — One reusable quest page template, location-first.**
+`/quests/:questId` renders every quest through one data-driven template (`src/pages/QuestDetail.tsx` + `src/lib/quests/questPage.ts`): location hero, intro, one required action, Explore & Share, venue card. The Frost Museum of Science mockup is the design reference and first sample; nothing venue-specific lives in components.
+
+**2026-09-28 — Explore & Share shows per-platform social cards.**
+Product-owner decision superseding the 0014-era rule that socials are a single Linktree-style link. Instagram, TikTok, X, Google Review and website each get a card, read from `quests.links`. Outbound clicks are tracked but never counted as completions, and advertised points (`links.action_points`) are not credited until a verification path exists. See `docs/QUEST_CONTENT_IMPORT.md`.
+
+**2026-09-28 — The app bottom nav has exactly three tabs: Rewards, Map, You.**
+No camera/scan tab: capture belongs to quest actions that need a photo, and venue codes open from the phone's own camera (`/scan/<code>`). Explore/Quests/quest pages sit under Map; Saved quests moved to the Profile page; `/app/rewards` is now mounted.
+

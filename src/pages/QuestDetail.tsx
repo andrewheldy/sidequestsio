@@ -1,115 +1,79 @@
-import { useEffect, useRef, useState } from "react";
-import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  MapPin,
-  Trophy,
-  CheckCircle2,
-  ArrowLeft,
-  Instagram,
-  RefreshCw,
   AlertCircle,
-  ExternalLink,
+  ArrowLeft,
   Camera,
+  CheckCircle2,
   MessageSquare,
   QrCode,
-  Share2,
-  Twitter,
+  RefreshCw,
 } from "lucide-react";
+import { toast } from "sonner";
 import { getRepository } from "@/lib/db";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useSignInPrompt } from "@/contexts/SignInPromptContext";
 import { recordQuestScan } from "@/lib/quests/scanFlow";
 import { isDemoMode } from "@/lib/demo";
-import { track } from "@/lib/analytics/events";
+import { nanoid } from "@/lib/app/id";
+import { setPendingScan, getPendingScan, clearPendingScan } from "@/lib/app/session";
 import {
-  setPendingScan,
-  getPendingScan,
-  clearPendingScan,
-} from "@/lib/app/session";
-import { Button } from "@/components/ui/button";
+  applyInstance,
+  buildQuestPageModel,
+  formatUnlockDate,
+  hostOf,
+  type QuestActionDefinition,
+} from "@/lib/quests/questPage";
+import {
+  questEventContext,
+  trackQuestEvent,
+  trackQuestEventOnce,
+  type QuestEventContext,
+} from "@/lib/analytics/questEvents";
 import { Input } from "@/components/ui/input";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { CommunityNotes } from "@/components/app/CommunityNotes";
-import { QuestProofCamera } from "@/components/app/QuestProofCamera";
 import BottomNav from "@/components/app/BottomNav";
+import { NoQuestFound } from "@/components/app/NoQuestFound";
 import {
   QuestHero,
-  RewardCard,
-  QuestObjectiveCard,
-  AboutActions,
-  InfoCards,
+  QuestIntro,
+  QuestOptionalActions,
+  QuestPageSkeleton,
+  QuestPrimaryAction,
+  VenueInfoCard,
+  type PrimaryCtaState,
 } from "@/components/app/quest-detail";
-import { toast } from "sonner";
 import type { CompleteQuestResult } from "@/lib/db/repository";
-import type { QuestInstance, QuestLinks, QuestWithContext, ProofMethod } from "@/types/db";
+import type { ProofMethod, QuestInstance } from "@/types/db";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+// The capture flow only opens after a completion — keep its camera/canvas code
+// out of the quest page's initial download.
+const QuestProofCamera = lazy(() =>
+  import("@/components/app/QuestProofCamera").then((m) => ({ default: m.QuestProofCamera })),
+);
 
-/** Socials is a single landing page (Linktree/Linkme style), never a
- *  per-network button grid. Canonical key is `links.socials_url`; legacy
- *  per-platform keys are only a fallback for old demo content. */
-function resolveSocialsUrl(links: QuestLinks | undefined): string | null {
-  if (!links) return null;
-  return (
-    links.socials_url ||
-    links.instagram_url ||
-    links.tiktok_url ||
-    links.x_url ||
-    links.facebook_url ||
-    null
-  );
-}
+const COMPLETE_ERRORS: Record<string, string> = {
+  already_completed: "You've already completed this quest.",
+  instance_invalid: "This quest refreshed. Reload the page to get your current objective.",
+  scan_required: "Scan the QR code or tap the NFC tag at the venue, then try again.",
+  quest_inactive: "This quest isn't active right now.",
+  quest_expired: "This quest has expired.",
+  not_found: "Quest not found.",
+};
 
-/** Human label for a $-sign price tier, shown as the card's secondary line. */
-function priceRangeNote(priceRange: string | null | undefined): string | null {
-  switch (priceRange) {
-    case "$":    return "Budget-friendly";
-    case "$$":   return "Moderate";
-    case "$$$":  return "Upscale";
-    case "$$$$": return "Luxury";
-    default:     return null;
-  }
-}
-
-function proofMethodLabel(method: ProofMethod | null | undefined): string {
-  switch (method) {
-    case "camera":
-    case "photo":   return "Snap a photo as proof";
-    case "staff_phrase": return "Show staff the phrase";
-    case "breadcrumb":  return "Leave a Breadcrumb note";
-    case "qr":      return "QR verified at venue";
-    case "manual":  return "Mark complete yourself";
-    default:        return "Complete at the venue";
-  }
-}
-
-function proofMethodIcon(method: ProofMethod | null | undefined): React.ElementType {
-  switch (method) {
-    case "camera":
-    case "photo":   return Camera;
-    case "staff_phrase": return MessageSquare;
-    case "breadcrumb":  return MessageSquare;
-    case "qr":      return QrCode;
-    default:        return CheckCircle2;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-
+/**
+ * /quests/:questId — the one quest page template. Every quest renders through
+ * it: data comes from the repository (Supabase in production), is adapted by
+ * buildQuestPageModel, and flows into presentational sections. Completion uses
+ * the existing server-verified flow (startQuest → completeQuest RPC → capture).
+ */
 export default function QuestDetail() {
   const { questId } = useParams<{ questId: string }>();
   const [params] = useSearchParams();
+  const location = useLocation();
   const { user, isAuthenticated, refresh } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { promptSignIn } = useSignInPrompt();
@@ -131,8 +95,16 @@ export default function QuestDetail() {
   const [showCompletionSheet, setShowCompletionSheet] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
   const recordedRef = useRef(false);
-  const viewTrackedRef = useRef(false);
-  const actionCardTrackedRef = useRef(false);
+
+  // One page view per quest id: groups this visit's events and scopes de-duping.
+  // questId is the intended cache key here, not an input.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const pageViewId = useMemo(() => nanoid(12), [questId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadStartedAt = useMemo(() => performance.now(), [questId]);
+  // Attribution is fixed at entry; later query-string changes don't rewrite it.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const arrival = useMemo(() => arrivalContext(params, location.state), [pageViewId]);
 
   const {
     data: quest,
@@ -157,8 +129,27 @@ export default function QuestDetail() {
   });
   // Keeps the completed objective on screen after the offer refetches.
   const [completedInstance, setCompletedInstance] = useState<QuestInstance | null>(null);
+  const instance = offer?.instance ?? completedInstance;
 
-  // Timeout guard: never show the spinner forever
+  // The quest as this user sees it: a generated objective, instructions and
+  // rewards replace the static ones when there is an instance.
+  const shown = useMemo(
+    () => (quest ? (instance ? applyInstance(quest, instance) : quest) : null),
+    [quest, instance],
+  );
+  const model = useMemo(() => (shown ? buildQuestPageModel(shown) : null), [shown]);
+
+  const ctx: QuestEventContext = questEventContext(model, {
+    questId: questId ?? "",
+    userId: user?.id ?? null,
+    pageViewId,
+    source: arrival.source,
+    utm: arrival.utm,
+  });
+  const ctxRef = useRef(ctx);
+  ctxRef.current = ctx;
+
+  // Timeout guard: never show the skeleton forever.
   useEffect(() => {
     if (!isLoading) {
       setTimedOut(false);
@@ -168,36 +159,32 @@ export default function QuestDetail() {
     return () => clearTimeout(id);
   }, [isLoading]);
 
-  // Track quest page view once per quest load
+  // --- Page-level analytics (each at most once per page view) --------------
   useEffect(() => {
-    if (!quest || viewTrackedRef.current) return;
-    viewTrackedRef.current = true;
-    track("quest_page_viewed", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      venue_id: quest.venue_id,
-      user_id: user?.id ?? null,
+    trackQuestEventOnce("page", "quest_page_viewed", ctxRef.current, {
+      props: arrival.referrerDomain ? { referrer_domain: arrival.referrerDomain } : undefined,
     });
-    track("quest_page_view", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      user_id: user?.id ?? null,
-    });
-  }, [quest, user?.id]);
+  }, [pageViewId, arrival.referrerDomain]);
 
-  // Track action card view once it's visible
   useEffect(() => {
-    if (!quest || actionCardTrackedRef.current) return;
-    if (!quest.funky_action && !quest.description) return;
-    actionCardTrackedRef.current = true;
-    track("action_card_view", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      user_id: user?.id ?? null,
+    if (!model) return;
+    trackQuestEventOnce("page", "quest_page_loaded", ctxRef.current, {
+      props: {
+        load_ms: Math.round(performance.now() - loadStartedAt),
+        has_hero_image: !!model.hero.imageUrl,
+        optional_action_count: model.optionalActions.length,
+        has_generated_objective: !!instance,
+      },
     });
-  }, [quest, user?.id]);
+  }, [model, loadStartedAt, instance]);
 
-  // Organic visit: record a quest_viewed scan event once
+  const failure = isError ? "error" : timedOut ? "timeout" : !isLoading && !quest ? "not_found" : null;
+  useEffect(() => {
+    if (!failure || !questId) return;
+    trackQuestEventOnce("page", "quest_load_failed", ctxRef.current, { props: { reason: failure } });
+  }, [failure, questId]);
+
+  // Organic visit: record a quest_viewed scan event once.
   useEffect(() => {
     if (!questId || scanParam || recordedRef.current) return;
     recordedRef.current = true;
@@ -211,7 +198,7 @@ export default function QuestDetail() {
     })();
   }, [questId, scanParam, user]);
 
-  // Resume a pending scan context after returning from auth
+  // Resume a pending scan context after returning from auth.
   useEffect(() => {
     if (!isAuthenticated) return;
     const pending = getPendingScan();
@@ -222,40 +209,71 @@ export default function QuestDetail() {
     }
   }, [isAuthenticated, questId]);
 
-  // --- Early returns -------------------------------------------------------
-  if (isLoading && !timedOut) return <ShellWithLoader />;
-
-  if (isError || timedOut || !quest) {
+  // --- Loading / error ---------------------------------------------------
+  if (isLoading && !timedOut) {
     return (
-      <ShellWithError
-        refetch={refetch}
-        notFound={!isLoading && !isError && !timedOut && !quest}
-      />
+      <QuestPageShell>
+        <QuestPageSkeleton />
+      </QuestPageShell>
     );
   }
 
+  if (failure || !quest || !shown || !model) {
+    return (
+      <QuestPageShell>
+        {failure === "not_found" ? (
+          <NoQuestFound className="min-h-[80vh] justify-center py-10" />
+        ) : (
+          <QuestLoadError onRetry={() => void refetch()} />
+        )}
+      </QuestPageShell>
+    );
+  }
+
+  // --- Derived state -------------------------------------------------------
+  const primary = model.requiredActions[0];
   const needsCode = quest.verification_type === "venue_code";
   // QR/NFC quests unlock only from a scan of the venue's code (0018).
   const needsScan = quest.verification_type === "qr" || quest.verification_type === "nfc";
-  const isDone = (offer && offer.status !== "available") || result?.ok;
-  const instance = offer?.instance ?? completedInstance;
-  // The quest as this user sees it: the generated objective, instructions and
-  // rewards replace the static ones when there is an instance.
-  const shown = instance ? applyInstance(quest, instance) : quest;
+  const isDone = (offer && offer.status !== "available") || !!result?.ok;
+  const ctaState: PrimaryCtaState = isDone
+    ? "completed"
+    : busy
+      ? "busy"
+      : needsScan && !scanVerified
+        ? "locked"
+        : isAuthenticated
+          ? "available"
+          : "signed_out";
+  const venueName = model.venue?.name ?? quest.partner?.name ?? null;
+  const proofMethod = shown.proof_method as ProofMethod | null | undefined;
+  const ProofIcon = proofMethodIcon(proofMethod);
 
-  // --- Event handlers ------------------------------------------------------
+  // --- Handlers ------------------------------------------------------------
 
-  const handleCompleteClick = () => {
-    track("complete_quest_click", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      user_id: user?.id ?? null,
+  const handleBack = () => {
+    trackQuestEvent("quest_back_clicked", ctx, { trackingId: "nav.back" });
+    // Arriving straight from a QR code there is no in-app page to go back to.
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate("/app/map");
+  };
+
+  const handleCta = () => {
+    trackQuestEvent("quest_primary_action_clicked", ctx, {
+      action: primary,
+      position: 0,
+      props: { cta_state: ctaState },
     });
-    if (!isAuthenticated || !user) {
+    if (ctaState === "locked") {
+      navigate("/app/checkin");
+      return;
+    }
+    if (ctaState === "signed_out" || !user) {
       if (scanId) setPendingScan({ questId: quest.id, scanId, verified: scanVerified });
-      const via = scanVerified ? "&via=scan" : "";
+      const viaParam = scanVerified ? "&via=scan" : "";
       navigate(
-        `/auth?next=${encodeURIComponent(`/quests/${quest.id}?scan=${scanId ?? ""}${via}`)}`,
+        `/auth?next=${encodeURIComponent(`/quests/${quest.id}?scan=${scanId ?? ""}${viaParam}`)}`,
       );
       return;
     }
@@ -267,160 +285,114 @@ export default function QuestDetail() {
       toast.info("Demo mode — saving disabled for now.");
       return;
     }
-    track("checkin_started", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      venue_id: quest.venue_id,
-      user_id: user?.id ?? null,
-    });
-    track("proof_started", {
-      quest_id: quest.id,
-      user_id: user?.id ?? null,
-      props: { proof_method: shown.proof_method ?? "manual" },
+    if (!user) return;
+    const detail = { action: primary, position: 0 };
+    trackQuestEvent("quest_primary_action_started", ctx, {
+      ...detail,
+      props: { proof_method: proofMethod ?? "manual" },
     });
 
     setBusy(true);
-    const repo = await getRepository();
-    await repo.startQuest(user!.id, quest.id);
-    track("quest_started", { quest_id: quest.id, user_id: user!.id, partner_id: quest.partner_id });
-    track("verification_started", { quest_id: quest.id, user_id: user!.id });
-
-    const res = await repo.completeQuest({
-      userId: user!.id,
-      questId: quest.id,
-      verificationMethod: quest.verification_type,
-      venueCode: needsCode ? venueCode : undefined,
-      sourceScanId: scanId,
-      instanceId: instance?.id ?? null,
-    });
-    setBusy(false);
-
-    if (!res.ok) {
-      track("verification_failed", {
-        quest_id: quest.id,
-        user_id: user!.id,
-        props: { reason: res.error ?? "" },
+    try {
+      const repo = await getRepository();
+      await repo.startQuest(user.id, quest.id);
+      const res = await repo.completeQuest({
+        userId: user.id,
+        questId: quest.id,
+        verificationMethod: quest.verification_type,
+        venueCode: needsCode ? venueCode : undefined,
+        sourceScanId: scanId,
+        instanceId: instance?.id ?? null,
       });
-      const errorMessages: Record<string, string> = {
-        already_completed: "You've already completed this quest.",
-        cooldown: `You can do a new version of this quest on ${formatAvailableAt(res.availableAt)}.`,
-        instance_invalid: "This quest refreshed. Reload the page to get your current objective.",
-        scan_required: "Scan the QR code or tap the NFC tag at the venue, then try again.",
-        verification_failed: needsCode
-          ? "That venue code didn't match. Ask staff and try again."
-          : "Verification failed. Please try again.",
-        quest_inactive: "This quest isn't active right now.",
-        quest_expired: "This quest has expired.",
-        not_found: "Quest not found.",
-      };
-      toast.error(errorMessages[res.error ?? ""] ?? "Could not complete quest.");
-      if (res.error === "scan_required") {
-        setScanVerified(false);
-        setShowCompletionSheet(false);
+
+      if (!res.ok) {
+        trackQuestEvent("quest_primary_action_failed", ctx, {
+          ...detail,
+          props: { reason: res.error ?? "unknown" },
+        });
+        const message =
+          res.error === "cooldown"
+            ? `You can do a new version of this quest on ${formatUnlockDate(res.availableAt)}.`
+            : res.error === "verification_failed"
+              ? needsCode
+                ? "That venue code didn't match. Ask staff and try again."
+                : "Verification failed. Please try again."
+              : COMPLETE_ERRORS[res.error ?? ""] ?? "Could not complete quest.";
+        toast.error(message);
+        if (res.error === "scan_required") {
+          setScanVerified(false);
+          setShowCompletionSheet(false);
+        }
+        return;
       }
-      return;
-    }
 
-    track("verification_passed", { quest_id: quest.id, user_id: user!.id });
-    track("quest_completed", { quest_id: quest.id, user_id: user!.id, partner_id: quest.partner_id });
-    track("points_awarded", {
-      quest_id: quest.id,
-      user_id: user!.id,
-      props: { points: res.pointsAwarded ?? 0, xp: res.xpAwarded ?? 0 },
-    });
-    track("proof_submitted", {
-      quest_id: quest.id,
-      user_id: user!.id,
-      props: { proof_method: shown.proof_method ?? "manual" },
-    });
-    track("reward_viewed", {
-      quest_id: quest.id,
-      user_id: user!.id,
-      props: { xp: res.xpAwarded ?? 0, points: res.pointsAwarded ?? 0 },
-    });
-
-    setResult(res);
-    setCompletedInstance(instance);
-    setShowCompletionSheet(false);
-    await refresh();
-    qc.invalidateQueries({ queryKey: ["quest-offer", questId, user!.id] });
-    qc.invalidateQueries({ queryKey: ["completions", user!.id] });
-    toast.success(`+${res.xpAwarded} XP · +${res.pointsAwarded} points!`);
-    setShowProofCamera(true);
-  };
-
-  const handleLinkClick = (type: string) => {
-    track("link_clicked", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      venue_id: quest.venue_id,
-      user_id: user?.id ?? null,
-      link_type: type,
-    });
-    if (type === "google_reviews") {
-      track("google_review_click", {
-        quest_id: quest.id,
-        partner_id: quest.partner_id,
-        user_id: user?.id ?? null,
+      const awarded = {
+        points_awarded: res.pointsAwarded ?? 0,
+        xp_awarded: res.xpAwarded ?? 0,
+      };
+      trackQuestEvent("quest_primary_action_completed", ctx, {
+        ...detail,
+        props: { ...awarded, leveled_up: !!res.leveledUp },
       });
-    }
-    if (type === "website") {
-      track("website_click", {
-        quest_id: quest.id,
-        partner_id: quest.partner_id,
-        user_id: user?.id ?? null,
-      });
+      trackQuestEvent("reward_earned", ctx, { ...detail, props: awarded });
+
+      setResult(res);
+      setCompletedInstance(instance);
+      setShowCompletionSheet(false);
+      await refresh();
+      qc.invalidateQueries({ queryKey: ["quest-offer", questId, user.id] });
+      qc.invalidateQueries({ queryKey: ["completions", user.id] });
+      toast.success(`+${res.xpAwarded} XP · +${res.pointsAwarded} points!`);
+      // Photo quests (and every quest) continue into the existing capture flow.
+      setShowProofCamera(true);
+    } catch {
+      trackQuestEvent("quest_action_failed", ctx, { ...detail, props: { stage: "complete" } });
+      toast.error("Couldn't reach SideQuests. Check your connection and try again.");
+    } finally {
+      setBusy(false);
     }
   };
 
-  const handleSocialShare = (platform: string) => {
-    track("social_share_click", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      user_id: user?.id ?? null,
-      props: { platform },
-    });
-    const caption = shown.social_share_prompt ?? `Just completed "${quest.title}"! 🗺️ #sidequests`;
-    if (platform === "x") {
-      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(caption)}`, "_blank", "noopener");
-    } else if (platform === "instagram" || platform === "tiktok") {
-      navigator.clipboard?.writeText(caption);
-      toast.success(`Caption copied — paste it into ${platform === "instagram" ? "Instagram" : "TikTok"}!`);
-    }
-  };
-
-  // Hero "Share" — shares the quest page itself.
-  const handleShare = async () => {
-    track("social_share_click", {
-      quest_id: quest.id,
-      partner_id: quest.partner_id,
-      user_id: user?.id ?? null,
-      props: { platform: "page" },
-    });
-    const url = window.location.href;
-    const shareData = {
-      title: quest.title,
-      text: `Check out this SideQuest: ${quest.title}`,
-      url,
-    };
+  const shareOrCopy = async (data: ShareData, copied: string) => {
     try {
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share(data);
         return;
       }
     } catch {
-      // user cancelled or share failed — fall through to clipboard
+      return; // cancelled — nothing to do
     }
     try {
-      await navigator.clipboard?.writeText(url);
-      toast.success("Link copied to clipboard");
+      await navigator.clipboard?.writeText(data.text ? `${data.text} ${data.url ?? ""}`.trim() : data.url ?? "");
+      toast.success(copied);
     } catch {
-      /* ignore */
+      /* clipboard unavailable */
     }
   };
 
-  // Hero "Save" — favorites are gated behind sign-in per app rules.
+  const handleShare = () => {
+    trackQuestEvent("quest_share_clicked", ctx, { trackingId: "quest.share", props: { target: "page" } });
+    void shareOrCopy(
+      { title: quest.title, text: `Check out this SideQuest: ${quest.title}`, url: window.location.href },
+      "Link copied to clipboard",
+    );
+  };
+
+  const handleShareWin = () => {
+    trackQuestEvent("quest_share_clicked", ctx, {
+      trackingId: "quest.completed.share",
+      props: { target: "completion" },
+    });
+    const caption = shown.social_share_prompt ?? `Just completed "${quest.title}" on SideQuests 🗺️ #sidequests`;
+    void shareOrCopy({ text: caption, url: `${window.location.origin}/quests/${quest.id}` }, "Caption copied — paste it anywhere!");
+  };
+
+  // Favorites are gated behind sign-in per app rules.
   const handleToggleSave = () => {
+    trackQuestEvent("quest_save_toggled", ctx, {
+      trackingId: "quest.save",
+      props: { saved: !isFavorite(quest.id), signed_in: isAuthenticated },
+    });
     if (!isAuthenticated) {
       promptSignIn("save this quest");
       return;
@@ -428,358 +400,250 @@ export default function QuestDetail() {
     toggleFavorite(quest.id);
   };
 
-  // --- Derived display values ----------------------------------------------
+  const handleOptionalViewed = (action: QuestActionDefinition, position: number) =>
+    trackQuestEventOnce(action.id, "quest_optional_action_viewed", ctx, { action, position });
 
-  // The venue is the customer-facing business (partners are the B2B account
-  // shell and may own several venue brands), so prefer the venue's name.
-  const businessName = quest.venue?.name ?? quest.partner?.name ?? null;
-
-  const venueLabel = quest.venue
-    ? [quest.venue.name, quest.venue.city].filter(Boolean).join(" · ")
-    : null;
-
-  const objective =
-    shown.funky_action ??
-    quest.description ??
-    (businessName ? `Complete this quest at ${businessName}.` : "Complete this quest at the venue.");
-
-  const proofMethod = shown.proof_method as ProofMethod | null | undefined;
-  const ProofIcon = proofMethodIcon(proofMethod);
-
-  const websiteUrl = quest.links?.website_url ?? null;
-  const reviewsUrl =
-    quest.links?.reviews_url ?? quest.links?.google_reviews_url ?? null;
-  const socialsUrl = resolveSocialsUrl(quest.links);
+  // Fires synchronously in the click handler, before the new tab opens; the
+  // link itself does the navigation, so analytics can never block it.
+  const handleOptionalClick = (action: QuestActionDefinition, position: number) =>
+    trackQuestEvent("quest_optional_action_clicked", ctx, { action, position });
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      {/* ── 1. Hero ─────────────────────────────────────────────────────── */}
+    <QuestPageShell>
       <QuestHero
-        imageUrl={quest.image_url}
-        title={quest.title}
-        businessName={businessName}
-        logoUrl={quest.venue?.logo_url}
-        category={quest.category}
-        difficulty={quest.difficulty}
-        estimatedTime={shown.estimated_time}
+        hero={model.hero}
+        category={model.category}
+        categoryLabel={model.categoryLabel}
         isSaved={isFavorite(quest.id)}
-        onBack={() => navigate(-1)}
+        onBack={handleBack}
         onShare={handleShare}
         onToggleSave={handleToggleSave}
+        onVisible={(image) =>
+          trackQuestEventOnce("hero", "quest_hero_viewed", ctxRef.current, { props: { hero_image: image } })
+        }
       />
 
-      {/* ── Content ─────────────────────────────────────────────────────── */}
-      <div className="mx-auto w-full max-w-2xl space-y-5 px-5 pt-5">
+      <QuestIntro text={model.intro} />
 
-        {/* ── 2. Quest summary ── */}
-        <section className="space-y-4">
-          <RewardCard xp={shown.xp_reward} points={shown.points_reward} />
+      <QuestPrimaryAction
+        action={primary}
+        ctaState={ctaState}
+        venueName={venueName}
+        completion={
+          result?.ok
+            ? {
+                xpAwarded: result.xpAwarded ?? null,
+                pointsAwarded: result.pointsAwarded ?? null,
+                leveledUp: !!result.leveledUp,
+                newLevel: result.newLevel ?? null,
+              }
+            : null
+        }
+        nextAvailableAt={offer?.status === "cooldown" ? offer.availableAt ?? null : null}
+        canShare
+        onCta={handleCta}
+        onShare={handleShareWin}
+        onViewed={() =>
+          trackQuestEventOnce(primary.id, "quest_primary_action_viewed", ctxRef.current, {
+            action: primary,
+            position: 0,
+            props: { cta_state: ctaState },
+          })
+        }
+        onRewardViewed={() =>
+          trackQuestEventOnce(primary.id, "reward_impression", ctxRef.current, { action: primary, position: 0 })
+        }
+      />
 
-          {venueLabel && (
-            <div className="flex items-center gap-1.5 text-sm font-medium text-foreground/80">
-              <MapPin className="h-4 w-4 shrink-0 text-[hsl(var(--ocean-500))]" />
-              <span className="truncate">{venueLabel}</span>
-            </div>
-          )}
+      <QuestOptionalActions
+        actions={model.optionalActions}
+        onViewed={handleOptionalViewed}
+        onClick={handleOptionalClick}
+      />
 
-          {quest.description && (
-            <p className="text-base leading-relaxed text-muted-foreground">
-              {quest.description}
-            </p>
-          )}
-        </section>
-
-        {/* ── 3. Your SideQuest (objective) ── */}
-        <QuestObjectiveCard objective={objective} />
-
-        {/* ── 4. Primary CTA ── */}
-        {!isDone && needsScan && !scanVerified ? (
-          <ScanToUnlockCard businessName={businessName} />
-        ) : isDone ? (
-          <CompletedCard
-            result={result}
-            quest={shown}
-            nextAvailableAt={offer?.status === "cooldown" ? offer.availableAt ?? null : null}
-            onShare={handleSocialShare}
-          />
-        ) : (
-          <div className="space-y-2">
-            <button
-              onClick={handleCompleteClick}
-              disabled={busy}
-              className="flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl bg-[hsl(var(--midnight-900))] px-6 font-display text-base font-bold text-white disabled:opacity-60"
-            >
-              {isAuthenticated ? "Complete Quest" : "Sign in to complete"}
-              <QrCode className="h-5 w-5" />
-            </button>
-            <p className="text-center text-xs text-muted-foreground">
-              {quest.verification_type === "gps"
-                ? "Be at the venue to check in. Location is only used to verify — never stored."
-                : "Complete the challenge at the venue to earn your reward."}
-            </p>
-          </div>
-        )}
-
-        {/* ── 5. About (exactly three actions) ── */}
-        <AboutActions
-          businessName={businessName}
-          websiteUrl={websiteUrl}
-          reviewsUrl={reviewsUrl}
-          socialsUrl={socialsUrl}
-          onAction={handleLinkClick}
+      {model.venue && (
+        <VenueInfoCard
+          venue={model.venue}
+          onViewed={() => trackQuestEventOnce("venue", "venue_card_viewed", ctxRef.current)}
+          onWebsiteClick={() =>
+            trackQuestEvent("venue_website_clicked", ctx, {
+              trackingId: "venue.website",
+              props: { destination_domain: hostOf(model.venue?.websiteUrl) },
+            })
+          }
         />
+      )}
 
-        {/* ── 6. Information cards ── */}
-        <InfoCards
-          hours={quest.venue?.hours ?? null}
-          hoursNote={quest.venue?.hours_note ?? null}
-          priceRange={quest.venue?.price_range ?? null}
-          priceNote={priceRangeNote(quest.venue?.price_range)}
-          neighborhood={quest.venue?.neighborhood ?? quest.venue?.city ?? null}
-          city={quest.venue?.neighborhood ? (quest.venue?.city ?? null) : null}
-        />
-
-        {/* ── 7. Community Notes ── */}
-        <CommunityNotes
-          questId={quest.id}
-          canPost={!!isDone && isAuthenticated}
-          title="Community Notes"
-        />
+      <div className="px-5 pt-8">
+        <CommunityNotes questId={quest.id} canPost={!!isDone && isAuthenticated} title="Community Notes" />
       </div>
 
-      {/* ── Completion Sheet ── */}
+      {/* Completion confirmation — the existing, server-verified flow. */}
       <Sheet open={showCompletionSheet} onOpenChange={setShowCompletionSheet}>
-        <SheetContent side="bottom" className="rounded-t-3xl border-border bg-background px-5 pb-[max(2rem,env(safe-area-inset-bottom))]">
-          <SheetHeader className="mb-4">
-            <SheetTitle className="font-display text-xl">
-              Ready to complete this quest?
-            </SheetTitle>
+        <SheetContent
+          side="bottom"
+          className="dark mx-auto max-w-xl rounded-t-[2rem] border-white/10 bg-midnight-950 px-5 pb-[max(2rem,env(safe-area-inset-bottom))] text-sand-50"
+        >
+          <SheetHeader className="mb-4 text-left">
+            <SheetTitle className="font-display text-xl text-sand-50">Ready to complete this quest?</SheetTitle>
           </SheetHeader>
 
-          {/* Objective reminder */}
-          <div className="mb-4 rounded-2xl border border-[hsl(var(--midnight-900)/0.12)] bg-[hsl(var(--sand-200))] p-4">
-            <p className="sq-overline mb-2 text-[hsl(var(--ocean-700))]">
-              Your quest
-            </p>
-            <p className="text-sm leading-relaxed text-foreground">{objective}</p>
+          <div className="mb-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-ocean-soft">Your quest</p>
+            <p className="text-sm leading-relaxed text-sand-50">{primary.title}</p>
           </div>
 
-          {/* Proof method instructions */}
-          <div className="mb-4 flex items-start gap-3 rounded-xl bg-muted/50 p-3">
-            <ProofIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
+          <div className="mb-4 flex items-start gap-3 rounded-xl bg-white/[0.04] p-3">
+            <ProofIcon className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden />
+            <p className="text-sm text-sand-50/75">
               {proofMethod === "staff_phrase" && shown.staff_phrase
                 ? `Tell staff: "${shown.staff_phrase}"`
                 : proofMethodLabel(proofMethod)}
             </p>
           </div>
 
-          {/* Venue code input (when needed) */}
           {needsCode && (
             <div className="mb-4">
-              <label className="text-sm text-muted-foreground">
+              <label htmlFor="venue-code" className="text-sm text-sand-50/70">
                 Enter the venue code from staff
               </label>
               <Input
+                id="venue-code"
                 value={venueCode}
                 onChange={(e) => setVenueCode(e.target.value)}
                 placeholder="e.g. SUNRISE"
-                className="mt-1 bg-muted/50 uppercase"
+                autoComplete="off"
+                className="mt-1 border-white/15 bg-white/[0.04] uppercase text-sand-50"
               />
             </div>
           )}
 
-          <Button
+          <button
+            type="button"
             onClick={handleComplete}
             disabled={busy || (needsCode && !venueCode)}
-            className="w-full gap-2"
-            size="lg"
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-sand-50 text-[13px] font-bold uppercase tracking-[0.22em] text-midnight-950 transition-transform active:scale-[0.98] disabled:opacity-60"
           >
-            {busy ? (
-              <span className="h-2.5 w-2.5 rounded-full bg-current" />
-            ) : (
-              <CheckCircle2 className="h-5 w-5" />
-            )}
-            {busy ? "Saving…" : "Confirm & Complete"}
-          </Button>
+            <CheckCircle2 className="h-5 w-5" aria-hidden />
+            {busy ? "Saving…" : "Confirm & complete"}
+          </button>
         </SheetContent>
       </Sheet>
 
-      {/* Quest Proof Camera — shown after successful completion (proof system) */}
-      {showProofCamera && result?.ok && quest && (
-        <QuestProofCamera
-          quest={shown}
-          result={result}
-          onDone={() => setShowProofCamera(false)}
-        />
+      {showProofCamera && result?.ok && (
+        <Suspense fallback={null}>
+          <QuestProofCamera quest={shown} result={result} onDone={() => setShowProofCamera(false)} />
+        </Suspense>
       )}
+    </QuestPageShell>
+  );
+}
 
-      {/* ── Bottom navigation ── */}
+// ---------------------------------------------------------------------------
+// Shell, error state and helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Dark, phone-width column. `dark` switches the shadcn tokens for anything
+ * nested (Community Notes). On wide screens the column stays at app width on
+ * a navy stage instead of stretching.
+ */
+function QuestPageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="dark min-h-screen bg-midnight-950 bg-[radial-gradient(60rem_40rem_at_50%_-10%,hsl(var(--ocean-500)/0.10),transparent_70%)] text-sand-50">
+      <main className="relative mx-auto w-full max-w-xl overflow-x-clip bg-midnight-950 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:min-h-screen sm:border-x sm:border-white/5 sm:shadow-[0_0_80px_-20px_rgba(0,0,0,0.8)]">
+        {children}
+      </main>
       <BottomNav />
     </div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Completed card — replaces the primary CTA once the quest is done
-// ---------------------------------------------------------------------------
-
-/** Shown on QR/NFC quests until the user scans the venue's code. */
-function ScanToUnlockCard({ businessName }: { businessName: string | null }) {
-  return (
-    <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4">
-      <QrCode className="mt-0.5 h-6 w-6 shrink-0 text-[hsl(var(--ocean-500))]" />
-      <div className="space-y-1">
-        <p className="font-display text-base font-bold text-foreground">Scan to unlock</p>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {businessName ? `At ${businessName}, scan` : "At the venue, scan"} the SideQuests QR code
-          or tap the NFC tag with your phone. That checks you in so you can complete this quest.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** Overlays a generated instance on the quest so the page renders it as-is. */
-function applyInstance(quest: QuestWithContext, instance: QuestInstance): QuestWithContext {
-  return {
-    ...quest,
-    funky_action: instance.objective,
-    action_prompt: instance.prompt ?? quest.action_prompt,
-    proof_method: instance.proof_method ?? quest.proof_method,
-    staff_phrase: instance.staff_phrase ?? quest.staff_phrase,
-    social_share_prompt: instance.share_prompt ?? quest.social_share_prompt,
-    estimated_time: instance.estimated_time ?? quest.estimated_time,
-    xp_reward: instance.xp_reward,
-    points_reward: instance.points_reward,
-  };
-}
-
-function formatAvailableAt(iso: string | null | undefined): string {
-  if (!iso) return "a later date";
-  return new Date(iso).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
-}
-
-function CompletedCard({
-  result,
-  quest,
-  nextAvailableAt,
-  onShare,
-}: {
-  result: CompleteQuestResult | null;
-  quest: QuestWithContext;
-  /** Set for repeatable quests: when a new version unlocks. */
-  nextAvailableAt: string | null;
-  onShare: (platform: string) => void;
-}) {
-  const [showShare, setShowShare] = useState(false);
-
-  return (
-    <div className="flex flex-col items-center gap-2 rounded-2xl border border-[hsl(var(--palm-500)/0.24)] bg-[hsl(var(--palm-500)/0.08)] p-6 text-center">
-      <Trophy className="h-10 w-10 text-[hsl(var(--palm-500))]" />
-      <h2 className="font-display text-xl font-bold text-foreground">
-        Quest complete!
-      </h2>
-      {result?.ok && (
-        <p className="text-sm text-muted-foreground">
-          +{result.xpAwarded} XP · +{result.pointsAwarded} points
-          {result.leveledUp && (
-            <span className="ml-1 font-semibold text-secondary">
-              · Level up to {result.newLevel}! 🎉
-            </span>
-          )}
-        </p>
-      )}
-      {nextAvailableAt && (
-        <p className="text-sm text-muted-foreground">
-          A new version of this quest unlocks on {formatAvailableAt(nextAvailableAt)}.
-        </p>
-      )}
-      <div className="mt-2 flex flex-wrap justify-center gap-2">
-        <Button asChild variant="outline" size="sm">
-          <Link to="/app/explore">More quests</Link>
-        </Button>
-        <Button asChild size="sm">
-          <Link to="/app/profile">View progress</Link>
-        </Button>
-        {quest.social_share_prompt && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            onClick={() => setShowShare((v) => !v)}
-          >
-            <Share2 className="h-3.5 w-3.5" />
-            Share
-          </Button>
-        )}
-      </div>
-      {showShare && quest.social_share_prompt && (
-        <div className="mt-3 w-full">
-          <p className="mb-2 rounded-lg bg-muted/50 px-3 py-2 text-xs italic text-muted-foreground">
-            "{quest.social_share_prompt}"
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => onShare("instagram")}>
-              <Instagram className="h-3.5 w-3.5" /> Instagram
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => onShare("tiktok")}>
-              <ExternalLink className="h-3.5 w-3.5" /> TikTok
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-xs" onClick={() => onShare("x")}>
-              <Twitter className="h-3.5 w-3.5" /> X
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Loading / error shells
-// ---------------------------------------------------------------------------
-
-function ShellWithLoader() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background">
-      <div className="h-3 w-3 rounded-full bg-[hsl(var(--ocean-500))]" />
-      <p className="text-sm text-muted-foreground">Loading quest…</p>
-    </div>
-  );
-}
-
-function ShellWithError({
-  refetch,
-  notFound,
-}: {
-  refetch: () => void;
-  notFound?: boolean;
-}) {
+function QuestLoadError({ onRetry }: { onRetry: () => void }) {
   const navigate = useNavigate();
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-6 text-center">
-      <AlertCircle className="h-12 w-12 text-muted-foreground" />
+    <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 p-6 text-center">
+      <AlertCircle className="h-12 w-12 text-sand-50/50" aria-hidden />
       <div>
-        <p className="font-poppins font-semibold text-foreground">
-          {notFound ? "Quest not found" : "Couldn't load quest"}
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {notFound
-            ? "This quest doesn't exist or has been removed."
-            : "Check your connection and try again."}
-        </p>
+        <h1 className="font-display text-lg font-semibold text-sand-50">Couldn't load quest</h1>
+        <p className="mt-1 text-sm text-sand-50/60">Check your connection and try again.</p>
       </div>
       <div className="flex gap-3">
-        <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Go back
-        </Button>
-        {!notFound && (
-          <Button size="sm" onClick={() => void refetch()}>
-            <RefreshCw className="mr-2 h-4 w-4" /> Retry
-          </Button>
-        )}
+        <button
+          type="button"
+          onClick={() => navigate("/app/map")}
+          className="inline-flex h-10 items-center gap-2 rounded-full border border-sand-50/25 px-4 text-sm font-semibold"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden /> Find quests
+        </button>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-sand-50 px-4 text-sm font-semibold text-midnight-950"
+        >
+          <RefreshCw className="h-4 w-4" aria-hidden /> Retry
+        </button>
       </div>
     </div>
   );
+}
+
+/** How the visitor reached this quest, captured once per page view. */
+function arrivalContext(params: URLSearchParams, state: unknown) {
+  const utm: QuestEventContext["utm"] = {};
+  for (const key of ["utm_source", "utm_medium", "utm_campaign"] as const) {
+    const value = params.get(key);
+    if (value) utm[key] = value.slice(0, 100);
+  }
+
+  let referrerDomain: string | null = null;
+  try {
+    const ref = document.referrer ? new URL(document.referrer) : null;
+    if (ref && ref.origin !== window.location.origin) referrerDomain = ref.hostname.replace(/^www\./, "");
+  } catch {
+    /* ignore malformed referrer */
+  }
+
+  const from = (state as { from?: unknown } | null)?.from;
+  const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+  const source =
+    params.get("via") ??
+    (params.get("scan") ? "scan_link" : null) ??
+    (typeof from === "string" ? from : null) ??
+    (idx > 0 ? "in_app" : referrerDomain ? "external" : "direct");
+
+  return { source, utm, referrerDomain };
+}
+
+function proofMethodLabel(method: ProofMethod | null | undefined): string {
+  switch (method) {
+    case "camera":
+    case "photo":
+      return "Snap a photo as proof — the camera opens right after you confirm.";
+    case "staff_phrase":
+      return "Show staff the phrase";
+    case "breadcrumb":
+      return "Leave a Community Note about your visit";
+    case "qr":
+      return "QR verified at venue";
+    case "manual":
+      return "Mark complete yourself";
+    default:
+      return "Complete at the venue";
+  }
+}
+
+function proofMethodIcon(method: ProofMethod | null | undefined): React.ElementType {
+  switch (method) {
+    case "camera":
+    case "photo":
+      return Camera;
+    case "staff_phrase":
+    case "breadcrumb":
+      return MessageSquare;
+    case "qr":
+      return QrCode;
+    default:
+      return CheckCircle2;
+  }
 }

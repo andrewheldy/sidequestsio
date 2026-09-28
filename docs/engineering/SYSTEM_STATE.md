@@ -235,3 +235,14 @@ Verified against production (`wvedvngtuzsttpavmgjw`) through the Supabase connec
 - **Operational follow-up:** the 9 physical codes must encode
   `https://miamisidequests.io/scan/<code>`. Old `/q/<quest id>` stickers can't unlock a quest.
 
+---
+
+## Update 2026-09-28 (quest page) — code only, not yet deployed
+
+- `/quests/:questId` now renders the reusable quest page template (see `docs/DECISIONS.md`, 2026-09-28). The route is unchanged.
+- The global bottom nav is Rewards / Map / You. `/app/rewards` is now **mounted**; `/app/wallet`, `/app/leaderboard` and `/app/history` are still unmounted.
+- **Pending migrations, authored but not applied:**
+  - `0019_venue_about.sql`: `venues.description`, `venues.image_url`. The app reads them optionally.
+  - `0020_analytics_events.sql`: `analytics_events` plus `record_analytics_events()`. Nothing writes to it until `VITE_ANALYTICS_SINK=supabase` is set.
+- The Frost Museum sample quest exists only in dev/mock and LocalRepository data, not in production.
+

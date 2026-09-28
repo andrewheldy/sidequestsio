@@ -45,6 +45,7 @@ import Settings from "./pages/app/Settings";
 import QuestBrowser from "./pages/app/QuestBrowser";
 import AppCommunityNotes from "./pages/app/AppCommunityNotes";
 import CheckIn from "./pages/app/CheckIn";
+import Rewards from "./pages/app/Rewards";
 import ReadinessBrief from "./pages/ReadinessBrief";
 import NotFound from "./pages/NotFound";
 
@@ -115,6 +116,7 @@ const App = () => (
                         <Route path="map" element={<MapView />} />
                         <Route path="quests" element={<QuestBrowser />} />
                         <Route path="community-notes" element={<AppCommunityNotes />} />
+                        <Route path="rewards" element={<Rewards />} />
                         <Route
                           path="checkin"
                           element={

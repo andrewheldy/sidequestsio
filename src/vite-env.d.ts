@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_ANON_KEY?: string;
   /** Mapbox public token used by the interactive quest map. */
   readonly VITE_MAPBOX_PUBLIC_TOKEN?: string;
+  /** Set to "supabase" to send consented analytics events to record_analytics_events (0020). */
+  readonly VITE_ANALYTICS_SINK?: string;
 }
 
 interface ImportMeta {

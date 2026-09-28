@@ -2,6 +2,31 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-28 — Reusable quest page, three-tab nav, quest analytics
+
+- **Quest page replaced** (`/quests/:questId`, same route) with the new location-first design:
+  hero → intro → required action → Explore & Share → venue card → Community Notes. One template,
+  fed by `buildQuestPageModel()` (`src/lib/quests/questPage.ts`) from the existing
+  `QuestWithContext` shape. Completion still uses the existing flow (startQuest → completeQuest RPC
+  → capture camera, now lazy-loaded). Removed the superseded `AboutActions`, `InfoCards`,
+  `RewardCard`, `QuestObjectiveCard` and `BusinessAvatar` components.
+- **Global bottom nav** is now Rewards / Map / You (no scan item). `/app/rewards` is mounted;
+  Saved quests is linked from Profile.
+- **Prototype avatar (temporary):** signed-in users without an avatar see
+  `src/assets/prototype-avatar.webp` in the nav. **Remove before public launch.**
+- **Analytics:** quest-page event catalogue (`src/types/events.ts`), `trackQuestEvent` /
+  `trackQuestEventOnce` (`src/lib/analytics/questEvents.ts`), one-shot impression hook
+  (`src/hooks/useImpression.ts`), a dev-only console sink, and consent gating for remote sinks.
+  Events still only reach the on-device buffer unless `VITE_ANALYTICS_SINK=supabase` is set.
+- **New migrations, not applied:** `0019_venue_about.sql` (`venues.description`,
+  `venues.image_url`) and `0020_analytics_events.sql` (`analytics_events` table +
+  `record_analytics_events()` RPC). Both are idempotent; apply after a backup.
+- **"No quest found" 404:** missing quests and every unknown route show one shared doorway screen
+  (`src/components/app/NoQuestFound.tsx`). The door swings open onto an empty path, and rests
+  open under reduced motion. The network-error state keeps its retry screen.
+- **Sample content:** the Frost Museum of Science quest in `src/data/mock/quests.json` (dev) and
+  the LocalRepository seed (`STORE_VERSION` 6). It is not in production.
+
 ## 2026-09-28 — Migration 0018 applied; PR #40 live
 
 - PR #40 was merged to `main` (`a2d41b6`) and deployed to Vercel production. Then
