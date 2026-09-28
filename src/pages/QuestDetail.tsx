@@ -36,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { CommunityNotes } from "@/components/app/CommunityNotes";
 import BottomNav from "@/components/app/BottomNav";
+import { NoQuestFound } from "@/components/app/NoQuestFound";
 import {
   QuestHero,
   QuestIntro,
@@ -220,7 +221,11 @@ export default function QuestDetail() {
   if (failure || !quest || !shown || !model) {
     return (
       <QuestPageShell>
-        <QuestLoadError notFound={failure === "not_found"} onRetry={() => void refetch()} />
+        {failure === "not_found" ? (
+          <NoQuestFound className="min-h-[80vh] justify-center py-10" />
+        ) : (
+          <QuestLoadError onRetry={() => void refetch()} />
+        )}
       </QuestPageShell>
     );
   }
@@ -554,18 +559,14 @@ function QuestPageShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function QuestLoadError({ notFound, onRetry }: { notFound: boolean; onRetry: () => void }) {
+function QuestLoadError({ onRetry }: { onRetry: () => void }) {
   const navigate = useNavigate();
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 p-6 text-center">
       <AlertCircle className="h-12 w-12 text-sand-50/50" aria-hidden />
       <div>
-        <h1 className="font-display text-lg font-semibold text-sand-50">
-          {notFound ? "Quest not found" : "Couldn't load quest"}
-        </h1>
-        <p className="mt-1 text-sm text-sand-50/60">
-          {notFound ? "This quest doesn't exist or has been removed." : "Check your connection and try again."}
-        </p>
+        <h1 className="font-display text-lg font-semibold text-sand-50">Couldn't load quest</h1>
+        <p className="mt-1 text-sm text-sand-50/60">Check your connection and try again.</p>
       </div>
       <div className="flex gap-3">
         <button
@@ -575,15 +576,13 @@ function QuestLoadError({ notFound, onRetry }: { notFound: boolean; onRetry: () 
         >
           <ArrowLeft className="h-4 w-4" aria-hidden /> Find quests
         </button>
-        {!notFound && (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-sand-50 px-4 text-sm font-semibold text-midnight-950"
-          >
-            <RefreshCw className="h-4 w-4" aria-hidden /> Retry
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={onRetry}
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-sand-50 px-4 text-sm font-semibold text-midnight-950"
+        >
+          <RefreshCw className="h-4 w-4" aria-hidden /> Retry
+        </button>
       </div>
     </div>
   );

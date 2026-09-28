@@ -21,6 +21,9 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
 - **New migrations, not applied:** `0019_venue_about.sql` (`venues.description`,
   `venues.image_url`) and `0020_analytics_events.sql` (`analytics_events` table +
   `record_analytics_events()` RPC). Both are idempotent; apply after a backup.
+- **"No quest found" 404:** missing quests and every unknown route show one shared doorway screen
+  (`src/components/app/NoQuestFound.tsx`). The door swings open onto an empty path, and rests
+  open under reduced motion. The network-error state keeps its retry screen.
 - **Sample content:** the Frost Museum of Science quest in `src/data/mock/quests.json` (dev) and
   the LocalRepository seed (`STORE_VERSION` 6). It is not in production.
 
