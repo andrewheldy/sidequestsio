@@ -2,6 +2,16 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-28 — Migrations 0019/0020 applied; Frost quest SQL
+
+- **Applied to production:** `0019_venue_about.sql` and `0020_analytics_events.sql`, with post-checks passing (see `SYSTEM_STATE.md`).
+  - There was no backup: both migrations only add schema.
+- **Added `supabase/frost_museum_quest.sql`:** an idempotent insert of the Frost Museum partner, venue, quest and one venue code.
+  - The code is generated at run time and printed with its sticker URL.
+  - It passed a rolled-back dry run, then was **run on production**: the Frost quest is live at
+    `/quests/30000000-0000-0000-0000-000000000010`, with one QR code. Production now has 10 active quests.
+  - **Action needed:** print the Frost sticker with its `/scan/<code>` URL (shared with the owner).
+
 ## 2026-09-28 — Reusable quest page, three-tab nav, quest analytics
 
 - **Quest page replaced** (`/quests/:questId`, same route) with the new location-first design:
