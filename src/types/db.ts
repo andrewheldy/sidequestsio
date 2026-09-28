@@ -149,6 +149,10 @@ export interface Venue {
   hours_note?: string | null;
   /** Price tier as dollar signs: $, $$, $$$ or $$$$ (0014). */
   price_range?: string | null;
+  /** Short editorial "about" copy for the venue card on quest pages (0019). */
+  description?: string | null;
+  /** Landscape venue photo for the venue card on quest pages (0019). */
+  image_url?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -191,6 +195,8 @@ export interface Quest {
   estimated_time?: string | null;
   /** NULL = complete once, ever. N = may be completed again N days after the last completion. */
   repeat_cooldown_days?: number | null;
+  /** Optional business/host links (quests.links JSONB, 0012). */
+  links?: QuestLinks | null;
 }
 
 /**
@@ -417,16 +423,20 @@ export interface AuditLog {
  *  Not every quest is a restaurant — all fields are optional.
  *  Stored in the quests.links JSONB column.
  *
- *  Canonical shape (import path + new content):
- *    { website_url, reviews_url, reviews_source, socials_url, socials_source }
- *  The remaining keys are legacy — still readable (the UI falls back to them)
- *  but not written by the content importer. */
+ *  The quest page's Explore & Share row reads (see src/lib/quests/questPage.ts):
+ *    instagram_url, tiktok_url, x_url   one card per platform
+ *    reviews_url / google_reviews_url   Google Review card
+ *    website_url                        website card + venue card CTA
+ *    socials_url                        a single "All links" card, or the matching
+ *                                       platform card when it is an IG/TikTok/X URL
+ *  The content importer currently writes only website/reviews/socials; the
+ *  per-platform keys are authored directly (docs/QUEST_CONTENT_IMPORT.md). */
 export interface QuestLinks {
   website_url?: string | null;
   /** Canonical reviews link (Google, Yelp, …). */
   reviews_url?: string | null;
   reviews_source?: "google" | "yelp" | "other" | null;
-  /** ONE external landing page (Linktree/Linkme style) — never per-platform. */
+  /** One external landing page (Linktree/Linkme style). */
   socials_url?: string | null;
   socials_source?: "linktree" | "linkme" | "other" | null;
   instagram_url?: string | null;
@@ -442,6 +452,13 @@ export interface QuestLinks {
   special_deals?: string | null;
   /** E.164 phone number for a "call/save contact" action. */
   contact_phone?: string | null;
+  /**
+   * Points *advertised* on the quest page's Explore & Share cards, keyed by
+   * action type (instagram, tiktok, x, google_review, website). Display only:
+   * nothing credits these points until a verification path exists — see
+   * src/lib/quests/questPage.ts.
+   */
+  action_points?: Partial<Record<string, number>> | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -451,8 +468,6 @@ export interface QuestLinks {
 export interface QuestWithContext extends Quest {
   partner?: Partner;
   venue?: Venue;
-  /** Optional business/host links — only populated when the partner has set them. */
-  links?: QuestLinks;
 }
 
 export interface LeaderboardRow {

@@ -31,14 +31,32 @@ changes; missing optional fields hide gracefully.
   "website_url":    "https://…",
   "reviews_url":    "https://…",
   "reviews_source": "google" | "yelp" | "other",
-  "socials_url":    "https://…",        // ONE landing page (Linktree/Linkme style)
-  "socials_source": "linktree" | "linkme" | "other"
+  "socials_url":    "https://…",        // one landing page (Linktree/Linkme style)
+  "socials_source": "linktree" | "linkme" | "other",
+  "instagram_url":  "https://…",        // per-platform Explore & Share cards (2026-09-28)
+  "tiktok_url":     "https://…",
+  "x_url":          "https://…",
+  "action_points":  { "instagram": 50, "tiktok": 50, "x": 25, "google_review": 75, "website": 25 }
 }
 ```
 
-Legacy keys (`google_reviews_url`, `instagram_url`, …) remain readable — the
-UI prefers the canonical keys and falls back — but new content should only
-use the shape above. No per-platform social keys, no menu/call/reservation.
+The quest page's **Explore & Share** row renders one card per platform
+(Instagram, TikTok, X, Google Review, website), superseding the earlier
+single-socials rule (see `docs/DECISIONS.md`, 2026-09-28). `socials_url` still
+works: it becomes the matching platform card when it is an Instagram/TikTok/X
+profile, otherwise one "All links" card. Only `http(s)` URLs are rendered.
+
+`action_points` is **display-only**: nothing credits these points yet (there is
+no verification for social/review/website actions). Leave it out of live
+content until a verification path exists.
+
+The importer does not write `instagram_url` / `tiktok_url` / `x_url` /
+`action_points` yet; author them directly in `quests.links` (SQL editor) until
+the CSV gains those columns. `google_reviews_url` remains a readable legacy key.
+No menu/call/reservation keys.
+
+Venue "about" copy and photo live on the venue (`venues.description`,
+`venues.image_url`, migration `0019_venue_about.sql`).
 
 ## CSV template
 

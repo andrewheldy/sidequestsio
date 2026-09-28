@@ -305,3 +305,25 @@
 @media (prefers-reduced-motion: reduce) {
   html:focus-within { scroll-behavior: auto; }
 }
+
+/* Navy skeleton bones (quest page). A soft sweep on a slightly lighter navy
+   surface; static for prefers-reduced-motion. */
+.sq-skeleton {
+  background-color: hsl(var(--midnight-800) / 0.7);
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    hsl(var(--sand-50) / 0.06) 45%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  background-position: 120% 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sq-skeleton { animation: sq-skeleton-sweep 1.6s var(--ease-standard) infinite; }
+}
+
+@keyframes sq-skeleton-sweep {
+  to { background-position: -120% 0; }
+}

@@ -22,6 +22,29 @@ export function getAnonymousSessionId(): string {
   return id;
 }
 
+const BROWSING_SESSION_KEY = "sq.session_id";
+let memorySessionId: string | null = null;
+
+/**
+ * Per-tab browsing session for analytics (sessionStorage), so "one visit" can
+ * be told apart from the long-lived anonymous id above.
+ */
+export function getBrowsingSessionId(): string {
+  if (typeof window === "undefined") return "ssr";
+  try {
+    let id = window.sessionStorage.getItem(BROWSING_SESSION_KEY);
+    if (!id) {
+      id = `sess_${nanoid(16)}`;
+      window.sessionStorage.setItem(BROWSING_SESSION_KEY, id);
+    }
+    return id;
+  } catch {
+    // Storage blocked (private mode, sandboxed iframe): keep it for this page load.
+    memorySessionId ??= `sess_${nanoid(16)}`;
+    return memorySessionId;
+  }
+}
+
 export interface PendingScanContext {
   questId: string;
   scanId: string;

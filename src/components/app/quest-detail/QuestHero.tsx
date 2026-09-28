@@ -1,95 +1,173 @@
-import { ArrowLeft, Bookmark, BarChart3, Clock, Share2 } from 'lucide-react';
-import type { Difficulty } from '@/types/db';
-import { cn } from '@/lib/utils';
-import { BusinessAvatar } from './BusinessAvatar';
-import { categoryMeta } from './questCategory';
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, Bookmark, Clock, MapPin, Share2, Sparkle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { responsiveImage } from "@/lib/images";
+import { CategoryIcon } from "@/components/brand/CategoryIcon";
+import type { QuestHeroModel } from "@/lib/quests/questPage";
+import { TopoLines } from "./QuestDecor";
 
-const DIFFICULTY_LABEL: Record<Difficulty, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
-
+/**
+ * Location hero: the venue photo bleeds into Midnight Navy, with the category
+ * pill, the venue name in two weights and location/duration metadata laid
+ * over its lower edge. Entirely data-driven — a quest without a photo gets a
+ * branded navy fallback anchored by its category glyph.
+ *
+ * The photo is the page's LCP candidate, so it loads eagerly at high priority.
+ */
 export function QuestHero({
-  imageUrl,
-  title,
-  businessName,
-  logoUrl,
+  hero,
   category,
-  difficulty,
-  estimatedTime,
+  categoryLabel,
   isSaved,
   onBack,
   onShare,
   onToggleSave,
+  onVisible,
 }: {
-  imageUrl: string | null;
-  title: string;
-  businessName: string | null;
-  logoUrl?: string | null;
+  hero: QuestHeroModel;
   category: string;
-  difficulty?: Difficulty | null;
-  estimatedTime?: string | null;
+  categoryLabel: string;
   isSaved: boolean;
   onBack: () => void;
   onShare: () => void;
   onToggleSave: () => void;
+  /** Fires when the hero has painted: its photo loaded, or the fallback is showing. */
+  onVisible: (image: "loaded" | "fallback") => void;
 }) {
-  const categoryInfo = categoryMeta(category);
-  const CategoryIcon = categoryInfo.icon;
+  const [status, setStatus] = useState<"loading" | "loaded" | "failed">(
+    hero.imageUrl ? "loading" : "failed",
+  );
+  const image = hero.imageUrl ? responsiveImage(hero.imageUrl, [640, 960, 1280]) : null;
+  const showFallback = !image || status === "failed";
 
   return (
-    <header className="relative min-h-[480px] h-[58svh] max-h-[660px] w-full overflow-hidden bg-[hsl(var(--midnight-900))] text-white">
-      {imageUrl ? (
-        <img src={imageUrl} alt="" className="h-full w-full object-cover" />
-      ) : (
-        <div className="h-full w-full bg-[hsl(var(--midnight-800))]" />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--midnight-950)/0.98)] via-[hsl(var(--midnight-950)/0.14)] to-black/35" />
+    <header className="relative">
+      <div className="relative h-[clamp(300px,50svh,440px)] overflow-hidden bg-midnight-900">
+        {showFallback ? (
+          <HeroFallback category={category} onMount={() => onVisible("fallback")} />
+        ) : (
+          <img
+            src={image.src}
+            srcSet={image.srcSet}
+            sizes="(min-width: 640px) 600px, 100vw"
+            alt=""
+            decoding="async"
+            // React 18 has no typed fetchPriority prop; the lowercase attribute passes through.
+            {...({ fetchpriority: "high" } as Record<string, string>)}
+            onLoad={() => {
+              setStatus("loaded");
+              onVisible("loaded");
+            }}
+            onError={() => setStatus("failed")}
+            className={cn(
+              "h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none",
+              status === "loaded" ? "scale-100 opacity-100" : "scale-[1.04] opacity-0 motion-reduce:scale-100",
+            )}
+          />
+        )}
+        {/* Readability: dark top edge for controls, deep navy fade under the title. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-midnight-950/55 via-transparent to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-midnight-950 via-midnight-950/75 to-transparent" />
+      </div>
 
-      <div className="absolute inset-x-0 top-0 mx-auto flex w-full max-w-2xl items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
-        <HeroButton label="Back" onClick={onBack}><ArrowLeft className="h-5 w-5" /></HeroButton>
-        <div className="flex items-center gap-2">
-          <HeroButton label="Share" onClick={onShare}><Share2 className="h-5 w-5" /></HeroButton>
-          <HeroButton label={isSaved ? 'Remove from saved quests' : 'Save quest'} onClick={onToggleSave} active={isSaved}>
-            <Bookmark className={cn('h-5 w-5', isSaved && 'fill-current')} />
-          </HeroButton>
+      {/* Top controls */}
+      <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))]">
+        <GlassButton label="Go back" onClick={onBack}>
+          <ArrowLeft className="h-5 w-5" />
+        </GlassButton>
+        <div className="flex min-w-0 items-center gap-2">
+          <GlassButton label="Share this quest" onClick={onShare}>
+            <Share2 className="h-[18px] w-[18px]" />
+          </GlassButton>
+          <GlassButton
+            label={isSaved ? "Remove from saved quests" : "Save quest"}
+            onClick={onToggleSave}
+            pressed={isSaved}
+          >
+            <Bookmark className={cn("h-[18px] w-[18px]", isSaved && "fill-current text-gold")} />
+          </GlassButton>
+          {hero.city && (
+            <span className="inline-flex h-11 min-w-0 items-center gap-1.5 rounded-full border border-white/10 bg-midnight-950/70 px-4 text-[11px] font-bold uppercase tracking-[0.18em] text-sand-50 backdrop-blur-md">
+              <MapPin className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="truncate">{hero.city}</span>
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-2xl px-5 pb-7">
-        <div className="mb-5 flex flex-wrap gap-2">
-          <span className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-white/12 px-3 text-xs font-bold backdrop-blur-md">
-            <CategoryIcon className="h-3.5 w-3.5" /> {categoryInfo.label}
+      {/* Title block overlaps the photo's faded lower edge */}
+      <div className="relative -mt-32 px-5">
+        <span className="inline-flex items-center gap-2 rounded-full border border-gold/70 bg-midnight-950/60 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-gold backdrop-blur-sm">
+          <Sparkle className="h-3.5 w-3.5 fill-current" aria-hidden />
+          {categoryLabel}
+        </span>
+        <h1 className="mt-3 break-words font-display text-sand-50">
+          <span className="block text-[clamp(2.4rem,11vw,3.4rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
+            {hero.titleLead}
           </span>
-          {difficulty && (
-            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-white/12 px-3 text-xs font-bold backdrop-blur-md">
-              <BarChart3 className="h-3.5 w-3.5 text-[hsl(var(--gold-500))]" /> {DIFFICULTY_LABEL[difficulty]}
+          {hero.titleTail && (
+            <span className="mt-1 block text-[clamp(1.6rem,7vw,2.1rem)] font-medium leading-tight tracking-[-0.03em] text-sand-50/90">
+              {hero.titleTail}
             </span>
           )}
-          {estimatedTime && (
-            <span className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-white/12 px-3 text-xs font-bold backdrop-blur-md">
-              <Clock className="h-3.5 w-3.5" /> {estimatedTime}
-            </span>
-          )}
-        </div>
+        </h1>
 
-        <h1 className="font-display text-[clamp(2.5rem,9vw,4.5rem)] font-bold leading-[0.96] tracking-[-0.055em]">{title}</h1>
-        {businessName && (
-          <div className="mt-5 flex items-center gap-3">
-            <BusinessAvatar name={businessName} src={logoUrl} className="h-11 w-11 text-xs ring-2 ring-white/24" />
-            <div><p className="sq-overline text-white/45">Quest host</p><p className="mt-1 text-sm font-semibold text-white/82">{businessName}</p></div>
-          </div>
+        {(hero.locationLabel || hero.duration) && (
+          <ul className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[15px] text-sand-50/85">
+            {hero.locationLabel && (
+              <li className="flex items-center gap-2">
+                <MapPin className="h-[18px] w-[18px] text-sand-50" aria-hidden />
+                <span className="sr-only">Location: </span>
+                {hero.locationLabel}
+              </li>
+            )}
+            {hero.locationLabel && hero.duration && (
+              <li aria-hidden className="h-5 w-px bg-sand-50/20" />
+            )}
+            {hero.duration && (
+              <li className="flex items-center gap-2">
+                <Clock className="h-[18px] w-[18px] text-sand-50" aria-hidden />
+                <span className="sr-only">Estimated time: </span>
+                {hero.duration}
+              </li>
+            )}
+          </ul>
         )}
       </div>
     </header>
   );
 }
 
-function HeroButton({ children, label, onClick, active }: { children: React.ReactNode; label: string; onClick: () => void; active?: boolean }) {
+function HeroFallback({ category, onMount }: { category: string; onMount: () => void }) {
+  // The fallback is the painted hero for this quest; report it once on mount.
+  const report = useRef(onMount);
+  useEffect(() => report.current(), []);
+  return (
+    <div className="relative flex h-full w-full items-center justify-center bg-[radial-gradient(120%_90%_at_70%_20%,hsl(var(--ocean-500)/0.28),transparent_60%),linear-gradient(160deg,hsl(var(--midnight-800)),hsl(var(--midnight-950)))]">
+      <TopoLines className="absolute inset-0 h-full w-full text-sand-50/[0.07]" />
+      <CategoryIcon category={category} strokeWidth={1.2} className="relative h-24 w-24 -translate-y-8 text-gold/40" />
+    </div>
+  );
+}
+
+function GlassButton({
+  children,
+  label,
+  onClick,
+  pressed,
+}: {
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  pressed?: boolean;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
-      aria-pressed={label.includes('Save') || label.includes('Remove') ? active : undefined}
-      className={cn('flex h-11 w-11 items-center justify-center rounded-xl border border-white/20 bg-black/40 text-white backdrop-blur-md', active && 'text-[hsl(var(--gold-500))]')}
+      aria-pressed={pressed}
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-midnight-950/70 text-sand-50 backdrop-blur-md transition-transform duration-150 hover:bg-midnight-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold active:scale-95"
     >
       {children}
     </button>

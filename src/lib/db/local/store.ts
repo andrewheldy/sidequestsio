@@ -50,7 +50,7 @@ export interface DbSnapshot {
 }
 
 const STORE_KEY = "sq.db";
-const STORE_VERSION = 5; // 5: quest frameworks + instances
+const STORE_VERSION = 6; // 6: Frost quest-page sample (venue about, links)
 const VERSION_KEY = "sq.db.version";
 
 let memory: DbSnapshot | null = null;
