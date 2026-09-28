@@ -10,10 +10,10 @@
 > stubbed `auth`/`storage` schemas. 0006 stops at one statement (P11); the statements it then
 > skips are re-done by 0004, 0010 and 0011, so the end state matched this file (20 tables,
 > 2 views, 19 enums). P1, P2 and P10 below were reproduced there.
-> **Applied to production 2026-09-28:** `0016_rls_hardening.sql` (P1, P2, P10 fixed; §11) and
-> `0017_quest_frameworks.sql` (generated quests; §12).
-> **Pending:** `0018_scan_verification.sql` makes QR/NFC quests require a real scan (§13); apply it
-> after the app from PR #40 is deployed.
+> **Applied to production 2026-09-28:** `0016_rls_hardening.sql` (P1, P2, P10 fixed; §11),
+> `0017_quest_frameworks.sql` (generated quests; §12) and `0018_scan_verification.sql` (QR/NFC
+> quests require a real scan; P12, P13 fixed; §13). The sections below still describe the schema
+> after 0001–0015; §11–§13 list what each applied migration changed.
 > **Live verification:** not performed. The applied-migration ledger has drifted (CLAUDE.md §9). Run `scripts/schema-snapshot.sql` in the Supabase SQL editor to dump
 > the live schema and diff it against this file.
 >
@@ -590,7 +590,7 @@ alter table quest_completions add column instance_id uuid references quest_insta
   `cooldown` and `instance_invalid`.
 - Triggers: `quest_frameworks_validate` (every `{token}` must be a slot with non-blank options).
 
-## 13. Pending: `0018_scan_verification.sql` (authored, not applied; apply after 0017 and after the app ships)
+## 13. `0018_scan_verification.sql` (applied to production 2026-09-28)
 
 - `qr_codes.kind text not null default 'qr' check (kind in ('qr','nfc'))`: an NFC tag is a venue
   code like a QR sticker; both encode `/scan/<code>`. `destination_url` is backfilled to that path.
