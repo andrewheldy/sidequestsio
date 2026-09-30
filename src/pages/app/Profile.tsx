@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { Bookmark, LogOut, Settings, Settings2, RefreshCw } from "lucide-react";
+import { BarChart3, Bookmark, LogOut, Settings, Settings2, RefreshCw } from "lucide-react";
 import AppHeader from "@/components/app/AppHeader";
 import { StatTile, SectionHeader, Loading } from "@/components/app/ui";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -13,10 +13,12 @@ import { levelProgress } from "@/lib/app/leveling";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
 import { isDemoMode } from "@/lib/demo";
+import { usePartnerAccess } from "@/lib/partner/usePartner";
 
 export default function Profile() {
   const { user, profile, role, signOut } = useAuth();
   const navigate = useNavigate();
+  const { data: partnerAccess } = usePartnerAccess();
   const qc = useQueryClient();
 
   const demoProfile = isDemoMode && !user
@@ -186,6 +188,15 @@ export default function Profile() {
           </div>
         )}
       </div>
+
+      {/* Partner Insights — only for admins and linked partner logins. */}
+      {!!partnerAccess?.partners.length && (
+        <Button asChild className="mt-4 w-full h-11 gap-2">
+          <Link to="/partner">
+            <BarChart3 className="h-4 w-4" /> Partner Insights
+          </Link>
+        </Button>
+      )}
 
       {/* Saved quests — no longer a bottom-nav tab (Rewards / Map / You). */}
       <Button asChild variant="outline" className="mt-4 w-full h-11 gap-2">

@@ -376,6 +376,39 @@ Impressions and page-level events are de-duplicated per page view. A click is ne
 
 ---
 
+## Partner Insights dashboard (2026-09-30)
+
+- **Routes:**
+  - `/partner` is the partner overview across all venues, with a venue table and a partner picker for admins.
+  - `/partner/venues/:venueId` shows the same view for one venue.
+  - Both offer 7, 30 or 90 days. The entry point is "Partner Insights" on the Profile page, shown only to people with access.
+- **Data:** `partner_insights(partner, venue?, days)` (migration 0021) returns aggregates only:
+  - page views, unique and repeat visitors;
+  - verified check-ins (QR/NFC scans);
+  - the funnel (viewed → saw challenge → tapped → started → completed);
+  - completions with points and XP issued;
+  - website, review and social clicks;
+  - rewards redeemed (partner level only) and approved Community Notes;
+  - a daily series, per-quest and per-venue tables, and click and source breakdowns.
+  - Sources are hidden when there are only 1–4 visitors.
+- **Counts:** views, visitors, funnel steps and clicks only include visitors who accepted analytics cookies. Check-ins, completions, points, rewards and notes are complete counts.
+- **Local/dev:** `src/lib/partner/insights.ts` mirrors the RPC for the Local and Mock repositories. Dev builds show deterministic demo activity.
+- **Access (run in the SQL editor):**
+
+  ```sql
+  -- Give a partner's login access to its dashboard
+  update public.partners
+     set owner_user_id = (select id from public.users where email = 'owner@venue.com')
+   where id = '<partner uuid>';
+
+  -- Make an account a SideQuests admin (sees every partner)
+  update public.users set role = 'admin' where email = 'you@sidequests.io';
+  ```
+
+  The UI reads `users.role`, the same field `is_admin()` checks, not editable auth metadata.
+
+---
+
 # Dashboard Requirements
 
 ## Executive Dashboard

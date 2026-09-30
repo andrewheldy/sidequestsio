@@ -263,3 +263,13 @@ Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. T
   - Production now has **10 active quests**.
   - Anon can read the quest and venue, but not the code; the code was shared with the owner out of band.
 
+---
+
+## Update 2026-09-30 — Analytics on in production; Partner Insights (code)
+
+- **Production is redeployed from `main` (`daf5d07`)** with `VITE_ANALYTICS_SINK=supabase` (Production only) and `VITE_MAPBOX_PUBLIC_TOKEN`.
+  - Consenting visitors' events now go to `analytics_events` via `record_analytics_events()`.
+- **Partner Insights (`/partner`, `/partner/venues/:venueId`)** is in code and needs **`0021_partner_insights.sql`** applied.
+  - Until then the page shows "Couldn't load insights".
+  - Access is controlled by `partners.owner_user_id` and `users.role = 'admin'`; see ANALYTICS_SPEC.md.
+

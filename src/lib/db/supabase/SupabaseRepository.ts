@@ -53,7 +53,7 @@ import type {
   RedeemRewardResult,
   Repository,
 } from "../repository";
-import type { AnalyticsSummary } from "../types";
+import type { AnalyticsSummary, PartnerInsights, PartnerInsightsInput } from "../types";
 import { detectDevice, getReferrer } from "@/lib/app/device";
 
 export class SupabaseRepository implements Repository {
@@ -474,6 +474,15 @@ export class SupabaseRepository implements Repository {
     });
     if (error) throw error;
     return data as AnalyticsSummary;
+  }
+  async getPartnerInsights(input: PartnerInsightsInput): Promise<PartnerInsights> {
+    const { data, error } = await this.sb.rpc("partner_insights", {
+      p_partner_id: input.partnerId,
+      p_venue_id: input.venueId ?? null,
+      p_days: input.days,
+    });
+    if (error) throw error;
+    return data as PartnerInsights;
   }
   async getPlatformAnalytics(): Promise<AnalyticsSummary> {
     const { data, error } = await this.sb.rpc("platform_analytics");

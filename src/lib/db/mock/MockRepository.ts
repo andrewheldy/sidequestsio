@@ -17,7 +17,8 @@ import type {
   CreateNoteInput,
   CreateNoteResult,
 } from "../repository";
-import type { AnalyticsSummary } from "../types";
+import type { AnalyticsSummary, PartnerInsights, PartnerInsightsInput } from "../types";
+import { buildPartnerInsights, type InsightsEventRecord } from "@/lib/partner/insights";
 import type {
   User,
   UserProfile,
@@ -426,6 +427,28 @@ export class MockRepository implements Repository {
     return DEMO_ANALYTICS;
   }
 
+  /** Dev-only: the real aggregation over deterministic demo activity. */
+  async getPartnerInsights(input: PartnerInsightsInput): Promise<PartnerInsights> {
+    const data = questsData as unknown as { partners: Partner[]; venues: Venue[]; quests: Quest[] };
+    const partner = data.partners.find((p) => p.id === input.partnerId);
+    if (!partner) throw new Error("not_found");
+    const venues = data.venues.filter((v) => v.partner_id === partner.id);
+    const venue = input.venueId ? venues.find((v) => v.id === input.venueId) : null;
+    if (input.venueId && !venue) throw new Error("forbidden");
+    const quests = data.quests.filter((q) => q.partner_id === partner.id);
+    const demo = demoActivity(quests, partner.id);
+    return buildPartnerInsights({
+      partner: { id: partner.id, name: partner.name },
+      venue: venue ? { id: venue.id, name: venue.name, neighborhood: venue.neighborhood ?? null } : null,
+      venues,
+      quests,
+      ...demo,
+      redemptions: demo.completions.filter((_, i) => i % 3 === 0).map((c) => ({ redeemed_at: c.completed_at })),
+      notes: demo.completions.filter((_, i) => i % 4 === 0).map((c) => ({ quest_id: c.quest_id, moderation_status: "approved", created_at: c.completed_at })),
+      days: input.days,
+    });
+  }
+
   async getPlatformAnalytics(): Promise<AnalyticsSummary> {
     return DEMO_ANALYTICS;
   }
@@ -453,4 +476,43 @@ export class MockRepository implements Repository {
       created_at: new Date().toISOString(),
     };
   }
+}
+
+/**
+ * Deterministic demo traffic for the partner dashboard in dev builds: ~90 days
+ * of visits per quest with a realistic funnel. Seeded by quest id, so the same
+ * quest always shows the same numbers.
+ */
+function demoActivity(quests: Quest[], partnerId: string) {
+  const events: InsightsEventRecord[] = [];
+  const scans: { quest_id: string; venue_id: string | null; timestamp: string; code_verified: boolean }[] = [];
+  const completions: { quest_id: string; venue_id: string | null; completed_at: string; points_awarded: number; xp_awarded: number }[] = [];
+  const now = Date.now();
+  const sources = ["qr", "in_app", "direct", "external", "nfc"];
+  const actions = ["instagram", "google_review", "website", "tiktok", "x"];
+  for (const q of quests) {
+    let seed = [...q.id].reduce((n: number, ch: string) => (n * 31 + ch.charCodeAt(0)) >>> 0, 7);
+    const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+    for (let day = 0; day < 90; day++) {
+      const visits = Math.floor(rand() * 7 + (day < 14 ? 3 : 1));
+      for (let v = 0; v < visits; v++) {
+        const at = new Date(now - day * 86_400_000 - Math.floor(rand() * 10) * 3_600_000).toISOString();
+        const anon = `demo_${q.id}_${Math.floor(rand() * 60)}`;
+        const base = { at, anonymousId: anon, questId: q.id, venueId: q.venue_id, partnerId, actionType: null, source: sources[Math.floor(rand() * sources.length)] };
+        events.push({ ...base, name: "quest_page_loaded" });
+        if (rand() < 0.8) events.push({ ...base, name: "quest_primary_action_viewed" });
+        if (rand() < 0.45) {
+          events.push({ ...base, name: "quest_primary_action_clicked" });
+          if (rand() < 0.7) {
+            events.push({ ...base, name: "quest_primary_action_started" });
+            scans.push({ quest_id: q.id, venue_id: q.venue_id, timestamp: at, code_verified: true });
+            if (rand() < 0.85) completions.push({ quest_id: q.id, venue_id: q.venue_id, completed_at: at, points_awarded: q.points_reward ?? 0, xp_awarded: q.xp_reward ?? 0 });
+          }
+        }
+        if (rand() < 0.25) events.push({ ...base, name: "quest_optional_action_clicked", actionType: actions[Math.floor(rand() * actions.length)] });
+        if (rand() < 0.08) events.push({ ...base, name: "venue_website_clicked" });
+      }
+    }
+  }
+  return { events, scans, completions };
 }

@@ -2,6 +2,18 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-30 — Partner Insights dashboard; production analytics on
+
+- **Production redeployed** with `VITE_ANALYTICS_SINK=supabase` and a new URL-restricted `VITE_MAPBOX_PUBLIC_TOKEN`.
+  - The live bundle includes the Supabase sink and a public (`pk.`) Mapbox token.
+- **Partner Insights:**
+  - `/partner` and `/partner/venues/:venueId` show read-only analytics per partner and per venue.
+  - It is lazy-loaded, so the chart code only loads for people who open it.
+  - Built on the new `partner_insights()` RPC (`0021_partner_insights.sql`, **not yet applied**).
+  - Tested on Postgres (PGlite) against a production-shaped schema, covering the metrics and access: owner, other partner, venue of another partner, plain user, anon and admin.
+  - A TypeScript twin gives the Local and Mock repositories identical numbers.
+- **Removed:** the superseded, unmounted `PartnerHome` and `PartnerAnalytics` pages.
+
 ## 2026-09-28 — Prototype avatar removed; SideQuests explorer avatar
 
 - Removed `src/assets/prototype-avatar.webp`: the temporary personal photo from the quest-page work is gone.
