@@ -47,7 +47,9 @@ import type {
   RedeemRewardResult,
   Repository,
 } from "../repository";
-import { AnalyticsSummary, SMALL_SAMPLE_THRESHOLD } from "../types";
+import { AnalyticsSummary, SMALL_SAMPLE_THRESHOLD, type PartnerInsights, type PartnerInsightsInput } from "../types";
+import { buildPartnerInsights } from "@/lib/partner/insights";
+import { readLocalEvents } from "@/lib/analytics/events";
 import { loadDb, mutate, DbSnapshot } from "./store";
 import { nanoid, shortCode } from "@/lib/app/id";
 import { levelForXp } from "@/lib/app/leveling";
@@ -947,6 +949,45 @@ export class LocalRepository implements Repository {
 
   async getPlatformAnalytics(): Promise<AnalyticsSummary> {
     return this.computeAnalytics(() => true, null);
+  }
+
+  /** Same aggregation as the 0021 RPC, over local records + on-device events. */
+  async getPartnerInsights(input: PartnerInsightsInput): Promise<PartnerInsights> {
+    const db = loadDb();
+    const partner = db.partners.find((p) => p.id === input.partnerId);
+    if (!partner) throw new Error("not_found");
+    const venues = db.venues.filter((v) => v.partner_id === partner.id);
+    const venue = input.venueId ? venues.find((v) => v.id === input.venueId) : null;
+    if (input.venueId && !venue) throw new Error("forbidden");
+    const quests = db.quests.filter((q) => q.partner_id === partner.id);
+    const questIds = new Set(quests.map((q) => q.id));
+    return buildPartnerInsights({
+      partner: { id: partner.id, name: partner.name },
+      venue: venue ? { id: venue.id, name: venue.name, neighborhood: venue.neighborhood ?? null } : null,
+      venues,
+      quests,
+      scans: db.scans.filter((x) => x.partner_id === partner.id),
+      completions: db.completions.filter((c) => c.partner_id === partner.id),
+      redemptions: db.redemptions.filter((r) => r.partner_id === partner.id),
+      notes: db.notes.filter((n) => questIds.has(n.quest_id)),
+      events: readLocalEvents()
+        .filter((e) => e.quest_id && questIds.has(e.quest_id))
+        .map((e) => {
+          const quest = quests.find((q) => q.id === e.quest_id);
+          return {
+            name: e.name,
+            at: e.timestamp,
+            anonymousId: e.anonymous_session_id ?? null,
+            questId: e.quest_id ?? null,
+            // Attribution from the quest row, as the RPC does.
+            venueId: quest?.venue_id ?? null,
+            partnerId: partner.id,
+            actionType: e.action_type ?? null,
+            source: typeof e.props?.source === "string" ? e.props.source : null,
+          };
+        }),
+      days: input.days,
+    });
   }
 
   private computeAnalytics(

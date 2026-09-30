@@ -45,3 +45,9 @@ Product-owner decision superseding the 0014-era rule that socials are a single L
 **2026-09-28 — The app bottom nav has exactly three tabs: Rewards, Map, You.**
 No camera/scan tab: capture belongs to quest actions that need a photo, and venue codes open from the phone's own camera (`/scan/<code>`). Explore/Quests/quest pages sit under Map; Saved quests moved to the Profile page; `/app/rewards` is now mounted.
 
+**2026-09-30 — Partner Insights: read-only analytics for partners and admins.**
+Product-owner decision that supersedes PD-1 (docs/engineering/PRODUCTION_SPRINT_PLAN.md) for analytics only.
+- `/partner` (partner overview) and `/partner/venues/:venueId` (one venue) are mounted.
+- Admins see every partner. A partner login sees only its own partner, enforced by `owns_partner()` in `partner_insights()` (0021).
+- Analytics only: the old partner pages for quests, rewards and QR codes stay unmounted, and quest content stays curated by SideQuests.
+

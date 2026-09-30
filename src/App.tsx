@@ -12,6 +12,7 @@ import { SignInPromptProvider } from "@/contexts/SignInPromptContext";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { DemoBanner } from "@/components/DemoBanner";
 import { BackendFallbackBanner } from "@/components/BackendFallbackBanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
@@ -51,6 +52,8 @@ import NotFound from "./pages/NotFound";
 
 // Concept/pitch microsite: lazy so its fonts, styles and code stay out of the main bundle.
 const IIIPoints = lazy(() => import("./pages/IIIPoints"));
+// Partner Insights: lazy so the charting library only loads for partners/admins.
+const PartnerInsights = lazy(() => import("./pages/partner/PartnerInsights"));
 
 const queryClient = new QueryClient();
 
@@ -103,6 +106,21 @@ const App = () => (
 
                       {/* Public profile (read-only, privacy-safe) */}
                       <Route path="/u/:username" element={<PublicProfile />} />
+
+                      {/* Partner Insights: read-only analytics (owner or admin; enforced in partner_insights) */}
+                      {["/partner", "/partner/venues/:venueId"].map((path) => (
+                        <Route
+                          key={path}
+                          path={path}
+                          element={
+                            <ProtectedRoute>
+                              <Suspense fallback={<LoadingScreen />}>
+                                <PartnerInsights />
+                              </Suspense>
+                            </ProtectedRoute>
+                          }
+                        />
+                      ))}
 
                       {/* Quest detail & QR resolution */}
                       <Route path="/quests/:questId" element={<QuestDetail />} />

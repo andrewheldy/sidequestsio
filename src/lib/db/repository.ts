@@ -14,6 +14,8 @@
 
 import type {
   AnalyticsSummary,
+  PartnerInsights,
+  PartnerInsightsInput,
 } from "./types";
 import type {
   AuditLog,
@@ -262,6 +264,8 @@ export interface Repository {
 
   // --- Analytics ---------------------------------------------------------
   getPartnerAnalytics(partnerId: string): Promise<AnalyticsSummary>;
+  /** Partner or venue dashboard (0021 partner_insights; owner or admin only). */
+  getPartnerInsights(input: PartnerInsightsInput): Promise<PartnerInsights>;
   getPlatformAnalytics(): Promise<AnalyticsSummary>;
 
   // --- Audit -------------------------------------------------------------
