@@ -1,0 +1,78 @@
+{
+  "spec_id": "quest-card-depth-feedback",
+  "date": "2026-08-15",
+  "owner": "Andrew Heldy",
+  "brief_ref": "DESIGN_BRIEF.md",
+  "registry_entries_used": ["emil-design-skills", "motion-intelligence"],
+  "objective": "Pointer users need immediate, restrained confirmation that a photography-led quest card opens a real quest detail surface.",
+  "semantic_purpose": "confirm-action",
+  "surface": "product-ui",
+  "trigger": { "interaction": "hover", "frequency": "frequent", "input_methods": ["pointer"] },
+  "elements": [
+    { "target": ".quest-card", "properties": ["transform"], "role": "container" },
+    { "target": ".quest-card__image", "properties": ["transform"], "role": "supporting" }
+  ],
+  "spatial_relationship": "The card lifts two pixels toward the pointer while its photograph moves only 1.5 percent closer within the fixed crop.",
+  "engine": "css-transition",
+  "selection_rationale": {
+    "escalation_reason": "Tier zero would remove a useful click-affordance cue; the known two-state values require only CSS.",
+    "rejected_alternatives": [
+      { "engine": "none", "why_not": "Photography-led cards otherwise have little pointer-specific affordance beyond the cursor." }
+    ],
+    "new_dependency": false
+  },
+  "sequence": [
+    { "step": 1, "target": ".quest-card", "change": "translateY(0) to translateY(-2px)" },
+    { "step": 2, "target": ".quest-card__image", "change": "scale(1) to scale(1.015)", "offset": "0s" }
+  ],
+  "timing": {
+    "duration_ms": 140,
+    "delay_ms": 0,
+    "stagger_ms": 0,
+    "derivation": "Hover is frequent and travel is two pixels or less, so the interaction uses the approved fast token and stays below the brand's larger 220 millisecond card ceiling."
+  },
+  "easing": {
+    "kind": "cubic-bezier",
+    "curve": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    "exit_curve": "cubic-bezier(0.4, 0, 1, 1)",
+    "character": "Responsive and grounded, with no spring or game-like bounce."
+  },
+  "interruption": { "behavior": "reverse-from-current", "notes": "CSS transitions naturally reverse when the pointer leaves mid-flight." },
+  "responsive": {
+    "mobile": "No hover motion; tap feedback is the browser-visible active state without travel.",
+    "tablet": "Runs only when the primary pointer reports hover capability.",
+    "desktop": "Two-pixel lift and 1.015 image scale on hover-capable pointers only.",
+    "orientation_or_input_notes": "The effect never runs for touch or keyboard activation."
+  },
+  "reduced_motion": {
+    "strategy": "none",
+    "end_state_preserved": true,
+    "implementation": "Hover transitions are defined only inside both prefers-reduced-motion: no-preference and hover:hover media queries.",
+    "vestibular_review": "Tiny local movement only; no large-area zoom or peripheral loop."
+  },
+  "keyboard_and_focus": {
+    "runs_on_keyboard_trigger": false,
+    "focus_behavior": "Keyboard focus uses an immediate three-pixel focus ring and never applies the hover transform."
+  },
+  "ssr": { "renders_on_server": false, "initial_state": "Static card at its resting transform.", "hydration_strategy": "Pure CSS; no hydration branch." },
+  "cleanup": { "unmount_behavior": "No runtime instance exists.", "route_change_behavior": "No runtime instance exists.", "instances_expected_after_unmount": 0 },
+  "performance_budget": {
+    "compositor_only": true,
+    "added_bytes_gz": 0,
+    "frame_rate_floor": 60,
+    "cls_contribution": "None; transform does not alter card layout.",
+    "inp_notes": "Navigation is immediate and never awaits motion."
+  },
+  "verification": {
+    "method": "playwright-mcp",
+    "required_checks": ["RM-1", "RM-2", "A11Y-1", "A11Y-2", "PERF-1", "CON-1", "VP-1", "VP-2", "VP-3", "OVF-1", "CLS-1", "NAV-1", "NAV-2", "CLEAN-1", "CLEAN-2", "HOV-1", "HOV-2"],
+    "viewport_matrix": ["375x812", "768x1024", "1440x900"],
+    "preference_matrix": ["no-preference", "reduce"]
+  },
+  "acceptance_criteria": [
+    "Hover feedback completes in 140 milliseconds and reverses cleanly.",
+    "Touch and keyboard activation do not trigger movement.",
+    "Reduced-motion mode leaves the card static and fully actionable.",
+    "The effect causes no layout shift or overflow."
+  ]
+}

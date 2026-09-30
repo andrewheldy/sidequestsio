@@ -17,7 +17,7 @@ interface AppLayoutProps {
  * @deprecated Do NOT use inside the /app route shell (src/pages/app/AppLayout.tsx)
  * — that shell already provides the column and BottomNav, and nesting this
  * wrapper doubles both. Mounted pages render <AppHeader /> + content directly.
- * Only the currently-unmounted pages (Wallet, Rewards, Leaderboard, History,
+ * Only the currently-unmounted pages (Wallet, Leaderboard, History,
  * AppHome) still use this; migrate them the same way if/when they mount.
  */
 export default function AppLayout({

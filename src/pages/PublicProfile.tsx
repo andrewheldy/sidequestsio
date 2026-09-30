@@ -87,7 +87,7 @@ function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
         {/* Decorative gradient banner */}
         <div
           aria-hidden
-          className="h-16 bg-gradient-to-br from-coral/30 via-primary/10 to-turquoise/20"
+          className="h-16 bg-navy"
         />
 
         <div className="flex flex-col items-center px-5 pb-6 text-center">
@@ -100,7 +100,7 @@ function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-coral to-turquoise text-3xl font-bold text-primary-foreground">
+              <div className="flex h-full w-full items-center justify-center bg-navy text-3xl font-bold text-sand-soft">
                 {name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -155,7 +155,7 @@ function PublicProfileView({ profile }: { profile: PublicProfileRow }) {
       {/* ── Stats ───────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3">
         <StatTile icon={<Trophy className="h-5 w-5 text-coral" />} value={`Lv ${profile.level}`} label="Level" />
-        <StatTile icon={<Award className="h-5 w-5 text-turquoise" />} value={`${profile.xp}`} label="XP" />
+        <StatTile icon={<Award className="h-5 w-5 text-gold-strong" />} value={`${profile.xp}`} label="XP" />
       </div>
 
       <XpMeter xp={profile.xp} level={profile.level} />

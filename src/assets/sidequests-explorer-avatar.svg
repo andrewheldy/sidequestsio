@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="sq-explorer-title">
+  <title id="sq-explorer-title">sidequests explorer</title>
+  <defs>
+    <radialGradient id="sq-explorer-bg" cx="50%" cy="28%" r="78%">
+      <stop offset="0" stop-color="#1D2C4F"/>
+      <stop offset="1" stop-color="#0D1321"/>
+    </radialGradient>
+    <clipPath id="sq-explorer-clip">
+      <circle cx="48" cy="48" r="48"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#sq-explorer-clip)">
+    <rect width="96" height="96" fill="url(#sq-explorer-bg)"/>
+    <!-- Contour lines: the map they're exploring -->
+    <path d="M-4 22c14-8 24 2 38-4s22-14 36-10 18 10 30 6" fill="none" stroke="#F2E8D5" stroke-width="1" opacity=".08"/>
+    <path d="M-4 12c14-8 26 0 40-6s22-12 36-8 16 8 28 4" fill="none" stroke="#F2E8D5" stroke-width="1" opacity=".06"/>
+    <!-- Character, zoomed so it still reads at nav size (36px) -->
+    <g transform="translate(48 56) scale(1.28) translate(-48 -54)">
+      <!-- The doorway they just stepped through -->
+      <path d="M20 100V46a28 28 0 0 1 56 0v54" fill="none" stroke="#2563EB" stroke-width="4.5" opacity=".6"/>
+      <!-- Ocean tee + Palm backpack straps -->
+      <path d="M17 100c1-18 13-27 31-27s30 9 31 27Z" fill="#2563EB"/>
+      <path d="M35 77.5V100M61 77.5V100" stroke="#2E7D5A" stroke-width="4.5" stroke-linecap="round"/>
+      <!-- Neck + face -->
+      <rect x="42.5" y="62" width="11" height="12" rx="4" fill="#E2CDA5"/>
+      <circle cx="48" cy="50" r="16" fill="#F2E8D5"/>
+      <!-- Reward Gold bucket hat: soft crown, drooping brim, brand sparkle -->
+      <path d="M34.5 42.5 36.8 31.5Q48 25.5 59.2 31.5L61.5 42.5Z" fill="#F2B94B"/>
+      <path d="M35.2 39.2h25.6l.6 3.3H34.6Z" fill="#0D1321" opacity=".22"/>
+      <path d="M25 46.5Q48 36.5 71 46.5 69.5 49.5 66 49.2 48 43 30 49.2 26.5 49.5 25 46.5Z" fill="#F2B94B"/>
+      <path d="m48 29.2 1.2 2.5 2.5 1.2-2.5 1.2-1.2 2.5-1.2-2.5-2.5-1.2 2.5-1.2Z" fill="#0D1321"/>
+      <!-- Face -->
+      <circle cx="42.5" cy="53" r="2.1" fill="#0D1321"/>
+      <circle cx="53.5" cy="53" r="2.1" fill="#0D1321"/>
+      <circle cx="38.6" cy="58" r="2.3" fill="#FF6F61" opacity=".5"/>
+      <circle cx="57.4" cy="58" r="2.3" fill="#FF6F61" opacity=".5"/>
+      <path d="M44 58.4c2.3 2.5 5.7 2.5 8 0" fill="none" stroke="#0D1321" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

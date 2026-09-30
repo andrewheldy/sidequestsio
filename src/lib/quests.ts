@@ -34,6 +34,8 @@ export interface Quest {
   social_share_prompt?: string | null;
   staff_phrase?: string | null;
   estimated_time?: string | null;
+  /** NULL/absent = once ever; N = repeatable N days after the last completion. */
+  repeatCooldownDays?: number | null;
 }
 
 /** UI category labels — DB `quest_category` values map onto these via

@@ -14,6 +14,8 @@
 
 import type {
   AnalyticsSummary,
+  PartnerInsights,
+  PartnerInsightsInput,
 } from "./types";
 import type {
   AuditLog,
@@ -32,6 +34,7 @@ import type {
   Quest,
   QuestAttempt,
   QuestCompletion,
+  QuestInstance,
   QuestWithContext,
   QrCode,
   Reward,
@@ -63,6 +66,22 @@ export interface RecordScanInput {
   anonymousSessionId: string;
 }
 
+export interface RecordCodeScanInput {
+  /** The code from /scan/<code> (printed QR or NFC tag). */
+  code: string;
+  userId?: string | null;
+  anonymousSessionId: string;
+}
+
+export interface RecordCodeScanResult {
+  ok: boolean;
+  error?: "invalid_code";
+  questId?: string;
+  codeKind?: "qr" | "nfc";
+  /** A code-verified scan; QR/NFC quests need one to complete. */
+  scan?: ScanEvent;
+}
+
 export interface CompleteQuestInput {
   userId: string;
   questId: string;
@@ -70,11 +89,16 @@ export interface CompleteQuestInput {
   /** Required when the quest uses `venue_code` verification. */
   venueCode?: string;
   sourceScanId?: string | null;
+  /** The generated instance being completed; fixes the rewards paid. */
+  instanceId?: string | null;
 }
 
 export type CompleteQuestError =
   | "not_found"
   | "already_completed"
+  | "cooldown"
+  | "instance_invalid"
+  | "scan_required"
   | "quest_inactive"
   | "quest_expired"
   | "verification_failed";
@@ -87,6 +111,20 @@ export interface CompleteQuestResult {
   pointsAwarded?: number;
   newLevel?: number;
   leveledUp?: boolean;
+  /** Set with `cooldown`: when the quest can be done again. */
+  availableAt?: string;
+}
+
+/**
+ * What a signed-in user can do with a quest right now. `instance` is the
+ * objective generated for them (null when the quest has no frameworks, so the
+ * static quest applies).
+ */
+export interface QuestOffer {
+  status: "available" | "already_completed" | "cooldown";
+  instance: QuestInstance | null;
+  /** Set with `cooldown`: when the quest can be done again. */
+  availableAt?: string | null;
 }
 
 export interface RedeemRewardInput {
@@ -168,16 +206,26 @@ export interface Repository {
   // --- QR codes ----------------------------------------------------------
   getQrByCode(code: string): Promise<QrCode | null>;
   listQrCodes(partnerId?: string): Promise<QrCode[]>;
-  createQrCode(input: { questId: string; partnerId: string; venueId?: string | null }): Promise<QrCode>;
+  createQrCode(input: {
+    questId: string;
+    partnerId: string;
+    venueId?: string | null;
+    kind?: "qr" | "nfc";
+  }): Promise<QrCode>;
 
   // --- Scans -------------------------------------------------------------
+  /** Unverified scan (page view, direct /q/ link). */
   recordScan(input: RecordScanInput): Promise<ScanEvent>;
+  /** Resolves a scanned venue code server-side and records a verified scan. */
+  recordCodeScan(input: RecordCodeScanInput): Promise<RecordCodeScanResult>;
   markScanConverted(scanId: string, state: ScanEvent["conversion_state"]): Promise<void>;
   listScans(filter?: { partnerId?: string; questId?: string; limit?: number }): Promise<ScanEvent[]>;
 
   // --- Attempts & completion --------------------------------------------
   startQuest(userId: string, questId: string): Promise<QuestAttempt>;
   hasCompleted(userId: string, questId: string): Promise<boolean>;
+  /** Generates (or returns the open) objective for this user's visit. */
+  getQuestOffer(userId: string, questId: string): Promise<QuestOffer>;
   completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult>;
   listCompletions(userId: string): Promise<QuestCompletion[]>;
 
@@ -216,6 +264,8 @@ export interface Repository {
 
   // --- Analytics ---------------------------------------------------------
   getPartnerAnalytics(partnerId: string): Promise<AnalyticsSummary>;
+  /** Partner or venue dashboard (0021 partner_insights; owner or admin only). */
+  getPartnerInsights(input: PartnerInsightsInput): Promise<PartnerInsights>;
   getPlatformAnalytics(): Promise<AnalyticsSummary>;
 
   // --- Audit -------------------------------------------------------------

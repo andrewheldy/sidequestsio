@@ -29,7 +29,7 @@ export const de: Translations = {
         { main: "Entdecke Orte durch Menschen, nicht Feeds", sub: "Brotkrumen sind kurze Notizen von echten Besuchern — keine Follower, kein Lärm." },
         { main: "Community ohne Einfluss", sub: "Keine Likes. Keine Rankings. Nur geteilte Entdeckungen an echten Orten." },
         { main: "Hinterlasse eine Spur. Hilf dem nächsten Entdecker.", sub: "Hinterlasse nach jedem Quest einen Brotkrumen — einen Tipp, einen Moment, eine Erinnerung." },
-        { main: "Mehr erkunden. Weniger scrollen.", sub: "SideQuests belohnt Neugier in der echten Welt, nicht Bildschirmzeit." },
+        { main: "Mehr erkunden. Weniger scrollen.", sub: "sidequests belohnt Neugier in der echten Welt, nicht Bildschirmzeit." },
         { main: "Verwandle die echte Welt in ein spielbares Abenteuer", sub: "Scanne QR-Codes, checke ein und steige auf, indem du Orte besuchst." },
         { main: "Kein Feed. Eine Spur.", sub: "Jeder Quest hat sein eigenes lebendiges Message Board — geformt von Entdeckern." },
         { main: "Die besten Orte sind nicht im Trend", sub: "Sie werden entdeckt, leise geteilt und durch Brotkrumen weitergegeben." },
@@ -71,7 +71,7 @@ export const de: Translations = {
     },
     hosts: {
       title: 'Erstelle Quests für Deine Community',
-      description: 'Bist du Veranstaltungsort-Besitzer, Event-Organisator oder lokaler Experte? Werde Partner von SideQuests.',
+      description: 'Bist du Veranstaltungsort-Besitzer, Event-Organisator oder lokaler Experte? Werde Partner von sidequests.',
       cta: 'Gastgeber Werden',
     },
   },
@@ -96,7 +96,7 @@ export const de: Translations = {
     },
   },
   communityNotesPage: {
-    badge: 'Das Herz von SideQuests',
+    badge: 'Das Herz von sidequests',
     title: 'Hinterlasse eine Spur,',
     titleHighlight: 'Hilf Anderen zu Finden',
     description: 'Brotkrumen sind kurze Notizen und Fotos, die Entdecker an Quest-Orten hinterlassen. Sie sind anonym, hilfreich und völlig frei von Social-Media-Dynamiken.',
@@ -160,14 +160,14 @@ export const de: Translations = {
     },
     cta: {
       title: 'Findest Du Deine Nische Nicht?',
-      description: 'Wir expandieren ständig. Hast du eine Kategorie im Kopf, die noch nicht existiert? Lass es uns wissen und hilf, die Zukunft von SideQuests zu gestalten.',
+      description: 'Wir expandieren ständig. Hast du eine Kategorie im Kopf, die noch nicht existiert? Lass es uns wissen und hilf, die Zukunft von sidequests zu gestalten.',
       button: 'Kontaktiere Uns',
     },
   },
   partnerships: {
     badge: 'Partnerschaften',
     title: 'Partner von',
-    titleHighlight: 'SideQuests',
+    titleHighlight: 'sidequests',
     description: 'Werde Teil eines wachsenden Netzwerks von Orten, Marken und Communities, die an authentische Entdeckung glauben.',
     whoTitle: 'Wer Mit Uns Partnert',
     types: {
@@ -231,7 +231,7 @@ export const de: Translations = {
       completionsLabel: 'Abschlüsse',
     },
     benefits: {
-      title: 'Warum auf SideQuests hosten',
+      title: 'Warum auf sidequests hosten',
       items: [
         { title: 'Kostenlos Starten', description: 'Quests erstellen und hosten ist völlig kostenlos. Keine versteckten Kosten.' },
         { title: 'Einfaches Dashboard', description: 'Verfolge Abschlüsse, Brotkrumen und Engagement auf einen Blick.' },

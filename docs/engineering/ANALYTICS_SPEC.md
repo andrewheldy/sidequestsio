@@ -314,6 +314,101 @@ Avoid ambiguous event names.
 
 ---
 
+# Implementation (2026-09-28)
+
+## Pipeline
+
+`track(name, context)` (`src/lib/analytics/events.ts`) is the only call-site API. Components never call vendor SDKs. Quest-page code goes through `trackQuestEvent` / `trackQuestEventOnce` (`src/lib/analytics/questEvents.ts`), which attach attribution and action identity.
+
+Sinks:
+
+- on-device ring buffer (localStorage, 500 events), always on;
+- `console.debug("[analytics]", …)` in dev builds only;
+- Supabase (`src/lib/analytics/supabaseSink.ts` → `record_analytics_events`, migration 0020). It is off unless `VITE_ANALYTICS_SINK=supabase`. As a *remote* sink it only receives events from visitors who accepted analytics cookies.
+
+Every sink runs in its own try/catch. Outbound links fire tracking synchronously in the click handler and open in a new tab, so analytics never delays navigation.
+
+## Envelope
+
+Every event carries:
+
+- `name`, `timestamp`
+- `anonymous_session_id` (per browser) and `session_id` (per tab)
+- `user_id`
+- `page_path` (no query string), `device_type`, `viewport_width`
+
+Quest events add:
+
+- attribution: `quest_id`, `venue_id`, `partner_id`, `campaign_id`, `activation_id` (the last two are null until columns exist)
+- action identity: `action_id`, `action_type`, `tracking_id` (a stable CTA id such as `quest.primary.complete`, `quest.optional.instagram`, `venue.website`, `nav.back`)
+- `props`: `page_view_id`, `source` (qr | nfc | scan | scan_link | in_app | external | direct), `utm_*`, `quest_category`, `venue_name`, `action_position`, `points_available`, `xp_available`, `verification_type`, `destination_domain`
+
+No precise user location is collected. The venue is the geography.
+
+## Quest page events
+
+| Event | Fires when |
+|---|---|
+| `quest_page_viewed` | route entered (before data) |
+| `quest_page_loaded` | data rendered; `load_ms` |
+| `quest_load_failed` | error, timeout, not found |
+| `quest_hero_viewed` | hero painted (`hero_image`: loaded / fallback) |
+| `quest_back_clicked`, `quest_share_clicked`, `quest_save_toggled` | hero controls |
+| `quest_primary_action_viewed` / `reward_impression` | action card / points badge ≥50% visible |
+| `quest_primary_action_clicked` | CTA tap (`cta_state`: available, signed_out, locked) |
+| `quest_primary_action_started` | completion confirmed |
+| `quest_primary_action_completed` + `reward_earned` | server accepted; `points_awarded`, `xp_awarded` |
+| `quest_primary_action_failed` | server rejected (`reason`) |
+| `quest_action_failed` | unexpected error (network) |
+| `quest_optional_action_viewed` / `_clicked` | Explore & Share impression / outbound click |
+| `quest_optional_action_completed` | **reserved** — only a verified completion may emit it; none exists yet |
+| `venue_card_viewed`, `venue_website_clicked` | venue card |
+| `nav_rewards_clicked`, `nav_map_clicked`, `nav_profile_clicked` | bottom nav (all pages) |
+
+Impressions and page-level events are de-duplicated per page view. A click is never a completion.
+
+## Before production
+
+- Apply `0020_analytics_events.sql` and set `VITE_ANALYTICS_SINK=supabase`.
+- Decide consent UX: the cookie banner defaults analytics to off, so only opted-in visitors are counted.
+- `record_analytics_events` is callable by anon. Add rate limiting (for example an edge function, or a per-session cap) before relying on the numbers.
+- Build `analytics_rollups` from `analytics_events` for the partner dashboard.
+
+---
+
+## Partner Insights dashboard (2026-09-30)
+
+- **Routes:**
+  - `/partner` is the partner overview across all venues, with a venue table and a partner picker for admins.
+  - `/partner/venues/:venueId` shows the same view for one venue.
+  - Both offer 7, 30 or 90 days. The entry point is "Partner Insights" on the Profile page, shown only to people with access.
+- **Data:** `partner_insights(partner, venue?, days)` (migration 0021) returns aggregates only:
+  - page views, unique and repeat visitors;
+  - verified check-ins (QR/NFC scans);
+  - the funnel (viewed → saw challenge → tapped → started → completed);
+  - completions with points and XP issued;
+  - website, review and social clicks;
+  - rewards redeemed (partner level only) and approved Community Notes;
+  - a daily series, per-quest and per-venue tables, and click and source breakdowns.
+  - Sources are hidden when there are only 1–4 visitors.
+- **Counts:** views, visitors, funnel steps and clicks only include visitors who accepted analytics cookies. Check-ins, completions, points, rewards and notes are complete counts.
+- **Local/dev:** `src/lib/partner/insights.ts` mirrors the RPC for the Local and Mock repositories. Dev builds show deterministic demo activity.
+- **Access (run in the SQL editor):**
+
+  ```sql
+  -- Give a partner's login access to its dashboard
+  update public.partners
+     set owner_user_id = (select id from public.users where email = 'owner@venue.com')
+   where id = '<partner uuid>';
+
+  -- Make an account a SideQuests admin (sees every partner)
+  update public.users set role = 'admin' where email = 'you@sidequests.io';
+  ```
+
+  The UI reads `users.role`, the same field `is_admin()` checks, not editable auth metadata.
+
+---
+
 # Dashboard Requirements
 
 ## Executive Dashboard

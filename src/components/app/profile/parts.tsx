@@ -44,7 +44,7 @@ export function XpMeter({ xp, level }: { xp: number; level: number }) {
         aria-label="Level progress"
       >
         <div
-          className="h-full rounded-full bg-gradient-to-r from-coral to-turquoise transition-all duration-500"
+          className="h-full rounded-full bg-ocean transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>

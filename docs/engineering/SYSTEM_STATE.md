@@ -185,3 +185,91 @@ These are carried forward from the Codex production audit and have **not** been 
 - **Direct table update outside the RPC layer**: `SupabaseRepository`'s scan-conversion path (`markScanConverted`) updates `scan_events` directly rather than through an RPC, while RLS for that table has no corresponding update policy per the Codex audit — a potential silent-failure path, not re-verified this session.
 - **Multiple `SECURITY DEFINER` RPCs are broadly executable** by `anon`/`authenticated` without additional restriction (§4) — flagged by Supabase's own advisors, not addressed this session.
 - **Leaked-password protection is disabled** in Supabase Auth (§4).
+
+---
+
+## Update 2026-09-28 — Migrations 0016 and 0017 applied
+
+Verified against production (`wvedvngtuzsttpavmgjw`) through the Supabase connector:
+
+- **Applied `0016_rls_hardening.sql`** (ledger `20260928015058`):
+  - `is_admin()`, `owns_partner()` and `app_uid()` are `SECURITY DEFINER`.
+  - Venue-code secrets live in the server-only `quest_secrets` table.
+  - `community_notes_with_author` returns only approved notes, the viewer's own, or everything for
+    admins.
+- **Applied `0017_quest_frameworks.sql`** (ledger `20260928031102`):
+  - New `quest_frameworks` and `quest_instances` tables, plus `quests.repeat_cooldown_days`.
+  - `generate_quest_instance()`.
+  - `complete_quest(…, p_instance_id)` enforces the repeat rule; `unique (user_id, quest_id)` is
+    dropped.
+  - No frameworks are authored yet, so every quest still shows its static objective.
+- **Pending: `0018_scan_verification.sql`** (scan enforcement, NFC tags, `record_scan` fix). Apply it
+  after the PR #40 app is deployed.
+- **Live facts:**
+  - 9 active quests, all QR, one code each (`destination_url` `/q/<quest id>`).
+  - 7 auth users and 1 quest completion.
+  - **Zero `scan_events` rows ever**, because `record_scan()` fails on a missing enum cast (fixed
+    in 0018).
+  - 0 of 9 active quests have Fable content.
+- **Migration ledger:** records 0001–0004, 0016 and 0017. 0005–0015 were applied out-of-band;
+  `scripts/verify-db.sql` checks 1–16 all pass.
+- **Production-only policies (in no migration):**
+  - `profiles` "Public SideQuests profiles are viewable" (`is_public = true`).
+  - `user_profiles` "profiles_self_insert".
+
+---
+
+## Update 2026-09-28 (later) — Migration 0018 applied; PR #40 deployed
+
+- **PR #40 is live in production** (`main` `a2d41b6`). It adds generated quests, the Explore
+  rotation, and the QR/NFC scan flow with "Scan to unlock".
+- **Applied `0018_scan_verification.sql`** (ledger `20260928031347`):
+  - Venue codes have a `kind` (`qr` or `nfc`), are no longer publicly readable, and point at
+    `/scan/<code>`.
+  - `record_code_scan()` records verified scans.
+  - `record_scan()` works again (it had failed on every call since 0003).
+  - `complete_quest()` requires a recent, unused, code-verified scan for QR/NFC quests.
+- `scripts/verify-db.sql` checks 1–16 and 18–26 pass. Check 17 (Fable content authored) still
+  fails: 0 of 9 quests have it.
+- **Migration ledger:** 0001–0004, 0016, 0017, 0018.
+- **Operational follow-up:** the 9 physical codes must encode
+  `https://miamisidequests.io/scan/<code>`. Old `/q/<quest id>` stickers can't unlock a quest.
+
+---
+
+## Update 2026-09-28 (quest page) — code only, not yet deployed
+
+- `/quests/:questId` now renders the reusable quest page template (see `docs/DECISIONS.md`, 2026-09-28). The route is unchanged.
+- The global bottom nav is Rewards / Map / You. `/app/rewards` is now **mounted**; `/app/wallet`, `/app/leaderboard` and `/app/history` are still unmounted.
+- **Pending migrations, authored but not applied:**
+  - `0019_venue_about.sql`: `venues.description`, `venues.image_url`. The app reads them optionally.
+  - `0020_analytics_events.sql`: `analytics_events` plus `record_analytics_events()`. Nothing writes to it until `VITE_ANALYTICS_SINK=supabase` is set.
+- The Frost Museum sample quest exists only in dev/mock and LocalRepository data, not in production.
+
+## Update 2026-09-28 (later) — Migrations 0019 and 0020 applied
+
+Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. There was no backup: the owner chose to proceed because both migrations only add schema.
+
+- **Ledger:** `0019_venue_about` and `0020_analytics_events` are now recorded.
+- **0019:** `venues.description` and `venues.image_url` exist. They are empty on all 9 live venues.
+- **0020:** `analytics_events` exists with RLS on, and anon/authenticated cannot insert or read it directly.
+  - `record_analytics_events()` is `SECURITY DEFINER` and executable by anon.
+- **Rolled-back live test of the RPC, as anon:**
+  - It wrote a valid event, with the partner taken from the quest (a spoofed `partner_id` was ignored).
+  - It skipped an invalid event name and clamped a bad timestamp.
+  - The table still has 0 rows, and nothing writes to it until `VITE_ANALYTICS_SINK=supabase` is set.
+- **Frost Museum quest is live:** `supabase/frost_museum_quest.sql` was run on production.
+  - It added partner `…0008`, venue `…0010` and quest `30000000-0000-0000-0000-000000000010` (status `active`), plus one QR venue code.
+  - Production now has **10 active quests**.
+  - Anon can read the quest and venue, but not the code; the code was shared with the owner out of band.
+
+---
+
+## Update 2026-09-30 — Analytics on in production; Partner Insights (code)
+
+- **Production is redeployed from `main` (`daf5d07`)** with `VITE_ANALYTICS_SINK=supabase` (Production only) and `VITE_MAPBOX_PUBLIC_TOKEN`.
+  - Consenting visitors' events now go to `analytics_events` via `record_analytics_events()`.
+- **Partner Insights (`/partner`, `/partner/venues/:venueId`)** is in code and needs **`0021_partner_insights.sql`** applied.
+  - Until then the page shows "Couldn't load insights".
+  - Access is controlled by `partners.owner_user_id` and `users.role = 'admin'`; see ANALYTICS_SPEC.md.
+

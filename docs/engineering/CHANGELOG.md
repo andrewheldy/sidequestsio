@@ -2,6 +2,323 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-09-30 — Partner Insights dashboard; production analytics on
+
+- **Production redeployed** with `VITE_ANALYTICS_SINK=supabase` and a new URL-restricted `VITE_MAPBOX_PUBLIC_TOKEN`.
+  - The live bundle includes the Supabase sink and a public (`pk.`) Mapbox token.
+- **Partner Insights:**
+  - `/partner` and `/partner/venues/:venueId` show read-only analytics per partner and per venue.
+  - It is lazy-loaded, so the chart code only loads for people who open it.
+  - Built on the new `partner_insights()` RPC (`0021_partner_insights.sql`, **not yet applied**).
+  - Tested on Postgres (PGlite) against a production-shaped schema, covering the metrics and access: owner, other partner, venue of another partner, plain user, anon and admin.
+  - A TypeScript twin gives the Local and Mock repositories identical numbers.
+- **Removed:** the superseded, unmounted `PartnerHome` and `PartnerAnalytics` pages.
+
+## 2026-09-28 — Prototype avatar removed; SideQuests explorer avatar
+
+- Removed `src/assets/prototype-avatar.webp`: the temporary personal photo from the quest-page work is gone.
+- Anyone without a profile photo (guests, or signed-in users who haven't uploaded one) now sees the
+  SideQuests explorer (`src/assets/sidequests-explorer-avatar.svg`) as the "You" avatar in the bottom nav.
+  - It is a brand-palette vector: bucket hat with the discovery sparkle, backpack straps, framed by the doorway.
+  - A broken avatar URL also falls back to it.
+
+## 2026-09-28 — Migrations 0019/0020 applied; Frost quest SQL
+
+- **Applied to production:** `0019_venue_about.sql` and `0020_analytics_events.sql`, with post-checks passing (see `SYSTEM_STATE.md`).
+  - There was no backup: both migrations only add schema.
+- **Added `supabase/frost_museum_quest.sql`:** an idempotent insert of the Frost Museum partner, venue, quest and one venue code.
+  - The code is generated at run time and printed with its sticker URL.
+  - It passed a rolled-back dry run, then was **run on production**: the Frost quest is live at
+    `/quests/30000000-0000-0000-0000-000000000010`, with one QR code. Production now has 10 active quests.
+  - **Action needed:** print the Frost sticker with its `/scan/<code>` URL (shared with the owner).
+
+## 2026-09-28 — Reusable quest page, three-tab nav, quest analytics
+
+- **Quest page replaced** (`/quests/:questId`, same route) with the new location-first design:
+  hero → intro → required action → Explore & Share → venue card → Community Notes. One template,
+  fed by `buildQuestPageModel()` (`src/lib/quests/questPage.ts`) from the existing
+  `QuestWithContext` shape. Completion still uses the existing flow (startQuest → completeQuest RPC
+  → capture camera, now lazy-loaded). Removed the superseded `AboutActions`, `InfoCards`,
+  `RewardCard`, `QuestObjectiveCard` and `BusinessAvatar` components.
+- **Global bottom nav** is now Rewards / Map / You (no scan item). `/app/rewards` is mounted;
+  Saved quests is linked from Profile.
+- **Prototype avatar (temporary):** signed-in users without an avatar see
+  `src/assets/prototype-avatar.webp` in the nav. **Remove before public launch.**
+- **Analytics:** quest-page event catalogue (`src/types/events.ts`), `trackQuestEvent` /
+  `trackQuestEventOnce` (`src/lib/analytics/questEvents.ts`), one-shot impression hook
+  (`src/hooks/useImpression.ts`), a dev-only console sink, and consent gating for remote sinks.
+  Events still only reach the on-device buffer unless `VITE_ANALYTICS_SINK=supabase` is set.
+- **New migrations, not applied:** `0019_venue_about.sql` (`venues.description`,
+  `venues.image_url`) and `0020_analytics_events.sql` (`analytics_events` table +
+  `record_analytics_events()` RPC). Both are idempotent; apply after a backup.
+- **"No quest found" 404:** missing quests and every unknown route show one shared doorway screen
+  (`src/components/app/NoQuestFound.tsx`). The door swings open onto an empty path, and rests
+  open under reduced motion. The network-error state keeps its retry screen.
+- **Sample content:** the Frost Museum of Science quest in `src/data/mock/quests.json` (dev) and
+  the LocalRepository seed (`STORE_VERSION` 6). It is not in production.
+
+## 2026-09-28 — Migration 0018 applied; PR #40 live
+
+- PR #40 was merged to `main` (`a2d41b6`) and deployed to Vercel production. Then
+  `0018_scan_verification.sql` was applied to production (ledger `20260928031347`).
+- **All `scripts/verify-db.sql` checks 18–26 pass in production:**
+  - venue codes are private and point at `/scan/<code>` (9 QR codes backfilled);
+  - `record_code_scan()` exists and scans carry `code_verified`;
+  - `complete_quest()` requires a verified scan for QR/NFC quests.
+- **Rolled-back live test** (nothing persisted):
+  - `record_code_scan()` accepts a real code case-insensitively and records a verified scan;
+  - it rejects a bad code;
+  - `record_scan()` records again, which fixes P12.
+- **Action needed:** re-encode the 9 venue stickers (or write NFC tags) with
+  `https://miamisidequests.io/scan/<code>`. Stickers that encode the old `/q/<quest id>` link open
+  the quest but show "Scan to unlock". See `PARTNERSHIP_PLAYBOOK.md`, "Venue codes".
+
+## 2026-09-28 — Migrations 0016 and 0017 applied to production
+
+- Both were applied to `wvedvngtuzsttpavmgjw` with the Supabase connector's `apply_migration`.
+  The ledger records them as `20260928015058 0016_rls_hardening` and
+  `20260928031102 0017_quest_frameworks`. The ledger also lists 0001–0004; 0005–0015 were applied
+  out-of-band.
+- **Pre-checks passed:**
+  - The live `complete_quest` matched 0003.
+  - There were no venue-code secrets to move.
+  - There were no duplicate `(user_id, quest_id)` completions.
+- **Post-checks passed:**
+  - The RLS helpers are `SECURITY DEFINER`.
+  - `quest_secrets`, `quest_frameworks` and `quest_instances` are unreadable by anon.
+  - The notes view is moderation-filtered.
+  - `complete_quest` has the 5-argument signature.
+  - `unique (user_id, quest_id)` is gone.
+  - The one existing completion is intact.
+- **Still pending:** `0018_scan_verification.sql`. Apply it after the PR #40 app is deployed,
+  because the previous app can't produce verified scans.
+
+## 2026-09-28 — QR/NFC quests require a real scan; NFC tags as venue codes
+
+- **Found while checking production (read-only, via the Supabase connector):**
+  - `record_scan()` has failed on every call since 0003, because of a missing enum cast. There
+    are zero scan rows, and `/scan/<code>` hangs.
+  - `complete_quest()` never checked QR scans, and venue codes were publicly readable.
+  - 9 active QR quests with one code each; 1 completion ever.
+- **Added `supabase/migrations/0018_scan_verification.sql`:**
+  - Venue codes get a `kind` (`qr` or `nfc`) and become private.
+  - `record_code_scan()` verifies a scanned code server-side.
+  - `record_scan()` is fixed.
+  - `complete_quest()` requires a recent, unused, code-verified scan for QR/NFC quests.
+  - `create_qr_code()` takes a kind.
+  - `scripts/verify-db.sql` gains checks 24–26.
+- **App:**
+  - `/scan/<code>` resolves through `Repository.recordCodeScan()`. The Supabase version falls back
+    to the old lookup until 0018 is applied.
+  - Scan failures now show an error instead of a spinner.
+  - The quest page shows "Scan to unlock" on QR/NFC quests until the user arrives from a scan,
+    and it keeps the scan through sign-in.
+  - The Local and Mock repositories mirror the rule.
+- **Docs:** `PARTNERSHIP_PLAYBOOK.md` has a new "Venue codes: QR stickers and NFC tags" section
+  (what URL to print, how to write and lock NFC tags, rotating a leaked code). The schema snapshot
+  adds P12, P13 and §13.
+- **Verification:**
+  - Local Postgres 16 with 0001–0018, including a re-run of 0018. All 23 scenarios behaved as
+    intended:
+    - codes are unreadable by anon and other users;
+    - bad, inactive, stale (3h), reused, other-user and other-quest scans are all rejected;
+    - an anonymous scan is claimed after sign-in;
+    - venue-code quests are unaffected;
+    - NFC codes are created and resolved;
+    - the old call signatures still work.
+  - LocalRepository was tested in Node.
+  - Quest page states were checked in a browser.
+  - Typecheck, build and lint pass.
+
+## 2026-09-27 — Quests generated on the spot from curated frameworks
+
+- **Scope change (product owner):** quests may now be generated per user when they open a quest.
+  Recorded in `PRODUCT_DECISION_LOG.md` ("Generated Quests"), `DECISIONS.md` and `PRODUCT_SPEC.md`.
+  Guardrails: curator-written frameworks and templates (no AI), partner venues only, repeatable
+  only after a cooldown the quest opts into.
+- **Added `supabase/migrations/0017_quest_frameworks.sql` (not applied; apply after 0016):**
+  - New tables `quest_frameworks` (templates with `{slot}` placeholders, validated by trigger)
+    and `quest_instances` (one generated objective per visit, stable until completed or 24h).
+  - `generate_quest_instance()` prefers a different framework than the user's last visit.
+  - `quests.repeat_cooldown_days` added. NULL keeps the once-ever rule.
+  - `complete_quest()` takes `p_instance_id` and enforces the repeat rule under an advisory lock.
+    It replaces the dropped `unique (user_id, quest_id)`.
+  - `scripts/verify-db.sql` gains checks 21–23.
+- **App:**
+  - `Repository.getQuestOffer()` is implemented in the Supabase, Local and Mock repositories.
+    The Supabase version falls back to the static quest until 0017 is applied.
+  - The quest page shows the generated objective, instructions, staff phrase and rewards, sends
+    the instance on completion, and says when a new version unlocks.
+  - Explore's "Featured detour" now rotates per user per day (`src/lib/quests/rotation.ts`) and
+    skips quests the user can't do right now.
+  - The local seed gives Wynwood Walls and Gramps frameworks and a 7-day cooldown. The local
+    store version bumps to 5, so local sample data reseeds.
+- **Verification:**
+  - Local Postgres 16 with 0001–0017, including a re-run of 0017 to confirm it is idempotent.
+    Generation, refresh stability, framework rotation, and single-framework slot re-draws all
+    checked out (0 repeats in 12 pairs). So did the cooldown and once-ever rules, instance
+    ownership, a concurrent double-complete (second one got `cooldown`), the old 4-argument
+    call, and private instance reads.
+  - LocalRepository was exercised in Node with the same scenarios.
+  - The Explore rotation had 0 back-to-back repeats over 365 days and spreads evenly across users.
+  - Quest page rendering was checked in a browser against a stubbed instance.
+  - Typecheck and build pass. Lint on the touched files shows no new errors (18 pre-existing).
+
+## 2026-09-27 — Database schema snapshot, live-schema dump script, RLS hardening migration
+
+- **Added `docs/architecture/DATABASE_SCHEMA_SNAPSHOT.md`**, a dated, derived reference of the
+  schema after migrations 0001–0015: Mermaid ER diagram, consolidated DDL, triggers, RPCs, an
+  RLS/grant matrix, storage buckets and known pitfalls. Built to paste into another LLM. The
+  migrations stay authoritative.
+- **Added `scripts/schema-snapshot.sql`**, a read-only query that dumps the live `public` schema
+  (columns, constraints, policies, grants, functions, triggers, indexes, buckets, row counts) as one
+  JSON document for diffing against the snapshot.
+- **Verification:** all 15 migrations were applied in order to a local Postgres 16 with stubbed
+  `auth`/`storage` schemas. The end state matched the snapshot (20 tables, 2 views, 19 enums,
+  42 FKs). 0006 stops at line 434 on a fresh build (P11, below). The live database was not
+  inspected: the session's Supabase MCP was not authenticated.
+- **Pitfalls surfaced** (reproduced locally as `anon`): `quests.verification_secret` is readable
+  by anon (P1); `community_notes_with_author` returns non-approved notes (P2); and
+  `is_admin()`/`owns_partner()` run as the caller, so any draft quest makes anon `SELECT` on
+  `quests` fail with `permission denied for table users` (P10).
+- **Added `supabase/migrations/0016_rls_hardening.sql` (not applied)**, which fixes P1, P2 and P10:
+  - RLS helpers become `SECURITY DEFINER` with an empty `search_path`.
+  - Venue-code secrets move to a server-only `quest_secrets` table. A trigger keeps
+    `quests.verification_secret` NULL so existing writers keep working, and `complete_quest()`
+    (0003's body, only the lookup changed) reads the secret from the new table.
+  - `community_notes_with_author` gets a WHERE clause restating `notes_public_read`.
+  - `scripts/verify-db.sql` gains checks 18–20. They fail on a 0001–0015 build and pass after 0016.
+  - Tested locally, including a re-run of 0016 to confirm it is idempotent. Anon quest reads work
+    with a draft present, the secret is hidden, and non-approved notes are hidden from anon and
+    other users but visible to their author and admins. Right code completes, wrong code fails,
+    and the trigger stores new secrets, ignores blank ones and updates changed ones.
+- **Found, not fixed (P11):** on a fresh build, 0006's `create or replace view
+  community_notes_with_author` fails because 0005 already added `flag_count`. Later migrations
+  re-do what 0006 skips, but any from-scratch build stops there.
+
+## 2026-09-27 — `/iiipoints`: unofficial III Points concept microsite (pitch prototype)
+
+- **New route `/iiipoints`**, a self-contained interactive pitch for the III Points team: quest feed,
+  three concept sponsor quests (Red Bull, Stella Artois, Playboy), a concept festival map, XP/profile,
+  the post-festival Miami continuation, three-sided value, a mock organizer dashboard and a final CTA.
+- **Not a product surface.** All state is session-only in the browser (`QuestState.tsx`); nothing
+  touches Supabase, the repository layer, or real quests/points. Quests, sponsor activations, map
+  and dashboard numbers are labelled as concept/fictional on the page, and the footer carries the
+  unofficial-concept disclaimer. Sponsor names are typeset, not their logo files.
+- **Isolated from the rest of the site.** The page is `React.lazy`-loaded (own ~19 KB gzip JS + ~10 KB
+  CSS chunk); its fonts (Anton, Space Grotesk, IBM Plex Mono), title, `theme-color` and a
+  `robots: noindex, nofollow` meta are added on mount and removed on unmount. Styles are scoped
+  under `.iii` in `src/components/iiipoints/iiipoints.css`.
+- **Analytics:** demo interactions emit one new typed event, `concept_interaction`
+  (`props.page = "iiipoints"`), through the existing `track()` sink.
+- Verified with typecheck + build and headless Chromium at 320/390/1440px: no horizontal overflow,
+  no page errors, and a full scripted play-through (quests, all three sponsor flows, map hidden door,
+  easter egg, level-up) with and without `prefers-reduced-motion`.
+
+## 2026-09-25 — Header lockup: mark and wordmark sized separately
+
+- **The header mark was a smudge, and the brand spec is why.** `logo-horizontal.svg` fixes the mark
+  at ~15% of the lockup's width, so the site header's 150px lockup rendered it ~23px tall and the
+  app header's 128px one ~20px. `brand/README.md`'s own selection table sets `icon.svg`'s minimum at
+  32px while prescribing a 148px horizontal lockup — which yields ~23px. The two rows disagree;
+  nothing was being misused.
+- **`Logo` now composes the lockup** from `icon.svg` + `wordmark.svg` at independent sizes
+  (`sm`/`md`/`lg`), instead of scaling the fixed horizontal file. `md` puts the mark ink at 32px.
+  No artwork changed — this is an arrangement of the existing files. `logo-horizontal.svg` remains
+  the signature for marketing, print and export.
+- **Callers size by step, not width.** The six `<Logo>` sites dropped their `w-[…]` classes for
+  `size`. App chrome uses `sm`, which lands the mark at ~28px: under the 32px floor, but it has to
+  share a 320px header with the bell and avatar, and `icon-small.svg` can't stand in because it
+  paints with `currentColor`, which an `<img>` cannot inherit.
+- **Trade-off recorded:** the wordmark holds at 0.74× the mark's box, leaving the mark's wall ~11%
+  heavier than the wordmark's stroke. Equal weight would need a ~205px lockup. Documented under
+  "Screen lockup" in `brand/README.md`.
+- Verified against the built app over CDP at 320/375/390/1280px: site header, auth, footer (reverse
+  on Midnight Navy) and the app header all clear their neighbours at 320px.
+
+## 2026-09-16 — Brand migration, phase 2: shipped assets, metadata, and the last legacy surfaces
+
+- **Fixed a production-facing asset gap.** `index.html` and `site.webmanifest` referenced
+  `/apple-touch-icon.png`, `/og-image.png`, `/icon-192.png` and `/icon-512.png`, none of which
+  existed in `public/` — social shares rendered with no image and PWA install had no icon. The
+  shipped `favicon.ico` was still the Lovable default heart. All of them are now generated from the
+  brand vectors by `scripts/generate-brand-assets.mjs` (headless Chromium over CDP, no new npm
+  dependency), which writes `favicon.ico` (16/32/48), `favicon.svg`, `favicon-16/32.png`,
+  `apple-touch-icon.png`, `icon-192/512.png`, `icon-maskable-512.png`, `mask-icon.svg` and a
+  1200 × 630 `og-image.png` built from `scripts/brand/og-image.html`.
+- **Metadata.** `theme-color` and the manifest's `theme_color`/`background_color` moved from Ocean
+  Blue to Midnight Navy `#0D1321`; added SVG favicon + 16/32 PNG + Safari mask-icon links, Apple
+  web-app meta, `og:locale`, `og:image:{type,width,height,alt}`, `twitter:image:alt`, and `image` on
+  the Organization JSON-LD. Manifest gained `id`, `scope`, `lang`, `categories` and a maskable icon.
+  `start_url` deliberately unchanged. The `@SideQuestsIO` handle was already established and is kept.
+- **Logo usage is centralized** in `src/components/brand/Logo.tsx` (`<Logo>` lockup, `<LogoMark>`
+  symbol). Five files previously imported brand SVGs by relative path; the homepage recoloured the
+  navy mark with a `brightness-0 invert` filter, which is now the real reverse artwork
+  (`brand/logos/icon-reverse.svg`). The winding-path glyph was redrawn as one continuous switchback
+  ribbon to match the supplied artwork, applied across all 22 brand SVGs.
+- **Removed the last of the previous identity.** The in-app header and app home rendered the
+  wordmark as italic all-caps `SIDEQUESTS` on a coral gradient — replaced with the real lockup. Map
+  markers were seven rainbow hex colours with emoji glyphs; they are now Midnight Navy doorway pins
+  with lucide category glyphs in Reward Gold, Ocean Blue when selected. Also migrated: the
+  coral→turquoise gradient CTAs and avatars, the generic-purple gradient chip (dead code, deleted),
+  the onboarding blur-blob background and its emoji pickers, and the `#0E1428` / `#22c55e` /
+  `#3B82F6` hardcoded hexes.
+- **Tokens.** `src/index.css` gained brand-role variables (`--navy`, `--ocean`, `--sand`, `--palm`,
+  `--gold`, `--coral`) and semantic `--success` / `--reward` / `--highlight` pairs, wired through
+  `tailwind.config.ts` as `navy`/`ocean`/`sand`/`palm`/`gold`/`coral`/`success`/`reward`/`highlight`.
+  The legacy `turquoise`/`indigo`/`sandstone`/`charcoal` aliases, the `gradient-coral` /
+  `gradient-turquoise` recipes, the no-op `text-gradient-*` / `glow-*` classes and the `pulse-glow`
+  keyframe were removed once nothing referenced them.
+- **Wordmark spelling.** User-visible copy now reads `sidequests`, including the wordmark composited
+  into every shared quest photo (`ctx.fillText`, and its font moved from Poppins to Manrope). 64
+  occurrences across the eight locale files and the local seed data. Developer console prefixes
+  (`[SideQuests]`) are unchanged.
+- Removed obsolete duplicates: `brand/favicon/` (a stale parallel icon set with its own manifest,
+  referenced by nothing), `public/site 2.webmanifest`, `src/components/BackendFallbackBanner 2.tsx`,
+  and the ` 2` copies of the brand docs. Off-palette "achievement Violet" is gone from the brand docs.
+- **OG card fixes (follow-up within the same migration).** The first pass shipped a card with
+  several defects: the doorway mark rendered at ~30px in the lockup, where its winding path
+  collapses into a smudge (the mark needs ~90px to resolve, in both positive and reverse); the
+  arch's cream outline used a `box-shadow` spread, which cannot follow a border-radius the canvas
+  clips and so rendered as a flat vertical stripe; the photo crop bisected the right-hand figure and
+  its dark side sank into the navy background; the headline's three-line wrap was a coincidence of a
+  `ch`-based measure; and the layout left a dead gap between the wordmark and the overline. The card
+  now uses the **wordmark alone** (recognition on a social card lives in the wordmark, and it
+  reproduces cleanly at any size), a real `border` that traces the arch, a lifted 68% crop with both
+  figures whole, explicit line breaks, and an explicit three-row rhythm. The generator now fails
+  loudly if an OG source file is missing instead of emitting a blank panel.
+- Fixed a pre-existing clip in `brand/logos/wordmark.svg`: its ink runs to x=1076 but the viewBox was
+  1050 wide, cutting 26 units off the final "s". Never visible before because nothing rendered the
+  wordmark standalone — the app uses `logo-horizontal.svg`. Widened to 1094 and added
+  `wordmark-reverse.svg` for dark surfaces.
+- `brand/logos/icon-small.svg` and `logo-small.svg` (the 16–24px reduced-detail variants) were missed
+  by the glyph redraw because they live in a 24-unit space rather than the 64-unit one the
+  replacement matched. Ported, so the whole kit now carries one glyph.
+- Verification: `npx tsc -p tsconfig.app.json --noEmit` clean; production build passes; `npm run lint`
+  unchanged from baseline (36 pre-existing problems, none in the migrated code). Ten routes were
+  screenshotted at 1440 px and 390 px against a local production build. No schema, RPC, auth, routing
+  or business-logic change.
+
+## 2026-08-15 — Design-intelligence rebuild, phase 1 (not deployed)
+
+- Established the product's new visual direction: **a playable Miami field guide** with a quiet
+  editorial base, threshold-shaped photography, stronger content hierarchy, and a Midnight / Ocean /
+  Sand / Palm / Gold / Coral palette. Added the design-intelligence connection record, design brief,
+  reusable findings, and machine-readable motion specifications under `docs/design/`.
+- Rebuilt the global type, color, focus, card, button, header, footer, and public layout foundations;
+  replaced the previous glow/gradient-heavy presentation with the approved brand system. The landing
+  page, sign-in/sign-up, partnerships, Explore, app shell/navigation, and Quest Detail now share this
+  system while preserving the existing routes, repository boundaries, consent behavior, auth flow,
+  quest-completion flow, and analytics calls.
+- Added restrained progressive-enhancement motion: below-fold sections reveal over 220 ms and quest
+  cards lift 2 px on hover-capable devices. Content is visible without JavaScript, the hero is static,
+  and `prefers-reduced-motion: reduce` disables reveals and hover transforms.
+- Verification: TypeScript and production build pass; Playwright viewport checks pass at 1440 px,
+  375 px, and 320 px with no horizontal overflow or console errors on the rebuilt routes. Keyboard
+  focus, mobile navigation, reveal behavior, hover reset, and reduced-motion behavior were exercised.
+  No deployment or backend/database change was made. Remaining public and secondary app routes are
+  intentionally queued for the next rebuild phase.
+
 ## 2026-07-07 — Image fallbacks + asset-candidate sourcing sheet (no DB writes)
 
 - Frontend: quest images can no longer render as broken `<img>` elements — matters because all 62

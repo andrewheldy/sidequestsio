@@ -149,6 +149,10 @@ export interface Venue {
   hours_note?: string | null;
   /** Price tier as dollar signs: $, $$, $$$ or $$$$ (0014). */
   price_range?: string | null;
+  /** Short editorial "about" copy for the venue card on quest pages (0019). */
+  description?: string | null;
+  /** Landscape venue photo for the venue card on quest pages (0019). */
+  image_url?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -189,6 +193,53 @@ export interface Quest {
   staff_phrase?: string | null;
   /** Human-readable estimated time to complete, e.g. "5 min". */
   estimated_time?: string | null;
+  /** NULL = complete once, ever. N = may be completed again N days after the last completion. */
+  repeat_cooldown_days?: number | null;
+  /** Optional business/host links (quests.links JSONB, 0012). */
+  links?: QuestLinks | null;
+}
+
+/**
+ * Curator-written template a quest's objective is generated from. `{slot}`
+ * tokens in the templates are filled from `slots` (0017_quest_frameworks.sql).
+ */
+export interface QuestFramework {
+  id: string;
+  quest_id: string;
+  name: string;
+  action_type: string | null;
+  objective_template: string;
+  prompt_template: string | null;
+  proof_method: ProofMethod | null;
+  staff_phrase_template: string | null;
+  share_template: string | null;
+  estimated_time: string | null;
+  slots: Record<string, string[]>;
+  /** Reward overrides; NULL falls back to the quest's rewards. */
+  xp_reward: number | null;
+  points_reward: number | null;
+  status: EntityStatus;
+  created_at: string;
+}
+
+/** One objective generated for one user's visit, rendered from a framework. */
+export interface QuestInstance {
+  id: string;
+  user_id: string;
+  quest_id: string;
+  framework_id: string | null;
+  slot_values: Record<string, string>;
+  objective: string;
+  prompt: string | null;
+  proof_method: ProofMethod | null;
+  staff_phrase: string | null;
+  share_prompt: string | null;
+  estimated_time: string | null;
+  xp_reward: number;
+  points_reward: number;
+  created_at: string;
+  expires_at: string;
+  completed_at: string | null;
 }
 
 export interface QrCode {
@@ -196,11 +247,13 @@ export interface QrCode {
   quest_id: string;
   venue_id: string | null;
   partner_id: string;
-  /** Short, URL-safe public code used in /scan/[code]. */
+  /** Short code carried in /scan/[code]. Server-only since 0018: it proves a visit. */
   code: string;
   destination_url: string;
   status: EntityStatus;
   created_at: string;
+  /** 'qr' = printed sticker, 'nfc' = NFC tag. Both encode /scan/<code>. */
+  kind?: "qr" | "nfc";
 }
 
 // ---------------------------------------------------------------------------
@@ -224,6 +277,8 @@ export interface ScanEvent {
   approximate_location: string | null;
   location_permission_granted: boolean;
   conversion_state: ScanConversionState;
+  /** True only for scans of a real venue code (record_code_scan, 0018). */
+  code_verified?: boolean;
 }
 
 export interface QuestAttempt {
@@ -247,6 +302,8 @@ export interface QuestCompletion {
   xp_awarded: number;
   points_awarded: number;
   source_scan_id: string | null;
+  /** The generated instance this completion fulfilled (NULL for static quests). */
+  instance_id?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -366,16 +423,20 @@ export interface AuditLog {
  *  Not every quest is a restaurant — all fields are optional.
  *  Stored in the quests.links JSONB column.
  *
- *  Canonical shape (import path + new content):
- *    { website_url, reviews_url, reviews_source, socials_url, socials_source }
- *  The remaining keys are legacy — still readable (the UI falls back to them)
- *  but not written by the content importer. */
+ *  The quest page's Explore & Share row reads (see src/lib/quests/questPage.ts):
+ *    instagram_url, tiktok_url, x_url   one card per platform
+ *    reviews_url / google_reviews_url   Google Review card
+ *    website_url                        website card + venue card CTA
+ *    socials_url                        a single "All links" card, or the matching
+ *                                       platform card when it is an IG/TikTok/X URL
+ *  The content importer currently writes only website/reviews/socials; the
+ *  per-platform keys are authored directly (docs/QUEST_CONTENT_IMPORT.md). */
 export interface QuestLinks {
   website_url?: string | null;
   /** Canonical reviews link (Google, Yelp, …). */
   reviews_url?: string | null;
   reviews_source?: "google" | "yelp" | "other" | null;
-  /** ONE external landing page (Linktree/Linkme style) — never per-platform. */
+  /** One external landing page (Linktree/Linkme style). */
   socials_url?: string | null;
   socials_source?: "linktree" | "linkme" | "other" | null;
   instagram_url?: string | null;
@@ -391,6 +452,13 @@ export interface QuestLinks {
   special_deals?: string | null;
   /** E.164 phone number for a "call/save contact" action. */
   contact_phone?: string | null;
+  /**
+   * Points *advertised* on the quest page's Explore & Share cards, keyed by
+   * action type (instagram, tiktok, x, google_review, website). Display only:
+   * nothing credits these points until a verification path exists — see
+   * src/lib/quests/questPage.ts.
+   */
+  action_points?: Partial<Record<string, number>> | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -400,8 +468,6 @@ export interface QuestLinks {
 export interface QuestWithContext extends Quest {
   partner?: Partner;
   venue?: Venue;
-  /** Optional business/host links — only populated when the partner has set them. */
-  links?: QuestLinks;
 }
 
 export interface LeaderboardRow {

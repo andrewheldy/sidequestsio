@@ -29,7 +29,7 @@ export const ja: Translations = {
         { main: "フィードではなく、人を通じて場所を発見", sub: "パンくずは本物の訪問者が残した短いメモ — フォロワーなし、ノイズなし。" },
         { main: "影響力のないコミュニティ", sub: "いいねなし。ランキングなし。実際の場所に結びついた共有の発見だけ。" },
         { main: "足跡を残す。次の探検家を助ける。", sub: "各クエストの後にパンくずを落とす — ヒント、瞬間、思い出。" },
-        { main: "もっと探索。スクロールは少なく。", sub: "SideQuestsは現実世界の好奇心を報酬し、スクリーン時間ではありません。" },
+        { main: "もっと探索。スクロールは少なく。", sub: "sidequestsは現実世界の好奇心を報酬し、スクリーン時間ではありません。" },
         { main: "現実世界をプレイ可能な冒険に変える", sub: "QRコードをスキャンし、チェックインし、場所に行くことでレベルアップ。" },
         { main: "フィードではない。トレイルだ。", sub: "各クエストには独自の生きたメッセージボードがある — 探検家によって形作られる。" },
         { main: "最高の場所はトレンドではない", sub: "発見され、静かに共有され、パンくずを通じて伝えられる。" },
@@ -71,7 +71,7 @@ export const ja: Translations = {
     },
     hosts: {
       title: 'コミュニティのためにクエストを作成',
-      description: '会場オーナー、イベント主催者、地元の専門家ですか？SideQuestsと提携しましょう。',
+      description: '会場オーナー、イベント主催者、地元の専門家ですか？sidequestsと提携しましょう。',
       cta: 'ホストになる',
     },
   },
@@ -96,7 +96,7 @@ export const ja: Translations = {
     },
   },
   communityNotesPage: {
-    badge: 'SideQuestsの心臓部',
+    badge: 'sidequestsの心臓部',
     title: '足跡を残す、',
     titleHighlight: '他の人が見つけるのを助ける',
     description: 'パンくずは探検家がクエストの場所で残す短いメモと写真です。匿名で、役立ち、ソーシャルメディアのダイナミクスから完全に自由です。',
@@ -160,14 +160,14 @@ export const ja: Translations = {
     },
     cta: {
       title: 'ニッチが見つからない？',
-      description: '常に拡大中です。まだ存在しないカテゴリーがありますか？教えてください、SideQuestsの未来を形作るのを手伝ってください。',
+      description: '常に拡大中です。まだ存在しないカテゴリーがありますか？教えてください、sidequestsの未来を形作るのを手伝ってください。',
       button: 'お問い合わせ',
     },
   },
   partnerships: {
     badge: 'パートナーシップ',
     title: 'との提携',
-    titleHighlight: 'SideQuests',
+    titleHighlight: 'sidequests',
     description: 'アルゴリズムプロモーションよりも本物の発見を信じる、会場、ブランド、コミュニティの成長するネットワークに参加しよう。',
     whoTitle: '誰が私たちと提携するか',
     types: {
@@ -231,7 +231,7 @@ export const ja: Translations = {
       completionsLabel: '完了',
     },
     benefits: {
-      title: 'SideQuestsでホストする理由',
+      title: 'sidequestsでホストする理由',
       items: [
         { title: '無料で開始', description: 'クエストの作成とホスティングは完全無料。隠れたコストなし。' },
         { title: 'シンプルなダッシュボード', description: '完了、パンくず、エンゲージメントを一目で追跡。' },

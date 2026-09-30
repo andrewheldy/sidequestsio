@@ -29,7 +29,7 @@ export const es: Translations = {
         { main: "Descubre lugares a través de personas, no de feeds", sub: "Las migas son notas cortas dejadas por visitantes reales — sin seguidores, sin ruido." },
         { main: "Comunidad sin influencia", sub: "Sin likes. Sin rankings. Solo descubrimientos compartidos ligados a lugares reales." },
         { main: "Deja un rastro. Ayuda al próximo explorador.", sub: "Deja una Miga después de cada misión — un consejo, un momento, un recuerdo." },
-        { main: "Explora más. Desplázate menos.", sub: "SideQuests recompensa la curiosidad en el mundo real, no el tiempo de pantalla." },
+        { main: "Explora más. Desplázate menos.", sub: "sidequests recompensa la curiosidad en el mundo real, no el tiempo de pantalla." },
         { main: "Convierte el mundo real en una aventura jugable", sub: "Escanea códigos QR, regístrate y sube de nivel yendo a lugares." },
         { main: "No es un feed. Es un camino.", sub: "Cada misión tiene su propio tablero de mensajes vivo — formado por exploradores." },
         { main: "Los mejores lugares no son tendencia", sub: "Se descubren, se comparten en silencio y se pasan a través de Migas." },
@@ -71,7 +71,7 @@ export const es: Translations = {
     },
     hosts: {
       title: 'Crea Misiones para Tu Comunidad',
-      description: '¿Eres dueño de un local, organizador de eventos o experto local? Asóciate con SideQuests para atraer exploradores a tu puerta.',
+      description: '¿Eres dueño de un local, organizador de eventos o experto local? Asóciate con sidequests para atraer exploradores a tu puerta.',
       cta: 'Conviértete en Anfitrión',
     },
   },
@@ -96,7 +96,7 @@ export const es: Translations = {
     },
   },
   communityNotesPage: {
-    badge: 'El Corazón de SideQuests',
+    badge: 'El Corazón de sidequests',
     title: 'Deja un Rastro,',
     titleHighlight: 'Ayuda a Otros a Encontrar',
     description: 'Las migas son notas cortas y fotos dejadas por exploradores en lugares de misiones. Son anónimas, útiles y completamente libres de dinámicas de redes sociales.',
@@ -160,14 +160,14 @@ export const es: Translations = {
     },
     cta: {
       title: '¿No Encuentras Tu Nicho?',
-      description: 'Siempre estamos expandiéndonos. ¿Tienes una categoría en mente que aún no existe? Déjanos saber y ayuda a dar forma al futuro de SideQuests.',
+      description: 'Siempre estamos expandiéndonos. ¿Tienes una categoría en mente que aún no existe? Déjanos saber y ayuda a dar forma al futuro de sidequests.',
       button: 'Contáctanos',
     },
   },
   partnerships: {
     badge: 'Alianzas',
     title: 'Asóciate con',
-    titleHighlight: 'SideQuests',
+    titleHighlight: 'sidequests',
     description: 'Únete a una red creciente de locales, marcas y comunidades que creen en el descubrimiento auténtico sobre la promoción algorítmica.',
     whoTitle: 'Quiénes Se Asocian con Nosotros',
     types: {
@@ -231,7 +231,7 @@ export const es: Translations = {
       completionsLabel: 'completaciones',
     },
     benefits: {
-      title: 'Por Qué Ser Anfitrión en SideQuests',
+      title: 'Por Qué Ser Anfitrión en sidequests',
       items: [
         { title: 'Gratis para Empezar', description: 'Crear y alojar misiones es completamente gratis. Sin costos ocultos.' },
         { title: 'Panel Simple', description: 'Rastrea completaciones, migas y engagement de un vistazo.' },

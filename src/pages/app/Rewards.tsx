@@ -1,16 +1,18 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Gift, Ticket, Lock } from "lucide-react";
-import AppLayout from "@/components/app/AppLayout";
+import AppHeader from "@/components/app/AppHeader";
 import { SectionHeader, EmptyState, Loading } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSignInPrompt } from "@/contexts/SignInPromptContext";
 import { getRepository } from "@/lib/db";
 import { track } from "@/lib/analytics/events";
 import { toast } from "sonner";
 
 export default function Rewards() {
   const { user, profile, refresh } = useAuth();
+  const { promptSignIn } = useSignInPrompt();
   const qc = useQueryClient();
   const balance = profile?.points_balance_cache ?? 0;
 
@@ -27,7 +29,10 @@ export default function Rewards() {
   });
 
   const redeem = async (rewardId: string) => {
-    if (!user) return;
+    if (!user) {
+      promptSignIn("redeem rewards");
+      return;
+    }
     const repo = await getRepository();
     track("reward_viewed", { user_id: user.id, props: { reward_id: rewardId } });
     const res = await repo.redeemReward({ userId: user.id, rewardId });
@@ -50,8 +55,9 @@ export default function Rewards() {
   };
 
   return (
-    <AppLayout title="Rewards">
-      <div className="glass-card mt-2 flex items-center justify-between p-4">
+    <>
+      <AppHeader title="Rewards" />
+      <div className="glass-card mt-4 flex items-center justify-between p-4">
         <div>
           <p className="text-sm text-muted-foreground">Available to spend</p>
           <p className="font-poppins text-2xl font-bold text-secondary">{balance} pts</p>
@@ -135,6 +141,6 @@ export default function Rewards() {
           </div>
         )}
       </div>
-    </AppLayout>
+    </>
   );
 }

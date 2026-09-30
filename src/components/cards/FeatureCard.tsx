@@ -17,12 +17,12 @@ export function FeatureCard({ title, items, type, delay = 0, className }: Featur
     <AnimatedSection direction={isPositive ? 'left' : 'right'} delay={delay}>
       <div
         className={cn(
-          'glass-card p-6 md:p-8 h-full',
-          isPositive ? 'border-l-4 border-l-turquoise' : 'border-l-4 border-l-coral',
+          'h-full rounded-2xl border border-border bg-card p-6 md:p-8',
+          isPositive ? 'border-l-4 border-l-success' : 'border-l-4 border-l-destructive',
           className
         )}
       >
-        <h3 className="font-poppins font-semibold text-xl text-foreground mb-6">
+        <h3 className="mb-6 font-display text-xl font-bold tracking-[-0.02em] text-foreground">
           {title}
         </h3>
 
@@ -32,7 +32,7 @@ export function FeatureCard({ title, items, type, delay = 0, className }: Featur
               <div
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5',
-                  isPositive ? 'bg-turquoise/20 text-turquoise' : 'bg-coral/20 text-coral'
+                  isPositive ? 'bg-success/12 text-success' : 'bg-destructive/12 text-destructive'
                 )}
               >
                 {isPositive ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}

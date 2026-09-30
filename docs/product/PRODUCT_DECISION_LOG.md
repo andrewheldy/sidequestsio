@@ -24,6 +24,32 @@ Ideas should earn their place through evidence rather than novelty.
 
 ---
 
+# Visual Experience Direction (2026-08-15)
+
+## Decision
+
+SideQuests should feel like a **playable field guide**: editorial, tactile, and grounded in real Miami
+places. The visual signature is a threshold or doorway that frames photography and suggests crossing
+from the familiar city into an unexpected experience.
+
+Motion is supporting evidence, not decoration. It may reveal the path through a page, clarify state,
+or add a small sense of discovery, but must remain brief, optional, and subordinate to the content.
+
+### Why
+
+The product is asking people to leave the screen and notice the physical world. A calm field-guide
+system makes curated quests feel intentional and trustworthy while the threshold motif provides a
+distinctive sense of possibility. This direction reinforces the existing core loop without adding a
+new feature, currency, publishing model, or navigation surface.
+
+### Expected outcome
+
+Users should understand what SideQuests is, why a quest is worth a detour, and what happens after they
+arrive. Partners should see a curated experience product rather than a coupon marketplace or generic
+local directory.
+
+---
+
 # Product Vision
 
 ## Decision
@@ -300,3 +326,23 @@ When a major product decision is made, record:
 - The expected outcome
 
 Future contributors should understand not only what SideQuests does, but why it was designed that way.
+
+# Generated Quests (2026-09-27)
+
+## Decision
+
+Quests may be generated for each user at the moment they open a quest, from curator-written frameworks. This overturns the exclusion of generated quests in "MVP Scope" above; the rest of that exclusion list stands.
+
+Guardrails chosen by the product owner:
+
+- **Frameworks and templates, not AI.** Curators write each framework: templates with `{slot}` placeholders and the approved options for every slot. Generation only fills those slots. An AI-written variant was considered and not chosen.
+- **Partner venues only.** A framework belongs to an existing quest, so the venue's QR code still proves the visit and the partner stays in control of what happens at their venue.
+- **Repeatable after a cooldown.** A quest can opt in to repeat completions after N days (`repeat_cooldown_days`). Quests that don't opt in keep the once-ever rule.
+
+### Why
+
+Users should not get the same quest twice in a row. Rotating curated objectives keeps return visits fresh without giving up curation, presence verification or partner trust.
+
+Implementation: `supabase/migrations/0017_quest_frameworks.sql`; authoring guide in `docs/product/QUEST_DESIGN_GUIDE.md` ("Quest Frameworks").
+
+---

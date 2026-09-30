@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate as useNav } from "react-router-dom";
 
-/** /scan/:code — resolves a physical QR code to its quest. */
+/** /scan/:code — resolves a printed QR code or NFC tag to its quest. */
 export default function ScanResolve() {
   const { code } = useParams<{ code: string }>();
   const { user, loading } = useAuth();
@@ -20,7 +20,7 @@ export default function ScanResolve() {
       const res = await resolveByCode(code, user?.id ?? null);
       if (res.quest) {
         navigate(
-          `/quests/${res.quest.id}?scan=${res.scan?.id ?? ""}&via=qr`,
+          `/quests/${res.quest.id}?scan=${res.scan?.id ?? ""}&via=${res.codeKind ?? "qr"}`,
           { replace: true },
         );
       } else {

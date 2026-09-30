@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DemoSessionProvider } from "@/contexts/DemoSessionContext";
@@ -11,7 +12,9 @@ import { SignInPromptProvider } from "@/contexts/SignInPromptContext";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { DemoBanner } from "@/components/DemoBanner";
+import { BackendFallbackBanner } from "@/components/BackendFallbackBanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import Index from "./pages/Index";
 import Quests from "./pages/Quests";
@@ -43,8 +46,14 @@ import Settings from "./pages/app/Settings";
 import QuestBrowser from "./pages/app/QuestBrowser";
 import AppCommunityNotes from "./pages/app/AppCommunityNotes";
 import CheckIn from "./pages/app/CheckIn";
+import Rewards from "./pages/app/Rewards";
 import ReadinessBrief from "./pages/ReadinessBrief";
 import NotFound from "./pages/NotFound";
+
+// Concept/pitch microsite: lazy so its fonts, styles and code stay out of the main bundle.
+const IIIPoints = lazy(() => import("./pages/IIIPoints"));
+// Partner Insights: lazy so the charting library only loads for partners/admins.
+const PartnerInsights = lazy(() => import("./pages/partner/PartnerInsights"));
 
 const queryClient = new QueryClient();
 
@@ -62,6 +71,7 @@ const App = () => (
                 <SignInPromptProvider>
                   <CookieConsentProvider>
                     <DemoBanner />
+                    <BackendFallbackBanner />
                     <ScrollToTop />
                     <Routes>
                       {/* Marketing site */}
@@ -81,6 +91,14 @@ const App = () => (
                       <Route path="/delete-account" element={<DeleteAccountPolicy />} />
                       <Route path="/partner-terms" element={<PartnerTerms />} />
                       <Route path="/readiness" element={<ReadinessBrief />} />
+                      <Route
+                        path="/iiipoints"
+                        element={
+                          <Suspense fallback={<div className="min-h-screen" style={{ background: "#C9AEF4" }} />}>
+                            <IIIPoints />
+                          </Suspense>
+                        }
+                      />
 
                       {/* Auth + onboarding */}
                       <Route path="/auth" element={<Auth />} />
@@ -88,6 +106,21 @@ const App = () => (
 
                       {/* Public profile (read-only, privacy-safe) */}
                       <Route path="/u/:username" element={<PublicProfile />} />
+
+                      {/* Partner Insights: read-only analytics (owner or admin; enforced in partner_insights) */}
+                      {["/partner", "/partner/venues/:venueId"].map((path) => (
+                        <Route
+                          key={path}
+                          path={path}
+                          element={
+                            <ProtectedRoute>
+                              <Suspense fallback={<LoadingScreen />}>
+                                <PartnerInsights />
+                              </Suspense>
+                            </ProtectedRoute>
+                          }
+                        />
+                      ))}
 
                       {/* Quest detail & QR resolution */}
                       <Route path="/quests/:questId" element={<QuestDetail />} />
@@ -101,6 +134,7 @@ const App = () => (
                         <Route path="map" element={<MapView />} />
                         <Route path="quests" element={<QuestBrowser />} />
                         <Route path="community-notes" element={<AppCommunityNotes />} />
+                        <Route path="rewards" element={<Rewards />} />
                         <Route
                           path="checkin"
                           element={

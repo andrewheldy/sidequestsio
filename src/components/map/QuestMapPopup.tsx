@@ -2,7 +2,8 @@ import { X, MapPin, Clock, Zap, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getCategoryColor, getCategoryEmoji, calcDistance } from '@/lib/mapbox';
+import { calcDistance } from '@/lib/mapbox';
+import { CategoryIcon } from '@/components/brand/CategoryIcon';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSignInPrompt } from '@/contexts/SignInPromptContext';
 import { useToast } from '@/hooks/use-toast';
@@ -25,8 +26,6 @@ const QuestMapPopup = ({ quest, userCoords, onClose }: QuestMapPopupProps) => {
   const { promptSignIn } = useSignInPrompt();
   const { toast } = useToast();
 
-  const color = getCategoryColor(quest.category);
-  const emoji = getCategoryEmoji(quest.category);
   const distance = userCoords
     ? calcDistance(userCoords, { lat: quest.lat, lng: quest.lng })
     : quest.distance;
@@ -50,12 +49,9 @@ const QuestMapPopup = ({ quest, userCoords, onClose }: QuestMapPopupProps) => {
     <div className="absolute bottom-0 left-0 right-0 z-20 map-popup-enter">
       <div className="m-3 rounded-2xl border border-border/50 bg-card/95 p-4 shadow-2xl backdrop-blur-xl">
         <div className="flex items-start gap-3">
-          {/* Category icon badge */}
-          <div
-            className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-lg"
-            style={{ background: `${color}22`, border: `1.5px solid ${color}55` }}
-          >
-            {emoji}
+          {/* Category badge — the doorway palette, not a per-category colour. */}
+          <div className="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-navy/15 bg-navy text-reward">
+            <CategoryIcon category={quest.category} />
           </div>
 
           {/* Quest info */}
@@ -66,8 +62,7 @@ const QuestMapPopup = ({ quest, userCoords, onClose }: QuestMapPopupProps) => {
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
-                className="border-0 px-1.5 py-0 text-[10px] font-semibold"
-                style={{ background: `${color}22`, color }}
+                className="border-0 bg-ocean/10 px-1.5 py-0 text-[10px] font-semibold text-ocean-strong"
               >
                 {quest.category}
               </Badge>

@@ -32,3 +32,22 @@ The immediate goal is a polished MVP launch with real Miami businesses, validati
 
 **2026-07-06 — Engineering favors shipping over premature optimization.**
 Decisions should optimize for launching, onboarding businesses, measuring engagement, and demonstrating ROI — not for hypothetical scale or enterprise requirements the product hasn't earned yet. See `docs/PRODUCT_DIRECTION.md`, "Engineering Principles."
+
+**2026-09-27 — Quests can be generated on the spot from curated frameworks.**
+Product-owner decision overturning the MVP exclusion of generated quests. Generation fills curator-written templates (no AI), only at partner venues, and a quest may be repeated after a cooldown it opts into. See "Generated Quests" in `docs/product/PRODUCT_DECISION_LOG.md` and `supabase/migrations/0017_quest_frameworks.sql`.
+
+**2026-09-28 — One reusable quest page template, location-first.**
+`/quests/:questId` renders every quest through one data-driven template (`src/pages/QuestDetail.tsx` + `src/lib/quests/questPage.ts`): location hero, intro, one required action, Explore & Share, venue card. The Frost Museum of Science mockup is the design reference and first sample; nothing venue-specific lives in components.
+
+**2026-09-28 — Explore & Share shows per-platform social cards.**
+Product-owner decision superseding the 0014-era rule that socials are a single Linktree-style link. Instagram, TikTok, X, Google Review and website each get a card, read from `quests.links`. Outbound clicks are tracked but never counted as completions, and advertised points (`links.action_points`) are not credited until a verification path exists. See `docs/QUEST_CONTENT_IMPORT.md`.
+
+**2026-09-28 — The app bottom nav has exactly three tabs: Rewards, Map, You.**
+No camera/scan tab: capture belongs to quest actions that need a photo, and venue codes open from the phone's own camera (`/scan/<code>`). Explore/Quests/quest pages sit under Map; Saved quests moved to the Profile page; `/app/rewards` is now mounted.
+
+**2026-09-30 — Partner Insights: read-only analytics for partners and admins.**
+Product-owner decision that supersedes PD-1 (docs/engineering/PRODUCTION_SPRINT_PLAN.md) for analytics only.
+- `/partner` (partner overview) and `/partner/venues/:venueId` (one venue) are mounted.
+- Admins see every partner. A partner login sees only its own partner, enforced by `owns_partner()` in `partner_insights()` (0021).
+- Analytics only: the old partner pages for quests, rewards and QR codes stay unmounted, and quest content stays curated by SideQuests.
+

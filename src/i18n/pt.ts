@@ -29,7 +29,7 @@ export const pt: Translations = {
         { main: "Descubra lugares através de pessoas, não feeds", sub: "Migalhas são notas curtas deixadas por visitantes reais — sem seguidores, sem ruído." },
         { main: "Comunidade sem influência", sub: "Sem likes. Sem rankings. Apenas descobertas compartilhadas ligadas a lugares reais." },
         { main: "Deixe um rastro. Ajude o próximo explorador.", sub: "Deixe uma Migalha após cada missão — uma dica, um momento, uma memória." },
-        { main: "Explore mais. Role menos.", sub: "SideQuests recompensa a curiosidade no mundo real, não tempo de tela." },
+        { main: "Explore mais. Role menos.", sub: "sidequests recompensa a curiosidade no mundo real, não tempo de tela." },
         { main: "Transforme o mundo real em uma aventura jogável", sub: "Escaneie códigos QR, faça check-in e suba de nível indo a lugares." },
         { main: "Não é um feed. É uma trilha.", sub: "Cada missão tem seu próprio quadro de mensagens vivo — moldado por exploradores." },
         { main: "Os melhores lugares não estão em alta", sub: "Eles são descobertos, compartilhados quietamente e passados através de Migalhas." },
@@ -71,7 +71,7 @@ export const pt: Translations = {
     },
     hosts: {
       title: 'Crie Missões para Sua Comunidade',
-      description: 'Você é dono de um local, organizador de eventos ou especialista local? Seja parceiro do SideQuests.',
+      description: 'Você é dono de um local, organizador de eventos ou especialista local? Seja parceiro do sidequests.',
       cta: 'Seja um Anfitrião',
     },
   },
@@ -96,7 +96,7 @@ export const pt: Translations = {
     },
   },
   communityNotesPage: {
-    badge: 'O Coração do SideQuests',
+    badge: 'O Coração do sidequests',
     title: 'Deixe um Rastro,',
     titleHighlight: 'Ajude Outros a Encontrar',
     description: 'Migalhas são notas curtas e fotos deixadas por exploradores em locais de missões. São anônimas, úteis e completamente livres de dinâmicas de redes sociais.',
@@ -160,14 +160,14 @@ export const pt: Translations = {
     },
     cta: {
       title: 'Não Encontra Seu Nicho?',
-      description: 'Estamos sempre expandindo. Tem uma categoria em mente que ainda não existe? Nos avise e ajude a moldar o futuro do SideQuests.',
+      description: 'Estamos sempre expandindo. Tem uma categoria em mente que ainda não existe? Nos avise e ajude a moldar o futuro do sidequests.',
       button: 'Entre em Contato',
     },
   },
   partnerships: {
     badge: 'Parcerias',
     title: 'Parceria com',
-    titleHighlight: 'SideQuests',
+    titleHighlight: 'sidequests',
     description: 'Junte-se a uma rede crescente de locais, marcas e comunidades que acreditam em descobertas autênticas.',
     whoTitle: 'Quem Faz Parceria Conosco',
     types: {
@@ -231,7 +231,7 @@ export const pt: Translations = {
       completionsLabel: 'conclusões',
     },
     benefits: {
-      title: 'Por Que Hospedar no SideQuests',
+      title: 'Por Que Hospedar no sidequests',
       items: [
         { title: 'Grátis para Começar', description: 'Criar e hospedar missões é totalmente grátis. Sem custos ocultos.' },
         { title: 'Painel Simples', description: 'Acompanhe conclusões, migalhas e engajamento de relance.' },

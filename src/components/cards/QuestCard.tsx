@@ -1,8 +1,6 @@
-import { useNavigate } from 'react-router-dom';
-import { MapPin, Clock, Users, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowUpRight, Clock, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import AnimatedSection from '@/components/AnimatedSection';
-import { Badge } from '@/components/ui/badge';
 import QuestImage from '@/components/QuestImage';
 
 interface QuestCardProps {
@@ -11,17 +9,15 @@ interface QuestCardProps {
   category: string;
   duration?: string;
   participants?: number;
-  /** Quest concept / description (replaces duration+participants when provided) */
   concept?: string;
-  /** XP earned on completion */
   xp?: number;
-  /** Physical reward text */
+  points?: number;
   physicalReward?: string;
   image: string;
   delay?: number;
   className?: string;
-  /** If provided, clicking navigates to /quests/:questId instead of /app/explore */
   questId?: string;
+  featured?: boolean;
 }
 
 export function QuestCard({
@@ -29,91 +25,65 @@ export function QuestCard({
   location,
   category,
   duration,
-  participants,
   concept,
   xp,
+  points,
   physicalReward,
   image,
-  delay = 0,
   className,
   questId,
+  featured = false,
 }: QuestCardProps) {
-  const navigate = useNavigate();
-  const useMiamiLayout = concept !== undefined;
   const dest = questId ? `/quests/${questId}` : '/app/explore';
 
   return (
-    <AnimatedSection direction="up" delay={delay}>
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => navigate(dest)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') navigate(dest);
-        }}
-        className={cn(
-          'glass-card overflow-hidden hover-lift group cursor-pointer',
-          className
-        )}
-      >
-        {/* Image */}
-        <div className="relative h-48 overflow-hidden">
-          <QuestImage
-            src={image}
-            alt={title}
-            category={category}
-            className="transition-transform duration-500 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-          <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
-            {category}
-          </Badge>
+    <Link
+      to={dest}
+      className={cn(
+        'quest-card group block overflow-hidden rounded-2xl border border-border bg-card focus-visible:outline-none',
+        featured && 'md:grid md:grid-cols-[1.25fr_1fr]',
+        className,
+      )}
+      aria-label={`Open quest: ${title}`}
+    >
+      <div className={cn('relative aspect-[4/3] overflow-hidden bg-muted', featured && 'md:aspect-auto md:min-h-[360px]')}>
+        <QuestImage src={image} alt="" category={category} className="quest-card__image" />
+        <span className="sq-overline absolute left-4 top-4 rounded-lg bg-[hsl(var(--midnight-900))] px-2.5 py-2 text-white">
+          {category}
+        </span>
+      </div>
+
+      <div className={cn('flex flex-col p-5', featured && 'justify-between md:p-8')}>
+        <div>
+          <div className="mb-3 flex items-start justify-between gap-4">
+            <h3 className={cn('font-display text-xl font-bold leading-tight tracking-[-0.035em]', featured && 'text-3xl')}>
+              {title}
+            </h3>
+            <ArrowUpRight className="mt-1 h-5 w-5 shrink-0 text-muted-foreground group-hover:text-foreground" aria-hidden />
+          </div>
+          <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+            <MapPin className="h-4 w-4 text-[hsl(var(--ocean-500))]" aria-hidden />
+            <span>{location}</span>
+          </div>
+          {concept && <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{concept}</p>}
         </div>
 
-        {/* Content */}
-        <div className="p-5">
-          <h3 className="font-poppins font-semibold text-lg text-foreground mb-2 line-clamp-2 leading-snug">
-            {title}
-          </h3>
-
-          <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
-            <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-            <span className="line-clamp-1">{location}</span>
-          </div>
-
-          {useMiamiLayout ? (
-            <>
-              {concept && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
-                  {concept}
-                </p>
-              )}
-              <div className="flex items-center gap-1.5 text-sm font-medium text-primary">
-                <Zap className="w-4 h-4 flex-shrink-0" />
-                <span>{xp} XP</span>
-                {physicalReward && (
-                  <>
-                    <span className="text-muted-foreground font-normal">•</span>
-                    <span className="text-muted-foreground font-normal line-clamp-1">{physicalReward}</span>
-                  </>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{duration}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
-                <span>{participants} explorers</span>
-              </div>
-            </div>
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border pt-4 text-sm">
+          {duration && (
+            <span className="flex items-center gap-1.5 text-muted-foreground">
+              <Clock className="h-4 w-4" aria-hidden /> {duration}
+            </span>
           )}
+          {typeof xp === 'number' && (
+            <span className="sq-mono font-bold text-[hsl(var(--ocean-700))]">+{xp} XP</span>
+          )}
+          {typeof points === 'number' && (
+            <span className="sq-mono font-bold text-[hsl(var(--gold-700))]">+{points} Points</span>
+          )}
+          {physicalReward && <span className="w-full text-xs text-muted-foreground">Reward: {physicalReward}</span>}
         </div>
       </div>
-    </AnimatedSection>
+    </Link>
   );
 }
 
