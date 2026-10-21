@@ -2,6 +2,27 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-21 — Production: column-scoped self-update grants (0023 applied)
+
+- **Problem (live-verified via read-only MCP before the fix):** `authenticated` held
+  table-wide UPDATE on `public.users` and `public.user_profiles`, limited only by
+  self-row RLS. Any signed-in user could set their own `users.role = 'admin'`
+  (`is_admin()` trusts that column) or raise their own `points_balance_cache` / `xp` /
+  `level`, which `redeem_reward()` spends against.
+- **Fix:** `supabase/migrations/0023_progress_role_integrity.sql` replaces table-wide
+  UPDATE with column grants on `users (display_name, avatar_url, last_active_at)` and
+  `user_profiles (home_city)`. RLS policies are unchanged; SECURITY DEFINER writers
+  (signup trigger, `complete_quest`, `redeem_reward`, `adjust_points`) are unaffected.
+  No client code wrote these tables directly.
+- **Applied** by the owner in the Supabase SQL editor on 2026-10-21 (after backup).
+- **Verified (read-only MCP, project `wvedvngtuzsttpavmgjw`, 2026-10-21):** `authenticated`
+  can no longer update `users.role`, `users.account_status`, `user_profiles.points_balance_cache`,
+  `xp` or `level`; table-wide UPDATE is false for `authenticated` and `anon` on both tables;
+  the four granted columns are updatable; SELECT is unchanged.
+- **Exposure check (aggregates only, no personal data):** 9 users, all `role = 'user'`
+  (no admin accounts exist); all 9 `user_profiles` balances and XP match the
+  `points_ledger` sums. No evidence the hole was used.
+
 ## 2026-10-20 — Consumer mobile foundation (code only)
 
 - Added `apps/mobile`: Expo SDK 58 / React Native 0.88 / React 19.3 / strict

@@ -23,8 +23,8 @@
 -- harmless self-service columns only. RLS policies are unchanged.
 --
 -- Idempotent (revoke/grant are repeatable); non-destructive (no data change).
--- Apply in the SQL editor after a backup. The mobile MVP does not depend on it,
--- but reward redemption should stay disabled in clients until it is applied.
+-- APPLIED to production 2026-10-21 (SQL editor, after backup) and verified via
+-- read-only MCP; see docs/engineering/CHANGELOG.md.
 
 begin;
 
