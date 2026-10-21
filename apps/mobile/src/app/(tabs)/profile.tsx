@@ -1,5 +1,5 @@
-import { PlaceholderScreen } from '../../components/PlaceholderScreen';
+import { ProfileScreen } from '../../features/profile/ProfileScreen';
 
-export default function ProfileScreen() {
-  return <PlaceholderScreen title="Profile" description="Your explorer profile will appear here." />;
+export default function ProfileRoute() {
+  return <ProfileScreen />;
 }
