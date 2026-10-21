@@ -1,10 +1,7 @@
-// Placeholder owned by node F; replaced during feature implementation.
-import { EmptyState, Screen } from '../../../components/ui';
+import { useLocalSearchParams } from 'expo-router';
+import { CompleteQuestScreen } from '../../../features/quest-loop/CompleteQuestScreen';
 
-export default function Placeholder() {
-  return (
-    <Screen>
-      <EmptyState title="Complete quest" message="Coming in this build." />
-    </Screen>
-  );
+export default function CompleteQuestRoute() {
+  const { questId } = useLocalSearchParams<{ questId: string }>();
+  return <CompleteQuestScreen questId={Array.isArray(questId) ? questId[0] : questId} />;
 }

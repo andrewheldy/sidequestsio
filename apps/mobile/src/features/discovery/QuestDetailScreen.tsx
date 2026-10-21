@@ -10,6 +10,7 @@ import { backend, webOrigin } from '../../lib/config';
 import type { QuestWithContext } from '../../lib/types';
 import { accountGate, type GateResult } from '../../session/accountGate';
 import { useSession } from '../../session/SessionProvider';
+import { useQuestCta } from '../quest-loop/useQuestStatus';
 import { colors, radii, spacing, touchTarget } from '../../theme/tokens';
 import { formatMiles, distanceToQuest } from './geo';
 import { RewardPills } from './QuestCard';
@@ -92,6 +93,7 @@ function QuestDetail({ quest }: { quest: QuestWithContext }) {
   const { state } = useSession();
   const location = useDeviceLocation();
   const [blocked, setBlocked] = useState<string | null>(null);
+  const cta = useQuestCta(quest);
 
   const venue = quest.venue;
   const image = questImage(quest);
@@ -107,7 +109,7 @@ function QuestDetail({ quest }: { quest: QuestWithContext }) {
   };
 
   const start = () => {
-    if (!isQr) return; // the button is disabled; only QR completion is supported
+    if (!isQr || cta.done) return; // the button is disabled; only QR completion is supported
     setBlocked(null);
     const gate = accountGate(state, { kind: 'quest', questId: quest.id });
     if (gate.kind === 'redirect') router.push(gate.href);
@@ -166,12 +168,17 @@ function QuestDetail({ quest }: { quest: QuestWithContext }) {
               : "Verification: this quest type isn't supported in the app yet."}
           </Text>
           <Button
-            label="Start quest"
-            icon="qr-code-outline"
+            label={isQr ? cta.label : 'Start quest'}
+            icon={isQr ? cta.icon : 'qr-code-outline'}
             onPress={start}
-            disabled={!isQr}
-            accessibilityHint={isQr ? 'Starts this quest' : 'Not available: only QR quests can be completed in the app'}
+            disabled={!isQr || cta.done}
+            accessibilityHint={isQr ? (cta.done ? 'Nothing to start right now' : 'Starts this quest') : 'Not available: only QR quests can be completed in the app'}
           />
+          {isQr && cta.note ? (
+            <Text variant="small" muted>
+              {cta.note}
+            </Text>
+          ) : null}
           {!isQr ? (
             <Text variant="small" muted>
               Only QR quests can be completed in the app for now.
