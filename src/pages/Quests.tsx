@@ -140,7 +140,7 @@ const Quests = () => {
       <CTASection
         title={t.quests.cta.title}
         description={t.quests.cta.description}
-        primaryAction={{ label: t.quests.cta.button, href: '/hosts' }}
+        primaryAction={{ label: t.quests.cta.button, href: '/partnerships' }}
         variant="navy"
       />
     </Layout>

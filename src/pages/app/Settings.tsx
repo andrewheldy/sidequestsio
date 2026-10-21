@@ -247,7 +247,7 @@ export default function Settings() {
               />
               <PrivacyRow
                 label="Analytics"
-                desc="Help partners measure aggregate, privacy-safe traffic."
+                desc="Share anonymous visit counts."
                 checked={privacy.analytics_consent}
                 onChange={(v) => updatePrivacy({ analytics_consent: v })}
               />
@@ -259,7 +259,7 @@ export default function Settings() {
               />
               <PrivacyRow
                 label="Marketing emails"
-                desc="Occasional updates about new quests & rewards."
+                desc="Occasional updates about new quests."
                 checked={privacy.marketing_consent}
                 onChange={(v) => updatePrivacy({ marketing_consent: v })}
               />

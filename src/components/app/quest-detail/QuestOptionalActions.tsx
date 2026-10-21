@@ -32,7 +32,7 @@ export function QuestOptionalActions({
         </h2>
         <span aria-hidden className="mb-1.5 h-px flex-1 bg-sand-50/15" />
         {advertisesPoints && (
-          <span className="-rotate-3 font-display text-xs italic text-sand-50/50">More ways to earn</span>
+          <span className="-rotate-3 font-display text-xs italic text-sand-50/50">More to explore</span>
         )}
       </div>
 
@@ -68,7 +68,7 @@ export function QuestActionCard({
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => onClick(action, position)}
-      aria-label={`${action.label}${action.points != null ? `, ${action.points} points` : ""} (opens in a new tab)`}
+      aria-label={`${action.label} (opens in a new tab)`}
       className={cn(
         "flex h-full min-h-[118px] flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-1.5 py-3 text-center",
         "transition-[transform,border-color,background-color] duration-150 hover:border-gold/40 hover:bg-white/[0.06] active:scale-[0.96]",
@@ -77,9 +77,6 @@ export function QuestActionCard({
     >
       <OptionalActionIcon type={action.type as OptionalActionType} className="h-8 w-8" />
       <span className="text-[12px] font-semibold leading-tight text-sand-50">{action.label}</span>
-      {action.points != null && (
-        <span className="text-[12px] font-semibold text-gold">+{action.points} pts</span>
-      )}
     </a>
   );
 }

@@ -261,14 +261,14 @@ const Onboarding = () => {
                 );
               })}
             </div>
-            <FooterCTA disabled={!canAdvance} onClick={next} label="Build my first quest" />
+            <FooterCTA disabled={!canAdvance} onClick={next} label="Pick my first quest" />
           </div>
         )}
 
         {/* STEP 5 — First quest preview */}
         {step === 5 && (
           <div key="s5" className={cn('flex flex-1 flex-col justify-center', stepAnim)}>
-            <StepHeader title="Build your first quest" subtitle="Personalized just for you." center />
+            <StepHeader title="Your first quest" subtitle="Matched to what you picked." center />
             <div className="glass-card overflow-hidden">
               <div className="flex items-center justify-between bg-navy p-5 text-sand-soft">
                 <CategoryIcon category={firstQuest.category} className="h-9 w-9 text-reward" strokeWidth={1.5} />
@@ -279,7 +279,7 @@ const Onboarding = () => {
               <div className="space-y-4 p-5">
                 <h2 className="font-display text-xl font-bold tracking-[-0.02em]">{firstQuest.title}</h2>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <QuestStat icon={<Gift className="h-4 w-4 text-gold-strong" />} label="Reward" value={firstQuest.reward} />
+                  <QuestStat icon={<Gift className="h-4 w-4 text-gold-strong" />} label="You earn" value={firstQuest.reward} />
                   <QuestStat icon={<Zap className="h-4 w-4 text-gold-strong" />} label="XP" value={`${firstQuest.xp} XP`} />
                   <QuestStat icon={<MapPin className="h-4 w-4 text-ocean-strong" />} label="Distance" value={firstQuest.distance} />
                   <QuestStat icon={<Star className="h-4 w-4 text-ocean-strong" />} label="Time" value={firstQuest.time} />

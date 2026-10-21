@@ -38,7 +38,7 @@ export default function Rewards() {
     const res = await repo.redeemReward({ userId: user.id, rewardId });
     if (!res.ok) {
       const map: Record<string, string> = {
-        insufficient_points: "Not enough points yet — keep questing!",
+        insufficient_points: "You don't have enough points for this yet.",
         out_of_stock: "This reward is out of stock.",
         inactive: "This reward isn't available.",
         expired: "This reward has expired.",
@@ -69,6 +69,8 @@ export default function Rewards() {
         <SectionHeader title="Available Rewards" />
         {isLoading ? (
           <Loading />
+        ) : rewards.length === 0 ? (
+          <EmptyState title="No rewards yet" description="Rewards may be added as local spots join." />
         ) : (
           <div className="space-y-3">
             {rewards.map((r) => {
@@ -117,7 +119,7 @@ export default function Rewards() {
       <div className="mt-6">
         <SectionHeader title="My Redemptions" />
         {redemptions.length === 0 ? (
-          <EmptyState title="No redemptions yet" description="Redeem points for real rewards." />
+          <EmptyState title="No redemptions yet" description="Rewards may be added as local spots join." />
         ) : (
           <div className="space-y-2">
             {redemptions.map((red) => (

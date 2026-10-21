@@ -2,6 +2,11 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, Mail } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 
+// TODO(contact): hello@miamisidequests.io can't receive mail yet. Swap this address
+// (or remove the link below) before sharing the site. The III Points page
+// (src/components/iiipoints/FinalSection.tsx) has its own mailto with the same address.
+const CONTACT_EMAIL = 'hello@miamisidequests.io';
+
 const footerGroups = [
   {
     title: 'Explore',
@@ -16,7 +21,6 @@ const footerGroups = [
     title: 'Partners',
     links: [
       ['Become a partner', '/partnerships'],
-      ['For hosts', '/hosts'],
       ['Partner terms', '/partner-terms'],
     ],
   },
@@ -43,11 +47,11 @@ export function Footer() {
               A reason to take the side street, try the unfamiliar door, and remember the place you found.
             </p>
             <a
-              href="mailto:hello@miamisidequests.io"
+              href={`mailto:${CONTACT_EMAIL}`}
               className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[hsl(var(--gold-500))] hover:text-white"
             >
               <Mail className="h-4 w-4" />
-              hello@miamisidequests.io
+              {CONTACT_EMAIL}
             </a>
           </div>
 

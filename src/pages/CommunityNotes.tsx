@@ -18,13 +18,13 @@ const CommunityNotes = () => {
   const sampleCommunityNotes = [
     {
       author: 'Explorer',
-      location: 'Panther Coffee Wynwood',
+      location: 'A Wynwood coffee shop',
       message: t.communityNotesPage.examples.items[0],
       image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=200&fit=crop',
     },
     {
       author: 'Wanderer',
-      location: 'Wynwood Walls',
+      location: 'Wynwood murals',
       message: t.communityNotesPage.examples.items[1],
       image: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=400&h=200&fit=crop',
     },
@@ -36,12 +36,12 @@ const CommunityNotes = () => {
     },
     {
       author: 'Discoverer',
-      location: 'All Day Coffee',
+      location: 'A Miami café',
       message: t.communityNotesPage.examples.items[3] || t.communityNotesPage.examples.items[0],
     },
     {
       author: 'Navigator',
-      location: 'Vizcaya Museum',
+      location: 'A Miami waterfront',
       message: t.communityNotesPage.examples.items[4] || t.communityNotesPage.examples.items[1],
     },
     {

@@ -251,8 +251,8 @@ function requiredActionType(
 const REQUIRED_HINT: Record<RequiredActionType, string> = {
   photo: "Snap a photo as proof when you complete it.",
   check_in: "Complete it at the venue, then check in here.",
-  qr: "Scan the SideQuests code at the venue to verify your visit.",
-  nfc: "Tap the SideQuests tag at the venue to verify your visit.",
+  qr: "Scan the sidequests code at the venue to verify your visit.",
+  nfc: "Tap the sidequests tag at the venue to verify your visit.",
   staff_phrase: "Say the quest phrase to staff to complete it.",
   venue_code: "Ask staff for the venue code to complete it.",
   note: "Leave a Community Note about your visit to complete it.",

@@ -2,7 +2,7 @@
   "id": "/",
   "name": "sidequests — Miami field guide",
   "short_name": "sidequests",
-  "description": "Real-world quests at local Miami spots. Scan to check in, complete an objective, and earn XP and real rewards.",
+  "description": "Quests at local Miami spots. Scan a QR code when you arrive and finish a small challenge. Rewards may be added as local spots join.",
   "lang": "en-US",
   "start_url": "/",
   "scope": "/",

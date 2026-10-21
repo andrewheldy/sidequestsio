@@ -73,7 +73,7 @@ export default function PartnerInsights() {
           description={
             accessError
               ? "Check your connection and try again."
-              : "Partner Insights is for SideQuests partners. Ask the SideQuests team to link your login to your business."
+              : "Partner Insights is for sidequests partners. Ask the sidequests team to link your login to your business."
           }
         />
       </DashboardLayout>

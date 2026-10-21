@@ -17,7 +17,6 @@ const verticalData: Record<string, {
     location: string;
     category: string;
     duration: string;
-    participants: number;
     image: string;
   }>;
   communityNotes: Array<{
@@ -33,13 +32,13 @@ const verticalData: Record<string, {
     description: 'From hidden rooftop espresso bars to cozy neighborhood gems, discover the coffee spots that locals love.',
     hero: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&h=600&fit=crop',
     quests: [
-      { title: 'Hidden Rooftop Coffee', location: 'Downtown Arts District', category: 'Coffee', duration: '30 min', participants: 127, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop' },
-      { title: 'Secret Garden Café', location: 'Russian Hill', category: 'Coffee', duration: '45 min', participants: 78, image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop' },
-      { title: 'Vintage Coffee House', location: 'North Beach', category: 'Coffee', duration: '1 hour', participants: 156, image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop' },
+      { title: 'Hidden Rooftop Coffee', location: 'Miami', category: 'Coffee', duration: '30 min', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop' },
+      { title: 'Secret Garden Café', location: 'Miami', category: 'Coffee', duration: '45 min', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop' },
+      { title: 'Vintage Coffee House', location: 'Miami', category: 'Coffee', duration: '1 hour', image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop' },
     ],
     communityNotes: [
-      { author: 'CoffeeLover', location: 'Ritual Coffee', message: 'The back patio is the real gem. Ask about their single-origin Ethiopian.', image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=200&fit=crop' },
-      { author: 'Barista Fan', location: 'Blue Bottle', message: 'The Gibraltar is their secret menu item. Trust me.' },
+      { author: 'CoffeeLover', location: 'A coffee shop', message: 'The back patio is the real gem. Go early for a quiet seat.', image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=200&fit=crop' },
+      { author: 'Barista Fan', location: 'A coffee shop', message: 'Ask what\'s not on the menu. Trust me.' },
     ],
   },
   art: {
@@ -48,13 +47,13 @@ const verticalData: Record<string, {
     description: 'Explore street art, underground galleries, and creative spaces that showcase the city\'s artistic soul.',
     hero: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=1200&h=600&fit=crop',
     quests: [
-      { title: 'Street Art Walking Tour', location: 'Mission District', category: 'Art', duration: '2 hours', participants: 89, image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=300&fit=crop' },
-      { title: 'Gallery Night Walk', location: 'SOMA Arts', category: 'Art', duration: '3 hours', participants: 167, image: 'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&h=300&fit=crop' },
-      { title: 'Hidden Murals Hunt', location: 'Tenderloin', category: 'Art', duration: '1.5 hours', participants: 45, image: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=400&h=300&fit=crop' },
+      { title: 'Street Art Walking Tour', location: 'Miami', category: 'Art', duration: '2 hours', image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=300&fit=crop' },
+      { title: 'Gallery Night Walk', location: 'Miami', category: 'Art', duration: '3 hours', image: 'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&h=300&fit=crop' },
+      { title: 'Hidden Murals Hunt', location: 'Miami', category: 'Art', duration: '1.5 hours', image: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=400&h=300&fit=crop' },
     ],
     communityNotes: [
-      { author: 'ArtSeeker', location: 'Clarion Alley', message: 'Come early morning for the best photos. The light is perfect around 8am.', image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=200&fit=crop' },
-      { author: 'Creative', location: 'SFMOMA', message: 'The rooftop sculpture garden is free and often empty on weekday mornings.' },
+      { author: 'ArtSeeker', location: 'A mural alley', message: 'Come early morning for the best photos. The light is perfect around 8am.', image: 'https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=400&h=200&fit=crop' },
+      { author: 'Creative', location: 'A museum', message: 'The outdoor area is often quiet on weekday mornings.' },
     ],
   },
   music: {
@@ -63,13 +62,13 @@ const verticalData: Record<string, {
     description: 'Find the best live music venues, underground scenes, and unforgettable nights out.',
     hero: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=1200&h=600&fit=crop',
     quests: [
-      { title: 'Jazz Underground', location: 'North Beach', category: 'Music', duration: '3 hours', participants: 56, image: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=300&fit=crop' },
-      { title: 'Vinyl Record Hunt', location: 'Haight-Ashbury', category: 'Music', duration: '2 hours', participants: 98, image: 'https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=400&h=300&fit=crop' },
-      { title: 'Live Music Crawl', location: 'Mission', category: 'Music', duration: '4 hours', participants: 134, image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop' },
+      { title: 'Jazz Underground', location: 'Miami', category: 'Music', duration: '3 hours', image: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=300&fit=crop' },
+      { title: 'Vinyl Record Hunt', location: 'Miami', category: 'Music', duration: '2 hours', image: 'https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=400&h=300&fit=crop' },
+      { title: 'Live Music Crawl', location: 'Miami', category: 'Music', duration: '4 hours', image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop' },
     ],
     communityNotes: [
-      { author: 'MusicFan', location: 'The Saloon', message: 'Oldest bar in SF with live blues every night. Cash only!', image: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=200&fit=crop' },
-      { author: 'NightOwl', location: 'Rickshaw Stop', message: 'Best sound system in the city. Arrive by 9pm to avoid the line.' },
+      { author: 'MusicFan', location: 'A music bar', message: 'Arrive early if you want a spot near the stage.', image: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=200&fit=crop' },
+      { author: 'NightOwl', location: 'A music venue', message: 'Arrive early to avoid the line.' },
     ],
   },
   outdoors: {
@@ -78,13 +77,13 @@ const verticalData: Record<string, {
     description: 'Adventure awaits at hidden beaches, scenic trails, and natural wonders just waiting to be discovered.',
     hero: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=600&fit=crop',
     quests: [
-      { title: 'Sunset Beach Meditation', location: 'Ocean Beach', category: 'Outdoors', duration: '1 hour', participants: 203, image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop' },
-      { title: 'Mountain Trail Sunrise', location: 'Mt. Tamalpais', category: 'Outdoors', duration: '4 hours', participants: 234, image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=300&fit=crop' },
-      { title: 'Hidden Waterfall Hike', location: 'Muir Woods', category: 'Outdoors', duration: '3 hours', participants: 189, image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=300&fit=crop' },
+      { title: 'Sunset Beach Meditation', location: 'Miami', category: 'Outdoors', duration: '1 hour', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop' },
+      { title: 'Mountain Trail Sunrise', location: 'Miami', category: 'Outdoors', duration: '4 hours', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=300&fit=crop' },
+      { title: 'Hidden Waterfall Hike', location: 'Miami', category: 'Outdoors', duration: '3 hours', image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=300&fit=crop' },
     ],
     communityNotes: [
-      { author: 'Hiker', location: 'Lands End', message: 'Take the left fork at the second junction. Hidden bench with the best view.', image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=200&fit=crop' },
-      { author: 'BeachBum', location: 'Baker Beach', message: 'The north end is less crowded and has tide pools at low tide.' },
+      { author: 'Hiker', location: 'A coastal trail', message: 'Take the left fork at the second junction. Hidden bench with the best view.', image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=400&h=200&fit=crop' },
+      { author: 'BeachBum', location: 'A beach', message: 'The north end is less crowded and has tide pools at low tide.' },
     ],
   },
   everyday: {
@@ -93,13 +92,13 @@ const verticalData: Record<string, {
     description: 'Turn your daily routine into an adventure. Discover hidden gems in your own neighborhood.',
     hero: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=600&fit=crop',
     quests: [
-      { title: 'Vintage Bookstore Crawl', location: 'Hayes Valley', category: 'Everyday', duration: '2 hours', participants: 142, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop' },
-      { title: 'Secret Stairway Walk', location: 'Telegraph Hill', category: 'Everyday', duration: '1.5 hours', participants: 167, image: 'https://images.unsplash.com/photo-1516156008625-3a9d6067fab5?w=400&h=300&fit=crop' },
-      { title: 'Hidden Park Discovery', location: 'Noe Valley', category: 'Everyday', duration: '1 hour', participants: 89, image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop' },
+      { title: 'Vintage Bookstore Crawl', location: 'Miami', category: 'Everyday', duration: '2 hours', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop' },
+      { title: 'Secret Stairway Walk', location: 'Miami', category: 'Everyday', duration: '1.5 hours', image: 'https://images.unsplash.com/photo-1516156008625-3a9d6067fab5?w=400&h=300&fit=crop' },
+      { title: 'Hidden Park Discovery', location: 'Miami', category: 'Everyday', duration: '1 hour', image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=400&h=300&fit=crop' },
     ],
     communityNotes: [
-      { author: 'Local', location: 'Green Apple Books', message: 'The basement has rare first editions. Ask the staff for access.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=200&fit=crop' },
-      { author: 'Walker', location: 'Filbert Steps', message: 'Wild parrots live in the trees halfway up. Bring peanuts!' },
+      { author: 'Local', location: 'A bookstore', message: 'Ask the staff what they\'d recommend.', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=200&fit=crop' },
+      { author: 'Walker', location: 'A hillside stairway', message: 'Look up halfway through the climb.' },
     ],
   },
   events: {
@@ -108,13 +107,13 @@ const verticalData: Record<string, {
     description: 'Pop-up experiences, community gatherings, and festivals that bring people together.',
     hero: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=1200&h=600&fit=crop',
     quests: [
-      { title: 'Food Truck Festival', location: 'SoMa', category: 'Events', duration: '4 hours', participants: 315, image: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=400&h=300&fit=crop' },
-      { title: 'Night Market Adventure', location: 'Oakland', category: 'Events', duration: '3 hours', participants: 278, image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop' },
-      { title: 'Pop-Up Art Show', location: 'Dogpatch', category: 'Events', duration: '2 hours', participants: 123, image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop' },
+      { title: 'Food Truck Festival', location: 'Miami', category: 'Events', duration: '4 hours', image: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=400&h=300&fit=crop' },
+      { title: 'Night Market Adventure', location: 'Miami', category: 'Events', duration: '3 hours', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop' },
+      { title: 'Pop-Up Art Show', location: 'Miami', category: 'Events', duration: '2 hours', image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop' },
     ],
     communityNotes: [
-      { author: 'Foodie', location: 'Off the Grid', message: 'The Señor Sisig truck is always the longest line, but worth it.', image: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=400&h=200&fit=crop' },
-      { author: 'EventHopper', location: 'Treasure Island Flea', message: 'Arrive before 10am for the best vintage finds. Bring cash!' },
+      { author: 'Foodie', location: 'A food truck night', message: 'The longest line is usually worth it.', image: 'https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=400&h=200&fit=crop' },
+      { author: 'EventHopper', location: 'A flea market', message: 'Arrive before 10am for the best vintage finds. Bring cash!' },
     ],
   },
 };
@@ -171,12 +170,13 @@ const VerticalDetail = () => {
         </div>
       </section>
 
+      {/* Sample content only: made-up examples, not real quests, places or visitors. */}
       {/* Quests */}
       <section className="py-16 md:py-24">
         <div className="container">
           <AnimatedSection>
             <h2 className="font-poppins font-bold text-2xl md:text-3xl text-foreground mb-8">
-              Featured {data.title} Quests
+              Example {data.title} Quests
             </h2>
           </AnimatedSection>
 
@@ -193,7 +193,7 @@ const VerticalDetail = () => {
         <div className="container">
           <AnimatedSection>
             <h2 className="font-poppins font-bold text-2xl md:text-3xl text-foreground mb-8">
-              Community Notes from {data.title} Explorers
+              Example Community Notes for {data.title}
             </h2>
           </AnimatedSection>
 
@@ -208,7 +208,7 @@ const VerticalDetail = () => {
       {/* CTA */}
       <CTASection
         title={`Ready to Explore ${data.title}?`}
-        description="Start your first quest in this category and leave a community note for the next explorer."
+        description="Find a quest in this category and leave a community note for the next explorer."
         primaryAction={{ label: 'Find a Quest', href: '/quests' }}
         variant="sand"
       />

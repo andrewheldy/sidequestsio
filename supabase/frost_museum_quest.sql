@@ -13,8 +13,9 @@
 --   venue    20000000-0000-0000-0000-000000000010
 --   quest    30000000-0000-0000-0000-000000000010
 --
--- Before launch: confirm the social handles, and that Frost is happy to be
--- featured (docs/business/PARTNERSHIP_PLAYBOOK.md). Photos are public-domain
+-- Before launch: Frost has NOT agreed to be featured, and a venue code needs a
+-- sticker inside the museum, which needs their OK. Consider setting the quest
+-- status to 'draft' until they have (docs/business/PARTNERSHIP_PLAYBOOK.md). Photos are public-domain
 -- (Wikimedia Commons: "Frost Science.jpg", "Water is wet!.jpg").
 --
 -- Undo:
@@ -32,7 +33,7 @@ values (
   'Frost Museum of Science',
   'nonprofit',
   'info@frostscience.org',
-  'active'
+  'pending'
 )
 on conflict (id) do update set
   name = excluded.name,
@@ -53,7 +54,7 @@ values (
   -80.1880,
   'active',
   'Downtown Miami',
-  'A leading science museum with interactive exhibitions, a planetarium, and an aquarium in the heart of Miami.',
+  'Science museum on Biscayne Bay.',
   'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Water_is_wet%21.jpg/960px-Water_is_wet%21.jpg'
 )
 on conflict (id) do update set
@@ -77,7 +78,7 @@ values (
   '10000000-0000-0000-0000-000000000008',
   '20000000-0000-0000-0000-000000000010',
   'Frost Museum: Spark of Curiosity',
-  'Explore a universe of discovery at Miami''s Frost Museum of Science. From the planetarium to the aquarium, this is curiosity in real life.',
+  'A photo quest inside a Miami science museum. sidequests is independent and isn''t affiliated with or endorsed by the museum. Admission is separate.',
   'culture',
   'easy',
   130,
@@ -89,18 +90,12 @@ values (
   'explore',
   'Capture something that sparks your curiosity — an exhibit, view, or moment.',
   'camera',
-  'Found something that sparked my curiosity at the Frost Museum of Science 🔭 #sidequests #FrostScience #Miami',
+  'Found something that sparked my curiosity at the Frost Museum of Science 🔭 #sidequests #Miami',
   '45 min',
   jsonb_build_object(
-    'website_url',    'https://www.frostscience.org',
-    'instagram_url',  'https://www.instagram.com/frostscience/',
-    'tiktok_url',     'https://www.tiktok.com/@frostscience',
-    'x_url',          'https://x.com/FrostScience',
-    'reviews_url',    'https://www.google.com/maps/search/?api=1&query=Phillip+and+Patricia+Frost+Museum+of+Science',
-    'reviews_source', 'google'
-    -- Advertised Explore & Share points (display only; nothing credits them
-    -- yet — see docs/QUEST_CONTENT_IMPORT.md). Uncomment to show them:
-    -- , 'action_points', jsonb_build_object('instagram', 50, 'tiktok', 50, 'x', 25, 'google_review', 75, 'website', 25)
+    'website_url',    'https://www.frostscience.org'
+    -- Social links and advertised share points are intentionally left out: they
+    -- would suggest the museum is involved, and nothing credits those points yet.
   )
 )
 on conflict (id) do update set

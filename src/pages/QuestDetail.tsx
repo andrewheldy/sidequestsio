@@ -347,7 +347,7 @@ export default function QuestDetail() {
       setShowProofCamera(true);
     } catch {
       trackQuestEvent("quest_action_failed", ctx, { ...detail, props: { stage: "complete" } });
-      toast.error("Couldn't reach SideQuests. Check your connection and try again.");
+      toast.error("Couldn't reach sidequests. Check your connection and try again.");
     } finally {
       setBusy(false);
     }
@@ -373,7 +373,7 @@ export default function QuestDetail() {
   const handleShare = () => {
     trackQuestEvent("quest_share_clicked", ctx, { trackingId: "quest.share", props: { target: "page" } });
     void shareOrCopy(
-      { title: quest.title, text: `Check out this SideQuest: ${quest.title}`, url: window.location.href },
+      { title: quest.title, text: `Check out this quest on sidequests: ${quest.title}`, url: window.location.href },
       "Link copied to clipboard",
     );
   };
@@ -383,7 +383,7 @@ export default function QuestDetail() {
       trackingId: "quest.completed.share",
       props: { target: "completion" },
     });
-    const caption = shown.social_share_prompt ?? `Just completed "${quest.title}" on SideQuests 🗺️ #sidequests`;
+    const caption = shown.social_share_prompt ?? `Just completed "${quest.title}" on sidequests 🗺️ #sidequests`;
     void shareOrCopy({ text: caption, url: `${window.location.origin}/quests/${quest.id}` }, "Caption copied — paste it anywhere!");
   };
 

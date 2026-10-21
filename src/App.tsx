@@ -22,7 +22,6 @@ import CommunityNotes from "./pages/CommunityNotes";
 import Verticals from "./pages/Verticals";
 import VerticalDetail from "./pages/VerticalDetail";
 import Partnerships from "./pages/Partnerships";
-import Hosts from "./pages/Hosts";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import PublicProfile from "./pages/PublicProfile";
@@ -47,7 +46,6 @@ import QuestBrowser from "./pages/app/QuestBrowser";
 import AppCommunityNotes from "./pages/app/AppCommunityNotes";
 import CheckIn from "./pages/app/CheckIn";
 import Rewards from "./pages/app/Rewards";
-import ReadinessBrief from "./pages/ReadinessBrief";
 import NotFound from "./pages/NotFound";
 
 // Concept/pitch microsite: lazy so its fonts, styles and code stay out of the main bundle.
@@ -82,7 +80,6 @@ const App = () => (
                       <Route path="/verticals" element={<Verticals />} />
                       <Route path="/verticals/:slug" element={<VerticalDetail />} />
                       <Route path="/partnerships" element={<Partnerships />} />
-                      <Route path="/hosts" element={<Hosts />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsOfService />} />
                       <Route path="/community-guidelines" element={<CommunityGuidelines />} />
@@ -90,7 +87,6 @@ const App = () => (
                       <Route path="/cookie-preferences" element={<CookiePreferences />} />
                       <Route path="/delete-account" element={<DeleteAccountPolicy />} />
                       <Route path="/partner-terms" element={<PartnerTerms />} />
-                      <Route path="/readiness" element={<ReadinessBrief />} />
                       <Route
                         path="/iiipoints"
                         element={

@@ -76,7 +76,7 @@ export const EXPLORER_STYLES: ExplorerStyle[] = [
     id: 'competitive',
     icon: Trophy,
     label: 'Competitive Hunter',
-    description: 'Chase XP, climb leaderboards, win streaks.',
+    description: 'Collect progress and finish more quests.',
     energy: 'competitive',
   },
   {
@@ -161,7 +161,7 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
   const byVibe: Record<string, GeneratedQuest> = {
     foodie: {
       title: `${neighborhood} Taco & Cafecito Crawl`,
-      reward: 'Free Pastelito',
+      reward: 'Points',
       xp: 120,
       distance: '0.7 miles',
       time: '25 minutes',
@@ -169,7 +169,7 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
     },
     nightlife: {
       title: `${neighborhood} After-Dark Soundwalk`,
-      reward: 'Skip-the-Line Pass',
+      reward: 'Points',
       xp: 150,
       distance: '0.9 miles',
       time: '30 minutes',
@@ -177,7 +177,7 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
     },
     wellness: {
       title: `${neighborhood} Sunrise Reset`,
-      reward: 'Free Smoothie',
+      reward: 'Points',
       xp: 100,
       distance: '0.5 miles',
       time: '20 minutes',
@@ -185,7 +185,7 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
     },
     culture: {
       title: `${neighborhood} Mural & Gallery Hunt`,
-      reward: 'Gallery Print',
+      reward: 'Points',
       xp: 130,
       distance: '0.8 miles',
       time: '35 minutes',
@@ -193,7 +193,7 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
     },
     outdoor: {
       title: `${neighborhood} Bayfront Loop`,
-      reward: 'Bike Rental Hour',
+      reward: 'Points',
       xp: 110,
       distance: '1.2 miles',
       time: '30 minutes',
@@ -201,7 +201,7 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
     },
     community: {
       title: `${neighborhood} Local Legends Quest`,
-      reward: 'Community Badge',
+      reward: 'Points',
       xp: 90,
       distance: '0.6 miles',
       time: '25 minutes',
@@ -209,7 +209,7 @@ export function buildFirstQuest(selections: OnboardingSelections): GeneratedQues
     },
     'hidden-gems': {
       title: `Hidden ${neighborhood} Coffee Crawl`,
-      reward: 'Free Specialty Coffee',
+      reward: 'Points',
       xp: 100,
       distance: '0.6 miles',
       time: '20 minutes',
