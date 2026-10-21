@@ -630,10 +630,10 @@ Reconcile this table against `git log` and worktrees before launching more work.
 | Node | Scope | Owner | Status | Commit | Evidence |
 |---|---|---|---|---|---|
 | A | Baseline inspection | root | done | `9bc4245` | typecheck pass; 4/4 nav tests (first cold run timed out at 5 s — pre-existing flake); doctor 17/20 (2 network-only, 1 SDK patch drift — pre-existing) |
-| B | Shared contracts, client, primitives | root | done | (this commit) | typecheck pass; 20/20 jest (mocked); iOS+Android JS export pass; doctor unchanged 17/20 |
-| C | Explore + Quest Detail | worker | pending | — | — |
-| D | Auth + Onboarding | worker | pending | — | — |
-| J1 | Integrate C+D | root | pending | — | — |
+| B | Shared contracts, client, primitives | root | done | `ad7a18a`, `ca2cac2` | typecheck pass; 20/20 jest (mocked); iOS+Android JS export pass; doctor unchanged 17/20 |
+| C | Explore + Quest Detail | worker (Sonnet, medium, worktree) | accepted | `1034a96` (merged `9b12b9e`) | worker: tsc pass, 43 jest, export pass; root re-ran after merge; nav suite rebased `65c9769` |
+| D | Auth + Onboarding | worker (Sonnet, medium, worktree) | accepted | `890b879` (merged `a0b6c02`) | worker: tsc pass, 69 jest (account+foundation), export pass; root review: scope, consent payload, no starter XP, draft ownership, callback param allowlist |
+| J1 | Integrate C+D | root | done | `a4824f5` | tsc pass; 99/99 jest (11 suites, mocked) incl. cross-feature journey; iOS+Android JS export pass. Not run on simulator/device or live backend |
 | E | Profile + Settings | worker | pending | — | — |
 | F | Quest completion + Rewards | worker | pending | — | — |
 | J2 | Integrate E+F | root | pending | — | — |
