@@ -40,8 +40,9 @@ export function resolveBackend(
   if (!isLocal && parsed.protocol !== 'https:') {
     return { status: 'refused', message: 'The backend URL must use HTTPS.' };
   }
-  const projectRef = parsed.hostname.endsWith('.supabase.co') ? parsed.hostname.split('.')[0] : null;
-  if (projectRef === PRODUCTION_PROJECT_REF) {
+  const hostname = parsed.hostname.toLowerCase().replace(/\.$/, '');
+  const projectRef = hostname.endsWith('.supabase.co') ? hostname.split('.')[0] : null;
+  if (projectRef === PRODUCTION_PROJECT_REF || hostname.includes(PRODUCTION_PROJECT_REF)) {
     return {
       status: 'refused',
       message:

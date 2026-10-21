@@ -181,8 +181,11 @@ function QrFlow({ quest, userId }: { quest: QuestWithContext; userId: string }) 
   };
 
   // What the server already says about this quest (display; complete_quest re-checks).
+  // When the server's offer says available, the device-clock status must not override it.
   const serverDone: Outcome | null =
-    offer.data?.kind === 'already_completed'
+    offer.data?.kind === 'available'
+      ? null
+      : offer.data?.kind === 'already_completed'
       ? { kind: 'completed', completedAt: status.data?.kind === 'completed' ? status.data.completedAt : null }
       : offer.data?.kind === 'cooldown'
         ? { kind: 'cooldown', availableAt: offer.data.availableAt }

@@ -428,8 +428,7 @@ describe('delete account', () => {
   });
 
   it('shows the address when no email app can open, without pretending anything was sent', async () => {
-    jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(false);
-    const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined as never);
+    const openURL = jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('No app handles mailto'));
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     signedIn();
     await toDeleteScreen();
@@ -440,6 +439,6 @@ describe('delete account', () => {
     expect(screen.getByText(/To: support@/)).toBeVisible();
     expect(screen.getByText('Subject: Account Deletion Request')).toBeVisible();
     expect(screen.getByText(/Nothing has been requested yet/)).toBeVisible();
-    expect(openURL).not.toHaveBeenCalled();
+    expect(openURL).toHaveBeenCalledTimes(1);
   });
 });

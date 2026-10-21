@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Button, EmptyState, LoadingState, Screen, SetupRequired } from '../../components/ui';
+import { clearPendingReturn } from '../../lib/navigation/returnTo';
 import { requireSupabase } from '../../lib/supabase';
 import { classifyAuthError, messageForKind } from '../../features/account/authErrors';
 import { parseCallbackParams, type CallbackParams } from '../../features/account/callbackParams';
@@ -10,6 +11,13 @@ import { useSession } from '../../session/SessionProvider';
 import { spacing } from '../../theme/tokens';
 
 type Phase = 'working' | 'failed';
+
+/**
+ * Codes this app instance has exchanged successfully. A failed exchange is only
+ * treated as a harmless replay when the same code already worked here; an
+ * existing session alone proves nothing (it may belong to another account).
+ */
+const exchangedCodes = new Set<string>();
 
 /**
  * Deep-link landing for email confirmation and password recovery
@@ -52,16 +60,17 @@ function CallbackBody({ params }: { params: CallbackParams }) {
       try {
         const sb = requireSupabase();
         const { error } = await sb.auth.exchangeCodeForSession(code);
-        if (error) {
-          // A replayed link may land after the first delivery already signed us in.
-          const { data } = await sb.auth.getSession();
-          if (!data.session) {
-            setFailure(messageForKind(classifyAuthError(error) === 'network' ? 'network' : 'link_expired'));
-            setPhase('failed');
-            return;
-          }
+        if (error && !exchangedCodes.has(code)) {
+          setFailure(messageForKind(classifyAuthError(error) === 'network' ? 'network' : 'link_expired'));
+          setPhase('failed');
+          return;
         }
-        if (flow === 'recovery') router.replace('/auth/reset-password');
+        exchangedCodes.add(code);
+        if (flow === 'recovery') {
+          // Recovery never continues to a quest: drop any pending quest return first.
+          await clearPendingReturn();
+          router.replace('/auth/reset-password');
+        }
       } catch (e) {
         setFailure(messageForKind(classifyAuthError(e as Error) === 'network' ? 'network' : 'link_expired'));
         setPhase('failed');

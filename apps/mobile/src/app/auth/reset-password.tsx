@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useRef, useState, type ComponentRef } from 'react';
 import { TextInput, View } from 'react-native';
 import { Button, EmptyState, LoadingState, Screen, SetupRequired, Text, TextField } from '../../components/ui';
+import { clearPendingReturn, encodeReturnTarget } from '../../lib/navigation/returnTo';
 import { requireSupabase } from '../../lib/supabase';
 import { classifyAuthError, messageForKind } from '../../features/account/authErrors';
 import { FormMessage } from '../../features/account/components';
@@ -71,7 +72,13 @@ export default function ResetPassword() {
         setError(messageForKind(classifyAuthError(authError)));
         return;
       }
-      router.replace(needsOnboarding ? '/onboarding' : '/');
+      // Never resume a quest return after recovery, now or in a later session.
+      await clearPendingReturn();
+      router.replace(
+        needsOnboarding
+          ? { pathname: '/onboarding', params: { returnTo: encodeReturnTarget({ kind: 'tab', tab: 'explore' }) } }
+          : '/',
+      );
     } catch (e) {
       setError(messageForKind(classifyAuthError(e as Error)));
     } finally {

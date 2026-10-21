@@ -26,7 +26,8 @@ function DeleteRequest({ account }: { account: ReadyAccount }) {
   async function openEmail() {
     const url = deletionMailto(account.email, account.userId);
     try {
-      if (!(await Linking.canOpenURL(url))) throw new Error('No email app');
+      // openURL rejects when no mail app can handle it (canOpenURL needs extra
+      // manifest queries on Android 11+, so it is not used here).
       await Linking.openURL(url);
       setOutcome('opened');
     } catch {

@@ -26,3 +26,8 @@ it('returns null for an unknown quest', async () => {
   backend.reset(null, () => ({ data: null }));
   expect(await api.getQuest('missing')).toBeNull();
 });
+
+it('treats a malformed (non-uuid) id as not found instead of a connection error', async () => {
+  backend.reset(null, () => ({ error: { code: '22P02', message: 'invalid input syntax for type uuid' } }));
+  expect(await api.getQuest('abc')).toBeNull();
+});

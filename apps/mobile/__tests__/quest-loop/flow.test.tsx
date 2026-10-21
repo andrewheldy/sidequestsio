@@ -315,6 +315,8 @@ describe('completion', () => {
 describe('status and persistence', () => {
   it('shows an already completed quest without a scanner', async () => {
     world.completions = [completionRow()];
+    // The real generate_quest_instance reports a completed once-ever quest as already_completed.
+    world.offer = () => ({ data: { ok: false, error: 'already_completed' } });
     await mount();
     expect(await screen.findByText('Quest completed', {}, { timeout: 8000 })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Scan the SideQuests code' })).toBeNull();
@@ -365,11 +367,23 @@ describe('quest detail CTA', () => {
     expect(button).toBeDisabled();
   });
 
-  it('shows Available again with the date during a cooldown', async () => {
+  it('shows the repeat date during a device-computed cooldown without blocking Start (server decides)', async () => {
     world.quests = [{ ...(world.quests[0] as object), repeat_cooldown_days: 36500 }, world.quests[1]];
     world.completions = [completionRow()];
     await mount({ url: `/quests/${QUEST_ID}` });
-    expect(await screen.findByRole('button', { name: /^Available again on / }, { timeout: 8000 })).toBeDisabled();
+    expect(await screen.findByText(/You can repeat this quest from /, {}, { timeout: 8000 })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Start quest' })).toBeEnabled();
+  });
+
+  it('lets the server offer override a device-clock cooldown on the completion screen', async () => {
+    world.quests = [{ ...(world.quests[0] as object), repeat_cooldown_days: 1 }, world.quests[1]];
+    // Device clock says the 1-day cooldown is still running...
+    world.completions = [completionRow({ completed_at: new Date(Date.now() - 23 * 3600_000).toISOString() })];
+    // ...but the server says the quest is available.
+    world.offer = () => ({ data: { ok: true, instance: null } });
+    grantCamera();
+    await mount();
+    expect(await screen.findByRole('button', { name: 'Scan the SideQuests code' }, { timeout: 8000 })).toBeVisible();
   });
 
   it('shows Continue when a verified scan is pending', async () => {

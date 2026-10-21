@@ -38,6 +38,8 @@ export async function listActiveQuests(): Promise<QuestList> {
 /** Returns null when the quest does not exist or is not visible to the caller. */
 export async function getQuest(questId: string): Promise<QuestWithContext | null> {
   const { data, error } = await requireSupabase().from('quests').select(QUEST_SELECT).eq('id', questId).maybeSingle();
+  // quests.id is a uuid: a malformed id (22P02 invalid_text_representation) cannot exist.
+  if (error && (error as { code?: string }).code === '22P02') return null;
   if (error) throw error;
   return (data as QuestWithContext | null) ?? null;
 }

@@ -52,11 +52,12 @@ export function useQuestCta(quest: Pick<Quest, 'id' | 'repeat_cooldown_days'>): 
     return { label: 'Completed', icon: 'checkmark-circle-outline', done: true, note: `You completed this quest on ${formatDate(status.data.completedAt)}.` };
   }
   if (status.data?.kind === 'cooldown') {
+    // Computed from the device clock, so it never blocks: the server decides when Start is pressed.
     return {
-      label: `Available again on ${formatDate(status.data.availableAt)}`,
-      icon: 'time-outline',
-      done: true,
-      note: null,
+      label: 'Start quest',
+      icon: 'qr-code-outline',
+      done: false,
+      note: `You can repeat this quest from ${formatDate(status.data.availableAt)}.`,
     };
   }
   if (pending.data) {
