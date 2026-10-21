@@ -634,9 +634,9 @@ Reconcile this table against `git log` and worktrees before launching more work.
 | C | Explore + Quest Detail | worker (Sonnet, medium, worktree) | accepted | `1034a96` (merged `9b12b9e`) | worker: tsc pass, 43 jest, export pass; root re-ran after merge; nav suite rebased `65c9769` |
 | D | Auth + Onboarding | worker (Sonnet, medium, worktree) | accepted | `890b879` (merged `a0b6c02`) | worker: tsc pass, 69 jest (account+foundation), export pass; root review: scope, consent payload, no starter XP, draft ownership, callback param allowlist |
 | J1 | Integrate C+D | root | done | `a4824f5` | tsc pass; 99/99 jest (11 suites, mocked) incl. cross-feature journey; iOS+Android JS export pass. Not run on simulator/device or live backend |
-| E | Profile + Settings | worker (Sonnet, medium, worktree) | running | base `2f1cea1` | — |
+| E | Profile + Settings | worker (Sonnet, medium, worktree) | accepted | `ac9eff4` (merged `df65040`) | worker: tsc pass, 132 jest, export pass; root review: editable-field allowlist, own-user writes, partial privacy upserts, append-only consent, `is_public` only, truthful mailto deletion; root re-ran 184 jest after merge |
 | F | Quest completion + Rewards | worker (Sonnet, medium, worktree) | accepted | `726afa5` (merged `a8562e9`; root fix `28cad6e` scan time from `scan_events.timestamp`) | worker: tsc pass, 153 jest, export pass; root review: QR-only, exact RPC params, single-flight, server-confirmed awards, no Redeem, CTA-only edit to detail; root re-ran tsc/153 jest/export after merge |
-| J2 | Integrate E+F | root | pending | — | — |
+| J2 | Integrate E+F | root | done | `bea8997` | tsc pass; 185/185 jest (17 suites, mocked) incl. completion→profile→sign-out journey; iOS+Android JS export pass; web `tsc -p tsconfig.app.json` + `npm run build` pass (no web files changed). iOS `LSApplicationQueriesSchemes: mailto` added. Not run on simulator/device or live backend |
 | G | Independent review | reviewer | pending | — | — |
 | H | Repairs, final checks, handoff | root | pending | — | — |
 
