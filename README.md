@@ -2,6 +2,12 @@
 
 Mobile-first QR quest platform — scan, explore, earn.
 
+## Start here
+
+Read [AGENTS.md](AGENTS.md) for shared contributor and coding-agent rules, then use the [documentation map](docs/README.md) to find the relevant source of truth. [CLAUDE.md](CLAUDE.md) points to the same rules rather than maintaining a duplicate manual.
+
+The [web design brief](DESIGN_BRIEF.md) and [mobile reference images](docs/design/mobile/) remain active references. Old architecture planning and the one-off redesign prompt are identified in the [archive index](docs/archive/README.md); do not treat them as current implementation instructions.
+
 ## Tech stack
 
 - **Vite + React + TypeScript**
@@ -17,7 +23,7 @@ Mobile-first QR quest platform — scan, explore, earn.
 
 ```sh
 # 1. Clone
-git clone <YOUR_GIT_URL>
+git clone https://github.com/andrewheldy/sidequestsio.git
 cd sidequestsio
 
 # 2. Install dependencies
@@ -74,14 +80,9 @@ instead of a blank screen.
 
 ### 2. Database
 
-Run the migration in `supabase/migrations/0001_profiles.sql`:
+The schema is maintained in `supabase/migrations/`; the original single-profile migration is not a complete setup guide for the current application.
 
-```sh
-supabase db push
-# or paste into the Supabase SQL editor
-```
-
-This creates the `profiles` table, RLS policies, and an auto-create-profile trigger on sign-up.
+Follow the database and migration guardrails in [AGENTS.md](AGENTS.md). Verify the target environment and applied schema before proposing changes. The repository's agent database connection is read-only; migrations and imports must be handed to the user for an explicitly authorized, backed-up workflow. Do not run a blanket database push as part of repository cleanup.
 
 ### 3. Auth settings
 
