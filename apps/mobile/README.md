@@ -1,10 +1,19 @@
-# SideQuests consumer mobile foundation
+# SideQuests consumer mobile app (MVP)
 
-One Expo Router + React Native + strict TypeScript app for iOS and Android.
-This task stops at the navigation foundation. No authentication, data integration,
-maps, camera, QR, completion, points, redemption, or database changes are included.
-Future integration must use the existing Supabase backend, with server-enforced
-authorization; no second backend is introduced here.
+One Expo Router + React Native + strict TypeScript app for iOS and Android, talking
+directly to the existing Supabase backend (no second backend). Navigation is
+Rewards / Explore / Profile; Settings, auth, onboarding, quest detail and quest
+completion are stack routes.
+
+Implemented journey: guest Explore (list/map, filters, optional "Near me") → quest
+detail → sign in / create account (email + password, verification, recovery) →
+onboarding when needed → back to the intended quest → QR quest completion confirmed by
+the server → progress and history in Profile → profile/privacy settings, sign out,
+deletion request. Rewards shows real balances and available rewards read-only.
+
+Deliberately excluded: reward redemption (no partner fulfilment flow; 0 live
+rewards), photo/proof capture, non-QR verification types, avatar upload, in-app
+account deletion (needs a backend endpoint — see "Release blockers").
 
 ## Package layout and compatibility
 
@@ -64,11 +73,12 @@ typecheck, navigation tests, Expo Doctor, and iOS/Android JS exports. It does no
 start EAS or compile/sign native binaries. Web ESLint ignores mobile; the existing
 web lint baseline is recorded separately below.
 
-The Jest integration suite renders the actual filesystem routes using
-`expo-router/testing-library`, not a mocked navigation callback. It checks initial
-Explore selection, tab order and switching, sample quest parameter delivery and
-back navigation, direct quest links, and hiding the sample link outside development.
-Native views are mocked by jest-expo; these tests do not prove device behavior.
+The Jest suites render the actual filesystem routes with `expo-router/testing-library`
+against an in-memory fake Supabase client (`__tests__/support`): navigation/tab order,
+discovery, auth/onboarding/return flows, profile/settings writes and account
+isolation, and the QR completion state machine, plus cross-feature journeys. Native
+modules (camera, maps, location, secure store) are mocked; these tests do not prove
+device behaviour or live-backend behaviour.
 
 ## Local development builds
 
@@ -115,7 +125,7 @@ iOS simulator builds do not require physical-device signing.
 
 ## Environments and client values
 
-The foundation runs without a `.env` file. If local native configuration is needed:
+Without a `.env.local` the app runs but shows a "Backend not configured" state (no demo data). To configure:
 
 ```sh
 cp apps/mobile/.env.example apps/mobile/.env.local
@@ -127,8 +137,10 @@ cp apps/mobile/.env.example apps/mobile/.env.local
 | `APP_VARIANT` | `development` by default, or `staging`; `production` is rejected in this foundation |
 | `MOBILE_IOS_BUNDLE_IDENTIFIER` | Approved iOS ID for the selected variant, required only for native iOS builds |
 | `MOBILE_ANDROID_APPLICATION_ID` | Approved Android ID for the selected variant, required only for native Android builds |
-| `EXPO_PUBLIC_SUPABASE_URL` | Placeholder for future existing-backend integration; currently unused |
-| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Placeholder for a browser-safe publishable/anon key; currently unused |
+| `EXPO_PUBLIC_SUPABASE_URL` | Approved non-production project URL; production ref is refused |
+| `EXPO_PUBLIC_WEB_ORIGIN` | Website origin for policy links and accepted scan host (default `https://miamisidequests.io`) |
+| `MOBILE_ANDROID_GOOGLE_MAPS_API_KEY` | Optional Android map key; without it Android is list-only |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable/anon key for that project (never service-role) |
 
 Development and staging must use distinct approved identifiers, URL schemes, and
 the existing backend's designated non-production configuration. To run staging,
@@ -143,25 +155,48 @@ passwords, signing credentials, or other privileged secrets in them. None are
 needed here. Configuration contains placeholders only; no migrations or imports
 should be run for this foundation.
 
-## Next implementation entry points
+## Code map and contracts
 
-| File/interface | Responsibility |
+| Path | Owner / responsibility |
 | --- | --- |
-| `src/app/_layout.tsx` | Root native stack; anchors direct quest links to the tab group |
-| `src/app/(tabs)/_layout.tsx` | Rewards / Explore / Profile tab ordering, initial Explore selection |
-| `src/app/(tabs)/index.tsx` | Explore placeholder and the development-only sample link |
-| `src/app/quests/[questId].tsx` | Quest detail; `useLocalSearchParams<{ questId: string }>()` receives the ID |
-| `src/components/PlaceholderScreen.tsx` | Simple accessible text, scrolling, safe-area container |
-| `__tests__/navigation.test.tsx` | Existing-route regression tests to extend with future screens |
+| `src/lib/config.ts` | One config path; refuses missing config and the production project ref |
+| `src/lib/supabase.ts`, `secureSessionStorage.ts` | Single PKCE client; session in Keychain/Keystore (chunked) |
+| `src/lib/appStorage.ts` | Non-secret local state; account-scoped keys cleared on signout/switch |
+| `src/lib/navigation/returnTo.ts` | Validated return targets (`quest:<id>`, `tab:<name>`), pending return with TTL |
+| `src/lib/api/{quests,progress}.ts` | Shared reads; `user_profiles` is the only XP/Points source |
+| `src/session/*` | Auth/profile state machine (`unconfigured · restoring · guest · loading_profile · needs_onboarding · ready · error`), `accountGate` |
+| `src/components/ui`, `src/theme/tokens.ts` | Primitives and dark tokens (brand semantic palette + reference accent) |
+| `src/features/discovery` | Explore, map, quest detail |
+| `src/features/account`, `src/features/onboarding` | Auth screens, deep-link callback, post-auth routing, onboarding draft/save |
+| `src/features/profile` | Profile, settings, edit profile, deletion request |
+| `src/features/quest-loop`, `src/features/rewards` | QR scan → `record_code_scan` → `complete_quest`; rewards tab |
+| `__tests__/` | Jest (mocked Supabase + native modules); `support/` holds the fake client |
 
-Navigate to detail with the Router object form:
-`{ pathname: '/quests/[questId]', params: { questId } }`. Preserve IDs as strings.
-No mobile quest data contract or repository has been added yet. Inspect the existing
-`src/types/db.ts`, `src/lib/db/repository.ts`, and Supabase migrations when integration
-is authorized; do not import web UI or browser/localStorage repositories into native.
+Navigate to a quest with `{ pathname: '/quests/[questId]', params: { questId } }`; ids stay strings.
+
+## Backend setup required for real use
+
+1. An approved **non-production** Supabase project with the repo migrations applied
+   (`scripts/verify-db.sql` afterwards). The app refuses `wvedvngtuzsttpavmgjw`.
+2. Auth → URL configuration → Redirect URLs: `sidequests-development://auth/callback**`
+   (and `sidequests-staging://auth/callback**` for staging). Without it, email links fall
+   back to the website and users sign in afterwards. Links must be opened on the
+   requesting device (PKCE).
+3. `apps/mobile/.env.local`: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+   optional `EXPO_PUBLIC_WEB_ORIGIN`, `MOBILE_ANDROID_GOOGLE_MAPS_API_KEY`.
+4. Synthetic test data in that project: an active QR quest with a venue and a printed
+   `/scan/<code>` code from `create_qr_code`.
+
+## Release blockers
+
+- In-app account deletion: Apple requires it; today the app opens a prefilled email to
+  support (truthful, not deletion). Needs an authenticated deletion RPC/Edge Function.
+- No live-backend, simulator, or device verification has been run (see verification record).
 
 ## Verification record
 
-See the foundation entry in `docs/engineering/CHANGELOG.md` for the completed-run
-results and outstanding native/device checks. Re-run the commands above after
+See the 2026-10-20 (foundation) and 2026-10-21 (MVP) entries in
+`docs/engineering/CHANGELOG.md` for command results and outstanding native/device
+checks, and the execution ledger in `docs/engineering/PRODUCTION_SPRINT_PLAN.md`
+Appendix C. Re-run the commands above after
 future changes; a JS export is not a successful native compilation.
