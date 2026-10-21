@@ -617,3 +617,31 @@ The four territories share almost no files; the only ordered edges are (a) DB-be
 ## Appendix B — Open [V] items (tracked in §1 Unknowns and LC-6/14/15/16)
 
 Mapbox allowlist · Supabase Auth settings (confirmation, providers, Site URL/redirects) · Vercel env values (proven only by smoke) · auto-deploy behavior · marketing `/quests` link targets · role-guard plumbing for admin mount.
+
+---
+
+## Appendix C — Mobile MVP execution ledger (started 2026-10-21)
+
+Branch `feat/mobile-mvp` from `main` `9bc4245` (mobile foundation, PR #50). Graph and
+contracts: root owns shared contracts/primitives/config/manifests/navigation tests;
+workers own feature routes under `apps/mobile/src/app` and `apps/mobile/src/features/*`.
+Reconcile this table against `git log` and worktrees before launching more work.
+
+| Node | Scope | Owner | Status | Commit | Evidence |
+|---|---|---|---|---|---|
+| A | Baseline inspection | root | done | `9bc4245` | typecheck pass; 4/4 nav tests (first cold run timed out at 5 s — pre-existing flake); doctor 17/20 (2 network-only, 1 SDK patch drift — pre-existing) |
+| B | Shared contracts, client, primitives | root | done | (this commit) | typecheck pass; 20/20 jest (mocked); iOS+Android JS export pass; doctor unchanged 17/20 |
+| C | Explore + Quest Detail | worker | pending | — | — |
+| D | Auth + Onboarding | worker | pending | — | — |
+| J1 | Integrate C+D | root | pending | — | — |
+| E | Profile + Settings | worker | pending | — | — |
+| F | Quest completion + Rewards | worker | pending | — | — |
+| J2 | Integrate E+F | root | pending | — | — |
+| G | Independent review | reviewer | pending | — | — |
+| H | Repairs, final checks, handoff | root | pending | — | — |
+
+Environment facts (2026-10-21): no approved non-production Supabase project exists (the
+only project is production `wvedvngtuzsttpavmgjw`, which the mobile app refuses), and this
+machine has no Xcode simulator, Android SDK, Docker or Supabase CLI. Live-backend
+integration, native compilation and simulator/device checks are therefore **pending**,
+not passed.
