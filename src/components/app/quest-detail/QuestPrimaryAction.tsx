@@ -185,7 +185,7 @@ const CTA_LABEL: Record<Exclude<PrimaryCtaState, "completed">, string> = {
 function ctaHint(state: PrimaryCtaState, action: QuestActionDefinition, venueName: string | null): string {
   const at = venueName ? `at ${venueName}` : "at the venue";
   if (state === "locked") {
-    return `Scan the SideQuests code or tap the NFC tag ${at} to unlock this quest.`;
+    return `Scan the sidequests code or tap the NFC tag ${at} to unlock this quest.`;
   }
   if (action.verificationType === "gps") {
     return "Be at the venue to check in. Location is only used to verify — never stored.";

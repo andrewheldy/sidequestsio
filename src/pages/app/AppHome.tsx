@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Flame, Star, Sparkles } from "lucide-react";
+import { Star, Sparkles } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import AppLayout from "@/components/app/AppLayout";
 import { SectionHeader, StatTile, Loading } from "@/components/app/ui";
@@ -47,15 +47,10 @@ export default function AppHome() {
 
         {/* Stats */}
         <div className="glass-card mt-5 p-4">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <StatTile label="Level" value={lvl.level} accent="reward" sub={`${lvl.xpToNext} XP to L${lvl.level + 1}`} />
             <StatTile label="Quests" value={profile?.completed_quests_count ?? 0} accent="ocean" sub="Completed" />
             <StatTile label="Points" value={profile?.points_balance_cache ?? 0} accent="reward" sub="Balance" />
-            <StatTile
-              label="Streak"
-              value={<span className="flex items-center gap-1"><Flame className="h-5 w-5 text-orange-400" />7</span>}
-              sub="days"
-            />
           </div>
           <Progress value={lvl.progress * 100} className="mt-3 h-2" />
         </div>
@@ -65,10 +60,10 @@ export default function AppHome() {
           <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 text-center">
             <Badge className="absolute left-4 top-4 bg-secondary text-secondary-foreground">NEW</Badge>
             <h2 className="font-display text-lg font-bold tracking-[-0.03em] text-foreground">
-              The rewards ecosystem
+              Your points
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Your adventures. Real rewards. Real impact.
+              Points can go toward rewards when local spots add them.
             </p>
             <div className="mx-auto mt-4 flex w-fit items-center gap-3 rounded-2xl border border-secondary/40 px-6 py-3">
               <Star className="h-6 w-6 text-primary" />

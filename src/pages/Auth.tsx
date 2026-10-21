@@ -118,7 +118,7 @@ const Auth = () => {
           <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">
             {mode === 'signin'
               ? 'Pick up where you left off and find something worth going out for.'
-              : 'Save quests, earn XP and Points, and keep an Adventure Log of what you find.'}
+              : 'Save quests and keep a record of what you find.'}
           </p>
         </div>
 

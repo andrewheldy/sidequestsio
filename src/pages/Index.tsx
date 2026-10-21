@@ -34,7 +34,7 @@ const featuredQuests = [
     location: 'Wynwood · Miami',
     category: 'Food & drink',
     duration: '20 min',
-    concept: 'Taste one single-origin coffee, ask where it began, and earn a reward for following the story.',
+    concept: 'Taste one single-origin coffee, ask where it began, and follow the story.',
     xp: 100,
     points: 20,
     image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&h=900&fit=crop',
@@ -88,7 +88,7 @@ const Index = () => (
           <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-white/58">
             <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[hsl(var(--palm-500))]" /> Free for explorers</span>
             <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[hsl(var(--palm-500))]" /> Curated in Miami</span>
-            <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[hsl(var(--palm-500))]" /> Real-world rewards</span>
+            <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[hsl(var(--palm-500))]" /> Rewards may come as local spots join</span>
           </div>
         </div>
 
@@ -103,8 +103,7 @@ const Index = () => (
             className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/20 bg-[hsl(var(--midnight-900)/0.88)] p-4 text-white backdrop-blur-md focus-visible:outline-none sm:left-auto sm:w-[330px] lg:bottom-7 lg:right-7"
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="sq-overline text-[hsl(var(--gold-500))]">Quest nearby</span>
-              <span className="sq-mono text-xs text-white/54">+130 XP</span>
+              <span className="sq-overline text-[hsl(var(--gold-500))]">Featured quest</span>
             </div>
             <p className="font-display text-xl font-bold leading-tight tracking-[-0.035em]">Find the mural that sees you back</p>
             <p className="mt-2 flex items-center gap-1.5 text-sm text-white/62"><MapPin className="h-4 w-4" /> Wynwood · 25 min</p>
@@ -178,7 +177,7 @@ const Index = () => (
           <div className="relative overflow-hidden rounded-3xl bg-[hsl(var(--midnight-900))] p-7 text-white sm:p-10">
             <div className="mb-12 flex items-center justify-between">
               <MessageSquareText className="h-7 w-7 text-[hsl(var(--gold-500))]" aria-hidden />
-              <span className="sq-overline text-white/42">Community Note · after completion</span>
+              <span className="sq-overline text-white/42">Example Community Note</span>
             </div>
             <blockquote className="font-display text-2xl font-bold leading-snug tracking-[-0.035em] sm:text-3xl">
               “Take the path along the jetty. There’s a quiet bench where the skyline finally slows down.”
@@ -214,7 +213,7 @@ const Index = () => (
             <p className="sq-overline mb-4 text-[hsl(var(--gold-500))]">For Miami businesses</p>
             <h2 className="sq-section-title max-w-[12ch]">Turn your place into somewhere people talk about.</h2>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/72">
-              We collaborate on one memorable objective, place a simple QR entry point, and measure real visits and completions.
+              We'd work with you on one memorable objective and a simple QR sign. We're starting small in Miami.
             </p>
             <Button asChild size="lg" className="mt-8 bg-[hsl(var(--gold-500))] text-[hsl(var(--midnight-900))] hover:bg-[hsl(var(--sand-200))]">
               <Link to="/partnerships">See the partner path <ArrowRight className="h-4 w-4" /></Link>
@@ -224,8 +223,8 @@ const Index = () => (
             {[
               ['Scan', 'Verified arrival'],
               ['Do', 'Meaningful action'],
-              ['Earn', 'Tangible reward'],
-              ['Return', 'Repeat visit'],
+              ['Keep', 'A moment to remember'],
+              ['Return', 'A reason to come back'],
             ].map(([title, body]) => (
               <div key={title} className="flex min-h-32 flex-col justify-end border-b border-r border-white/15 p-5">
                 <p className="sq-overline text-[hsl(var(--gold-500))]">{title}</p>

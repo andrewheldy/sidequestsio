@@ -471,7 +471,7 @@ export function buildSeed(): DbSnapshot {
         partner_id: "partner-kyu",
         venue_id: "venue-kyu",
         title: "KYU: Art of the Binchotan",
-        description: "KYU's wood-fired kitchen is a Wynwood institution. Ask your server for the chef's most underrated dish, order it, and enter the code to unlock your reward.",
+        description: "KYU's wood-fired kitchen is a Wynwood institution. Ask your server for the chef's most underrated dish, order it, and enter the code to finish.",
         category: "food",
         difficulty: "medium",
         xp_reward: 100,
@@ -637,7 +637,7 @@ export function buildSeed(): DbSnapshot {
         venue_id: "venue-frost",
         // The reference sample for the quest page template.
         title: "Frost Museum: Spark of Curiosity",
-        description: "Explore a universe of discovery at Miami's Frost Museum of Science. From the planetarium to the aquarium, this is curiosity in real life.",
+        description: "A photo quest inside a Miami science museum. sidequests is independent and isn't affiliated with or endorsed by the museum. Admission is separate.",
         category: "culture",
         difficulty: "easy",
         xp_reward: 130,
@@ -654,17 +654,12 @@ export function buildSeed(): DbSnapshot {
         action_type: "explore",
         action_prompt: "Capture something that sparks your curiosity — an exhibit, view, or moment.",
         proof_method: "camera",
-        social_share_prompt: "Found something that sparked my curiosity at the Frost Museum of Science 🔭 #sidequests #FrostScience #Miami",
+        social_share_prompt: "Found something that sparked my curiosity at the Frost Museum of Science 🔭 #sidequests #Miami",
         estimated_time: "45 min",
         links: {
           website_url: "https://www.frostscience.org",
-          instagram_url: "https://www.instagram.com/frostscience/",
-          tiktok_url: "https://www.tiktok.com/@frostscience",
-          x_url: "https://x.com/FrostScience",
           reviews_url: "https://www.google.com/maps/search/?api=1&query=Phillip+and+Patricia+Frost+Museum+of+Science",
           reviews_source: "google",
-          // Advertised on the Explore & Share cards; not credited until verification exists.
-          action_points: { instagram: 50, tiktok: 50, x: 25, google_review: 75, website: 25 },
         },
       },
       {
@@ -916,44 +911,8 @@ export function buildSeed(): DbSnapshot {
       },
     ],
 
-    rewards: [
-      {
-        id: "reward-coffee",
-        partner_id: "partner-vice",
-        title: "Free Cold Brew",
-        description: "Redeem for one free cold brew at Vice City Beans.",
-        points_cost: 500,
-        inventory: 50,
-        status: "active",
-        expiration_date: null,
-        image_url:
-          "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop",
-      },
-      {
-        id: "reward-print",
-        partner_id: "partner-wynwood",
-        title: "Limited Art Print",
-        description: "A signed Wynwood Walls art print from a featured artist.",
-        points_cost: 1500,
-        inventory: 10,
-        status: "active",
-        expiration_date: null,
-        image_url:
-          "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=600&h=400&fit=crop",
-      },
-      {
-        id: "reward-tour",
-        partner_id: "partner-wynwood",
-        title: "VIP Gallery Tour",
-        description: "Skip-the-line VIP guided tour of the Wynwood galleries.",
-        points_cost: 2500,
-        inventory: 5,
-        status: "active",
-        expiration_date: null,
-        image_url:
-          "https://images.unsplash.com/photo-1577720580479-7d839d829c73?w=600&h=400&fit=crop",
-      },
-    ],
+    // No rewards until a venue agrees to offer one.
+    rewards: [],
 
     notes: [
       {

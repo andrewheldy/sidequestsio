@@ -3,6 +3,8 @@ import { Logo } from '@/components/brand/Logo';
 import { doorOpening, doorPath, sparkPath } from './geometry';
 import { Reveal } from './shared';
 
+// TODO(contact): this address can't receive mail yet — swap it with the footer address in
+// src/components/layout/Footer.tsx (CONTACT_EMAIL).
 const PITCH_MAIL =
   'mailto:hello@miamisidequests.io?subject=' + encodeURIComponent('III Points × sidequests — build the quest');
 
