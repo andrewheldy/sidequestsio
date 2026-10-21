@@ -56,7 +56,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       ['react-native-maps', androidMapsKey ? { androidGoogleMapsApiKey: androidMapsKey } : {}],
     ],
-    ios: { supportsTablet: false, ...(bundleIdentifier ? { bundleIdentifier } : {}) },
+    ios: {
+      supportsTablet: false,
+      ...(bundleIdentifier ? { bundleIdentifier } : {}),
+      // Lets Linking.canOpenURL detect a mail app for support / deletion-request emails.
+      infoPlist: { LSApplicationQueriesSchemes: ['mailto'] },
+    },
     android: { ...(applicationId ? { package: applicationId } : {}) },
     extra: {
       appVariant: variant,
