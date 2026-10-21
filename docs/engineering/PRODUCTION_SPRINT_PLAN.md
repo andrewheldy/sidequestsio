@@ -635,7 +635,7 @@ Reconcile this table against `git log` and worktrees before launching more work.
 | D | Auth + Onboarding | worker (Sonnet, medium, worktree) | accepted | `890b879` (merged `a0b6c02`) | worker: tsc pass, 69 jest (account+foundation), export pass; root review: scope, consent payload, no starter XP, draft ownership, callback param allowlist |
 | J1 | Integrate C+D | root | done | `a4824f5` | tsc pass; 99/99 jest (11 suites, mocked) incl. cross-feature journey; iOS+Android JS export pass. Not run on simulator/device or live backend |
 | E | Profile + Settings | worker (Sonnet, medium, worktree) | running | base `2f1cea1` | — |
-| F | Quest completion + Rewards | worker (Sonnet, medium, worktree) | running | base `2f1cea1` | — |
+| F | Quest completion + Rewards | worker (Sonnet, medium, worktree) | accepted | `726afa5` (merged `a8562e9`; root fix `28cad6e` scan time from `scan_events.timestamp`) | worker: tsc pass, 153 jest, export pass; root review: QR-only, exact RPC params, single-flight, server-confirmed awards, no Redeem, CTA-only edit to detail; root re-ran tsc/153 jest/export after merge |
 | J2 | Integrate E+F | root | pending | — | — |
 | G | Independent review | reviewer | pending | — | — |
 | H | Repairs, final checks, handoff | root | pending | — | — |
