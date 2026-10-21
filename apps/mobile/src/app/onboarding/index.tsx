@@ -1,10 +1,8 @@
-// Placeholder owned by node D; replaced during feature implementation.
-import { EmptyState, Screen } from '../../components/ui';
+import { useLocalSearchParams } from 'expo-router';
+import { first } from '../../features/account/params';
+import { OnboardingFlow } from '../../features/onboarding/OnboardingFlow';
 
-export default function Placeholder() {
-  return (
-    <Screen>
-      <EmptyState title="Onboarding" message="Coming in this build." />
-    </Screen>
-  );
+export default function Onboarding() {
+  const params = useLocalSearchParams<{ returnTo?: string }>();
+  return <OnboardingFlow returnTo={first(params.returnTo)} />;
 }
