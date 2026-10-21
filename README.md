@@ -26,16 +26,64 @@ The [web design brief](DESIGN_BRIEF.md) and [mobile reference images](docs/desig
 git clone https://github.com/andrewheldy/sidequestsio.git
 cd sidequestsio
 
-# 2. Install dependencies
-npm install
+# 2. Install website dependencies from the existing root lockfile
+npm ci
 
-# 3. Configure environment (see sections below)
-cp .env.example .env
-# Then fill in VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_MAPBOX_PUBLIC_TOKEN
-
-# 4. Start dev server
+# 3. Start the website (port 8080)
 npm run dev
 ```
+
+The Vite dev build uses read-only sample data (`src/lib/demo.ts`); no backend
+credentials are needed for that workflow. For optional live configuration, create
+an ignored `.env.local` using the variable names below. The current root
+`.env.example` contains pre-existing conflict markers; do not copy it verbatim.
+Live repository integration requires a production build/preview; dev mode always
+selects the mock repository.
+
+Website checks, from the repository root:
+
+```sh
+npx tsc --noEmit -p tsconfig.app.json
+npm run build
+npm run lint # has pre-existing failures; see mobile verification notes
+```
+
+### Consumer mobile app
+
+The Expo / React Native iOS and Android foundation lives in `apps/mobile`; the
+website stays at the repository root. These are independent npm packages with
+separate lockfiles, so mobile's React 19 does not change the website's React 18
+resolution. There are no shared packages or new backend services.
+
+Use Node 24 LTS and npm for mobile:
+
+```sh
+# From the repository root; install separately from the website
+npm --prefix apps/mobile ci
+npm run mobile:start
+
+# In a separate terminal, after approved development IDs and native tooling exist
+npm run mobile:android
+npm run mobile:ios # macOS / Xcode required
+
+# Checks; these do not trigger cloud builds
+npm run mobile:typecheck
+npm run mobile:test
+npm run mobile:doctor
+npm run mobile:export # iOS + Android JavaScript/Hermes bundles, not native binaries
+```
+
+Install a development client before connecting to Metro. The mobile app opens
+Explore; tabs are Rewards / Explore / Profile. Development builds include a
+sample link to `/quests/sample-quest`, with native stack back navigation. Screens
+are placeholders, and the foundation makes no backend calls.
+
+See [mobile setup and verification](apps/mobile/README.md) for environment
+placeholders, identifier/signing requirements, exact native commands, test
+coverage, and the next implementation entry points. Root `npm ci`, `npm run dev`,
+`npm run build`, Vite config, web TypeScript settings, and Vercel deployment
+behavior retain their existing roles. CI runs both applications on every PR and
+main push, including shared configuration changes.
 
 ---
 

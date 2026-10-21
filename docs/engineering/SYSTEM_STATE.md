@@ -19,6 +19,14 @@ It is not a roadmap and proposes no new work. Where the Codex audit's findings h
 
 ## 1. Architecture
 
+**Code update 2026-10-20 (not a production deployment):** The consumer mobile
+foundation now lives under `apps/mobile`, with Expo Router placeholders and
+strict TypeScript. Its npm dependencies/lockfile are separate from the unchanged
+website dependency graph. No mobile backend integration or database changes are
+included. See `docs/architecture/TECHNICAL_ARCHITECTURE.md` for the native scope
+and `apps/mobile/README.md` for setup and pending native validation. Dated web
+and production observations below are not revalidated by this addition.
+
 SideQuests is a single-page application: **Vite + React 18 + TypeScript**, deployed as a static SPA on Vercel, talking directly to Supabase (Postgres + Auth + Storage + RPC) from the browser. There is no separate backend server or API layer.
 
 ```

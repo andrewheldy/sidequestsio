@@ -64,6 +64,17 @@ Goals:
 
 # Core User Flow
 
+## Consumer mobile delivery scope — 2026-10-20
+
+The native consumer app targets iOS and Android in one Expo / React Native app.
+The initial approved implementation is a navigation foundation only: Rewards /
+Explore / Profile tabs, Explore initial, and a parameterized quest-detail route.
+The sample navigation item is development-only. Full visual screens and the
+product behaviors below are subsequent tasks; this foundation does not implement
+authentication, backend integration, maps, camera/QR, completion, points, or
+reward redemption. The website remains in place and the existing backend is reused
+when integration is authorized.
+
 1. User creates an account.
 2. User discovers a quest.
 3. User visits the location.

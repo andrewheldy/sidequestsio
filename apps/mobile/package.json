@@ -1,0 +1,37 @@
+{
+  "name": "@sidequests/mobile",
+  "version": "0.1.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~58.0.16",
+    "expo-constants": "~58.0.12",
+    "expo-dev-client": "~58.0.14",
+    "expo-linking": "~58.0.13",
+    "expo-router": "~58.0.24",
+    "expo-status-bar": "~58.0.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.0"
+  },
+  "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
+    "@types/jest": "^30.0.0",
+    "@types/react": "~19.3.0",
+    "expo-doctor": "^1.21.5",
+    "jest": "^30.5.2",
+    "jest-expo": "~58.0.11",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "node scripts/run-native.cjs android",
+    "ios": "node scripts/run-native.cjs ios",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --runInBand",
+    "doctor": "expo-doctor",
+    "export": "expo export --platform ios --platform android"
+  },
+  "private": true
+}

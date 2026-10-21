@@ -1,0 +1,23 @@
+{
+  "build": {
+    "development": {
+      "environment": "development",
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": { "APP_VARIANT": "development" },
+      "android": { "buildType": "apk" }
+    },
+    "development-simulator": {
+      "extends": "development",
+      "env": { "APP_VARIANT": "development" },
+      "ios": { "simulator": true }
+    },
+    "staging": {
+      "environment": "preview",
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": { "APP_VARIANT": "staging" },
+      "android": { "buildType": "apk" }
+    }
+  }
+}
