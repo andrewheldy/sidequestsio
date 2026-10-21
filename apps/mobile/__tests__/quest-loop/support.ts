@@ -23,7 +23,7 @@ export interface World {
 
 export const QUEST_ID = 'q-loop';
 export const scanOk = (questId = QUEST_ID, id = 'scan-1') => ({
-  data: { ok: true, questId, codeKind: 'qr', scan: { id, created_at: new Date().toISOString() } },
+  data: { ok: true, questId, codeKind: 'qr', scan: { id, timestamp: new Date().toISOString() } },
 });
 export const completeOk = (extra: Record<string, unknown> = {}) => ({
   data: { ok: true, completion: { id: 'c-1' }, xpAwarded: 120, pointsAwarded: 45, newLevel: 1, leveledUp: false, ...extra },

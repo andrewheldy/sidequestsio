@@ -32,7 +32,8 @@ export async function recordCodeScan(code: string): Promise<ScanOutcome> {
   if (data.ok === false && data.error === 'invalid_code') return { kind: 'invalid_code' };
   const scan = data.scan;
   if (data.ok === true && typeof data.questId === 'string' && isObject(scan) && typeof scan.id === 'string' && scan.id) {
-    const created = typeof scan.created_at === 'string' ? Date.parse(scan.created_at) : NaN;
+    // scan_events stores its time in the "timestamp" column (0006/0018), not created_at.
+    const created = typeof scan.timestamp === 'string' ? Date.parse(scan.timestamp) : NaN;
     const now = Date.now();
     // Trust the server timestamp unless it is nonsense (clock skew): the server still enforces its own 2h window.
     const scannedAt = Number.isFinite(created) && Math.abs(created - now) < 10 * 60_000 ? created : now;
