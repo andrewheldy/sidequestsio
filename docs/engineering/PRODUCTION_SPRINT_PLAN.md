@@ -638,7 +638,7 @@ Reconcile this table against `git log` and worktrees before launching more work.
 | F | Quest completion + Rewards | worker (Sonnet, medium, worktree) | accepted | `726afa5` (merged `a8562e9`; root fix `28cad6e` scan time from `scan_events.timestamp`) | worker: tsc pass, 153 jest, export pass; root review: QR-only, exact RPC params, single-flight, server-confirmed awards, no Redeem, CTA-only edit to detail; root re-ran tsc/153 jest/export after merge |
 | J2 | Integrate E+F | root | done | `bea8997` | tsc pass; 185/185 jest (17 suites, mocked) incl. completion→profile→sign-out journey; iOS+Android JS export pass; web `tsc -p tsconfig.app.json` + `npm run build` pass (no web files changed). iOS `LSApplicationQueriesSchemes: mailto` added. Not run on simulator/device or live backend |
 | G | Independent review | reviewer (Opus, read-only) | done | reviewed `bea8997` | 0 blocker/high; 2 medium + 5 low, reproductions in throwaway jest; confirmed cache clearing, single-flight completion, no fabricated progress |
-| H | Repairs, final checks, handoff | root | done | `015bc94` (repairs), `015bc94` | 6 findings fixed with regression tests; 1 design-fidelity note deferred; final: mobile tsc pass, 191/191 jest, export pass, doctor = baseline, web tsc/build pass |
+| H | Repairs, final checks, handoff | root | done | `015bc94` (repairs; final checks on it) | 6 findings fixed with regression tests; 1 design-fidelity note deferred; final: mobile tsc pass, 191/191 jest, export pass, doctor = baseline, web tsc/build pass |
 
 Environment facts (2026-10-21): no approved non-production Supabase project exists (the
 only project is production `wvedvngtuzsttpavmgjw`, which the mobile app refuses), and this
