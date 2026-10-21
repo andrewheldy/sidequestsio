@@ -14,8 +14,9 @@
 --   quest    30000000-0000-0000-0000-000000000010
 --
 -- Before launch: Frost has NOT agreed to be featured, and a venue code needs a
--- sticker inside the museum, which needs their OK. Consider setting the quest
--- status to 'draft' until they have (docs/business/PARTNERSHIP_PLAYBOOK.md). Photos are public-domain
+-- sticker inside the museum, which needs their OK. The quest is therefore a
+-- 'draft' (hidden from the public) until they have
+-- (docs/business/PARTNERSHIP_PLAYBOOK.md); flip it to 'active' to publish. Photos are public-domain
 -- (Wikimedia Commons: "Frost Science.jpg", "Water is wet!.jpg").
 --
 -- Undo:
@@ -83,7 +84,7 @@ values (
   'easy',
   130,
   100,
-  'active',
+  'draft',
   'qr',
   'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Frost_Science.jpg/1280px-Frost_Science.jpg',
   'Take a photo inside the Frost Museum',
@@ -105,6 +106,7 @@ on conflict (id) do update set
   difficulty = excluded.difficulty,
   xp_reward = excluded.xp_reward,
   points_reward = excluded.points_reward,
+  status = excluded.status,
   verification_type = excluded.verification_type,
   image_url = excluded.image_url,
   funky_action = excluded.funky_action,

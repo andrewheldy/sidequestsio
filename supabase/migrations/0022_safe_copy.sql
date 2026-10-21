@@ -94,9 +94,10 @@ update public.venues set name = 'Wynwood Karaoke Night', address = 'Wynwood, Mia
  where id = '20000000-0000-0000-0000-000000000009' and name = 'Sweet Caroline Karaoke Bar';
 
 -- 5. Frost Museum quest: no implied endorsement, no museum social links, no
---    advertised share points. (Whether to keep the quest live at all is a
---    separate call — consider status = 'draft' until the museum agrees.)
+--    advertised share points. The quest is also unpublished (draft) until the
+--    museum agrees; set status back to 'active' to publish it.
 update public.quests set
+  status = 'draft',
   description = 'A photo quest inside a Miami science museum. sidequests is independent and isn''t affiliated with or endorsed by the museum. Admission is separate.',
   social_share_prompt = 'Found something that sparked my curiosity at the Frost Museum of Science 🔭 #sidequests #Miami',
   links = coalesce(links, '{}'::jsonb) - 'instagram_url' - 'tiktok_url' - 'x_url' - 'action_points'
