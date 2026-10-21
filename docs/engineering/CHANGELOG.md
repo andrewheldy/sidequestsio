@@ -2,6 +2,67 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-20 — Consumer mobile foundation (code only)
+
+- Added `apps/mobile`: Expo SDK 58 / React Native 0.88 / React 19.3 / strict
+  TypeScript, Expo Router, safe-area handling, and local development-client support.
+  Tabs are Rewards / Explore / Profile, Explore initial. The quest-detail route
+  receives `questId`; a development-only sample link demonstrates navigation/back.
+  Direct quest links are anchored to Explore so the stack can return there.
+- Kept the website at the root with its original dependency declarations, exact
+  lockfile, TypeScript settings, Vite and Vercel configuration. Mobile is an
+  independent npm package with a separate lockfile and root convenience scripts;
+  React versions are not unified and no shared package/backend was introduced.
+- Added the minimal jest-expo / React Native Testing Library 14 navigation suite.
+  CI retains web typecheck/build and adds mobile typecheck/tests, Expo Doctor,
+  and iOS/Android JS exports. Both jobs run on all existing triggers, including
+  shared configuration changes. No native cloud build/signing/submission is run.
+- Added development/staging config and placeholders only. Native commands reject
+  missing approved target identifiers; production config is deliberately blocked.
+  EAS profiles are internal development/staging configuration only and have no
+  account/project/signing bindings. No authentication, backend integration, maps,
+  camera/QR, completion, points, redemption, or database work was performed.
+- **Static/automated validation, Linux cloud instance with Node 24.19.0:**
+
+  | Command (repository root unless noted) | Result |
+  | --- | --- |
+  | `npm ci --no-audit --no-fund` | Passed; root dependency graph restored from original lockfile |
+  | `npm --prefix apps/mobile ci --no-audit --no-fund` | Passed; clean mobile install, 1069 packages |
+  | `npx tsc --noEmit -p tsconfig.app.json` | Passed before and after mobile changes (local tsc binary used) |
+  | `npm run build` | Passed before and after; existing Browserslist/chunk/import warnings remain |
+  | `npm run lint` | Failed before and after: unchanged 21 errors / 16 warnings; unrelated cleanup excluded |
+  | `npm run mobile:typecheck` | Passed after clean mobile install |
+  | `npm run mobile:test` | Passed, 1 suite / 4 tests; native views mocked, not device tests |
+  | `npm run mobile:export` | Passed for iOS and Android Hermes JS bundles; not native compilation |
+  | `EXPO_OFFLINE=1 npx expo install --check --npm` (in `apps/mobile`) | Passed against installed SDK compatibility map; online metadata not checked |
+  | `npm run mobile:doctor` | 18/20 passed; schema and React Native Directory checks failed fetching external metadata in restricted networking; full diagnostics remain pending |
+  | `npm run mobile:start -- --localhost --port 8081` | Metro started; status, Android development manifest and full development JS bundle returned HTTP 200; checked actual screen modules |
+  | `npm run mobile:android` | Blocked by missing approved Android application ID before native compilation |
+  | `npm run mobile:ios` | Blocked: iOS local builds require macOS |
+
+  In the cloud sandbox, npm used `NPM_CONFIG_CACHE=/workspace/.npm-cache`; Expo
+  commands used `EXPO_NO_TELEMETRY=1`, and bundling used `EXPO_OFFLINE=1`. Metro
+  needed access to its standard per-user `.expo/state.json`; no repository
+  workaround or trust bypass was added. Expo Doctor was also retried with Node's
+  environment-proxy support and still could not complete the two online checks.
+  Official Expo documentation was read from its GitHub source because the docs
+  hostname is outside this instance's network policy. Staging config generation
+  was checked for its distinct name/scheme and absent invented IDs; negative
+  config checks confirmed production and missing native IDs are rejected.
+- **Native compilation:** no successful iOS/Android native compilation. This
+  Linux image has no Android SDK, adb, emulator, Xcode, or CocoaPods. No approved
+  application identifiers/signing/EAS access were found. Supply approved
+  development/staging IDs and native tooling, then execute the documented local
+  native commands. No paid builds, production deployment, account registration,
+  store submission, database change, or merge was performed.
+- **Simulator/emulator checks:** unrun. **Physical-device checks:** unrun.
+  Native back gestures, hardware back, safe-area appearance, and installation
+  must still be checked on actual native targets. Re-run full Expo Doctor with
+  access to Expo API/schema and React Native Directory metadata.
+- Setup commands, environment separation, feature entry points, and outstanding
+  requirements are in `apps/mobile/README.md`. Existing root `.env.example`
+  conflict markers were observed and left unchanged.
+
 ## 2026-09-30 — Partner Insights dashboard; production analytics on
 
 - **Production redeployed** with `VITE_ANALYTICS_SINK=supabase` and a new URL-restricted `VITE_MAPBOX_PUBLIC_TOKEN`.
