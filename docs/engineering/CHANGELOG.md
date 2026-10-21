@@ -2,6 +2,45 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-21 — Consumer mobile MVP (code only, branch `feat/mobile-mvp`)
+
+- Built on the mobile foundation (`9bc4245`) through an execution graph with
+  worktree-isolated workers; ledger in `PRODUCTION_SPRINT_PLAN.md` Appendix C.
+- **Shared base:** single Supabase client (PKCE; session in Keychain/Keystore, chunked);
+  config refuses missing backends and the production project ref; session/profile state
+  machine with cache + private-storage clearing on account change; validated return
+  targets; account gate; dark tokens and primitives; Jest fake Supabase client.
+- **Discovery:** Explore (real active quests, category/neighbourhood filters, list/map,
+  "Near me" asks for location only on tap, distance only when known) and Quest Detail
+  (record-driven sections, https-only links, directions, share; no favourites/reviews).
+- **Account:** email/password sign-in/up with the website's consent semantics (terms
+  required, marketing optional and unchecked, version stamps 1.0.0), verification resend,
+  recovery, deep-link callback with param allowlist; onboarding adapted from the web with
+  real first-quest suggestions; saves only onboarding columns (no starter XP/streak).
+- **Profile/Settings:** progress and history from `user_profiles`/`quest_completions`
+  ("unavailable", never fabricated zeroes); profile edit; `is_public`, completed-quests,
+  leaderboard and marketing (+ `consent_events`) with rollback; permissions help;
+  policy links; sign out; deletion is a truthful email request (no in-app deletion).
+- **Quest loop:** QR-only. In-app scan accepts only `https://<web origin>/scan/<code>`
+  (never opened) → `record_code_scan` → `complete_quest(source_scan_id)`; single-flight,
+  no auto-retry, status re-check after network failure, pending vs confirmed states,
+  2-hour stored scan scoped to the user. Rewards tab is read-only (no redemption).
+- **Review (node G, independent):** no blockers/high; 2 medium + 4 low fixed in `015bc94`
+  with regression tests (recovery link vs existing session, recovery vs pending quest
+  return, device-clock cooldown, production-ref normalisation, malformed ids, Android
+  mailto). Remaining low: Explore defaults to list rather than the reference's map-led
+  layout; detail uses stacked sections instead of tabs.
+- **Validation (macOS, Node 24.19.0, final `015bc94`):**
+
+  | Command | Result |
+  | --- | --- |
+  | `npm run mobile:typecheck` | Passed |
+  | `npm run mobile:test` | Passed, 18 suites / 191 tests — mocked Supabase and native modules |
+  | `npm run mobile:export` | Passed, iOS + Android Hermes bundles (not native compilation) |
+  | `npm run mobile:doctor` | 17/20, identical to baseline: 2 checks need exp.host / RN Directory (sandbox network), 1 pre-existing SDK patch drift |
+  | `npx tsc -p tsconfig.app.json --noEmit`, `npm run build` (web) | Passed; no website files changed |
+  | Live backend, native compilation, simulator/emulator, physical device | **Not run** — no approved non-production Supabase project; no Xcode simulator / Android SDK on the build machine |
+
 ## 2026-10-21 — Production: column-scoped self-update grants (0023 applied)
 
 - **Problem (live-verified via read-only MCP before the fix):** `authenticated` held

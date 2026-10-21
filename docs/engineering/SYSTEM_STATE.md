@@ -27,6 +27,16 @@ included. See `docs/architecture/TECHNICAL_ARCHITECTURE.md` for the native scope
 and `apps/mobile/README.md` for setup and pending native validation. Dated web
 and production observations below are not revalidated by this addition.
 
+**Code update 2026-10-21 (branch `feat/mobile-mvp`, not merged or deployed):** the
+mobile app implements the consumer MVP against the existing Supabase backend:
+Explore/Quest Detail, email auth (PKCE deep links, recovery), onboarding (no starter
+XP), Profile/Settings, QR quest completion via `record_code_scan` → `complete_quest`
+(server-confirmed awards), and a read-only Rewards tab. It refuses the production
+project ref, so it has no approved backend yet; no live-backend, simulator or device
+verification has been run. Reward redemption, photo proof, non-QR verification and
+in-app account deletion are excluded. **Production DB change 2026-10-21:**
+`0023_progress_role_integrity.sql` applied and verified (see CHANGELOG).
+
 SideQuests is a single-page application: **Vite + React 18 + TypeScript**, deployed as a static SPA on Vercel, talking directly to Supabase (Postgres + Auth + Storage + RPC) from the browser. There is no separate backend server or API layer.
 
 ```
