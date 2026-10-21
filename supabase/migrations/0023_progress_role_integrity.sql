@@ -1,7 +1,8 @@
 -- 0023_progress_role_integrity.sql — stop clients editing their own role, XP and Points
 --
--- WHY (code-verified 2026-10-21, NOT live-verified — the read-only MCP was not
--- available in that session):
+-- WHY (code-verified and LIVE-verified 2026-10-21 via read-only MCP catalog
+-- query: has_column_privilege('authenticated', 'public.users', 'role', 'UPDATE')
+-- and ... 'public.user_profiles', 'points_balance_cache' ... both returned true):
 --   * 0009_grants.sql grants UPDATE on public.users and public.user_profiles to
 --     `authenticated`, and 0007's users_self_update / profiles_self_update
 --     policies allow any row where id/user_id = auth.uid(). There are no

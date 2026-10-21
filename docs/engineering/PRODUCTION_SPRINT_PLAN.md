@@ -645,3 +645,10 @@ only project is production `wvedvngtuzsttpavmgjw`, which the mobile app refuses)
 machine has no Xcode simulator, Android SDK, Docker or Supabase CLI. Live-backend
 integration, native compilation and simulator/device checks are therefore **pending**,
 not passed.
+
+Live facts (read-only MCP catalog query, 2026-10-21, project `wvedvngtuzsttpavmgjw`):
+`authenticated` can UPDATE `users.role` and `user_profiles.points_balance_cache` (privilege
+escalation + self-minted Points — fix authored as `0023_progress_role_integrity.sql`, not
+applied); `record_code_scan` and `generate_quest_instance` exist and `complete_quest` has the
+5-argument 0017/0018 signature; anon can SELECT quests/venues/partners; 9 active quests, all
+`qr`; 0 active rewards and 0 redemptions; `proofs` bucket exists.
