@@ -31,6 +31,7 @@ export const queryKeys = {
     privacy: (userId: string) => ['account', userId, 'privacy'] as const,
     completions: (userId: string) => ['account', userId, 'completions'] as const,
     questStatus: (userId: string, questId: string) => ['account', userId, 'quest', questId] as const,
+    deletion: (userId: string) => ['account', userId, 'deletion'] as const,
   },
   rewards: {
     available: () => ['rewards', 'available'] as const,

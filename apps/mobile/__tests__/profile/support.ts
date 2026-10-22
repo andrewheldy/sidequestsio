@@ -13,6 +13,14 @@ export interface ProfileDb {
   /** Recorded writes: [table, op, payload, eq args]. */
   writes: { table: string; op: string; payload: Record<string, unknown>; eq: unknown[] | undefined }[];
   profileReads: number;
+  /** Pending account deletion request per user (0024). */
+  deletion: Record<string, Record<string, unknown> | null>;
+  /** Simulates a server without 0024 (table/RPC missing). */
+  deletionUnsupported: boolean;
+  /** Error returned by the next deletion RPC calls. */
+  deletionRpcError: { code?: string; message: string } | null;
+  /** RPC names called, in order. */
+  rpcs: string[];
 }
 
 export function makeDb(partial: Partial<ProfileDb> = {}): ProfileDb {
@@ -26,6 +34,10 @@ export function makeDb(partial: Partial<ProfileDb> = {}): ProfileDb {
     failProgress: false,
     writes: [],
     profileReads: 0,
+    deletion: {},
+    deletionUnsupported: false,
+    deletionRpcError: null,
+    rpcs: [],
     ...partial,
   };
 }
@@ -75,7 +87,7 @@ const has = (call: RecordedCall, op: string) => call.ops.some((o) => o.op === op
 
 export function profileHandler(db: ProfileDb) {
   return (call: RecordedCall) => {
-    if (call.kind !== 'table') return undefined;
+    if (call.kind === 'rpc') return deletionRpc(db, call.name);
     const eq = eqArgs(call);
     const uid = eq?.[1] as string | undefined;
 
@@ -103,6 +115,9 @@ export function profileHandler(db: ProfileDb) {
         return { data: (uid && db.completions[uid]) || [] };
       case 'privacy_preferences':
         return { data: (uid && db.privacy[uid]) || null };
+      case 'account_deletion_requests':
+        if (db.deletionUnsupported) return { error: { code: 'PGRST205', message: 'table not found' } };
+        return { data: (uid && db.deletion[uid]) || null };
       case 'quests': {
         if (has(call, 'maybeSingle')) return { data: db.quests[Object.keys(db.quests)[0]] ?? null };
         return { data: Object.values(db.quests) };
@@ -111,4 +126,23 @@ export function profileHandler(db: ProfileDb) {
         return undefined;
     }
   };
+}
+
+/** request_/cancel_account_deletion for the signed-in user 'u1' (mocked RPCs). */
+function deletionRpc(db: ProfileDb, name: string) {
+  db.rpcs.push(name);
+  if (db.deletionUnsupported) return { error: { code: 'PGRST202', message: 'function not found' } };
+  if (db.deletionRpcError) return { error: db.deletionRpcError };
+  if (name === 'request_account_deletion') {
+    // Idempotent like the server: an existing pending request is returned unchanged.
+    db.deletion.u1 ??= { id: 'del-1', status: 'pending', requested_at: '2026-10-21T12:00:00Z', process_by: '2026-11-20T12:00:00Z' };
+    return { data: { ok: true, request: db.deletion.u1 } };
+  }
+  if (name === 'cancel_account_deletion') {
+    const current = db.deletion.u1;
+    if (!current) return { data: { ok: false, error: 'not_pending' } };
+    db.deletion.u1 = null;
+    return { data: { ok: true, request: { ...current, status: 'cancelled' } } };
+  }
+  return undefined;
 }

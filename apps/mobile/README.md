@@ -9,11 +9,11 @@ Implemented journey: guest Explore (list/map, filters, optional "Near me") → q
 detail → sign in / create account (email + password, verification, recovery) →
 onboarding when needed → back to the intended quest → QR quest completion confirmed by
 the server → progress and history in Profile → profile/privacy settings, sign out,
-deletion request. Rewards shows real balances and available rewards read-only.
+in-app deletion request. Rewards shows real balances and available rewards read-only.
 
 Deliberately excluded: reward redemption (no partner fulfilment flow; 0 live
-rewards), photo/proof capture, non-QR verification types, avatar upload, in-app
-account deletion (needs a backend endpoint — see "Release blockers").
+rewards), photo/proof capture, non-QR verification types, avatar upload, and
+deletion *processing* (needs a service-role job — see "Release blockers").
 
 ## Package layout and compatibility
 
@@ -189,8 +189,10 @@ Navigate to a quest with `{ pathname: '/quests/[questId]', params: { questId } }
 
 ## Release blockers
 
-- In-app account deletion: Apple requires it; today the app opens a prefilled email to
-  support (truthful, not deletion). Needs an authenticated deletion RPC/Edge Function.
+- In-app account deletion: the app records a request through `request_account_deletion()`
+  (migration 0024, **not yet applied**; until then it falls back to a prefilled email).
+  Requests are only processed once the service-role Edge Function described in 0024 exists
+  and runs, and `docs/legal/Delete-Account.md` must be updated when it ships.
 - No live-backend, simulator, or device verification has been run (see verification record).
 
 ## Verification record

@@ -391,54 +391,97 @@ describe('delete account', () => {
     return rendered;
   }
 
-  it('explains the process and does nothing until confirmed', async () => {
-    const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined as never);
+  it('explains what is deleted and does nothing until confirmed', async () => {
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     signedIn();
     await toDeleteScreen();
     expect(await screen.findByText('What gets deleted')).toBeVisible();
-    expect(screen.getByText(/within 30 days/)).toBeVisible();
-    await press('Request deletion by email');
+    await press('Request account deletion');
     expect(alert).toHaveBeenCalledTimes(1);
-    expect(openURL).not.toHaveBeenCalled();
+    expect(db.rpcs).toEqual([]);
   });
 
-  it('opens a prefilled mailto after confirmation and never claims the account is deleted', async () => {
-    jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(true);
-    const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined as never);
+  it('records an in-app request after confirmation and shows its truthful pending status', async () => {
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     signedIn();
     await toDeleteScreen();
-    await press('Request deletion by email');
-    await inAct(() => void alertPress(alert, 'Open email'));
+    await press('Request account deletion');
+    await inAct(() => void alertPress(alert, 'Request deletion'));
 
-    await waitFor(() => expect(openURL).toHaveBeenCalledTimes(1));
-    const url = openURL.mock.calls[0][0];
-    expect(url.startsWith('mailto:support@')).toBe(true);
-    const query = new URLSearchParams(url.split('?')[1]);
-    expect(query.get('subject')).toBe('Account Deletion Request');
-    expect(query.get('body')).toContain('u1@example.test');
-    expect(query.get('body')).toContain('User ID: u1');
-
-    expect(await screen.findByText(/only sent once you send that email/)).toBeVisible();
+    expect(await screen.findByText('Deletion requested')).toBeVisible();
+    expect(screen.getByText(/We will delete your account by/)).toBeVisible();
+    expect(screen.getByText(/your account still exists/)).toBeVisible();
+    expect(db.rpcs).toEqual(['request_account_deletion']);
     expect(screen.queryByText(/has been deleted|was deleted|deleted successfully/i)).toBeNull();
-    // Still signed in; nothing was written to the backend.
+    // The account stays usable: no sign-out, no direct table writes.
     expect(backend.fake.client.auth.signOut).not.toHaveBeenCalled();
     expect(db.writes).toHaveLength(0);
   });
 
-  it('shows the address when no email app can open, without pretending anything was sent', async () => {
-    const openURL = jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('No app handles mailto'));
+  it('shows an existing pending request on open and lets the user cancel it', async () => {
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    db.deletion.u1 = { id: 'del-1', status: 'pending', requested_at: '2026-10-01T12:00:00Z', process_by: '2026-10-31T12:00:00Z' };
     signedIn();
     await toDeleteScreen();
-    await press('Request deletion by email');
-    await inAct(() => void alertPress(alert, 'Open email'));
+    expect(await screen.findByText('Deletion requested')).toBeVisible();
+    await press('Cancel deletion request');
+    await inAct(() => void alertPress(alert, 'Cancel request'));
+    expect(await screen.findByText('Your deletion request was cancelled.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Request account deletion' })).toBeVisible();
+    expect(db.rpcs).toEqual(['cancel_account_deletion']);
+  });
 
-    expect(await screen.findByText(/could not open an email app/)).toBeVisible();
-    expect(screen.getByText(/To: support@/)).toBeVisible();
-    expect(screen.getByText('Subject: Account Deletion Request')).toBeVisible();
-    expect(screen.getByText(/Nothing has been requested yet/)).toBeVisible();
-    expect(openURL).toHaveBeenCalledTimes(1);
+  it('reports a failed request without claiming anything was requested', async () => {
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    db.deletionRpcError = { code: '500', message: 'server unavailable' };
+    signedIn();
+    await toDeleteScreen();
+    await press('Request account deletion');
+    await inAct(() => void alertPress(alert, 'Request deletion'));
+    expect(await screen.findByText(/Nothing has been requested/)).toBeVisible();
+    expect(screen.queryByText('Deletion requested')).toBeNull();
+  });
+
+  describe('server without 0024 (email fallback)', () => {
+    beforeEach(() => {
+      db.deletionUnsupported = true;
+    });
+
+    it('opens a prefilled mailto after confirmation and never claims the account is deleted', async () => {
+      const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined as never);
+      const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+      signedIn();
+      await toDeleteScreen();
+      await press('Request deletion by email');
+      await inAct(() => void alertPress(alert, 'Open email'));
+
+      await waitFor(() => expect(openURL).toHaveBeenCalledTimes(1));
+      const url = openURL.mock.calls[0][0];
+      expect(url.startsWith('mailto:support@')).toBe(true);
+      const query = new URLSearchParams(url.split('?')[1]);
+      expect(query.get('subject')).toBe('Account Deletion Request');
+      expect(query.get('body')).toContain('u1@example.test');
+      expect(query.get('body')).toContain('User ID: u1');
+
+      expect(await screen.findByText(/only sent once you send that email/)).toBeVisible();
+      expect(screen.queryByText(/has been deleted|was deleted|deleted successfully/i)).toBeNull();
+      expect(backend.fake.client.auth.signOut).not.toHaveBeenCalled();
+      expect(db.writes).toHaveLength(0);
+    });
+
+    it('shows the address when no email app can open, without pretending anything was sent', async () => {
+      const openURL = jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('No app handles mailto'));
+      const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+      signedIn();
+      await toDeleteScreen();
+      await press('Request deletion by email');
+      await inAct(() => void alertPress(alert, 'Open email'));
+
+      expect(await screen.findByText(/could not open an email app/)).toBeVisible();
+      expect(screen.getByText(/To: support@/)).toBeVisible();
+      expect(screen.getByText('Subject: Account Deletion Request')).toBeVisible();
+      expect(screen.getByText(/Nothing has been requested yet/)).toBeVisible();
+      expect(openURL).toHaveBeenCalledTimes(1);
+    });
   });
 });

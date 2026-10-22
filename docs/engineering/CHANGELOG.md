@@ -2,6 +2,27 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-21 — In-app account deletion requests (authored, not applied)
+
+- `supabase/migrations/0024_account_deletion_requests.sql` (**not applied**): table
+  `account_deletion_requests` (one pending request per user; no email/profile data; own-row
+  read via RLS; no client write grants) and authenticated SECURITY DEFINER RPCs
+  `request_account_deletion()` (idempotent, per-user advisory lock, `process_by` = +30 days)
+  and `cancel_account_deletion()`; both audit-logged. Nothing is deleted by this migration.
+- Processing is specified, not implemented: a service-role Edge Function
+  (`process-account-deletions`) that removes `proofs/<uid>/` and `avatars/<uid>/` objects,
+  deletes `public.users` (cascading game data; live `public.users` has no FK to
+  `auth.users`), calls `auth.admin.deleteUser`, marks the request completed, and sends the
+  confirmation email. Plan and cascade map are in the migration header.
+- Mobile: Settings → Delete account now records the request in-app, shows the pending
+  status and deadline, and allows cancelling (policy §6). The account stays usable until
+  processed. If the server lacks 0024 (PGRST202/PGRST205/42P01) the screen falls back to the
+  truthful emailed request. 199/199 mocked tests; SQL not executed anywhere (no
+  non-production database available).
+- Follow-ups before claiming in-app deletion: apply 0024 (after backup), build and schedule
+  the Edge Function, then bump `docs/legal/Delete-Account.md` (§1 currently says the in-app
+  option is "planned") per `docs/legal/README.md`.
+
 ## 2026-10-21 — Consumer mobile MVP (code only, branch `feat/mobile-mvp`)
 
 - Built on the mobile foundation (`9bc4245`) through an execution graph with
