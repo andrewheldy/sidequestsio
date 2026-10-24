@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, Clock, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import QuestImage from '@/components/QuestImage';
+import { attributionText, type ImageAttribution } from '@/lib/app/attribution';
 
 interface QuestCardProps {
   title: string;
@@ -14,6 +15,8 @@ interface QuestCardProps {
   points?: number;
   physicalReward?: string;
   image: string;
+  /** License credit for `image`; shown as plain text (the card is one link). */
+  imageCredit?: ImageAttribution | null;
   delay?: number;
   className?: string;
   questId?: string;
@@ -30,6 +33,7 @@ export function QuestCard({
   points,
   physicalReward,
   image,
+  imageCredit,
   className,
   questId,
   featured = false,
@@ -82,6 +86,9 @@ export function QuestCard({
           )}
           {physicalReward && <span className="w-full text-xs text-muted-foreground">Reward: {physicalReward}</span>}
         </div>
+        {imageCredit && image && (
+          <p className="mt-3 truncate text-[11px] text-muted-foreground/80">{attributionText(imageCredit)}</p>
+        )}
       </div>
     </Link>
   );

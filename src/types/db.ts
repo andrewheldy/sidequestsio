@@ -35,7 +35,8 @@ export type QuestCategory =
   | "fitness"
   | "hidden_gem";
 
-export type Difficulty = "easy" | "medium" | "hard";
+/** Reward tiers (XP / Points): easy 50/25, medium 150/75, hard 300/150, legendary 500/300 (0026). */
+export type Difficulty = "easy" | "medium" | "hard" | "legendary";
 
 export type VerificationType =
   | "qr"
@@ -195,6 +196,13 @@ export interface Quest {
   estimated_time?: string | null;
   /** NULL = complete once, ever. N = may be completed again N days after the last completion. */
   repeat_cooldown_days?: number | null;
+  /** Optional quest-specific location (0023); NULL = use the venue's coordinates. */
+  location_latitude?: number | null;
+  location_longitude?: number | null;
+  /** gps quests: presence radius in metres, 75–150 (NULL = 100; 0023/0025). */
+  verification_radius_m?: number | null;
+  /** Credit for image_url when its license requires it (0028); read via readAttribution(). */
+  image_attribution?: unknown;
   /** Optional business/host links (quests.links JSONB, 0012). */
   links?: QuestLinks | null;
 }

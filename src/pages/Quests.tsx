@@ -121,6 +121,7 @@ const Quests = () => {
                     concept={quest.description ?? ''}
                     xp={quest.xp}
                     image={quest.image}
+                    imageCredit={quest.imageCredit}
                     delay={index * 80}
                   />
                 ))}

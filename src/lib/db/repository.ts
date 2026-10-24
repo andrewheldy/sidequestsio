@@ -46,6 +46,7 @@ import type {
   Venue,
   VerificationType,
 } from "@/types/db";
+import type { GeoPosition, PresenceResult } from "@/lib/app/presence";
 
 // ---------------------------------------------------------------------------
 // Input / result shapes
@@ -91,6 +92,8 @@ export interface CompleteQuestInput {
   sourceScanId?: string | null;
   /** The generated instance being completed; fixes the rewards paid. */
   instanceId?: string | null;
+  /** gps quests: an 'inside' result from checkPresence() (0025). */
+  presenceCheckId?: string | null;
 }
 
 export type CompleteQuestError =
@@ -101,7 +104,8 @@ export type CompleteQuestError =
   | "scan_required"
   | "quest_inactive"
   | "quest_expired"
-  | "verification_failed";
+  | "verification_failed"
+  | "presence_required";
 
 export interface CompleteQuestResult {
   ok: boolean;
@@ -226,6 +230,11 @@ export interface Repository {
   hasCompleted(userId: string, questId: string): Promise<boolean>;
   /** Generates (or returns the open) objective for this user's visit. */
   getQuestOffer(userId: string, questId: string): Promise<QuestOffer>;
+  /**
+   * GPS quests: challenge → one fresh sample from `locate` → server verdict
+   * (0025). The sample is compared and discarded; only the outcome is kept.
+   */
+  checkPresence(userId: string, questId: string, locate: () => Promise<GeoPosition | null>): Promise<PresenceResult>;
   completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult>;
   listCompletions(userId: string): Promise<QuestCompletion[]>;
 

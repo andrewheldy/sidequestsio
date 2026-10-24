@@ -24,5 +24,55 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit -p tsconfig.app.json
 
+      - name: Unit tests
+        run: npm test
+
       - name: Build
         run: npm run build
+
+  mobile:
+    name: Mobile foundation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+
+      - name: Install mobile dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit and navigation tests
+        run: npm test
+
+      - name: Expo diagnostics
+        run: npm run doctor
+
+      # JavaScript bundles only. Never trigger EAS, signing, or native cloud builds.
+      - name: Bundle iOS and Android
+        run: npm run export
+
+  database:
+    name: Database migrations & SQL tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Local throwaway Postgres + PostGIS only; never a Supabase project.
+      - name: Install PostGIS
+        run: sudo apt-get update -q && sudo apt-get install -y -q postgresql-16 postgresql-16-postgis-3
+
+      - name: Apply migrations and run SQL tests
+        run: supabase/tests/run-local.sh

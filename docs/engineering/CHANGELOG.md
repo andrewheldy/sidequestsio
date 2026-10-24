@@ -2,6 +2,149 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-24 — Location, Discovery & Adventure Mode (code + authored migrations; nothing applied)
+
+- Authoritative spec, Phase 0 gap map, contracts and release gates:
+  `docs/product/LOCATION_DISCOVERY.md`. Standing decision added to `docs/DECISIONS.md`.
+- **Mobile (`apps/mobile`):** Manual (default) / Explore / Adventure modes with
+  desired-vs-effective capability; Explore screen (area selector, Near me with
+  explain-then-ask, map-area search, radius/category/duration filters, list + map,
+  external directions); location settings with the Adventure disclosure and one
+  permission per step; flag-off Adventure pipeline (module-scope geofence task, ≤ 15 + 1
+  regions, persisted gate closed before cleanup, 3 s bounded server claim, one local
+  notification, validated quest deep links); quest detail from fresh server state;
+  GPS check-in client. New deps via `npx expo install --npm`: expo-location,
+  expo-task-manager, expo-notifications, react-native-maps, AsyncStorage. Foundation
+  packages aligned to SDK 58 patch versions (Expo Doctor was failing on `main`).
+- **Native config:** background location only with `MOBILE_BACKGROUND_LOCATION=1`; no
+  Android location foreground service; Expo's auto-applied Background Fetch mode removed.
+  Verified by local `expo prebuild --no-install` with a placeholder ID (not committed,
+  generated folders deleted): foreground build has no `ACCESS_BACKGROUND_LOCATION` and no
+  "Always" string; background build adds `ACCESS_BACKGROUND_LOCATION` +
+  `RECEIVE_BOOT_COMPLETED`; iOS has no `UIBackgroundModes`. `POST_NOTIFICATIONS` comes from
+  the library manifest at Gradle merge and was not observed (no Gradle build run).
+- **Migrations authored, not applied:** `0023_location_discovery.sql` (PostGIS, generated
+  geography + GiST, quest location override and editorial fields, structured hours,
+  `discovery_areas`, `quest_feedback`, `discover_nearby`, `get_quest_card`),
+  `0024_adventure_nudges.sql` (consent purposes, nudge settings/installations/claims,
+  feature flags off, bundle/claim/result/purge RPCs), `0025_gps_presence.sql` (presence
+  challenges/checks; `complete_quest` requires an `inside` check for GPS quests — closes
+  SYSTEM_STATE blocker 10 for GPS; anon execute revoked).
+- **Test tooling:** `supabase/tests/run-local.sh` (`npm run db:test`) replays the
+  production migration path on a throwaway Postgres 16 + PostGIS with a test-only Supabase
+  shim; new CI job `database`. Jest now discovers `.test.ts` as well as `.test.tsx`.
+- **Validation, Linux cloud instance, Node 22.22.0 (CI uses 24):**
+
+  | Command | Result |
+  | --- | --- |
+  | `npm run mobile:typecheck` | Passed |
+  | `npm run mobile:test` | Passed: 11 suites, 71 tests |
+  | `npm run mobile:doctor` | Passed 20/20 (baseline `main`: 19/20) |
+  | `npm run mobile:export` | Passed; iOS and Android Hermes bundles |
+  | `npm run db:test` | Passed: 26 migration files applied; 8 SQL test files (≈200 checks) incl. two-session dblink concurrency |
+  | `npx tsc -p tsconfig.app.json --noEmit` / `npm run build` | Passed (existing chunk-size warnings) |
+
+  Local query plan on 20k synthetic venues + 2k override quests used both GiST indexes;
+  ≈ 14 ms (3 km) / 80 ms (10 km) per call locally — not a Supabase measurement.
+- **Not done / blocked:** no Supabase apply, no native compile, no device or field test,
+  no store submission, no policy publication (draft text in the spec §7), no mobile
+  sign-in (Adventure and GPS check-in show "Sign in required"), purge jobs unscheduled.
+- **Reward tiers (owner decision, same day):** Hard 300 XP / 150 Points; `legendary` added at
+  500 / 300 (`0026_legendary_difficulty.sql`, not applied). Only Hard quests on the exact old
+  400 / 200 tier move; earned rewards are untouched. Types, both importers' validators and the
+  partner quest form accept `legendary`. SQL test `70_reward_tiers` covers it.
+
+## 2026-10-24 — Miami Essentials seed, web GPS presence, photo credits (code/data; migrations not applied)
+
+- Reward tier defaults live in `src/lib/app/rewards.ts` (Easy 50/25, Medium
+  150/75, Hard 300/150, Legendary 500/300 — matching 0026). Partner quest form
+  and LocalRepository defaults read them. First web unit tests: `npm test`
+  (`tests/`, node:test via tsx) — reward tiers, GPS presence rules, photo
+  attribution — run in CI.
+- **Web GPS presence:** the quest page now completes `gps` quests through
+  0025's flow — `create_presence_challenge` → one fresh browser fix (never
+  cached) → `verify_gps_presence` → `complete_quest(p_presence_check_id)`.
+  Only `inside` completes; `outside` / `uncertain` explain why. Before this,
+  only the mobile app was wired, so a web gps quest returned
+  `presence_required`. LocalRepository mirrors the server rules
+  (`src/lib/app/presence.ts`, tested).
+- `import:crm` gains editorial-batch options (`partner_type`,
+  `verification_type`, `proof_method`, `social_share_prompt`,
+  `verification_radius_m` 75–150, photo-credit `image_*` columns, `--no-qr`,
+  pending partners for non-active batches, off-tier reward warnings, read-only
+  `<out>.preflight.sql`, migration guards). Existing CRM output unchanged.
+- Added migrations (**authored, not applied**):
+  `0027_quest_media_bucket.sql` (public-read `quest-media` bucket,
+  service-role writes) and `0028_quest_image_attribution.sql`
+  (`quests.image_attribution`). CC BY / BY-SA heroes show their credit on the
+  quest page hero and Explore/Favorites/map cards (linked) and on
+  quest-browser and /quests cards (plain text).
+- Added the Miami Essentials dataset (40 concepts, 34 importable as draft),
+  39 licensed hero images with provenance (29 of 33 seeded heroes credited;
+  4 public domain) and a validation/QA report: `data/generated/miami-essentials/`.
+- Quest browser cards without an image show the branded fallback.
+
+## 2026-10-20 — Consumer mobile foundation (code only)
+
+- Added `apps/mobile`: Expo SDK 58 / React Native 0.88 / React 19.3 / strict
+  TypeScript, Expo Router, safe-area handling, and local development-client support.
+  Tabs are Rewards / Explore / Profile, Explore initial. The quest-detail route
+  receives `questId`; a development-only sample link demonstrates navigation/back.
+  Direct quest links are anchored to Explore so the stack can return there.
+- Kept the website at the root with its original dependency declarations, exact
+  lockfile, TypeScript settings, Vite and Vercel configuration. Mobile is an
+  independent npm package with a separate lockfile and root convenience scripts;
+  React versions are not unified and no shared package/backend was introduced.
+- Added the minimal jest-expo / React Native Testing Library 14 navigation suite.
+  CI retains web typecheck/build and adds mobile typecheck/tests, Expo Doctor,
+  and iOS/Android JS exports. Both jobs run on all existing triggers, including
+  shared configuration changes. No native cloud build/signing/submission is run.
+- Added development/staging config and placeholders only. Native commands reject
+  missing approved target identifiers; production config is deliberately blocked.
+  EAS profiles are internal development/staging configuration only and have no
+  account/project/signing bindings. No authentication, backend integration, maps,
+  camera/QR, completion, points, redemption, or database work was performed.
+- **Static/automated validation, Linux cloud instance with Node 24.19.0:**
+
+  | Command (repository root unless noted) | Result |
+  | --- | --- |
+  | `npm ci --no-audit --no-fund` | Passed; root dependency graph restored from original lockfile |
+  | `npm --prefix apps/mobile ci --no-audit --no-fund` | Passed; clean mobile install, 1069 packages |
+  | `npx tsc --noEmit -p tsconfig.app.json` | Passed before and after mobile changes (local tsc binary used) |
+  | `npm run build` | Passed before and after; existing Browserslist/chunk/import warnings remain |
+  | `npm run lint` | Failed before and after: unchanged 21 errors / 16 warnings; unrelated cleanup excluded |
+  | `npm run mobile:typecheck` | Passed after clean mobile install |
+  | `npm run mobile:test` | Passed, 1 suite / 4 tests; native views mocked, not device tests |
+  | `npm run mobile:export` | Passed for iOS and Android Hermes JS bundles; not native compilation |
+  | `EXPO_OFFLINE=1 npx expo install --check --npm` (in `apps/mobile`) | Passed against installed SDK compatibility map; online metadata not checked |
+  | `npm run mobile:doctor` | 18/20 passed; schema and React Native Directory checks failed fetching external metadata in restricted networking; full diagnostics remain pending |
+  | `npm run mobile:start -- --localhost --port 8081` | Metro started; status, Android development manifest and full development JS bundle returned HTTP 200; checked actual screen modules |
+  | `npm run mobile:android` | Blocked by missing approved Android application ID before native compilation |
+  | `npm run mobile:ios` | Blocked: iOS local builds require macOS |
+
+  In the cloud sandbox, npm used `NPM_CONFIG_CACHE=/workspace/.npm-cache`; Expo
+  commands used `EXPO_NO_TELEMETRY=1`, and bundling used `EXPO_OFFLINE=1`. Metro
+  needed access to its standard per-user `.expo/state.json`; no repository
+  workaround or trust bypass was added. Expo Doctor was also retried with Node's
+  environment-proxy support and still could not complete the two online checks.
+  Official Expo documentation was read from its GitHub source because the docs
+  hostname is outside this instance's network policy. Staging config generation
+  was checked for its distinct name/scheme and absent invented IDs; negative
+  config checks confirmed production and missing native IDs are rejected.
+- **Native compilation:** no successful iOS/Android native compilation. This
+  Linux image has no Android SDK, adb, emulator, Xcode, or CocoaPods. No approved
+  application identifiers/signing/EAS access were found. Supply approved
+  development/staging IDs and native tooling, then execute the documented local
+  native commands. No paid builds, production deployment, account registration,
+  store submission, database change, or merge was performed.
+- **Simulator/emulator checks:** unrun. **Physical-device checks:** unrun.
+  Native back gestures, hardware back, safe-area appearance, and installation
+  must still be checked on actual native targets. Re-run full Expo Doctor with
+  access to Expo API/schema and React Native Directory metadata.
+- Setup commands, environment separation, feature entry points, and outstanding
+  requirements are in `apps/mobile/README.md`. Existing root `.env.example`
+  conflict markers were observed and left unchanged.
+
 ## 2026-09-30 — Partner Insights dashboard; production analytics on
 
 - **Production redeployed** with `VITE_ANALYTICS_SINK=supabase` and a new URL-restricted `VITE_MAPBOX_PUBLIC_TOKEN`.

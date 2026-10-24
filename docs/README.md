@@ -1,236 +1,64 @@
-# SideQuests Documentation
+# SideQuests documentation map
 
-Welcome to the SideQuests project documentation.
+Start with [AGENTS.md](../AGENTS.md) for the shared operating rules, required reading, scope, and source-of-truth hierarchy. [CLAUDE.md](../CLAUDE.md) is a tool entry point to the same manual, not a second policy document.
 
-This repository contains the source of truth for the product, business, design, and technical architecture of SideQuests. Every contributor—human or AI—should read these documents before making product or engineering decisions.
+Read the documents relevant to the task, not the entire repository. Update the existing owner of a topic instead of creating another master context, duplicate roadmap, or numbered copy.
 
----
+## Foundations and product
 
-# What is SideQuests?
+| Topic | Authoritative document |
+| --- | --- |
+| Foundational principles | [Project Constitution](PROJECT_CONSTITUTION.md) |
+| Product vision and MVP context | [Master Context](MASTER_CONTEXT.md) |
+| Product strategy | [Product Direction](PRODUCT_DIRECTION.md) |
+| MVP requirements | [Product Specification](product/PRODUCT_SPEC.md) |
+| Quest quality and structure | [Quest Design Guide](product/QUEST_DESIGN_GUIDE.md) |
+| Product decisions | [Product Decision Log](product/PRODUCT_DECISION_LOG.md) |
+| Location, discovery & Adventure Mode | [Location Discovery](product/LOCATION_DISCOVERY.md) |
+| Standing decisions | [Decisions](DECISIONS.md) |
 
-SideQuests is a platform that gamifies real-world exploration.
+## Design: distinct scopes, not competing redesign prompts
 
-Users discover quests at local businesses, landmarks, events, and attractions, complete real-world objectives, earn rewards, and build a personal history of their adventures.
+| Scope | Reference |
+| --- | --- |
+| Brand implementation specifications | [Brand design system](../brand/design-system.md) |
+| Product interaction and UX principles | [Product design system](product/DESIGN_SYSTEM.md) |
+| Existing website rebuild direction | [Web design brief](../DESIGN_BRIEF.md) |
+| Native-app visual references | [Mobile reference images](design/mobile/) |
+| Design evidence and motion specifications | [Design directory](design/) |
 
-Businesses benefit from measurable customer engagement, increased foot traffic, and actionable analytics.
+Keep the web brief and mobile reference images: they are not duplicates of the historical redesign prompt. A visual reference is not, by itself, a complete implementation specification. Surface conflicts between references instead of choosing a new visual direction during housekeeping.
 
-Our mission is to make discovering the real world as engaging as exploring a video game.
+## Engineering and operations
 
----
+| Topic | Owner |
+| --- | --- |
+| Architecture guidance | [Technical Architecture](architecture/TECHNICAL_ARCHITECTURE.md) |
+| Logical database design | [Database Specification](architecture/DATABASE_SPEC.md) |
+| Technical decisions | [Architecture Decision Record](architecture/ARCHITECTURE_DECISION_RECORD.md) |
+| Coding conventions | [Engineering Standards](engineering/ENGINEERING_STANDARDS.md) |
+| Engineering priorities | [Development Roadmap](engineering/DEVELOPMENT_ROADMAP.md) |
+| Execution planning | [Production Sprint Plan](engineering/PRODUCTION_SPRINT_PLAN.md) |
+| System verification record | [System State](engineering/SYSTEM_STATE.md) |
+| Operational history | [Changelog](engineering/CHANGELOG.md) |
+| Measurement requirements | [Analytics Specification](engineering/ANALYTICS_SPEC.md) |
+| Quest content import | [Quest Content Import](QUEST_CONTENT_IMPORT.md) |
+| CRM import | [CRM Import Runbook](CRM_IMPORT_RUNBOOK.md) |
 
-# Documentation Structure
+**Freshness matters.** The system-state document's header is dated `2026-07-06`; this cleanup does not reverify its deployment, database, route, or security claims. Read the dates and evidence attached to individual entries. Inspect current code and migrations, and verify the live environment when needed. A file in the active index can still contain an old snapshot or intended behavior rather than shipped behavior.
 
-## PROJECT_CONSTITUTION.md
+`engineering/ROADMAP.md` is only a compatibility pointer to `engineering/DEVELOPMENT_ROADMAP.md`. Do not maintain two sets of priorities.
 
-Foundational principles for the project.
+## Business and legal
 
-Read this first.
+Business model and partnership guidance live in [business/](business/). Policies live in [legal/](legal/) and are not archival clutter; they may be rendered by the application. Do not relocate or remove them as part of general documentation cleanup.
 
-Contains:
+This index does not change pricing, monetization, product scope, or the project constitution. Strategy changes require an explicit update to their owning documents.
 
-- Mission
-- Vision
-- Product values
-- Engineering values
-- Business values
-- Decision framework
+## History and archives
 
----
+[Audits](audits/), decision logs, and dated verification records retain their evidence and dates; do not silently rewrite history.
 
-## MASTER_CONTEXT.md
+[Archive index](archive/README.md) identifies the legacy architecture snapshot and one-off redesign prompt, their original paths, and the duplicate-file consolidation. Archived prompts are reference material, not active tasks. Root `ARCHITECTURE.md` and `CLAUDE_DESIGN_PROMPT.md` retain short forwarding notices rather than competing specifications.
 
-High-level overview of the product.
-
-Contains:
-
-- Vision
-- Core philosophy
-- User journey
-- Product principles
-- Current MVP scope
-
----
-
-## PRODUCT_SPEC.md
-
-Defines every feature included in the product.
-
-Includes:
-
-- User flows
-- Screens
-- Functional requirements
-- Acceptance criteria
-
----
-
-## DESIGN_SYSTEM.md
-
-Visual identity and interface guidelines.
-
-Includes:
-
-- Brand principles
-- Colors
-- Typography
-- Components
-- UX philosophy
-
----
-
-## BUSINESS_MODEL.md
-
-Defines how SideQuests operates as a business.
-
-Includes:
-
-- Customer segments
-- Pricing
-- Revenue model
-- Go-to-market strategy
-- Partnership structure
-
----
-
-## QUEST_DESIGN_GUIDE.md
-
-Standards for creating great quests.
-
-Includes:
-
-- Quest writing guidelines
-- Difficulty balancing
-- Rewards
-- User experience standards
-
----
-
-## PARTNERSHIP_PLAYBOOK.md
-
-Guide for onboarding and supporting partner businesses.
-
-Includes:
-
-- Outreach process
-- Sales workflow
-- Business onboarding
-- Success metrics
-
----
-
-## ANALYTICS_SPEC.md
-
-Measurement framework for users and businesses.
-
-Includes:
-
-- Event tracking
-- Business analytics
-- Product KPIs
-- Dashboard metrics
-
----
-
-## TECHNICAL_ARCHITECTURE.md
-
-Technical overview of the application.
-
-Includes:
-
-- Application architecture
-- Technology stack
-- Authentication
-- Analytics
-- Storage
-- Deployment
-- Infrastructure
-
----
-
-## ENGINEERING_STANDARDS.md
-
-Coding standards and engineering conventions.
-
-Includes:
-
-- TypeScript standards
-- React standards
-- Supabase conventions
-- Security expectations
-- Code review principles
-
----
-
-## DATABASE_SPEC.md
-
-Supabase database documentation.
-
-Includes:
-
-- Logical data model
-- Relationships
-- Import process
-- Security
-- Seed data
-
----
-
-## DEVELOPMENT_ROADMAP.md
-
-Current development priorities.
-
-Includes:
-
-- MVP milestones
-- Launch blockers
-- Polish items
-- Scale priorities
-- Release criteria
-
----
-
-## PRODUCT_DECISION_LOG.md
-
-Record of major product decisions and reasoning.
-
----
-
-## ARCHITECTURE_DECISION_RECORD.md
-
-Record of major technical and architectural decisions.
-
----
-
-# Product Principles
-
-Every feature should improve at least one of the following:
-
-1. Encourage real-world exploration.
-2. Create measurable value for partner businesses.
-3. Make quest completion enjoyable.
-4. Reward curiosity and discovery.
-5. Keep the experience approachable for first-time users.
-
-If a proposed feature does not support one or more of these principles, it should be reconsidered.
-
----
-
-# Current Development Philosophy
-
-The priority is shipping a polished, focused MVP.
-
-The project intentionally favors simplicity over feature breadth.
-
-Future ideas should not influence current implementation unless they have been promoted into the active product roadmap.
-
----
-
-# Source of Truth
-
-Each topic has a single authoritative document.
-
-Avoid duplicating information across files.
-
-When updating the project, modify the document responsible for that subject rather than copying information into multiple locations.
-
-This keeps documentation consistent and reduces implementation errors.
+Before mobile implementation, establish a current technical baseline and record approved mobile scope in the existing product and architecture documents. Cleaning documentation does not establish production readiness or authorize restructuring the working web app.

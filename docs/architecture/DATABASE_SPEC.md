@@ -314,6 +314,16 @@ Validation should occur at both the application and database layers.
 
 ---
 
+# Location & Discovery (0023–0025, authored 2026-10-24, not applied)
+
+Venues keep `latitude`/`longitude` as the only editable location; a generated
+PostGIS `geography` column indexes it. Quests may carry a location override and
+structured duration/eligibility fields; venues may carry structured
+`opening_hours` and an IANA `timezone`. Nudge reservations, consent purposes and
+GPS presence outcomes are minimal records — no device coordinates, no location
+history, no second completion or points ledger. Full table and RPC contracts:
+[`docs/product/LOCATION_DISCOVERY.md`](../product/LOCATION_DISCOVERY.md).
+
 # Privacy
 
 Collect only the information required to operate the platform.

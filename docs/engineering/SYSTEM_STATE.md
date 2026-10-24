@@ -19,6 +19,14 @@ It is not a roadmap and proposes no new work. Where the Codex audit's findings h
 
 ## 1. Architecture
 
+**Code update 2026-10-20 (not a production deployment):** The consumer mobile
+foundation now lives under `apps/mobile`, with Expo Router placeholders and
+strict TypeScript. Its npm dependencies/lockfile are separate from the unchanged
+website dependency graph. No mobile backend integration or database changes are
+included. See `docs/architecture/TECHNICAL_ARCHITECTURE.md` for the native scope
+and `apps/mobile/README.md` for setup and pending native validation. Dated web
+and production observations below are not revalidated by this addition.
+
 SideQuests is a single-page application: **Vite + React 18 + TypeScript**, deployed as a static SPA on Vercel, talking directly to Supabase (Postgres + Auth + Storage + RPC) from the browser. There is no separate backend server or API layer.
 
 ```
@@ -272,4 +280,15 @@ Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. T
 - **Partner Insights (`/partner`, `/partner/venues/:venueId`)** is in code and needs **`0021_partner_insights.sql`** applied.
   - Until then the page shows "Couldn't load insights".
   - Access is controlled by `partners.owner_user_id` and `users.role = 'admin'`; see ANALYTICS_SPEC.md.
+
+---
+
+## Update 2026-10-24 — Location discovery (code only, not deployed or applied)
+
+- Branch `feat/location-discovery` adds mobile location discovery and authored migrations
+  `0023`–`0026` (0026: `legendary` difficulty; Hard tier 300 XP / 150 Points). **None are applied to production**; the live ledger is unchanged.
+- Once 0025 is applied, `complete_quest()` requires a server-verified GPS presence check for
+  `gps` quests (all 10 live quests are QR, so nobody is affected) and anon can no longer
+  execute it.
+- See `docs/product/LOCATION_DISCOVERY.md` §9 for the release gates.
 

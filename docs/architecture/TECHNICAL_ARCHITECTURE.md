@@ -72,6 +72,34 @@ Performance is a feature.
 
 # Recommended Stack
 
+## Consumer native foundation — 2026-10-20
+
+The approved consumer native foundation is one Expo + React Native + strict
+TypeScript application under `apps/mobile`, targeting iOS and Android with Expo
+Router. The existing website remains at the repository root. Independent npm
+packages and lockfiles isolate mobile's React 19 toolchain from the website's
+React 18 dependency resolution; no shared package layer is introduced.
+
+Mobile currently implements only a native stack and three bottom tabs, ordered
+Rewards / Explore / Profile, with Explore initial. `/quests/[questId]` accepts a
+string identifier. A development-only sample link exercises navigation and back.
+The existing Supabase backend remains the intended backend, but this foundation
+does not connect to it or change its schema. Authentication, production data,
+maps, camera/QR, completion, points, and redemption remain separate feature work.
+
+**Location & discovery (2026-10-24, code only):** mobile adds foreground
+discovery, optional background geofencing and local notifications through
+`expo-location`, `expo-task-manager`, `expo-notifications`, `react-native-maps`
+(Apple Maps on iOS; Android only with an approved Google key) and AsyncStorage,
+talking to Supabase RPCs over PostgREST (no new backend, no LLM). Spatial queries
+use PostGIS in the existing database. Contracts, flags and release gates:
+[`docs/product/LOCATION_DISCOVERY.md`](../product/LOCATION_DISCOVERY.md). The web
+app's Mapbox implementation is unchanged.
+
+See [`apps/mobile/README.md`](../../apps/mobile/README.md) for the native build
+requirements, environment separation, verification limits, and implementation
+entry points. The stack described below continues to apply to the website.
+
 Frontend:
 
 - React

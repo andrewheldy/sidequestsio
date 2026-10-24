@@ -64,6 +64,17 @@ Goals:
 
 # Core User Flow
 
+## Consumer mobile delivery scope — 2026-10-20
+
+The native consumer app targets iOS and Android in one Expo / React Native app.
+The initial approved implementation is a navigation foundation only: Rewards /
+Explore / Profile tabs, Explore initial, and a parameterized quest-detail route.
+The sample navigation item is development-only. Full visual screens and the
+product behaviors below are subsequent tasks; this foundation does not implement
+authentication, backend integration, maps, camera/QR, completion, points, or
+reward redemption. The website remains in place and the existing backend is reused
+when integration is authorized.
+
 1. User creates an account.
 2. User discovers a quest.
 3. User visits the location.
@@ -120,6 +131,11 @@ Each quest card includes:
 ---
 
 ## Quest Discovery
+
+Location-based discovery (Manual / Explore / Adventure modes, nearby ranking,
+optional background nearby alerts, and GPS presence checks) is specified in
+[LOCATION_DISCOVERY.md](LOCATION_DISCOVERY.md) (2026-10-24). Location is always
+optional; proximity never completes a quest or earns XP/Points.
 
 Users can browse by:
 
@@ -297,23 +313,26 @@ XP is earned by completing quests.
 
 XP cannot be spent.
 
-Suggested rewards:
+Standard rewards (canonical values: `src/lib/app/rewards.ts`):
 
 Easy
 
-50 XP
+50 XP / 25 Points
 
 Medium
 
-150 XP
+150 XP / 75 Points
 
 Hard
 
-400 XP
+300 XP / 150 Points
 
 Legendary
 
-1000+ XP
+500 XP / 300 Points (special activations only)
+
+Rewards are stored per quest; these are the curation defaults (decision 2026-10-24,
+`supabase/migrations/0026_legendary_difficulty.sql`).
 
 ---
 

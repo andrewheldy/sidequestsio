@@ -2,6 +2,12 @@
 
 Mobile-first QR quest platform — scan, explore, earn.
 
+## Start here
+
+Read [AGENTS.md](AGENTS.md) for shared contributor and coding-agent rules, then use the [documentation map](docs/README.md) to find the relevant source of truth. [CLAUDE.md](CLAUDE.md) points to the same rules rather than maintaining a duplicate manual.
+
+The [web design brief](DESIGN_BRIEF.md) and [mobile reference images](docs/design/mobile/) remain active references. Old architecture planning and the one-off redesign prompt are identified in the [archive index](docs/archive/README.md); do not treat them as current implementation instructions.
+
 ## Tech stack
 
 - **Vite + React + TypeScript**
@@ -17,19 +23,67 @@ Mobile-first QR quest platform — scan, explore, earn.
 
 ```sh
 # 1. Clone
-git clone <YOUR_GIT_URL>
+git clone https://github.com/andrewheldy/sidequestsio.git
 cd sidequestsio
 
-# 2. Install dependencies
-npm install
+# 2. Install website dependencies from the existing root lockfile
+npm ci
 
-# 3. Configure environment (see sections below)
-cp .env.example .env
-# Then fill in VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_MAPBOX_PUBLIC_TOKEN
-
-# 4. Start dev server
+# 3. Start the website (port 8080)
 npm run dev
 ```
+
+The Vite dev build uses read-only sample data (`src/lib/demo.ts`); no backend
+credentials are needed for that workflow. For optional live configuration, create
+an ignored `.env.local` using the variable names below. The current root
+`.env.example` contains pre-existing conflict markers; do not copy it verbatim.
+Live repository integration requires a production build/preview; dev mode always
+selects the mock repository.
+
+Website checks, from the repository root:
+
+```sh
+npx tsc --noEmit -p tsconfig.app.json
+npm run build
+npm run lint # has pre-existing failures; see mobile verification notes
+```
+
+### Consumer mobile app
+
+The Expo / React Native iOS and Android foundation lives in `apps/mobile`; the
+website stays at the repository root. These are independent npm packages with
+separate lockfiles, so mobile's React 19 does not change the website's React 18
+resolution. There are no shared packages or new backend services.
+
+Use Node 24 LTS and npm for mobile:
+
+```sh
+# From the repository root; install separately from the website
+npm --prefix apps/mobile ci
+npm run mobile:start
+
+# In a separate terminal, after approved development IDs and native tooling exist
+npm run mobile:android
+npm run mobile:ios # macOS / Xcode required
+
+# Checks; these do not trigger cloud builds
+npm run mobile:typecheck
+npm run mobile:test
+npm run mobile:doctor
+npm run mobile:export # iOS + Android JavaScript/Hermes bundles, not native binaries
+```
+
+Install a development client before connecting to Metro. The mobile app opens
+Explore; tabs are Rewards / Explore / Profile. Development builds include a
+sample link to `/quests/sample-quest`, with native stack back navigation. Screens
+are placeholders, and the foundation makes no backend calls.
+
+See [mobile setup and verification](apps/mobile/README.md) for environment
+placeholders, identifier/signing requirements, exact native commands, test
+coverage, and the next implementation entry points. Root `npm ci`, `npm run dev`,
+`npm run build`, Vite config, web TypeScript settings, and Vercel deployment
+behavior retain their existing roles. CI runs both applications on every PR and
+main push, including shared configuration changes.
 
 ---
 
@@ -74,14 +128,9 @@ instead of a blank screen.
 
 ### 2. Database
 
-Run the migration in `supabase/migrations/0001_profiles.sql`:
+The schema is maintained in `supabase/migrations/`; the original single-profile migration is not a complete setup guide for the current application.
 
-```sh
-supabase db push
-# or paste into the Supabase SQL editor
-```
-
-This creates the `profiles` table, RLS policies, and an auto-create-profile trigger on sign-up.
+Follow the database and migration guardrails in [AGENTS.md](AGENTS.md). Verify the target environment and applied schema before proposing changes. The repository's agent database connection is read-only; migrations and imports must be handed to the user for an explicitly authorized, backed-up workflow. Do not run a blanket database push as part of repository cleanup.
 
 ### 3. Auth settings
 

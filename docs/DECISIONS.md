@@ -51,3 +51,14 @@ Product-owner decision that supersedes PD-1 (docs/engineering/PRODUCTION_SPRINT_
 - Admins see every partner. A partner login sees only its own partner, enforced by `owns_partner()` in `partner_insights()` (0021).
 - Analytics only: the old partner pages for quests, rewards and QR codes stay unmounted, and quest content stays curated by SideQuests.
 
+**2026-10-24 — Location is optional; proximity is a hint, never proof.**
+Mobile discovery has three modes — Manual (choose an area, the default), Explore (foreground location after permission) and Adventure (separately opted-in background geofences with local alerts, sign-in required). Declining every permission still leaves a working product. Entering a region, opening an alert or tapping directions never completes a quest or earns XP/Points; GPS quests need a server-computed, challenge-bound presence check. Exact device coordinates are never stored. Nudges are capped server-side (2/24 h, 3 h gap, 7-day quest and 24-hour venue suppression, quiet 21:00–10:00 local) and sponsored alerts stay off. See `docs/product/LOCATION_DISCOVERY.md`.
+
+**2026-10-24 — Reward tier defaults are defined once in code.**
+Easy 50 XP / 25 Points, Medium 150 / 75, Hard 300 / 150, Legendary 500 / 300 live in `src/lib/app/rewards.ts` (Legendary is a stored difficulty since `0026_legendary_difficulty.sql`). Quests keep their own stored rewards; the tiers are authoring defaults and the importer's off-tier warning.
+
+**2026-10-24 — Independent public-place quests use an editorial house partner and no QR codes.**
+Self-guided quests at public places (Miami Essentials) belong to one editorial partner (`type = other`, `pending`) — never an implied venue partnership — and get no QR codes; they verify with GPS presence (`0025_gps_presence.sql`), which the web quest page uses via `create_presence_challenge` → one fresh sample → `verify_gps_presence` → `complete_quest(p_presence_check_id)`. See `data/generated/miami-essentials/validation_report.md`.
+
+**2026-10-24 — Licensed quest photos are credited where they appear.**
+A hero photo whose license requires attribution (CC BY / BY-SA) stores its credit in `quests.image_attribution` (`0028_quest_image_attribution.sql`) and every consumer surface that shows the photo shows the credit: linked (creator → source page, license → license deed) where the surface allows links, plain text inside cards that are a single link. Incomplete credit is never rendered half-way and is refused at import.

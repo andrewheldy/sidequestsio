@@ -1,6 +1,6 @@
 # AGENTS.md — SideQuests.io Operating Manual
 
-This is the entry point for Codex sessions working on SideQuests.io. It is an **operating
+This is the shared entry point for AI-assisted sessions working on SideQuests.io. It is an **operating
 manual**, not a spec: it tells you what to read (and when), which source wins in a conflict, the
 hard guardrails of this repo, and what "done well" looks like. It **points to** the authoritative
 documents rather than duplicating them — always read the linked source before relying on a summary
@@ -29,7 +29,7 @@ you're doing.
 ### Layer 1 — Always read (before any meaningful work)
 - [`docs/PROJECT_CONSTITUTION.md`](docs/PROJECT_CONSTITUTION.md) — foundational principles.
 - [`docs/MASTER_CONTEXT.md`](docs/MASTER_CONTEXT.md) — product vision, MVP scope, user journey.
-- [`docs/engineering/SYSTEM_STATE.md`](docs/enginerring/SYSTEM_STATE.md) — the verified current state of the deployed system.
+- [`docs/engineering/SYSTEM_STATE.md`](docs/engineering/SYSTEM_STATE.md) — dated system-state evidence; check its dates and reverify live claims before relying on them.
 
 ### Layer 2 — Read when relevant
 **Product work**
@@ -53,7 +53,6 @@ you're doing.
 **Operational / current work**
 - [`docs/engineering/PRODUCTION_SPRINT_PLAN.md`](docs/engineering/PRODUCTION_SPRINT_PLAN.md) — evidence-tagged execution plan.
 - [`docs/QUEST_CONTENT_IMPORT.md`](docs/QUEST_CONTENT_IMPORT.md) — quest content import workflow.
-- [`docs/engineering/ROADMAP.md`](docs/engineering/ROADMAP.md) — planned work (if still current).
 - [`docs/engineering/CHANGELOG.md`](docs/engineering/CHANGELOG.md) — notable operational & code changes.
 - [`docs/legal/`](docs/legal/) — canonical source for all legal/policy documents, rendered live at
   `/privacy`, `/terms`, `/community-guidelines`, `/cookies`, `/delete-account`, `/partner-terms`;
@@ -71,13 +70,13 @@ you're doing.
 When two sources disagree about **what the system actually is**, resolve in this order of authority:
 
 1. **Current codebase (`src/`) and current `supabase/migrations/`** — implementation reality.
-2. **`docs/SYSTEM_STATE.md`** — the verified current state.
+2. **`docs/engineering/SYSTEM_STATE.md`** — dated verified state, subject to its recorded verification dates.
 3. **`docs/PROJECT_CONSTITUTION.md`** — long-term philosophy.
 4. **`docs/MASTER_CONTEXT.md`** — product vision and intended behavior.
 5. **Product / business / architecture / engineering docs** — implementation guidance.
 6. **Audit docs (`docs/audits/*`)** — historical evidence; **never silently rewritten**.
-7. **Legacy docs (e.g. root `ARCHITECTURE.md`)** — historical context only, unless explicitly
-   revalidated against `docs/SYSTEM_STATE.md`, `src/App.tsx`, and `supabase/migrations/`.
+7. **Archived docs (`docs/archive/`)** — historical context only, unless explicitly
+   revalidated against `docs/engineering/SYSTEM_STATE.md`, `src/App.tsx`, and `supabase/migrations/`.
 
 > **Core rule: never assume documentation is correct. Verify it against the implementation before
 > making code changes.**
@@ -85,10 +84,13 @@ When two sources disagree about **what the system actually is**, resolve in this
 - `docs/engineering/DEVELOPMENT_ROADMAP.md` is the reference for *current engineering priorities* —
   that is a separate question from the truth ordering above, which governs conflicts about what the
   system *is*.
-- Root **`ARCHITECTURE.md`** is a **legacy MVP snapshot**, not the current source of truth. A *future*
-  cleanup (do **not** do this now unless asked) is to move it to
-  `docs/architecture/legacy/ARCHITECTURE_OLD_MVP_BUILD.md`, or merge its still-accurate parts into
-  `docs/architecture/TECHNICAL_ARCHITECTURE.md`.
+- The legacy MVP architecture is preserved in
+  [`docs/archive/architecture/ARCHITECTURE_OLD_MVP_BUILD.md`](docs/archive/architecture/ARCHITECTURE_OLD_MVP_BUILD.md).
+  Root `ARCHITECTURE.md` is only a forwarding entry. Use
+  `docs/architecture/TECHNICAL_ARCHITECTURE.md` for architecture guidance.
+- [`docs/README.md`](docs/README.md) is the documentation map. Archived documents and one-off
+  prompts are historical context, not active instructions; read them only when the task needs history.
+- `CLAUDE.md` points to this manual rather than maintaining a second copy of the rules.
 
 ---
 
@@ -135,8 +137,9 @@ See `ENGINEERING_STANDARDS.md` and `TECHNICAL_ARCHITECTURE.md` for the full text
 **Reality caveats — verify, don't assume:**
 - TypeScript runs **non-strict** (`tsconfig.app.json`: `strict: false`) — a passing typecheck is
   weaker than strict-mode would be.
-- There is **no automated test suite**. CI (`.github/workflows/ci.yml`) runs install + typecheck +
-  build only. Verify changes by running the affected flow, not by trusting tests that don't exist.
+- The automated test suite is **minimal**: `npm test` (Node's built-in runner via `tsx`, files in
+  `tests/`) covers reward tiers, the GPS presence rules and photo attribution only. CI (`.github/workflows/ci.yml`) runs install + typecheck +
+  tests + build. Verify changes by running the affected flow, not by trusting tests that don't exist.
 - **Lint may not be clean** repo-wide — keep the files you touch clean; don't scope-creep a lint sweep.
 - The repo is organized **by type** (`src/components`, `src/pages`, `src/lib`, `src/hooks`), **not**
   the `features/` layout the spec docs describe. **Match the existing structure**; don't restructure.
@@ -205,8 +208,8 @@ Until this loop is validated with real users and partners in Miami, prioritize i
 
 - **Docs disagree with code → investigate before changing anything.** Code + migrations are the top of
   the truth hierarchy (§3).
-- **Strategy/product docs disagree with `SYSTEM_STATE.md` →** prefer `SYSTEM_STATE.md` for *current
-  reality*.
+- **Strategy/product docs disagree with `SYSTEM_STATE.md` →** use its dated evidence, then reverify
+  *current reality*. Do not treat an old snapshot as a fresh production audit.
 - **Architecture docs disagree with `supabase/migrations/` or `src/App.tsx` →** prefer the current
   code/migrations and **flag the doc as stale** (note it; don't silently "fix" the system to match a
   doc).
@@ -224,7 +227,7 @@ Until this loop is validated with real users and partners in Miami, prioritize i
 Project ref `wvedvngtuzsttpavmgjw`. Postgres + Auth + Storage + RPC via Supabase is the entire
 backend; the browser talks to it directly.
 
-- **The Supabase MCP is read-only** (`.mcp.json`). Codex **cannot** apply migrations or run imports.
+- **The Supabase MCP is read-only** (`.mcp.json`). Agents **must not** apply migrations or run imports.
   Author them and hand them to the user to run in the **SQL editor / CLI after a backup**.
 - **New migrations** are the next `NNNN_name.sql` in `supabase/migrations/` and must be
   **idempotent, non-destructive, reversible where practical, and commented** with intent.
@@ -260,7 +263,7 @@ backend; the browser talks to it directly.
 
 ---
 
-## 11. Definition of a successful Codex session
+## 11. Definition of a successful AI-assisted session
 
 A session is successful when:
 
@@ -282,7 +285,7 @@ A session is successful when:
 
 - **Package manager:** `npm` (matches `README.md` and CI). A `bun.lockb` also exists, but npm is
   canonical for this repo.
-- **Commands:** `npm run dev` · `npm run build` · `npm run lint` ·
+- **Commands:** `npm run dev` · `npm run build` · `npm run lint` · `npm test` ·
   `npx tsc -p tsconfig.app.json --noEmit` (typecheck) · `npm run smoke:supabase` ·
   `npm run import:quests -- <csv>`
 - **Stack:** Vite + React 18 + TypeScript · React Router v6 · TanStack Query v5 · Tailwind + shadcn/ui ·
