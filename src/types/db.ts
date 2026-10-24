@@ -197,6 +197,8 @@ export interface Quest {
   repeat_cooldown_days?: number | null;
   /** gps quests: completion radius in metres around the venue (NULL = 150; 0024). */
   geofence_radius_m?: number | null;
+  /** Credit for image_url when its license requires it (0025); read via readAttribution(). */
+  image_attribution?: unknown;
   /** Optional business/host links (quests.links JSONB, 0012). */
   links?: QuestLinks | null;
 }

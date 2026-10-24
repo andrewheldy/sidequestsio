@@ -143,7 +143,7 @@ interface ColumnSpec {
     | "identity"   // slug — drives deterministic UUIDs
     | "address"    // composed into venues.address (street, City, ST zip)
     | "control"    // eligibility/QA only — never persisted
-    | "insert_only" // validated, then applied on INSERT only (handled in buildRowPlan)
+    | "insert_only" // validated, then handled explicitly in buildRowPlan
     | { ignored: string };
   required?: boolean;
   validate?: Validator;
@@ -195,6 +195,14 @@ const MAPPING: Record<string, ColumnSpec> = {
   verification_type:   { target: { table: "quests", column: "verification_type" }, validate: "verification_type" },
   proof_method:        { target: { table: "quests", column: "proof_method" }, validate: "proof_method" },
   social_share_prompt: { target: { table: "quests", column: "social_share_prompt" } },
+  // Hero photo credit → quests.image_attribution (0025), built in buildRowPlan
+  // for CC BY / BY-SA photos only (public domain / CC0 need no credit).
+  image_creator:     { target: "insert_only" },
+  image_source_name: { target: "insert_only" },
+  image_source_url:  { target: "insert_only", validate: "url" },
+  image_license:     { target: "insert_only" },
+  image_license_url: { target: "insert_only", validate: "url" },
+  image_modified:    { target: "insert_only" },
   // gps quests: metres around the venue (0024; blank = 150 m server default).
   geofence_radius_m:   { target: { table: "quests", column: "geofence_radius_m" }, validate: "int" },
 
@@ -289,7 +297,7 @@ function inferSocialSource(url: string): string {
 interface EntityPlan {
   id: string;
   /** Columns provided by the CSV (insert values + on-conflict update set). */
-  values: Record<string, string | number>;
+  values: Record<string, string | number | Record<string, unknown>>;
   /** Columns set on INSERT only (status, type, FKs) — never updated on conflict. */
   insertOnly: Record<string, string>;
 }
@@ -446,6 +454,25 @@ function buildRowPlan(
   if (links.reviews_url) links.reviews_source = inferReviewSource(links.reviews_url);
   if (links.socials_url) links.socials_source = inferSocialSource(links.socials_url);
 
+  // Hero photo credit (0025): required, and complete, for CC BY / BY-SA photos.
+  const license = get("image_license");
+  if (/^CC BY/i.test(license)) {
+    const credit = {
+      creator: get("image_creator"),
+      source_url: get("image_source_url"),
+      license,
+      license_url: get("image_license_url"),
+      ...(get("image_source_name") ? { source_name: get("image_source_name") } : {}),
+      modified: /^(yes|true|1)$/i.test(get("image_modified")),
+    };
+    const missing = ["creator", "source_url", "license_url"].filter((k) => !credit[k as keyof typeof credit]);
+    if (missing.length > 0) {
+      errors.push(`row ${rowNo}: ${license} photo needs credit — missing image_${missing.join(", image_")}`);
+    } else {
+      quest.values.image_attribution = credit;
+    }
+  }
+
   // Standard reward tiers (src/lib/app/rewards.ts): flag off-tier values.
   const tier = REWARD_TIERS[get("difficulty") as RewardTier];
   if (tier) {
@@ -498,7 +525,8 @@ function mergeEntity(
 // --- SQL emission ----------------------------------------------------------------
 
 const sq = (s: string) => `'${s.replace(/'/g, "''")}'`;
-const lit = (v: string | number) => (typeof v === "number" ? String(v) : sq(v));
+const lit = (v: string | number | Record<string, unknown>) =>
+  typeof v === "number" ? String(v) : typeof v === "string" ? sq(v) : `${sq(JSON.stringify(v))}::jsonb`;
 
 /** Idempotent upsert: INSERT lists provided columns only; conflicting rows only
  *  update those same columns (insert-only columns — status/type/FKs — are left
@@ -537,6 +565,19 @@ function emitImportSql(
     raise exception 'venues profile columns missing — apply supabase/migrations/0014_venue_business_profile.sql first';
   end if;
 end $$;`,
+    ...(rows.some((r) => "image_attribution" in r.quest.values)
+      ? [
+          "-- Prerequisite guard: quests.image_attribution (migration 0025).",
+          `do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'quests' and column_name = 'image_attribution'
+  ) then
+    raise exception 'quests.image_attribution missing — apply supabase/migrations/0025_quest_image_attribution.sql first';
+  end if;
+end $$;`,
+        ]
+      : []),
     ...(rows.some((r) => "geofence_radius_m" in r.quest.values)
       ? [
           "-- Prerequisite guard: quests.geofence_radius_m (migration 0024).",

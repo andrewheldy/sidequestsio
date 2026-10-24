@@ -32,6 +32,13 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   LocalRepository applies the same rules (`src/lib/app/geofence.ts`, tested).
   `import:crm` maps `geofence_radius_m`. Deploy order: apply 0024, then the
   client.
+- Added `supabase/migrations/0025_quest_image_attribution.sql` (**authored, not
+  applied**): `quests.image_attribution` jsonb. CC BY / BY-SA hero photos show
+  their credit (creator, source, license, "cropped") on the quest page hero and
+  Explore cards with links, and on quest-browser and /quests cards as plain
+  text. `import:crm` builds it from `image_*` columns and refuses incomplete
+  credit for CC BY photos. 29 of the 33 seeded heroes are credited (4 are
+  public domain).
 
 ## 2026-10-20 — Consumer mobile foundation (code only)
 

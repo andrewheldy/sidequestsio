@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "@/components/brand/CategoryIcon";
 import { TopoLines } from "@/components/app/quest-detail/QuestDecor";
+import { attributionText, readAttribution } from "@/lib/app/attribution";
 import { getRepository } from "@/lib/db";
 import type { QuestCategory, QuestWithContext } from "@/types/db";
 
@@ -118,6 +119,8 @@ export default function QuestBrowser() {
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                     {q.description}
                   </p>
+                  {/* Plain text: the card is one link; the quest page links source and license. */}
+                  {q.image_url && <CardPhotoCredit value={q.image_attribution} />}
                 </div>
               </div>
             </Link>
@@ -127,4 +130,10 @@ export default function QuestBrowser() {
       </div>
     </>
   );
+}
+
+function CardPhotoCredit({ value }: { value: unknown }) {
+  const credit = readAttribution(value);
+  if (!credit) return null;
+  return <p className="mt-2 truncate text-[11px] text-muted-foreground/80">{attributionText(credit)}</p>;
 }

@@ -138,7 +138,7 @@ See `ENGINEERING_STANDARDS.md` and `TECHNICAL_ARCHITECTURE.md` for the full text
 - TypeScript runs **non-strict** (`tsconfig.app.json`: `strict: false`) — a passing typecheck is
   weaker than strict-mode would be.
 - The automated test suite is **minimal**: `npm test` (Node's built-in runner via `tsx`, files in
-  `tests/`) covers reward tiers and the GPS geofence rules only. CI (`.github/workflows/ci.yml`) runs install + typecheck +
+  `tests/`) covers reward tiers, the GPS geofence rules and photo attribution only. CI (`.github/workflows/ci.yml`) runs install + typecheck +
   tests + build. Verify changes by running the affected flow, not by trusting tests that don't exist.
 - **Lint may not be clean** repo-wide — keep the files you touch clean; don't scope-creep a lint sweep.
 - The repo is organized **by type** (`src/components`, `src/pages`, `src/lib`, `src/hooks`), **not**

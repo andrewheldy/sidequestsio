@@ -60,3 +60,6 @@ Independent public-place quests (Miami Essentials) belong to one editorial house
 **2026-10-24 — GPS quests are verified by a server-side geofence.**
 `complete_quest()` (0024) requires the player's position within the quest's `geofence_radius_m` of its venue (default 150 m, GPS error forgiven up to 50 m, fixes worse than 100 m refused) and never stores the position. This is a presence check, not tamper-proof proof: the browser supplies the coordinates. It is the accepted bar for self-guided starter quests; funded or high-value rewards still need QR/NFC or staff verification.
 
+**2026-10-24 — Licensed quest photos are credited where they appear.**
+A hero photo whose license requires attribution (CC BY / BY-SA) stores its credit in `quests.image_attribution` (0025) and every consumer surface that shows the photo shows the credit: linked (creator → source page, license → license deed) where the surface allows links, plain text inside cards that are a single link. Incomplete credit is never rendered half-way and is refused at import.
+

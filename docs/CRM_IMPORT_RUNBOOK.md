@@ -131,6 +131,10 @@ Self-guided quests at public places (first use: Miami Essentials,
   The server-side geofence lives in migration `0024_gps_geofence.sql` plus the
   client that sends the position; the importer cannot tell whether both are
   live, so gps quests are published by hand after deploy.
+- **Photo credit** (`image_creator`, `image_source_name`, `image_source_url`,
+  `image_license`, `image_license_url`, `image_modified`) → `quests.image_attribution`
+  (0025). Required and complete for CC BY / BY-SA photos (else the row fails);
+  ignored for public domain / CC0. The emitted SQL aborts if 0025 is missing.
 - **`geofence_radius_m`** (optional, metres, 25–5000) sets a gps quest's
   completion radius around its venue (blank = 150 m). Needs 0024; the emitted
   SQL aborts if the column is missing.

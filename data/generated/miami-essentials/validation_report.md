@@ -40,9 +40,14 @@ event-dependent (SoundScape WALLCAST) · 5 templates.
    a modified client can send the venue's coordinates. Until 0024 is applied
    and the client deployed, keep these quests draft; the importer still
    refuses `gps` quests unless draft/paused.
-2. **Image attribution (32 of 39 images).** 22 CC BY (2.0 ×13, 3.0 ×4,
-   4.0 ×5) and 10 CC BY-SA (3.0 ×2, 4.0 ×8) require visible credit; the app
-   has no image-credit display. Public domain ×4 and
+2. **Image attribution — resolved by 0025 + the client (deploy pending).**
+   22 CC BY (2.0 ×13, 3.0 ×4, 4.0 ×5) and 10 CC BY-SA (3.0 ×2, 4.0 ×8)
+   require visible credit. `quests.image_attribution` (migration 0025) holds
+   creator, source link, license + link and "cropped"; the quest page hero
+   shows it with links, Explore cards with links, and the quest browser and
+   public /quests cards as plain text (each card is a single link to the
+   quest page). Of the 33 seeded heroes, 29 carry a credit; the other 4 are
+   public domain. BY-SA crops stay BY-SA. Public domain ×4 and
    CC0 ×3 need none. BY-SA crops must stay BY-SA. `attribution_text` is ready
    in the manifest.
 3. **Duplicate pins (editorial call).** 17 rows overlap existing CRM/legacy
@@ -68,6 +73,7 @@ event-dependent (SoundScape WALLCAST) · 5 templates.
 | Seeded rows | 1 partner (`other`, `pending`), 34 venues, 34 draft quests, **0 QR codes**; rewards 19×50/25, 11×150/75, 4×300/150 |
 | Draft seeded quest completion attempt | `quest_inactive` — nothing awarded |
 | `0024` geofence (staging, applied ×2) | no position → `location_required`; accuracy > 100 m → `location_inaccurate`; 1 km / 111 m (±10 m) away → `outside_geofence` + failed attempt; 111 m (±50 m) → ok; venue without coordinates → `verification_failed`; QR still `scan_required`; venue_code wrong/right unchanged; coordinates found in no table; grants preserved |
+| Image credit (0025 + client) | 0025 applied ×2 on staging; seed ×2 → 29 credited / 33 heroes (the 4 without are public domain); existing rows untouched. Render QA (mobile): CC BY-SA hero shows "Photo: creator / Wikimedia Commons, CC BY-SA 4.0, cropped" linking source and license; public-domain and image-less quests show none; 29 credits on quest-browser cards, Explore cards (linked) and /quests; no nested links; no page errors |
 | Geofence client parity | `npm test` (geofence rules, TS distance = SQL distance); LocalRepository path in Chromium: same results; denied permission → no request sent |
 | Generated `verify.sql` | counts match; only gap: Wynwood hero |
 | Coordinate spot check (8 landmarks vs independent references) | ≤ 263 m except Shark Valley (dataset correctly uses the tower, 7 mi down the loop) and South Pointe (pier vs park) |
@@ -114,11 +120,11 @@ seed does not add one.
 
 ## 6. Production deployment (requires explicit approval)
 
-1. Decide the remaining blockers in §2: an image-credit display and the
-   duplicate-pin merges.
-2. Back up the database. Apply `supabase/migrations/0023_quest_media_bucket.sql`
-   and `0024_gps_geofence.sql`, then deploy the web client (it sends the
-   position for gps quests). The import SQL aborts if 0024 is missing.
+1. Decide the remaining blocker in §2: the duplicate-pin merges.
+2. Back up the database. Apply `supabase/migrations/0023_quest_media_bucket.sql`,
+   `0024_gps_geofence.sql` and `0025_quest_image_attribution.sql`, then deploy
+   the web client (it sends the position for gps quests and renders photo
+   credits). The import SQL aborts if 0024 or 0025 is missing.
 3. Upload `hero/*.webp` to bucket `quest-media` under `miami-essentials/`
    (dashboard or CLI, service role — never a `VITE_*` key).
 4. `npm run import:crm -- data/generated/miami-essentials/miami-essentials.csv --status draft --no-qr --emit-sql out/miami-essentials.sql`
