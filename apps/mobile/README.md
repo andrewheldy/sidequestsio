@@ -11,6 +11,12 @@ onboarding when needed → back to the intended quest → QR quest completion co
 the server → progress and history in Profile → profile/privacy settings, sign out,
 in-app deletion request. Rewards shows real balances and available rewards read-only.
 
+Location discovery and the Adventure nearby-alert pipeline from
+[`docs/product/LOCATION_DISCOVERY.md`](../../docs/product/LOCATION_DISCOVERY.md) are
+included but **off by default** (`EXPO_PUBLIC_FEATURE_NEARBY`, `EXPO_PUBLIC_FEATURE_ADVENTURE`):
+they need migrations 0023–0025, which are not applied to production. GPS quests get a
+"Check in with GPS" button on quest detail (server-computed presence, 0025).
+
 Deliberately excluded: reward redemption (no partner fulfilment flow; 0 live
 rewards), photo/proof capture, non-QR verification types, avatar upload, and
 deletion *processing* until its Edge Function is deployed (see "Release blockers").
@@ -78,7 +84,10 @@ against an in-memory fake Supabase client (`__tests__/support`): navigation/tab 
 discovery, auth/onboarding/return flows, profile/settings writes and account
 isolation, and the QR completion state machine, plus cross-feature journeys. Native
 modules (camera, maps, location, secure store) are mocked; these tests do not prove
-device behaviour or live-backend behaviour.
+device behaviour or live-backend behaviour. Pure logic suites cover the location
+work too (capability gate, quiet hours/DST, region budget, nudge pipeline, ranking,
+RPC client); `expo-notifications` and `expo-task-manager` are mocked as well, so they
+say nothing about permission dialogs, geofence delivery or battery on devices.
 
 ## Local development builds
 
@@ -140,6 +149,8 @@ cp apps/mobile/.env.example apps/mobile/.env.local
 | `EXPO_PUBLIC_SUPABASE_URL` | Approved non-production project URL; production ref is refused |
 | `EXPO_PUBLIC_WEB_ORIGIN` | Website origin for policy links and accepted scan host (default `https://miamisidequests.io`) |
 | `MOBILE_ANDROID_GOOGLE_MAPS_API_KEY` | Optional Android map key; without it Android is list-only |
+| `EXPO_PUBLIC_FEATURE_NEARBY` / `EXPO_PUBLIC_FEATURE_ADVENTURE` | `on` enables location discovery / Adventure (needs migrations 0023–0025); off otherwise |
+| `MOBILE_BACKGROUND_LOCATION` | `1` adds background location for Adventure; omit for a foreground-only build |
 | `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable/anon key for that project (never service-role) |
 
 Development and staging must use distinct approved identifiers, URL schemes, and
@@ -170,7 +181,12 @@ should be run for this foundation.
 | `src/features/account`, `src/features/onboarding` | Auth screens, deep-link callback, post-auth routing, onboarding draft/save |
 | `src/features/profile` | Profile, settings, edit profile, deletion request |
 | `src/features/quest-loop`, `src/features/rewards` | QR scan → `record_code_scan` → `complete_quest`; rewards tab |
-| `__tests__/` | Jest (mocked Supabase + native modules); `support/` holds the fake client |
+| `src/app/nearby.tsx` | Location-ranked discovery (area / Near me / map area, radius and time filters); behind `EXPO_PUBLIC_FEATURE_NEARBY` |
+| `src/app/settings/location.tsx` | Mode choice, Adventure disclosure and permission steps, pause, alert cap |
+| `src/lib/location/`, `discovery/`, `adventure/`, `presence/` | Location adapter, discovery RPCs and ranking, nudge pipeline, GPS check-in |
+| `src/lib/auth/session.ts`, `supabaseSession.ts` | Session seam for the location modules, fed by the Supabase Auth client |
+| `index.ts` | Entry: wires the session seam and registers the geofence task at module scope, then loads `expo-router/entry` |
+| `__tests__/` | Jest (mocked Supabase + native modules); `support/` holds the fake client and native mocks |
 
 Navigate to a quest with `{ pathname: '/quests/[questId]', params: { questId } }`; ids stay strings.
 
@@ -190,7 +206,7 @@ Navigate to a quest with `{ pathname: '/quests/[questId]', params: { questId } }
 ## Release blockers
 
 - In-app account deletion: the app records a request through `request_account_deletion()`
-  (migration 0024, **not yet applied**; until then it falls back to a prefilled email).
+  (migration 0030, **not yet applied**; until then it falls back to a prefilled email).
   Requests are processed by the service-role Edge Function
   `supabase/functions/process-account-deletions` (written, not deployed or scheduled), and
   `docs/legal/Delete-Account.md` must be updated when it ships.

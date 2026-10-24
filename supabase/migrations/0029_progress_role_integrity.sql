@@ -1,4 +1,9 @@
--- 0023_progress_role_integrity.sql — stop clients editing their own role, XP and Points
+-- 0029_progress_role_integrity.sql — stop clients editing their own role, XP and Points
+--
+-- RENUMBERED: authored and applied to production on 2026-10-21 as
+-- 0023_progress_role_integrity.sql. It was renamed when the mobile MVP branch merged,
+-- because main had already used 0023 for location discovery. Re-running it is a no-op
+-- (revoke/grant only), so the live ledger needs no change beyond recording the new name.
 --
 -- WHY (code-verified and LIVE-verified 2026-10-21 via read-only MCP catalog
 -- query: has_column_privilege('authenticated', 'public.users', 'role', 'UPDATE')

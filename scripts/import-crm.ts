@@ -11,6 +11,7 @@
  *   npx tsx scripts/import-crm.ts content/miami.csv --emit-sql out/miami-import.sql
  *   npx tsx scripts/import-crm.ts content/miami.csv --apply
  *   npx tsx scripts/import-crm.ts content/miami.csv --status draft   # import paused
+ *   npx tsx scripts/import-crm.ts content/x.csv --status draft --no-qr  # no venue codes
  *
  * Identity: the schema has no slug columns, so every entity gets a
  * DETERMINISTIC UUIDv5 derived from the row's `slug` (namespaced per entity
@@ -31,12 +32,17 @@
  * --apply needs SUPABASE_SERVICE_ROLE_KEY (env or .env). Never commit that key;
  * never ship it to the browser. --emit-sql needs no credentials — paste the
  * file into the Supabase SQL editor. --emit-sql also writes <out>.verify.sql
- * (read-only post-import checks) and <out>.rollback.sql (archives the batch).
+ * (read-only post-import checks), <out>.preflight.sql (read-only pre-import
+ * insert/update/conflict plan) and <out>.rollback.sql (archives the batch).
+ *
+ * --no-qr skips QR code creation (self-guided quests at places where no venue
+ * has authorized a sticker). Non-active batches create partners as 'pending'.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, resolve } from "node:path";
+import { REWARD_TIERS, type RewardTier } from "../src/lib/app/rewards";
 
 // --- env (same pattern as scripts/import-quest-content.ts) -------------------
 
@@ -127,7 +133,8 @@ function slugify(s: string): string {
 
 type Validator =
   | "url" | "int" | "latitude" | "longitude" | "category" | "difficulty"
-  | "price_range" | "state" | "zip" | "email" | "phone";
+  | "price_range" | "state" | "zip" | "email" | "phone"
+  | "partner_type" | "verification_type" | "proof_method" | "radius";
 
 interface ColumnSpec {
   target:
@@ -136,6 +143,7 @@ interface ColumnSpec {
     | "identity"   // slug — drives deterministic UUIDs
     | "address"    // composed into venues.address (street, City, ST zip)
     | "control"    // eligibility/QA only — never persisted
+    | "insert_only" // validated, then handled explicitly in buildRowPlan
     | { ignored: string };
   required?: boolean;
   validate?: Validator;
@@ -156,6 +164,8 @@ const MAPPING: Record<string, ColumnSpec> = {
   // ── partners (B2B account shell; one per business) ──
   business_name:  { target: { table: "partners", column: "name" }, required: true },
   contact_email:  { target: { table: "partners", column: "contact_email" }, validate: "email" },
+  // Optional; default 'venue'. Editorial (non-partner) batches use 'other'.
+  partner_type:   { target: "insert_only", validate: "partner_type" },
 
   // ── venues (the customer-facing location) ──
   location_name:  { target: { table: "venues", column: "name" } }, // falls back to business_name
@@ -181,6 +191,20 @@ const MAPPING: Record<string, ColumnSpec> = {
   quest_objective:   { target: { table: "quests", column: "funky_action" } },  // "Quest Objective" card
   funky_action:      { target: { table: "quests", column: "action_prompt" } }, // secondary playful prompt
   hero_image_url:    { target: { table: "quests", column: "image_url" }, validate: "url" },
+  // Optional; blank keeps the DB default (verification_type 'qr').
+  verification_type:   { target: { table: "quests", column: "verification_type" }, validate: "verification_type" },
+  proof_method:        { target: { table: "quests", column: "proof_method" }, validate: "proof_method" },
+  social_share_prompt: { target: { table: "quests", column: "social_share_prompt" } },
+  // Hero photo credit → quests.image_attribution (0028), built in buildRowPlan
+  // for CC BY / BY-SA photos only (public domain / CC0 need no credit).
+  image_creator:     { target: "insert_only" },
+  image_source_name: { target: "insert_only" },
+  image_source_url:  { target: "insert_only", validate: "url" },
+  image_license:     { target: "insert_only" },
+  image_license_url: { target: "insert_only", validate: "url" },
+  image_modified:    { target: "insert_only" },
+  // gps quests: presence radius around the venue, 75–150 m (0023/0025; blank = 100 m).
+  verification_radius_m: { target: { table: "quests", column: "verification_radius_m" }, validate: "radius" },
 
   // ── quests.links jsonb (canonical shape, docs/QUEST_CONTENT_IMPORT.md) ──
   website_url:        { target: { links: "website_url" }, validate: "url" },
@@ -191,10 +215,23 @@ const MAPPING: Record<string, ColumnSpec> = {
   // ── acknowledged, but no app-facing home (see runbook § discrepancies) ──
   category:        { target: { ignored: "business category — no app-facing column; partners.type stays 'venue'" } },
   google_maps_url: { target: { ignored: "not read by the app; venue lat/lng powers the map" }, validate: "url" },
+
+  // ── editorial metadata (data/generated/miami-essentials/) — review/QA only ──
+  ...Object.fromEntries(
+    [
+      "concept_number", "source_doc", "narrative", "shelf", "collections", "quest_kind", "cost_class",
+      "access_requirements", "restriction_flags", "completion_message", "community_prompt",
+      "evidence_supports", "coordinate_source", "geofence_radius_m", "geofence_note",
+      "publication_status", "content_readiness", "blockers", "overlaps_existing",
+    ].map((col): [string, ColumnSpec] => [col, { target: { ignored: "editorial metadata — no app-facing column" } }]),
+  ),
 };
 
 const CATEGORIES = ["art", "food", "outdoors", "culture", "nightlife", "shopping", "fitness", "hidden_gem"];
-const DIFFICULTIES = ["easy", "medium", "hard"];
+const DIFFICULTIES = ["easy", "medium", "hard", "legendary"];
+const PARTNER_TYPES = ["venue", "brand", "event", "nonprofit", "other"];
+const VERIFICATION_TYPES = ["qr", "nfc", "gps", "venue_code", "staff_approval"];
+const PROOF_METHODS = ["camera", "photo", "staff_phrase", "breadcrumb", "qr", "manual"];
 
 // --- eligibility ------------------------------------------------------------------
 
@@ -260,7 +297,7 @@ function inferSocialSource(url: string): string {
 interface EntityPlan {
   id: string;
   /** Columns provided by the CSV (insert values + on-conflict update set). */
-  values: Record<string, string | number>;
+  values: Record<string, string | number | Record<string, unknown>>;
   /** Columns set on INSERT only (status, type, FKs) — never updated on conflict. */
   insertOnly: Record<string, string>;
 }
@@ -324,6 +361,19 @@ function validateValue(
     case "phone":
       if (!/^\+?[\d\s().-]{7,}$/.test(v)) warnings.push(`phone "${v}" does not look like a phone number — stored as-is`);
       return true;
+    case "radius":
+      if (!/^\d+$/.test(v) || Number(v) < 75 || Number(v) > 150) {
+        errors.push(`row ${rowNo}: ${col} "${v}" must be an integer from 75 to 150 (quests_verification_radius_range)`);
+        return false;
+      }
+      return true;
+    case "partner_type":
+    case "verification_type":
+    case "proof_method": {
+      const allowed = { partner_type: PARTNER_TYPES, verification_type: VERIFICATION_TYPES, proof_method: PROOF_METHODS }[validator];
+      if (!allowed.includes(v)) { errors.push(`row ${rowNo}: ${col} "${v}" not in ${allowed.join("|")}`); return false; }
+      return true;
+    }
   }
 }
 
@@ -361,7 +411,8 @@ function buildRowPlan(
   const partner: EntityPlan = {
     id: partnerId,
     values: { name: get("business_name") },
-    insertOnly: { type: "venue", status: "active" },
+    // A non-active batch must not create live partner accounts.
+    insertOnly: { type: "venue", status: questStatus === "active" ? "active" : "pending" },
   };
   const venue: EntityPlan = {
     id: venueId,
@@ -381,13 +432,17 @@ function buildRowPlan(
     if (spec.validate && !validateValue(col, v, spec.validate, rowNo, errors, warnings)) continue;
     const t = spec.target;
     if (t === "identity" || t === "control" || t === "address") continue;
+    if (t === "insert_only") {
+      if (col === "partner_type") partner.insertOnly.type = v;
+      continue;
+    }
     if ("ignored" in t) continue;
     if ("links" in t) {
       links[t.links] = v;
       continue;
     }
     const { table, column } = t;
-    const numeric = spec.validate === "int" || spec.validate === "latitude" || spec.validate === "longitude";
+    const numeric = ["int", "latitude", "longitude", "radius"].includes(spec.validate ?? "");
     const value = numeric ? Number(v) : v;
     if (table === "partners" && column !== "name") partner.values[column] = value;
     else if (table === "venues" && column !== "name") venue.values[column] = value;
@@ -404,6 +459,35 @@ function buildRowPlan(
   // Canonical link-source keys, inferred exactly like import-quest-content.ts.
   if (links.reviews_url) links.reviews_source = inferReviewSource(links.reviews_url);
   if (links.socials_url) links.socials_source = inferSocialSource(links.socials_url);
+
+  // Hero photo credit (0028): required, and complete, for CC BY / BY-SA photos.
+  const license = get("image_license");
+  if (/^CC BY/i.test(license)) {
+    const credit = {
+      creator: get("image_creator"),
+      source_url: get("image_source_url"),
+      license,
+      license_url: get("image_license_url"),
+      ...(get("image_source_name") ? { source_name: get("image_source_name") } : {}),
+      modified: /^(yes|true|1)$/i.test(get("image_modified")),
+    };
+    const missing = ["creator", "source_url", "license_url"].filter((k) => !credit[k as keyof typeof credit]);
+    if (missing.length > 0) {
+      errors.push(`row ${rowNo}: ${license} photo needs credit — missing image_${missing.join(", image_")}`);
+    } else {
+      quest.values.image_attribution = credit;
+    }
+  }
+
+  // Standard reward tiers (src/lib/app/rewards.ts): flag off-tier values.
+  const tier = REWARD_TIERS[get("difficulty") as RewardTier];
+  if (tier) {
+    const xp = get("xp_reward");
+    const points = get("points_reward");
+    if ((xp && Number(xp) !== tier.xp) || (points && Number(points) !== tier.points)) {
+      warnings.push(`rewards ${xp || "∅"} XP / ${points || "∅"} Points differ from the ${get("difficulty")} tier (${tier.xp} / ${tier.points})`);
+    }
+  }
 
   // Launch-quality nudges (non-blocking).
   for (const col of ["quest_description", "quest_objective", "hero_image_url", "xp_reward", "points_reward", "hours"]) {
@@ -444,7 +528,8 @@ function mergeEntity(
 // --- SQL emission ----------------------------------------------------------------
 
 const sq = (s: string) => `'${s.replace(/'/g, "''")}'`;
-const lit = (v: string | number) => (typeof v === "number" ? String(v) : sq(v));
+const lit = (v: string | number | Record<string, unknown>) =>
+  typeof v === "number" ? String(v) : typeof v === "string" ? sq(v) : `${sq(JSON.stringify(v))}::jsonb`;
 
 /** Idempotent upsert: INSERT lists provided columns only; conflicting rows only
  *  update those same columns (insert-only columns — status/type/FKs — are left
@@ -469,7 +554,7 @@ function upsertSql(
 }
 
 function emitImportSql(
-  csvPath: string, partners: EntityPlan[], venues: EntityPlan[], rows: RowPlan[],
+  csvPath: string, partners: EntityPlan[], venues: EntityPlan[], rows: RowPlan[], withQr: boolean,
 ): string {
   const out: string[] = [
     `-- Generated by scripts/import-crm.ts from ${csvPath}\n-- ${new Date().toISOString()} — idempotent upserts keyed on deterministic UUIDs.\n-- Review before running in the Supabase SQL editor. Take a backup first.`,
@@ -483,14 +568,40 @@ function emitImportSql(
     raise exception 'venues profile columns missing — apply supabase/migrations/0014_venue_business_profile.sql first';
   end if;
 end $$;`,
+    ...(rows.some((r) => "image_attribution" in r.quest.values)
+      ? [
+          "-- Prerequisite guard: quests.image_attribution (migration 0028).",
+          `do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'quests' and column_name = 'image_attribution'
+  ) then
+    raise exception 'quests.image_attribution missing — apply supabase/migrations/0028_quest_image_attribution.sql first';
+  end if;
+end $$;`,
+        ]
+      : []),
+    ...(rows.some((r) => "verification_radius_m" in r.quest.values)
+      ? [
+          "-- Prerequisite guard: quests.verification_radius_m (migration 0023).",
+          `do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'quests' and column_name = 'verification_radius_m'
+  ) then
+    raise exception 'quests.verification_radius_m missing — apply supabase/migrations/0023_location_discovery.sql first';
+  end if;
+end $$;`,
+        ]
+      : []),
     `-- ── partners (${partners.length}) ──`,
     ...partners.map((p) => upsertSql("partners", p)),
     `-- ── venues (${venues.length}) ──`,
     ...venues.map((v) => upsertSql("venues", v)),
     `-- ── quests (${rows.length}) ──`,
     ...rows.map((r) => `-- ${r.slug}\n${upsertSql("quests", r.quest, { linksMerge: r.links })}`),
-    `-- ── qr codes (${rows.length}) ──`,
-    ...rows.map((r) =>
+    withQr ? `-- ── qr codes (${rows.length}) ──` : "-- ── qr codes: none (--no-qr) ──",
+    ...(withQr ? rows : []).map((r) =>
       upsertSql("qr_codes", {
         id: r.qr.id,
         values: { code: r.qr.code, destination_url: r.qr.destination_url },
@@ -502,11 +613,22 @@ end $$;`,
   return out.join("\n\n") + "\n";
 }
 
-function emitVerifySql(partners: EntityPlan[], venues: EntityPlan[], rows: RowPlan[]): string {
+function emitVerifySql(partners: EntityPlan[], venues: EntityPlan[], rows: RowPlan[], withQr: boolean): string {
   const questIds = rows.map((r) => sq(r.questId)).join(", ");
   const arr = (ids: string[]) => ids.map(sq).join(", ");
+  const qrCheck = withQr
+    ? `-- 3. Every imported quest has an active QR code pointing at it (0 rows expected).
+select q.id, q.title
+from public.quests q
+where q.id in (${questIds})
+  and not exists (
+    select 1 from public.qr_codes c
+    where c.quest_id = q.id and c.status = 'active'
+      and c.destination_url = '/q/' || q.id
+  );`
+    : "-- 3. QR codes: none expected (--no-qr batch); the count above must be 0.";
   return `-- Post-import verification (read-only) — generated by scripts/import-crm.ts
--- Expected: partners=${partners.length}, venues=${venues.length}, quests=${rows.length}, qr_codes=${rows.length}
+-- Expected: partners=${partners.length}, venues=${venues.length}, quests=${rows.length}, qr_codes=${withQr ? rows.length : 0}
 
 -- 1. Row counts for this batch (each count must equal the expected number above).
 select
@@ -522,15 +644,7 @@ left join public.venues v on v.id = q.venue_id
 where q.id in (${questIds})
   and (v.id is null or v.latitude is null or v.longitude is null);
 
--- 3. Every imported quest has an active QR code pointing at it (0 rows expected).
-select q.id, q.title
-from public.quests q
-where q.id in (${questIds})
-  and not exists (
-    select 1 from public.qr_codes c
-    where c.quest_id = q.id and c.status = 'active'
-      and c.destination_url = '/q/' || q.id
-  );
+${qrCheck}
 
 -- 4. Content gaps that hurt launch quality (review any rows returned).
 select q.id, q.title,
@@ -552,6 +666,52 @@ select
   has_table_privilege('anon', 'public.venues',   'select') as venues_readable,
   has_table_privilege('anon', 'public.partners', 'select') as partners_readable,
   has_table_privilege('anon', 'public.qr_codes', 'select') as qr_codes_readable;
+`;
+}
+
+/** Read-only pre-import plan against the target database: which planned rows
+ *  would be inserted vs updated, and which collide with pre-existing rows that
+ *  this batch does not own (same name/title/code under a different id). */
+function emitPreflightSql(partners: EntityPlan[], venues: EntityPlan[], rows: RowPlan[], withQr: boolean): string {
+  const planned = [
+    ...partners.map((p) => ["partners", p.id, String(p.values.name)]),
+    ...venues.map((v) => ["venues", v.id, String(v.values.name)]),
+    ...rows.map((r) => ["quests", r.questId, String(r.quest.values.title ?? r.slug)]),
+    ...(withQr ? rows.map((r) => ["qr_codes", r.qr.id, r.qr.code]) : []),
+  ];
+  const values = planned.map(([t, id, label]) => `  (${sq(t)}, ${sq(id)}::uuid, ${sq(label)})`).join(",\n");
+  return `-- Pre-import plan (read-only) — generated by scripts/import-crm.ts
+-- Run against the target database BEFORE the import file.
+with planned(tbl, id, label) as (values
+${values}
+),
+existing as (
+  select 'partners' as tbl, id, name as label from public.partners
+  union all select 'venues', id, name from public.venues
+  union all select 'quests', id, title from public.quests
+  union all select 'qr_codes', id, code from public.qr_codes
+)
+-- 1. Action per planned row: insert (new id) or update (id already present).
+select p.tbl, p.label, p.id,
+       case when e.id is null then 'insert' else 'update' end as action
+from planned p
+left join existing e on e.tbl = p.tbl and e.id = p.id
+order by p.tbl, action, p.label;
+
+-- 2. Conflicts: pre-existing rows with the same name/title/code under a different id (review every row).
+with planned(tbl, id, label) as (values
+${values}
+),
+existing as (
+  select 'partners' as tbl, id, name as label from public.partners
+  union all select 'venues', id, name from public.venues
+  union all select 'quests', id, title from public.quests
+  union all select 'qr_codes', id, code from public.qr_codes
+)
+select p.tbl, p.label, p.id as planned_id, e.id as existing_id
+from planned p
+join existing e on e.tbl = p.tbl and lower(e.label) = lower(p.label) and e.id <> p.id
+order by p.tbl, p.label;
 `;
 }
 
@@ -630,6 +790,7 @@ async function applyEntities(
 async function main() {
   const args = process.argv.slice(2);
   const apply = args.includes("--apply");
+  const withQr = !args.includes("--no-qr");
   const emitIdx = args.indexOf("--emit-sql");
   const emitPath = emitIdx !== -1 ? args[emitIdx + 1] : null;
   const statusIdx = args.indexOf("--status");
@@ -638,7 +799,7 @@ async function main() {
   const csvPath = args.find((a) => !a.startsWith("--") && !optionValues.has(a));
 
   if (!csvPath) {
-    console.error("Usage: npx tsx scripts/import-crm.ts <crm.csv> [--emit-sql <out.sql>] [--apply] [--status active|draft]");
+    console.error("Usage: npx tsx scripts/import-crm.ts <crm.csv> [--emit-sql <out.sql>] [--apply] [--status active|draft] [--no-qr]");
     process.exit(2);
   }
   if (emitIdx !== -1 && !emitPath) { console.error("--emit-sql requires an output path"); process.exit(2); }
@@ -705,7 +866,7 @@ async function main() {
   // Report.
   console.log(`\nParsed ${table.length - 1} row(s) from ${csvPath}`);
   console.log(`  eligible: ${rows.length} · skipped: ${skipped.length} · errors: ${errors.length}`);
-  console.log(`  entities: ${partners.size} partner(s), ${venues.size} venue(s), ${rows.length} quest(s) + QR code(s)`);
+  console.log(`  entities: ${partners.size} partner(s), ${venues.size} venue(s), ${rows.length} quest(s) ${withQr ? " + QR code(s)" : " (no QR codes: --no-qr)"}`);
   console.log(`  quest status on insert: ${questStatus}\n`);
 
   for (const s of skipped) console.log(`  ⏭ row ${s.rowNo} (${s.slug}) skipped — ${s.reason}`);
@@ -717,7 +878,7 @@ async function main() {
     console.log(`    venue:   ${r.venue.values.name} — ${r.venue.values.address}`);
     console.log(`    quest:   ${Object.keys(r.quest.values).join(", ") || "(defaults only)"}`);
     console.log(`    links:   ${Object.keys(r.links).join(", ") || "(none)"}`);
-    console.log(`    qr:      ${r.qr.code} → ${r.qr.destination_url}`);
+    if (withQr) console.log(`    qr:      ${r.qr.code} → ${r.qr.destination_url}`);
     for (const w of r.warnings) console.log(`    ⚠ ${w}`);
   }
 
@@ -736,13 +897,15 @@ async function main() {
   const venueList = [...venues.values()];
 
   if (emitPath) {
-    const importSql = emitImportSql(csvPath, partnerList, venueList, rows);
+    const importSql = emitImportSql(csvPath, partnerList, venueList, rows, withQr);
     const base = resolve(emitPath).replace(/\.sql$/, "");
     mkdirSync(dirname(resolve(emitPath)), { recursive: true });
     writeFileSync(resolve(emitPath), importSql);
-    writeFileSync(`${base}.verify.sql`, emitVerifySql(partnerList, venueList, rows));
+    writeFileSync(`${base}.preflight.sql`, emitPreflightSql(partnerList, venueList, rows, withQr));
+    writeFileSync(`${base}.verify.sql`, emitVerifySql(partnerList, venueList, rows, withQr));
     writeFileSync(`${base}.rollback.sql`, emitRollbackSql(rows));
     console.log(`\n✓ SQL written:`);
+    console.log(`    preflight: ${base}.preflight.sql (read-only: inserts / updates / conflicts)`);
     console.log(`    import:   ${emitPath}`);
     console.log(`    verify:   ${base}.verify.sql`);
     console.log(`    rollback: ${base}.rollback.sql`);
@@ -758,7 +921,7 @@ async function main() {
     const linksByQuest = new Map(rows.map((r) => [r.questId, r.links]));
     const q = await applyEntities("quests", rows.map((r) => r.quest), linksByQuest);
     console.log(`  ✓ quests:   ${q.inserted} inserted, ${q.updated} updated`);
-    const c = await applyEntities("qr_codes", rows.map((r) => ({
+    const c = !withQr ? { inserted: 0, updated: 0 } : await applyEntities("qr_codes", rows.map((r) => ({
       id: r.qr.id,
       values: { code: r.qr.code, destination_url: r.qr.destination_url },
       insertOnly: { quest_id: r.questId, venue_id: r.venueId, partner_id: r.partnerId, status: "active" },

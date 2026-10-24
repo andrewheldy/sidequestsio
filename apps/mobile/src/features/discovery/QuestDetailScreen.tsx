@@ -6,7 +6,9 @@ import { useState, type ComponentProps } from 'react';
 import { Linking, Pressable, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, Chip, EmptyState, ErrorState, LoadingState, Screen, SetupRequired, Text } from '../../components/ui';
+import { getSession } from '../../lib/auth/session';
 import { backend, webOrigin } from '../../lib/config';
+import { checkInWithGps, presenceMessage } from '../../lib/presence/checkIn';
 import type { QuestWithContext } from '../../lib/types';
 import { accountGate, type GateResult } from '../../session/accountGate';
 import { useSession } from '../../session/SessionProvider';
@@ -93,12 +95,15 @@ function QuestDetail({ quest }: { quest: QuestWithContext }) {
   const { state } = useSession();
   const location = useDeviceLocation();
   const [blocked, setBlocked] = useState<string | null>(null);
+  const [checkIn, setCheckIn] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
   const cta = useQuestCta(quest);
 
   const venue = quest.venue;
   const image = questImage(quest);
   const miles = distanceToQuest(location.coords, quest);
   const isQr = quest.verification_type === 'qr';
+  const isGps = quest.verification_type === 'gps';
   const links = questLinkItems(quest.links);
   const directions = directionsUrl(quest);
   const place = venue?.neighborhood || venue?.city || 'Miami';
@@ -115,6 +120,16 @@ function QuestDetail({ quest }: { quest: QuestWithContext }) {
     if (gate.kind === 'redirect') router.push(gate.href);
     else if (gate.kind === 'proceed') router.push({ pathname: '/quests/[questId]/complete', params: { questId: quest.id } });
     else setBlocked(BLOCKED_MESSAGES[gate.reason]);
+  };
+
+  // The server computes presence (0025); a result is a signal, never an award.
+  const onCheckIn = async () => {
+    if (checking) return;
+    const session = await getSession();
+    if (!session) return setCheckIn('Sign in to check in with GPS. You can still scan the venue’s QR code.');
+    setChecking(true);
+    setCheckIn(presenceMessage(await checkInWithGps(session, quest.id)));
+    setChecking(false);
   };
 
   const share = () => {
@@ -182,6 +197,21 @@ function QuestDetail({ quest }: { quest: QuestWithContext }) {
           {!isQr ? (
             <Text variant="small" muted>
               Only QR quests can be completed in the app for now.
+            </Text>
+          ) : null}
+          {isGps ? (
+            <Button
+              label={checking ? 'Checking…' : 'Check in with GPS'}
+              icon="navigate-outline"
+              variant="secondary"
+              onPress={() => void onCheckIn()}
+              disabled={checking}
+              accessibilityHint="Checks your location against this quest's area"
+            />
+          ) : null}
+          {checkIn ? (
+            <Text variant="small" muted accessibilityLiveRegion="polite">
+              {checkIn}
             </Text>
           ) : null}
           {blocked ? (

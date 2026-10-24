@@ -13,9 +13,9 @@ export interface ProfileDb {
   /** Recorded writes: [table, op, payload, eq args]. */
   writes: { table: string; op: string; payload: Record<string, unknown>; eq: unknown[] | undefined }[];
   profileReads: number;
-  /** Pending account deletion request per user (0024). */
+  /** Pending account deletion request per user (0030). */
   deletion: Record<string, Record<string, unknown> | null>;
-  /** Simulates a server without 0024 (table/RPC missing). */
+  /** Simulates a server without 0030 (table/RPC missing). */
   deletionUnsupported: boolean;
   /** Error returned by the next deletion RPC calls. */
   deletionRpcError: { code?: string; message: string } | null;

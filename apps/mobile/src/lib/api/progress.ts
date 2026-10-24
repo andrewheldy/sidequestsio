@@ -4,7 +4,7 @@ import type { Progress, QuestCompletion } from '../types';
 /**
  * Shared, server-maintained progression reads (Profile, Rewards, quest loop).
  * public.user_profiles is written only by SECURITY DEFINER RPCs
- * (complete_quest, redeem_reward) since 0023; clients read it, never write it.
+ * (complete_quest, redeem_reward) since 0029 (formerly 0023); clients read it, never write it.
  * Invalidate queryKeys.account.progress/completions after a confirmed completion.
  */
 const PROGRESS_COLUMNS =

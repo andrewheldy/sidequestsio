@@ -135,3 +135,46 @@ it('disables Start for non-QR verification types with an explanation', async () 
   await fireEvent.press(screen.getByRole('button', { name: 'Start quest' }));
   expect(rendered.getPathname()).toBe('/quests/q-gps');
 });
+
+describe('GPS check-in (0025 presence; never an award)', () => {
+  const { setSessionProvider } = require('../../src/lib/auth/session') as typeof import('../../src/lib/auth/session');
+  const realFetch = global.fetch;
+
+  afterEach(() => {
+    setSessionProvider(async () => null);
+    global.fetch = realFetch;
+    delete process.env.EXPO_PUBLIC_SUPABASE_URL;
+    delete process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  });
+
+  it('is offered on GPS quests only', async () => {
+    backend.reset(null, handlerFor());
+    await renderRouter('./src/app', { initialUrl: '/quests/q-full' });
+    await screen.findByText('Globe Snap');
+    expect(screen.queryByRole('button', { name: 'Check in with GPS' })).toBeNull();
+  });
+
+  it('asks a guest to sign in instead of checking in', async () => {
+    backend.reset(null, handlerFor());
+    await renderRouter('./src/app', { initialUrl: '/quests/q-gps' });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Check in with GPS' }));
+    expect(await screen.findByText(/Sign in to check in with GPS/)).toBeVisible();
+  });
+
+  it('asks the server with the signed-in token and reports a refusal without awarding', async () => {
+    backend.reset(makeSession('u1'), handlerFor('u1'));
+    setSessionProvider(async () => ({ userId: 'u1', accessToken: 'user-token' }));
+    process.env.EXPO_PUBLIC_SUPABASE_URL = 'https://project.example.co';
+    process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'publishable';
+    const fetchMock = jest.fn(async (_url: string, _init?: RequestInit) => ({ ok: true, status: 200, text: async () => JSON.stringify({ ok: false, error: 'rate_limited' }) }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await renderRouter('./src/app', { initialUrl: '/quests/q-gps' });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Check in with GPS' }));
+    expect(await screen.findByText(/Check-in isn’t available right now/)).toBeVisible();
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('https://project.example.co/rest/v1/rpc/create_presence_challenge');
+    expect((init?.headers as Record<string, string>).Authorization).toBe('Bearer user-token');
+    expect(fetchMock.mock.calls.some(([u]) => u.includes('complete_quest'))).toBe(false);
+  });
+});

@@ -4,10 +4,10 @@ import { requireSupabase } from '../../lib/supabase';
 export const DELETION_SUBJECT = 'Account Deletion Request';
 
 /**
- * In-app deletion requests (supabase/migrations/0024_account_deletion_requests.sql).
+ * In-app deletion requests (supabase/migrations/0030_account_deletion_requests.sql).
  * The app only records or cancels the request; support processes it within 30
  * days with a server-only job (docs/legal/Delete-Account.md). Nothing here
- * deletes data. Until 0024 is applied the calls report `unsupported` and the
+ * deletes data. Until 0030 is applied the calls report `unsupported` and the
  * screen falls back to the emailed request.
  */
 export interface DeletionRequest {
@@ -24,7 +24,7 @@ export class DeletionUnsupportedError extends Error {
   }
 }
 
-// PGRST202: function not found; PGRST205 / 42P01: table not found (0024 not applied).
+// PGRST202: function not found; PGRST205 / 42P01: table not found (0030 not applied).
 const MISSING_CODES = new Set(['PGRST202', 'PGRST205', '42P01', '42883']);
 const isMissing = (error: unknown) => MISSING_CODES.has((error as { code?: string } | null)?.code ?? '');
 
@@ -33,7 +33,7 @@ function fail(error: unknown): never {
   throw error instanceof Error ? error : new Error('The request could not be completed. Please try again.');
 }
 
-/** The caller's open request, or null. Throws DeletionUnsupportedError before 0024. */
+/** The caller's open request, or null. Throws DeletionUnsupportedError before 0030. */
 export async function getPendingDeletion(userId: string): Promise<DeletionRequest | null> {
   const { data, error } = await requireSupabase()
     .from('account_deletion_requests')
@@ -60,7 +60,7 @@ export const requestAccountDeletion = () => callDeletionRpc('request_account_del
 /** Resolves null when there was nothing pending to cancel. */
 export const cancelAccountDeletion = () => callDeletionRpc('cancel_account_deletion');
 
-/** Fallback before 0024: a prefilled email that identifies the account. */
+/** Fallback before 0030: a prefilled email that identifies the account. */
 export function deletionMailto(email: string | null | undefined, userId: string): string {
   const body = [
     'Please delete my SideQuests account and associated personal data.',

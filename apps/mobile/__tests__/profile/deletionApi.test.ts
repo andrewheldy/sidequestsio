@@ -15,7 +15,7 @@ it('reads only the caller’s pending request', async () => {
   );
 });
 
-it.each(['PGRST202', 'PGRST205', '42P01'])('maps a missing 0024 object (%s) to DeletionUnsupportedError', async (code) => {
+it.each(['PGRST202', 'PGRST205', '42P01'])('maps a missing 0030 object (%s) to DeletionUnsupportedError', async (code) => {
   backend.reset(null, () => ({ error: { code, message: 'missing' } }));
   await expect(api.requestAccountDeletion()).rejects.toBeInstanceOf(api.DeletionUnsupportedError);
   await expect(api.getPendingDeletion('u1')).rejects.toBeInstanceOf(api.DeletionUnsupportedError);

@@ -1,5 +1,5 @@
 /**
- * Account deletion processing (supabase/migrations/0024_account_deletion_requests.sql,
+ * Account deletion processing (supabase/migrations/0030_account_deletion_requests.sql,
  * docs/legal/Delete-Account.md). Runs with the service role only — see index.ts.
  *
  * Each pending request goes through the same steps, and every step is safe to

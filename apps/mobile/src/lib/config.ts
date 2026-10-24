@@ -81,3 +81,42 @@ export const policyLinks = {
   communityGuidelines: `${webOrigin}/community-guidelines`,
   deleteAccount: `${webOrigin}/delete-account`,
 } as const;
+
+// ---------------------------------------------------------------------------
+// Location discovery and Adventure (docs/product/LOCATION_DISCOVERY.md)
+// ---------------------------------------------------------------------------
+
+// EXPO_PUBLIC_* values are inlined at build time and ship in the app: only the
+// publishable key belongs here, never a service-role key.
+export type AppConfig = {
+  /** Empty unless resolveBackend accepts it, so the production project stays refused here too. */
+  supabaseUrl: string;
+  supabaseKey: string;
+  /**
+   * Nearby discovery (location-ranked Explore). Off unless explicitly 'on': it
+   * needs migration 0023 (discover_nearby, get_quest_card) on the backend.
+   */
+  nearbyEnabled: boolean;
+  /** Adventure UI and geofence registration. Off unless explicitly 'on'. */
+  adventureEnabled: boolean;
+  /** The native build declares background location (MOBILE_BACKGROUND_LOCATION=1). */
+  backgroundBuild: boolean;
+  /** Android has an approved Google Maps key; iOS always uses Apple Maps. */
+  androidMap: boolean;
+};
+
+export function getConfig(): AppConfig {
+  const native = (Constants.expoConfig?.extra ?? {}) as { backgroundLocation?: boolean; androidMapsConfigured?: boolean };
+  const resolved = resolveBackend(process.env.EXPO_PUBLIC_SUPABASE_URL, process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  return {
+    supabaseUrl: resolved.status === 'ready' ? resolved.url : '',
+    supabaseKey: resolved.status === 'ready' ? resolved.publishableKey : '',
+    nearbyEnabled: process.env.EXPO_PUBLIC_FEATURE_NEARBY === 'on',
+    adventureEnabled: process.env.EXPO_PUBLIC_FEATURE_ADVENTURE === 'on',
+    backgroundBuild: native.backgroundLocation === true,
+    androidMap: native.androidMapsConfigured === true,
+  };
+}
+
+/** Version of the in-app Adventure disclosure the consent records refer to. */
+export const ADVENTURE_DISCLOSURE_VERSION = 'adventure-2026-10-24-draft';

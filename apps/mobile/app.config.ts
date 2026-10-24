@@ -1,4 +1,15 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
+import { withInfoPlist, type ConfigPlugin } from 'expo/config-plugins';
+
+// Expo auto-applies expo-task-manager's plugin, which declares Background Fetch.
+// Region monitoring does not use it, so the artifact should not claim it.
+const withoutBackgroundFetch: ConfigPlugin = (config) =>
+  withInfoPlist(config, (mod) => {
+    const modes = (mod.modResults.UIBackgroundModes as string[] | undefined)?.filter((m) => m !== 'fetch');
+    if (modes?.length) mod.modResults.UIBackgroundModes = modes;
+    else delete mod.modResults.UIBackgroundModes;
+    return mod;
+  });
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   const variant = process.env.APP_VARIANT ?? 'development';
@@ -18,8 +29,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   // Optional. Without it Android shows the quest list only (iOS uses Apple Maps, no key).
   const androidMapsKey = process.env.MOBILE_ANDROID_GOOGLE_MAPS_API_KEY;
   const scheme = `sidequests-${variant}`;
+  // Background location is opt-in per build so a foreground-only artifact can
+  // ship if store review rejects background access (docs/product/LOCATION_DISCOVERY.md).
+  const backgroundLocation = process.env.MOBILE_BACKGROUND_LOCATION === '1';
 
-  return {
+  return withoutBackgroundFetch({
     ...config,
     name: `SideQuests (${variant === 'staging' ? 'Staging' : 'Dev'})`,
     slug: 'sidequests-consumer',
@@ -35,13 +49,19 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       'expo-status-bar',
       'expo-secure-store',
       'expo-image',
-      // Foreground "when in use" only. No background location is requested or declared.
       [
         'expo-location',
         {
-          locationWhenInUsePermission: 'SideQuests uses your location only when you ask for quests near you.',
+          locationWhenInUsePermission:
+            'SideQuests uses your location to show quests near you and, when you ask, to check you in at a quest.',
+          locationAlwaysAndWhenInUsePermission: backgroundLocation
+            ? 'With nearby alerts on, SideQuests uses your location in the background to notice when you are near an eligible quest. It uses proximity checks, not a route history. Pause anytime in Settings.'
+            : false,
+          locationAlwaysPermission: false,
+          motionUsagePermission: false,
+          // Region monitoring needs Always authorization only, not continuous background updates.
           isIosBackgroundLocationEnabled: false,
-          isAndroidBackgroundLocationEnabled: false,
+          isAndroidBackgroundLocationEnabled: backgroundLocation,
           isAndroidForegroundServiceEnabled: false,
         },
       ],
@@ -54,6 +74,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           barcodeScannerEnabled: true,
         },
       ],
+      'expo-notifications',
       ['react-native-maps', androidMapsKey ? { androidGoogleMapsApiKey: androidMapsKey } : {}],
     ],
     ios: {
@@ -67,6 +88,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       appVariant: variant,
       scheme,
       androidMapsConfigured: Boolean(androidMapsKey),
+      backgroundLocation,
     },
-  };
+  });
 };

@@ -3,11 +3,16 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useAdventureLifecycle } from '../hooks/useAdventureLifecycle';
+import { useNotificationRouting } from '../hooks/useNotificationRouting';
+import { configureNotificationHandler } from '../lib/adventure/notifications';
 import { createQueryClient } from '../lib/queryClient';
 import { SessionProvider } from '../session/SessionProvider';
 import { colors } from '../theme/tokens';
 
 export const unstable_settings = { anchor: '(tabs)' };
+
+configureNotificationHandler();
 
 const stackOptions = {
   headerStyle: { backgroundColor: colors.background },
@@ -19,6 +24,9 @@ const stackOptions = {
 
 export default function RootLayout() {
   const [queryClient] = useState(createQueryClient);
+  useNotificationRouting();
+  useAdventureLifecycle();
+
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
@@ -28,6 +36,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="quests/[questId]/index" options={{ title: 'Quest', headerShown: false }} />
             <Stack.Screen name="quests/[questId]/complete" options={{ title: 'Complete quest' }} />
+            <Stack.Screen name="nearby" options={{ title: 'Quests near you' }} />
             <Stack.Screen name="auth/sign-in" options={{ title: 'Sign in' }} />
             <Stack.Screen name="auth/sign-up" options={{ title: 'Create account' }} />
             <Stack.Screen name="auth/verify-email" options={{ title: 'Check your email' }} />
@@ -36,6 +45,7 @@ export default function RootLayout() {
             <Stack.Screen name="auth/callback" options={{ title: '', headerShown: false }} />
             <Stack.Screen name="onboarding/index" options={{ title: 'Get started', headerShown: false }} />
             <Stack.Screen name="settings/index" options={{ title: 'Settings' }} />
+            <Stack.Screen name="settings/location" options={{ title: 'Location & nearby alerts' }} />
           </Stack>
         </SessionProvider>
       </QueryClientProvider>

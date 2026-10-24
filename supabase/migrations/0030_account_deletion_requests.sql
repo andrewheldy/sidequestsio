@@ -1,4 +1,6 @@
--- 0024_account_deletion_requests.sql — in-app account deletion requests
+-- 0030_account_deletion_requests.sql — in-app account deletion requests
+--
+-- Authored as 0024 on the mobile MVP branch; renumbered on merge (main used 0024).
 --
 -- WHY: docs/legal/Delete-Account.md lets users delete their account, but the
 -- only way to ask today is an email to support. App stores require deletion to
@@ -82,7 +84,7 @@ create unique index if not exists account_deletion_requests_one_pending
   on public.account_deletion_requests (user_id) where status = 'pending';
 
 comment on table public.account_deletion_requests is
-  'In-app account deletion requests (Delete-Account.md). Written only by request_/cancel_account_deletion(); processed by the service-role Edge Function described in 0024.';
+  'In-app account deletion requests (Delete-Account.md). Written only by request_/cancel_account_deletion(); processed by the service-role Edge Function described in 0030.';
 
 alter table public.account_deletion_requests enable row level security;
 

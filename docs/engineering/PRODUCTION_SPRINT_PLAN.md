@@ -653,7 +653,7 @@ applied); `record_code_scan` and `generate_quest_instance` exist and `complete_q
 5-argument 0017/0018 signature; anon can SELECT quests/venues/partners; 9 active quests, all
 `qr`; 0 active rewards and 0 redemptions; `proofs` bucket exists.
 
-**2026-10-21 update:** `0023_progress_role_integrity.sql` was applied by the owner and
+**2026-10-21 update:** `0023_progress_role_integrity.sql` (now `0029_progress_role_integrity.sql`, renumbered 2026-10-24) was applied by the owner and
 re-verified via read-only MCP: self-update of `users.role` and `user_profiles` balance/XP/level
 is now denied; only `users (display_name, avatar_url, last_active_at)` and
 `user_profiles (home_city)` remain self-updatable. 9 users, none admin; all balances match the

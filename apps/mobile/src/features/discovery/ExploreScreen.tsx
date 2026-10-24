@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Chip, EmptyState, ErrorState, LoadingState, Screen, SetupRequired, Text, Wordmark } from '../../components/ui';
-import { backend, mapsAvailable } from '../../lib/config';
+import { backend, getConfig, mapsAvailable } from '../../lib/config';
 import type { QuestWithContext } from '../../lib/types';
 import { colors, radii, spacing, touchTarget } from '../../theme/tokens';
 import { QuestCard } from './QuestCard';
@@ -73,6 +73,15 @@ function ExploreContent() {
           <Text variant="bodyStrong">Near me</Text>
         </Pressable>
       </View>
+      {getConfig().nearbyEnabled ? (
+        <Button
+          label="Search near you or an area"
+          variant="secondary"
+          icon="compass-outline"
+          onPress={() => router.push('/nearby')}
+          accessibilityHint="Opens location-ranked discovery with radius, time and area filters"
+        />
+      ) : null}
       {location.status === 'denied' ? (
         <View style={styles.notice} accessibilityLiveRegion="polite">
           <Text variant="small" muted>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -19,7 +20,7 @@ import {
   EXPLORER_STYLES,
   NEIGHBORHOODS,
   VIBES,
-  buildFirstQuest,
+  pickFirstQuest,
   clearGuestOnboarding,
   emptyOnboarding,
   loadGuestOnboarding,
@@ -30,6 +31,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { getRepository } from '@/lib/db';
 import { safeNextPath } from '@/lib/navigation';
 
 const TOTAL_STEPS = 6;
@@ -66,7 +68,11 @@ const Onboarding = () => {
     if (hydrated) saveGuestOnboarding(selections);
   }, [selections, hydrated]);
 
-  const firstQuest = useMemo(() => buildFirstQuest(selections), [selections]);
+  const { data: activeQuests = [] } = useQuery({
+    queryKey: ['quests', 'active'],
+    queryFn: async () => (await getRepository()).listQuests({ status: 'active' }),
+  });
+  const firstQuest = useMemo(() => pickFirstQuest(activeQuests, selections), [activeQuests, selections]);
 
   if (loading || !hydrated) return <LoadingScreen label="Preparing your adventure…" />;
 
@@ -104,7 +110,8 @@ const Onboarding = () => {
     }
     clearGuestOnboarding();
     toast({ title: 'You’re all set! 🎉', description: 'Your first quest is waiting.' });
-    navigate(nextDest);
+    // No interrupted destination: land on the quest we showed in step 5.
+    navigate(rawNext && rawNext !== '/onboarding' ? rawNext : firstQuest ? `/quests/${firstQuest.quest.id}` : '/app');
   };
 
   return (
@@ -268,24 +275,36 @@ const Onboarding = () => {
         {/* STEP 5 — First quest preview */}
         {step === 5 && (
           <div key="s5" className={cn('flex flex-1 flex-col justify-center', stepAnim)}>
-            <StepHeader title="Your first quest" subtitle="Matched to what you picked." center />
-            <div className="glass-card overflow-hidden">
-              <div className="flex items-center justify-between bg-navy p-5 text-sand-soft">
-                <CategoryIcon category={firstQuest.category} className="h-9 w-9 text-reward" strokeWidth={1.5} />
-                <span className="rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sand-soft">
-                  {firstQuest.category}
-                </span>
-              </div>
-              <div className="space-y-4 p-5">
-                <h2 className="font-display text-xl font-bold tracking-[-0.02em]">{firstQuest.title}</h2>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <QuestStat icon={<Gift className="h-4 w-4 text-gold-strong" />} label="You earn" value={firstQuest.reward} />
-                  <QuestStat icon={<Zap className="h-4 w-4 text-gold-strong" />} label="XP" value={`${firstQuest.xp} XP`} />
-                  <QuestStat icon={<MapPin className="h-4 w-4 text-ocean-strong" />} label="Distance" value={firstQuest.distance} />
-                  <QuestStat icon={<Star className="h-4 w-4 text-ocean-strong" />} label="Time" value={firstQuest.time} />
+            <StepHeader
+              title="Your first quest"
+              subtitle={firstQuest?.matched ? 'Matched to what you picked.' : 'A good place to start.'}
+              center
+            />
+            {firstQuest ? (
+              <div className="glass-card overflow-hidden">
+                <div className="flex items-center justify-between bg-navy p-5 text-sand-soft">
+                  <CategoryIcon category={firstQuest.quest.category} className="h-9 w-9 text-reward" strokeWidth={1.5} />
+                  <span className="rounded-full bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sand-soft">
+                    {firstQuest.quest.category.replace('_', ' ')}
+                  </span>
+                </div>
+                <div className="space-y-4 p-5">
+                  <h2 className="font-display text-xl font-bold tracking-[-0.02em]">{firstQuest.quest.title}</h2>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <QuestStat icon={<Gift className="h-4 w-4 text-gold-strong" />} label="Points" value={`${firstQuest.quest.points_reward} pts`} />
+                    <QuestStat icon={<Zap className="h-4 w-4 text-gold-strong" />} label="XP" value={`${firstQuest.quest.xp_reward} XP`} />
+                    <QuestStat icon={<MapPin className="h-4 w-4 text-ocean-strong" />} label="Place" value={firstQuest.quest.venue?.neighborhood ?? firstQuest.quest.venue?.name ?? 'Miami'} />
+                    {firstQuest.quest.estimated_time && (
+                      <QuestStat icon={<Star className="h-4 w-4 text-ocean-strong" />} label="Time" value={firstQuest.quest.estimated_time} />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="glass-card p-5 text-center text-sm text-muted-foreground">
+                We couldn’t load quests right now. You can still finish setting up and browse them afterwards.
+              </div>
+            )}
             <Button size="lg" className="mt-8 h-12 w-full" onClick={next}>
               Start First Quest
               <ArrowRight className="ml-2 h-5 w-5" />

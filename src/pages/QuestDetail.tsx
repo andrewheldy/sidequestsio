@@ -46,6 +46,7 @@ import {
   VenueInfoCard,
   type PrimaryCtaState,
 } from "@/components/app/quest-detail";
+import { presenceMessage, requestPosition } from "@/lib/app/presence";
 import type { CompleteQuestResult } from "@/lib/db/repository";
 import type { ProofMethod, QuestInstance } from "@/types/db";
 
@@ -62,6 +63,7 @@ const COMPLETE_ERRORS: Record<string, string> = {
   quest_inactive: "This quest isn't active right now.",
   quest_expired: "This quest has expired.",
   not_found: "Quest not found.",
+  presence_required: "We need to confirm you're at the quest spot. Tap Complete again while you're there.",
 };
 
 /**
@@ -295,6 +297,21 @@ export default function QuestDetail() {
     setBusy(true);
     try {
       const repo = await getRepository();
+      // gps quests: server-computed presence first (0025). One fresh fix is
+      // compared on the server and discarded; only 'inside' can complete.
+      let presenceCheckId: string | null = null;
+      if (quest.verification_type === "gps") {
+        const presence = await repo.checkPresence(user.id, quest.id, () => requestPosition());
+        if (!("checkId" in presence) || presence.outcome !== "inside") {
+          trackQuestEvent("quest_primary_action_failed", ctx, {
+            ...detail,
+            props: { reason: "checkId" in presence ? `presence_${presence.outcome}` : presence.error },
+          });
+          toast.error(presenceMessage(presence));
+          return;
+        }
+        presenceCheckId = presence.checkId;
+      }
       await repo.startQuest(user.id, quest.id);
       const res = await repo.completeQuest({
         userId: user.id,
@@ -303,6 +320,7 @@ export default function QuestDetail() {
         venueCode: needsCode ? venueCode : undefined,
         sourceScanId: scanId,
         instanceId: instance?.id ?? null,
+        presenceCheckId,
       });
 
       if (!res.ok) {

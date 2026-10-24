@@ -171,6 +171,7 @@ function Settings({ account }: { account: ReadyAccount }) {
           Allowing or denying either never changes your email or privacy choices. You can change them in your device settings.
         </Text>
         <Button label="Location & camera permissions" variant="secondary" icon="settings-outline" onPress={() => void Linking.openSettings()} />
+        <LinkRow icon="navigate-outline" label="Location & nearby alerts" onPress={() => router.push('/settings/location')} />
       </Card>
 
       <Card title="Legal & support">

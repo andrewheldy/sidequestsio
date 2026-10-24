@@ -442,7 +442,7 @@ describe('delete account', () => {
     expect(screen.queryByText('Deletion requested')).toBeNull();
   });
 
-  describe('server without 0024 (email fallback)', () => {
+  describe('server without 0030 (email fallback)', () => {
     beforeEach(() => {
       db.deletionUnsupported = true;
     });

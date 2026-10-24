@@ -30,10 +30,39 @@ jest.mock('react-native-maps', () => {
 });
 
 jest.mock('expo-location', () => ({
+  Accuracy: { Balanced: 3, Highest: 6 },
+  LocationGeofencingEventType: { Enter: 1, Exit: 2 },
+  hasServicesEnabledAsync: jest.fn(async () => true),
   getForegroundPermissionsAsync: jest.fn(async () => ({ status: 'undetermined', granted: false, canAskAgain: true })),
+  getBackgroundPermissionsAsync: jest.fn(async () => ({ status: 'undetermined', granted: false, canAskAgain: true })),
   requestForegroundPermissionsAsync: jest.fn(async () => ({ status: 'denied', granted: false, canAskAgain: true })),
+  requestBackgroundPermissionsAsync: jest.fn(async () => ({ status: 'denied', granted: false, canAskAgain: false })),
+  getLastKnownPositionAsync: jest.fn(async () => null),
   getCurrentPositionAsync: jest.fn(async () => ({ coords: { latitude: 25.79, longitude: -80.19 } })),
-  Accuracy: { Balanced: 3 },
+  watchPositionAsync: jest.fn(async () => ({ remove: jest.fn() })),
+  startGeofencingAsync: jest.fn(async () => undefined),
+  stopGeofencingAsync: jest.fn(async () => undefined),
+  hasStartedGeofencingAsync: jest.fn(async () => false),
+}));
+
+jest.mock('expo-notifications', () => ({
+  AndroidImportance: { DEFAULT: 3 },
+  setNotificationHandler: jest.fn(),
+  getPermissionsAsync: jest.fn(async () => ({ granted: false, status: 'undetermined' })),
+  requestPermissionsAsync: jest.fn(async () => ({ granted: false, status: 'denied' })),
+  setNotificationChannelAsync: jest.fn(async () => null),
+  scheduleNotificationAsync: jest.fn(async () => 'id'),
+  getAllScheduledNotificationsAsync: jest.fn(async () => []),
+  cancelScheduledNotificationAsync: jest.fn(async () => undefined),
+  getPresentedNotificationsAsync: jest.fn(async () => []),
+  dismissNotificationAsync: jest.fn(async () => undefined),
+  getLastNotificationResponse: jest.fn(() => null),
+  addNotificationResponseReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
+}));
+
+jest.mock('expo-task-manager', () => ({
+  isTaskDefined: jest.fn(() => false),
+  defineTask: jest.fn(),
 }));
 
 jest.mock('expo-camera', () => {

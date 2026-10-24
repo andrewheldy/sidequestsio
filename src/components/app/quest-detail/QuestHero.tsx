@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { responsiveImage } from "@/lib/images";
 import { CategoryIcon } from "@/components/brand/CategoryIcon";
 import type { QuestHeroModel } from "@/lib/quests/questPage";
+import type { ImageAttribution } from "@/lib/app/attribution";
 import { TopoLines } from "./QuestDecor";
 
 /**
@@ -133,8 +134,29 @@ export function QuestHero({
             )}
           </ul>
         )}
+
+        {hero.imageCredit && !showFallback && <PhotoCredit credit={hero.imageCredit} />}
       </div>
     </header>
+  );
+}
+
+/** License credit for the hero photo (CC BY / BY-SA): creator, source, license, changes. */
+function PhotoCredit({ credit }: { credit: ImageAttribution }) {
+  const link = "underline decoration-sand-50/30 underline-offset-2 hover:text-sand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
+  return (
+    <p className="mt-3 text-[11px] leading-snug text-sand-50/55">
+      Photo:{" "}
+      <a href={credit.source_url} target="_blank" rel="noopener noreferrer" className={link}>
+        {credit.creator}
+        {credit.source_name ? ` / ${credit.source_name}` : ""}
+      </a>
+      ,{" "}
+      <a href={credit.license_url} target="_blank" rel="noopener noreferrer license" className={link}>
+        {credit.license}
+      </a>
+      {credit.modified ? ", cropped" : ""}
+    </p>
   );
 }
 

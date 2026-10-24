@@ -24,6 +24,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit -p tsconfig.app.json
 
+      - name: Unit tests
+        run: npm test
+
       - name: Build
         run: npm run build
 
@@ -51,7 +54,7 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Navigation tests
+      - name: Unit and navigation tests
         run: npm test
 
       - name: Expo diagnostics
@@ -60,3 +63,18 @@ jobs:
       # JavaScript bundles only. Never trigger EAS, signing, or native cloud builds.
       - name: Bundle iOS and Android
         run: npm run export
+
+  database:
+    name: Database migrations & SQL tests
+    # Pinned: ubuntu-latest moved to 26.04, which has no postgresql-16 package,
+    # and run-local.sh expects the Postgres 16 binaries.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # Local throwaway Postgres + PostGIS only; never a Supabase project.
+      - name: Install PostGIS
+        run: sudo apt-get update -q && sudo apt-get install -y -q postgresql-16 postgresql-16-postgis-3
+
+      - name: Apply migrations and run SQL tests
+        run: supabase/tests/run-local.sh

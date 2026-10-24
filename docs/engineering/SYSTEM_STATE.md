@@ -35,7 +35,7 @@ XP), Profile/Settings, QR quest completion via `record_code_scan` → `complete_
 project ref, so it has no approved backend yet; no live-backend, simulator or device
 verification has been run. Reward redemption, photo proof, non-QR verification and
 in-app account deletion are excluded. **Production DB change 2026-10-21:**
-`0023_progress_role_integrity.sql` applied and verified (see CHANGELOG).
+`0023_progress_role_integrity.sql` (renumbered `0029_progress_role_integrity.sql` on 2026-10-24) applied and verified (see CHANGELOG).
 
 SideQuests is a single-page application: **Vite + React 18 + TypeScript**, deployed as a static SPA on Vercel, talking directly to Supabase (Postgres + Auth + Storage + RPC) from the browser. There is no separate backend server or API layer.
 
@@ -290,4 +290,15 @@ Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. T
 - **Partner Insights (`/partner`, `/partner/venues/:venueId`)** is in code and needs **`0021_partner_insights.sql`** applied.
   - Until then the page shows "Couldn't load insights".
   - Access is controlled by `partners.owner_user_id` and `users.role = 'admin'`; see ANALYTICS_SPEC.md.
+
+---
+
+## Update 2026-10-24 — Location discovery (code only, not deployed or applied)
+
+- Branch `feat/location-discovery` adds mobile location discovery and authored migrations
+  `0023`–`0026` (0026: `legendary` difficulty; Hard tier 300 XP / 150 Points). **None are applied to production**; the live ledger is unchanged.
+- Once 0025 is applied, `complete_quest()` requires a server-verified GPS presence check for
+  `gps` quests (all 10 live quests are QR, so nobody is affected) and anon can no longer
+  execute it.
+- See `docs/product/LOCATION_DISCOVERY.md` §9 for the release gates.
 

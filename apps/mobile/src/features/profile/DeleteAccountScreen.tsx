@@ -143,7 +143,7 @@ function PendingRequest({
 
 type EmailOutcome = 'idle' | 'opened' | 'unavailable';
 
-/** Used only when the server has no in-app request support (0024 not applied). */
+/** Used only when the server has no in-app request support (0030 not applied). */
 function EmailRequest({ account }: { account: ReadyAccount }) {
   const [outcome, setOutcome] = useState<EmailOutcome>('idle');
 

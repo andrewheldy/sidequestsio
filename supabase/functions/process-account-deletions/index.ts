@@ -1,6 +1,6 @@
 /**
  * process-account-deletions — processes in-app account deletion requests
- * (supabase/migrations/0024_account_deletion_requests.sql). Logic: process.ts.
+ * (supabase/migrations/0030_account_deletion_requests.sql). Logic: process.ts.
  *
  * Service role only. `withSupabase({ auth: 'secret' })` rejects any caller that
  * does not present the project's secret API key (users' JWTs and the
@@ -57,7 +57,7 @@ export default {
       console.log(JSON.stringify({ fn: 'process-account-deletions', ...report }));
       return Response.json(report);
     } catch (e) {
-      // Could not even list requests (e.g. 0024 not applied). Nothing was changed.
+      // Could not even list requests (e.g. 0030 not applied). Nothing was changed.
       const message = e instanceof Error ? e.message : 'unknown error';
       console.error(JSON.stringify({ fn: 'process-account-deletions', error: message }));
       return Response.json({ error: 'listing_failed', message }, { status: 500 });

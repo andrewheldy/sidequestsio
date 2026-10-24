@@ -17,6 +17,7 @@ import type {
   CreateNoteInput,
   CreateNoteResult,
 } from "../repository";
+import type { GeoPosition, PresenceResult } from "@/lib/app/presence";
 import type { AnalyticsSummary, PartnerInsights, PartnerInsightsInput } from "../types";
 import { buildPartnerInsights, type InsightsEventRecord } from "@/lib/partner/insights";
 import type {
@@ -332,6 +333,14 @@ export class MockRepository implements Repository {
 
   async getQuestOffer(_userId: string, _questId: string): Promise<QuestOffer> {
     return { status: "available", instance: null };
+  }
+
+  async checkPresence(
+    _userId: string,
+    _questId: string,
+    _locate: () => Promise<GeoPosition | null>,
+  ): Promise<PresenceResult> {
+    return { ok: false, error: "unavailable" };
   }
 
   async completeQuest(_input: CompleteQuestInput): Promise<CompleteQuestResult> {
