@@ -2,6 +2,58 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-24 — Location, Discovery & Adventure Mode (code + authored migrations; nothing applied)
+
+- Authoritative spec, Phase 0 gap map, contracts and release gates:
+  `docs/product/LOCATION_DISCOVERY.md`. Standing decision added to `docs/DECISIONS.md`.
+- **Mobile (`apps/mobile`):** Manual (default) / Explore / Adventure modes with
+  desired-vs-effective capability; Explore screen (area selector, Near me with
+  explain-then-ask, map-area search, radius/category/duration filters, list + map,
+  external directions); location settings with the Adventure disclosure and one
+  permission per step; flag-off Adventure pipeline (module-scope geofence task, ≤ 15 + 1
+  regions, persisted gate closed before cleanup, 3 s bounded server claim, one local
+  notification, validated quest deep links); quest detail from fresh server state;
+  GPS check-in client. New deps via `npx expo install --npm`: expo-location,
+  expo-task-manager, expo-notifications, react-native-maps, AsyncStorage. Foundation
+  packages aligned to SDK 58 patch versions (Expo Doctor was failing on `main`).
+- **Native config:** background location only with `MOBILE_BACKGROUND_LOCATION=1`; no
+  Android location foreground service; Expo's auto-applied Background Fetch mode removed.
+  Verified by local `expo prebuild --no-install` with a placeholder ID (not committed,
+  generated folders deleted): foreground build has no `ACCESS_BACKGROUND_LOCATION` and no
+  "Always" string; background build adds `ACCESS_BACKGROUND_LOCATION` +
+  `RECEIVE_BOOT_COMPLETED`; iOS has no `UIBackgroundModes`. `POST_NOTIFICATIONS` comes from
+  the library manifest at Gradle merge and was not observed (no Gradle build run).
+- **Migrations authored, not applied:** `0023_location_discovery.sql` (PostGIS, generated
+  geography + GiST, quest location override and editorial fields, structured hours,
+  `discovery_areas`, `quest_feedback`, `discover_nearby`, `get_quest_card`),
+  `0024_adventure_nudges.sql` (consent purposes, nudge settings/installations/claims,
+  feature flags off, bundle/claim/result/purge RPCs), `0025_gps_presence.sql` (presence
+  challenges/checks; `complete_quest` requires an `inside` check for GPS quests — closes
+  SYSTEM_STATE blocker 10 for GPS; anon execute revoked).
+- **Test tooling:** `supabase/tests/run-local.sh` (`npm run db:test`) replays the
+  production migration path on a throwaway Postgres 16 + PostGIS with a test-only Supabase
+  shim; new CI job `database`. Jest now discovers `.test.ts` as well as `.test.tsx`.
+- **Validation, Linux cloud instance, Node 22.22.0 (CI uses 24):**
+
+  | Command | Result |
+  | --- | --- |
+  | `npm run mobile:typecheck` | Passed |
+  | `npm run mobile:test` | Passed: 11 suites, 71 tests |
+  | `npm run mobile:doctor` | Passed 20/20 (baseline `main`: 19/20) |
+  | `npm run mobile:export` | Passed; iOS and Android Hermes bundles |
+  | `npm run db:test` | Passed: 26 migration files applied; 8 SQL test files (≈200 checks) incl. two-session dblink concurrency |
+  | `npx tsc -p tsconfig.app.json --noEmit` / `npm run build` | Passed (existing chunk-size warnings) |
+
+  Local query plan on 20k synthetic venues + 2k override quests used both GiST indexes;
+  ≈ 14 ms (3 km) / 80 ms (10 km) per call locally — not a Supabase measurement.
+- **Not done / blocked:** no Supabase apply, no native compile, no device or field test,
+  no store submission, no policy publication (draft text in the spec §7), no mobile
+  sign-in (Adventure and GPS check-in show "Sign in required"), purge jobs unscheduled.
+- **Reward tiers (owner decision, same day):** Hard 300 XP / 150 Points; `legendary` added at
+  500 / 300 (`0026_legendary_difficulty.sql`, not applied). Only Hard quests on the exact old
+  400 / 200 tier move; earned rewards are untouched. Types, both importers' validators and the
+  partner quest form accept `legendary`. SQL test `70_reward_tiers` covers it.
+
 ## 2026-10-20 — Consumer mobile foundation (code only)
 
 - Added `apps/mobile`: Expo SDK 58 / React Native 0.88 / React 19.3 / strict

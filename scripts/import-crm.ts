@@ -194,7 +194,7 @@ const MAPPING: Record<string, ColumnSpec> = {
 };
 
 const CATEGORIES = ["art", "food", "outdoors", "culture", "nightlife", "shopping", "fitness", "hidden_gem"];
-const DIFFICULTIES = ["easy", "medium", "hard"];
+const DIFFICULTIES = ["easy", "medium", "hard", "legendary"];
 
 // --- eligibility ------------------------------------------------------------------
 

@@ -132,6 +132,11 @@ Each quest card includes:
 
 ## Quest Discovery
 
+Location-based discovery (Manual / Explore / Adventure modes, nearby ranking,
+optional background nearby alerts, and GPS presence checks) is specified in
+[LOCATION_DISCOVERY.md](LOCATION_DISCOVERY.md) (2026-10-24). Location is always
+optional; proximity never completes a quest or earns XP/Points.
+
 Users can browse by:
 
 - Nearby
@@ -312,19 +317,22 @@ Suggested rewards:
 
 Easy
 
-50 XP
+50 XP / 25 Points
 
 Medium
 
-150 XP
+150 XP / 75 Points
 
 Hard
 
-400 XP
+300 XP / 150 Points
 
 Legendary
 
-1000+ XP
+500 XP / 300 Points (special activations only)
+
+Rewards are stored per quest; these are the curation defaults (decision 2026-10-24,
+`supabase/migrations/0026_legendary_difficulty.sql`).
 
 ---
 

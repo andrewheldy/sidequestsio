@@ -87,6 +87,15 @@ The existing Supabase backend remains the intended backend, but this foundation
 does not connect to it or change its schema. Authentication, production data,
 maps, camera/QR, completion, points, and redemption remain separate feature work.
 
+**Location & discovery (2026-10-24, code only):** mobile adds foreground
+discovery, optional background geofencing and local notifications through
+`expo-location`, `expo-task-manager`, `expo-notifications`, `react-native-maps`
+(Apple Maps on iOS; Android only with an approved Google key) and AsyncStorage,
+talking to Supabase RPCs over PostgREST (no new backend, no LLM). Spatial queries
+use PostGIS in the existing database. Contracts, flags and release gates:
+[`docs/product/LOCATION_DISCOVERY.md`](../product/LOCATION_DISCOVERY.md). The web
+app's Mapbox implementation is unchanged.
+
 See [`apps/mobile/README.md`](../../apps/mobile/README.md) for the native build
 requirements, environment separation, verification limits, and implementation
 entry points. The stack described below continues to apply to the website.

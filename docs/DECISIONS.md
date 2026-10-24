@@ -51,3 +51,5 @@ Product-owner decision that supersedes PD-1 (docs/engineering/PRODUCTION_SPRINT_
 - Admins see every partner. A partner login sees only its own partner, enforced by `owns_partner()` in `partner_insights()` (0021).
 - Analytics only: the old partner pages for quests, rewards and QR codes stay unmounted, and quest content stays curated by SideQuests.
 
+**2026-10-24 — Location is optional; proximity is a hint, never proof.**
+Mobile discovery has three modes — Manual (choose an area, the default), Explore (foreground location after permission) and Adventure (separately opted-in background geofences with local alerts, sign-in required). Declining every permission still leaves a working product. Entering a region, opening an alert or tapping directions never completes a quest or earns XP/Points; GPS quests need a server-computed, challenge-bound presence check. Exact device coordinates are never stored. Nudges are capped server-side (2/24 h, 3 h gap, 7-day quest and 24-hour venue suppression, quiet 21:00–10:00 local) and sponsored alerts stay off. See `docs/product/LOCATION_DISCOVERY.md`.

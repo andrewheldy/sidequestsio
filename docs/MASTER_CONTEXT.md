@@ -183,8 +183,8 @@ Example rewards:
 
 - Easy — 50 XP
 - Medium — 150 XP
-- Hard — 400 XP
-- Legendary — 1000+ XP
+- Hard — 300 XP
+- Legendary — 500 XP
 
 ---
 
