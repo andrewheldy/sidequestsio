@@ -313,7 +313,7 @@ XP is earned by completing quests.
 
 XP cannot be spent.
 
-Suggested rewards:
+Standard rewards (canonical values: `src/lib/app/rewards.ts`):
 
 Easy
 

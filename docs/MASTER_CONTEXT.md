@@ -179,12 +179,12 @@ XP determines:
 - Prestige
 - Achievement progress
 
-Example rewards:
+Standard rewards (XP / Points; canonical values live in `src/lib/app/rewards.ts`):
 
-- Easy — 50 XP
-- Medium — 150 XP
-- Hard — 300 XP
-- Legendary — 500 XP
+- Easy — 50 XP / 25 Points
+- Medium — 150 XP / 75 Points
+- Hard — 300 XP / 150 Points
+- Legendary — 500 XP / 300 Points
 
 ---
 

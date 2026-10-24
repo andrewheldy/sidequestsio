@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { usePartner } from "@/lib/partner/usePartner";
 import { getRepository } from "@/lib/db";
+import { REWARD_TIERS, rewardForTier } from "@/lib/app/rewards";
 import type { Difficulty, QuestCategory, VerificationType } from "@/types/db";
 import { toast } from "sonner";
 
@@ -102,8 +103,8 @@ function CreateQuestForm({
     description: "",
     category: "art" as QuestCategory,
     difficulty: "easy" as Difficulty,
-    xp_reward: 50,
-    points_reward: 100,
+    xp_reward: REWARD_TIERS.easy.xp,
+    points_reward: REWARD_TIERS.easy.points,
     verification_type: "qr" as VerificationType,
     verification_secret: "",
     venue_id: "",
@@ -134,6 +135,11 @@ function CreateQuestForm({
   };
 
   const set = (k: string, v: string | number) => setForm((f) => ({ ...f, [k]: v }));
+  // Picking a difficulty pre-fills the standard tier rewards; both stay editable.
+  const setDifficulty = (difficulty: Difficulty) => {
+    const reward = rewardForTier(difficulty);
+    setForm((f) => ({ ...f, difficulty, xp_reward: reward.xp, points_reward: reward.points }));
+  };
 
   return (
     <form onSubmit={submit} className="space-y-3">
@@ -141,7 +147,7 @@ function CreateQuestForm({
       <Textarea placeholder="Description" value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} />
       <div className="grid grid-cols-2 gap-2">
         <Select label="Category" value={form.category} options={CATEGORIES} onChange={(v) => set("category", v)} />
-        <Select label="Difficulty" value={form.difficulty} options={["easy", "medium", "hard", "legendary"]} onChange={(v) => set("difficulty", v)} />
+        <Select label="Difficulty" value={form.difficulty} options={["easy", "medium", "hard", "legendary"]} onChange={(v) => setDifficulty(v as Difficulty)} />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <NumberField label="XP reward" value={form.xp_reward} onChange={(v) => set("xp_reward", v)} />

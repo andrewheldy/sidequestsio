@@ -73,6 +73,21 @@ export function AppQuestCard({ quest, featured = false }: { quest: Quest; featur
           <span className="sq-mono font-bold text-[hsl(var(--ocean-700))]">+{quest.xp} XP</span>
           {quest.reward && <span className="truncate font-semibold text-[hsl(var(--gold-700))]">{quest.reward}</span>}
         </div>
+
+        {quest.imageCredit && quest.image && (
+          <p className="mt-2 truncate text-[11px] text-muted-foreground/80">
+            Photo:{' '}
+            <a href={quest.imageCredit.source_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">
+              {quest.imageCredit.creator}
+              {quest.imageCredit.source_name ? ` / ${quest.imageCredit.source_name}` : ''}
+            </a>
+            ,{' '}
+            <a href={quest.imageCredit.license_url} target="_blank" rel="noopener noreferrer license" className="underline underline-offset-2 hover:text-foreground">
+              {quest.imageCredit.license}
+            </a>
+            {quest.imageCredit.modified ? ', cropped' : ''}
+          </p>
+        )}
       </div>
     </article>
   );

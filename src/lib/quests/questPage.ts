@@ -23,6 +23,7 @@ import type {
   VerificationType,
 } from "@/types/db";
 import { categoryMeta } from "@/components/app/quest-detail/questCategory";
+import { readAttribution, type ImageAttribution } from "@/lib/app/attribution";
 
 // ---------------------------------------------------------------------------
 // Action definitions
@@ -85,6 +86,8 @@ export interface QuestHeroModel {
   titleLead: string;
   titleTail: string | null;
   imageUrl: string | null;
+  /** Credit for the quest's own photo (never for the venue fallback photo). */
+  imageCredit: ImageAttribution | null;
   city: string | null;
   /** Neighborhood when known, else the city. */
   locationLabel: string | null;
@@ -158,6 +161,7 @@ export function buildQuestPageModel(quest: QuestWithContext): QuestPageModel {
       titleLead: lead,
       titleTail: tail,
       imageUrl: quest.image_url ?? venue?.image_url ?? null,
+      imageCredit: quest.image_url ? readAttribution(quest.image_attribution) : null,
       city: venue?.city ?? null,
       locationLabel: venue?.neighborhood ?? venue?.city ?? null,
       duration: formatDuration(quest.estimated_time),

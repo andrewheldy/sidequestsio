@@ -53,6 +53,8 @@ import { readLocalEvents } from "@/lib/analytics/events";
 import { loadDb, mutate, DbSnapshot } from "./store";
 import { nanoid, shortCode } from "@/lib/app/id";
 import { levelForXp } from "@/lib/app/leveling";
+import { rewardForTier } from "@/lib/app/rewards";
+import { CHECK_VALID_MS, classifyPresence, type GeoPosition, type PresenceResult } from "@/lib/app/presence";
 import { detectDevice, getReferrer } from "@/lib/app/device";
 
 const NOTE_MAX = 280;
@@ -330,8 +332,8 @@ export class LocalRepository implements Repository {
         description: input.description ?? "",
         category: input.category ?? "hidden_gem",
         difficulty: input.difficulty ?? "easy",
-        xp_reward: input.xp_reward ?? 50,
-        points_reward: input.points_reward ?? 100,
+        xp_reward: input.xp_reward ?? rewardForTier(input.difficulty ?? "easy").xp,
+        points_reward: input.points_reward ?? rewardForTier(input.difficulty ?? "easy").points,
         status: input.status ?? "draft",
         start_date: input.start_date ?? null,
         end_date: input.end_date ?? null,
@@ -504,6 +506,38 @@ export class LocalRepository implements Repository {
     });
   }
 
+  async checkPresence(
+    userId: string,
+    questId: string,
+    locate: () => Promise<GeoPosition | null>,
+  ): Promise<PresenceResult> {
+    if (!userId) return { ok: false, error: "auth_required" };
+    const db = loadDb();
+    const quest = db.quests.find((q) => q.id === questId);
+    if (!quest) return { ok: false, error: "not_found" };
+    if (quest.verification_type !== "gps") return { ok: false, error: "not_gps_quest" };
+    const venue = db.venues.find((v) => v.id === quest.venue_id);
+    const target =
+      quest.location_latitude != null && quest.location_longitude != null
+        ? { latitude: quest.location_latitude, longitude: quest.location_longitude }
+        : venue && venue.latitude != null && venue.longitude != null
+          ? { latitude: venue.latitude, longitude: venue.longitude }
+          : null;
+    if (!target) return { ok: false, error: "location_unavailable" };
+
+    const challengeCreatedAt = Date.now();
+    const sample = await locate();
+    if (!sample) return { ok: false, error: "location_unavailable" };
+    const verdict = classifyPresence(sample, target, quest.verification_radius_m, {
+      now: Date.now(),
+      challengeCreatedAt,
+    });
+    // Only the outcome is kept — never the sample.
+    const checkId = `presence-${nanoid(8)}`;
+    presenceChecks.set(checkId, { userId, questId, ...verdict, checkedAt: Date.now(), used: false });
+    return { ok: true, ...verdict, checkId };
+  }
+
   async completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult> {
     return mutate((db) => {
       const quest = db.quests.find((q) => q.id === input.questId);
@@ -526,6 +560,23 @@ export class LocalRepository implements Repository {
         return { ok: false, error: "quest_inactive" as const };
       if (quest.end_date && today > quest.end_date)
         return { ok: false, error: "quest_expired" as const };
+
+      // GPS quests: an unused 'inside' presence check by this user for this
+      // quest from the last 15 minutes (mirrors 0025's complete_quest).
+      if (quest.verification_type === "gps") {
+        const check = input.presenceCheckId ? presenceChecks.get(input.presenceCheckId) : undefined;
+        if (
+          !check ||
+          check.userId !== input.userId ||
+          check.questId !== quest.id ||
+          check.outcome !== "inside" ||
+          check.used ||
+          Date.now() - check.checkedAt > CHECK_VALID_MS
+        ) {
+          return { ok: false, error: "presence_required" as const };
+        }
+        check.used = true;
+      }
 
       // Verification.
       const verified = verify(quest, input);
@@ -1166,6 +1217,12 @@ function drawInstance(
   };
 }
 
+/** In-memory GPS presence outcomes (0025 parity); the sample itself is never kept. */
+const presenceChecks = new Map<
+  string,
+  { userId: string; questId: string; outcome: string; reason: string; checkedAt: number; used: boolean }
+>();
+
 function verify(quest: Quest, input: CompleteQuestInput): boolean {
   switch (quest.verification_type) {
     case "venue_code":
@@ -1175,9 +1232,8 @@ function verify(quest: Quest, input: CompleteQuestInput): boolean {
         input.venueCode.trim().toUpperCase() ===
           quest.verification_secret.toUpperCase()
       );
-    // QR / NFC / GPS / staff: in the MVP the act of reaching the verified
-    // completion call (post-scan, with location consent for GPS) is sufficient.
-    // Production tightens these with signed tokens / geofence checks server-side.
+    // QR / NFC are checked against the scan in completeQuest; GPS against a
+    // presence check there too (mirrors 0018 / 0025). Staff approval: MVP pass.
     case "qr":
     case "nfc":
     case "gps":

@@ -4,6 +4,7 @@
  */
 import type { Quest as FlatQuest } from '@/lib/quests';
 import type { QuestCategory, QuestWithContext } from '@/types/db';
+import { readAttribution } from '@/lib/app/attribution';
 
 // DB `quest_category` enum -> UI category label used by CATEGORY_COLORS /
 // CATEGORY_EMOJIS (src/lib/mapbox.ts) and QUEST_CATEGORIES (src/lib/quests.ts).
@@ -48,6 +49,7 @@ export function questWithContextToFlatQuest(q: QuestWithContext): FlatQuest | nu
     distance: '',
     time: q.estimated_time || '',
     image: q.image_url || '',
+    imageCredit: q.image_url ? readAttribution(q.image_attribution) : null,
     x: 50,
     y: 50,
     lat,

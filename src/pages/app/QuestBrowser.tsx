@@ -6,6 +6,9 @@ import AppHeader from "@/components/app/AppHeader";
 import { Loading, EmptyState } from "@/components/app/ui";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { CategoryIcon } from "@/components/brand/CategoryIcon";
+import { TopoLines } from "@/components/app/quest-detail/QuestDecor";
+import { attributionText, readAttribution } from "@/lib/app/attribution";
 import { getRepository } from "@/lib/db";
 import type { QuestCategory, QuestWithContext } from "@/types/db";
 
@@ -78,14 +81,24 @@ export default function QuestBrowser() {
           {filtered.map((q) => (
             <Link key={q.id} to={`/quests/${q.id}`} className="block">
               <div className="glass-card overflow-hidden hover-lift">
-                {q.image_url && (
-                  <div className="relative h-40">
+                <div className="relative h-40">
+                  {q.image_url ? (
                     <img
                       src={q.image_url}
                       alt={q.title}
                       loading="lazy"
                       className="h-full w-full object-cover"
                     />
+                  ) : (
+                    // Branded fallback, matching the quest page hero (QuestHero's HeroFallback).
+                    <div
+                      aria-hidden
+                      className="relative flex h-full w-full items-center justify-center bg-[radial-gradient(120%_90%_at_70%_20%,hsl(var(--ocean-500)/0.28),transparent_60%),linear-gradient(160deg,hsl(var(--midnight-800)),hsl(var(--midnight-950)))]"
+                    >
+                      <TopoLines className="absolute inset-0 h-full w-full text-sand-50/[0.07]" />
+                      <CategoryIcon category={q.category} strokeWidth={1.2} className="relative h-16 w-16 text-gold/40" />
+                    </div>
+                  )}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                     <Badge className="absolute left-3 top-3 bg-primary capitalize text-primary-foreground">
                       {q.category === "hidden_gem"
@@ -95,8 +108,7 @@ export default function QuestBrowser() {
                     <Badge className="absolute right-3 top-3 bg-secondary text-secondary-foreground">
                       +{q.xp_reward} XP
                     </Badge>
-                  </div>
-                )}
+                </div>
                 <div className="p-4">
                   <p className="font-poppins font-semibold text-foreground">{q.title}</p>
                   {q.venue && (
@@ -107,6 +119,8 @@ export default function QuestBrowser() {
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                     {q.description}
                   </p>
+                  {/* Plain text: the card is one link; the quest page links source and license. */}
+                  {q.image_url && <CardPhotoCredit value={q.image_attribution} />}
                 </div>
               </div>
             </Link>
@@ -116,4 +130,10 @@ export default function QuestBrowser() {
       </div>
     </>
   );
+}
+
+function CardPhotoCredit({ value }: { value: unknown }) {
+  const credit = readAttribution(value);
+  if (!credit) return null;
+  return <p className="mt-2 truncate text-[11px] text-muted-foreground/80">{attributionText(credit)}</p>;
 }

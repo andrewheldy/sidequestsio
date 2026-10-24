@@ -6,6 +6,8 @@
  * `venues` row.
  */
 
+import type { ImageAttribution } from '@/lib/app/attribution';
+
 export interface Quest {
   id: string;
   title: string;
@@ -36,6 +38,8 @@ export interface Quest {
   estimated_time?: string | null;
   /** NULL/absent = once ever; N = repeatable N days after the last completion. */
   repeatCooldownDays?: number | null;
+  /** License credit for `image` when required (quests.image_attribution). */
+  imageCredit?: ImageAttribution | null;
 }
 
 /** UI category labels — DB `quest_category` values map onto these via

@@ -301,6 +301,8 @@ Ideal reward:
 
 300 Points
 
+The canonical tier values live in `src/lib/app/rewards.ts`.
+
 ---
 
 # Business Guidelines

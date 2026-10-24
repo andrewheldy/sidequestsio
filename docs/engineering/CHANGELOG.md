@@ -54,6 +54,36 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   400 / 200 tier move; earned rewards are untouched. Types, both importers' validators and the
   partner quest form accept `legendary`. SQL test `70_reward_tiers` covers it.
 
+## 2026-10-24 — Miami Essentials seed, web GPS presence, photo credits (code/data; migrations not applied)
+
+- Reward tier defaults live in `src/lib/app/rewards.ts` (Easy 50/25, Medium
+  150/75, Hard 300/150, Legendary 500/300 — matching 0026). Partner quest form
+  and LocalRepository defaults read them. First web unit tests: `npm test`
+  (`tests/`, node:test via tsx) — reward tiers, GPS presence rules, photo
+  attribution — run in CI.
+- **Web GPS presence:** the quest page now completes `gps` quests through
+  0025's flow — `create_presence_challenge` → one fresh browser fix (never
+  cached) → `verify_gps_presence` → `complete_quest(p_presence_check_id)`.
+  Only `inside` completes; `outside` / `uncertain` explain why. Before this,
+  only the mobile app was wired, so a web gps quest returned
+  `presence_required`. LocalRepository mirrors the server rules
+  (`src/lib/app/presence.ts`, tested).
+- `import:crm` gains editorial-batch options (`partner_type`,
+  `verification_type`, `proof_method`, `social_share_prompt`,
+  `verification_radius_m` 75–150, photo-credit `image_*` columns, `--no-qr`,
+  pending partners for non-active batches, off-tier reward warnings, read-only
+  `<out>.preflight.sql`, migration guards). Existing CRM output unchanged.
+- Added migrations (**authored, not applied**):
+  `0027_quest_media_bucket.sql` (public-read `quest-media` bucket,
+  service-role writes) and `0028_quest_image_attribution.sql`
+  (`quests.image_attribution`). CC BY / BY-SA heroes show their credit on the
+  quest page hero and Explore/Favorites/map cards (linked) and on
+  quest-browser and /quests cards (plain text).
+- Added the Miami Essentials dataset (40 concepts, 34 importable as draft),
+  39 licensed hero images with provenance (29 of 33 seeded heroes credited;
+  4 public domain) and a validation/QA report: `data/generated/miami-essentials/`.
+- Quest browser cards without an image show the branded fallback.
+
 ## 2026-10-20 — Consumer mobile foundation (code only)
 
 - Added `apps/mobile`: Expo SDK 58 / React Native 0.88 / React 19.3 / strict
