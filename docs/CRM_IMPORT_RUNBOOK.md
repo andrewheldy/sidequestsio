@@ -114,6 +114,37 @@ npm run import:crm -- content/miami.csv --status draft
 emitted SQL → run the import file → run the `.verify.sql` file → run
 `npm run smoke:supabase` → open a few `/quests/<uuid>` and `/scan/<CODE>` URLs.
 
+### Editorial (non-partner) batches — added 2026-10-24
+
+Self-guided quests at public places (first use: Miami Essentials,
+`data/generated/miami-essentials/`) use the same pipeline with:
+
+- **Optional columns:** `partner_type` (insert-only; `other` for the editorial
+  house partner — not a venue partnership), `verification_type`
+  (`qr nfc gps venue_code staff_approval`), `proof_method`
+  (`camera photo staff_phrase breadcrumb qr manual`), `social_share_prompt`.
+  Blank keeps the DB default.
+- **`--no-qr`:** creates no `qr_codes` rows (no venue has authorized a sticker).
+- **Non-active batches** (`--status draft|paused`) insert partners as
+  `pending`, never `active`.
+- **`verification_type = gps` is refused unless `--status` is draft/paused** —
+  `complete_quest()` does not check location server-side, so a gps quest must
+  not go live until it does.
+- **Reward tiers:** rows whose XP/Points differ from the difficulty's standard
+  tier (`src/lib/app/rewards.ts`) get a non-blocking warning.
+- Editorial metadata columns (readiness, blockers, cost, collections, …) are
+  acknowledged and never persisted.
+
+```bash
+npm run import:crm -- data/generated/miami-essentials/miami-essentials.csv \
+  --status draft --no-qr --emit-sql out/miami-essentials.sql
+```
+
+`--emit-sql` also writes `<out>.preflight.sql`: a **read-only** plan to run
+against the target database first. It lists every planned row as `insert` or
+`update`, and every conflict (a pre-existing row with the same
+name/title/code under a different id).
+
 ## 6. Re-import / update semantics
 
 - Empty cell = existing DB value is left unchanged; fields are never nulled.

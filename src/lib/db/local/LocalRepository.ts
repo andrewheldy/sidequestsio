@@ -53,6 +53,7 @@ import { readLocalEvents } from "@/lib/analytics/events";
 import { loadDb, mutate, DbSnapshot } from "./store";
 import { nanoid, shortCode } from "@/lib/app/id";
 import { levelForXp } from "@/lib/app/leveling";
+import { rewardForTier } from "@/lib/app/rewards";
 import { detectDevice, getReferrer } from "@/lib/app/device";
 
 const NOTE_MAX = 280;
@@ -330,8 +331,8 @@ export class LocalRepository implements Repository {
         description: input.description ?? "",
         category: input.category ?? "hidden_gem",
         difficulty: input.difficulty ?? "easy",
-        xp_reward: input.xp_reward ?? 50,
-        points_reward: input.points_reward ?? 100,
+        xp_reward: input.xp_reward ?? rewardForTier(input.difficulty ?? "easy").xp,
+        points_reward: input.points_reward ?? rewardForTier(input.difficulty ?? "easy").points,
         status: input.status ?? "draft",
         start_date: input.start_date ?? null,
         end_date: input.end_date ?? null,

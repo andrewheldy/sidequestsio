@@ -308,23 +308,23 @@ XP is earned by completing quests.
 
 XP cannot be spent.
 
-Suggested rewards:
+Standard rewards (canonical values: `src/lib/app/rewards.ts`):
 
 Easy
 
-50 XP
+50 XP · 25 Points
 
 Medium
 
-150 XP
+150 XP · 75 Points
 
 Hard
 
-400 XP
+300 XP · 150 Points
 
 Legendary
 
-1000+ XP
+500 XP · 300 Points
 
 ---
 

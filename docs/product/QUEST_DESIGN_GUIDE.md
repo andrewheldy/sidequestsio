@@ -271,9 +271,9 @@ Attend a scheduled activity
 
 Ideal reward:
 
-400 XP
+300 XP
 
-200 Points
+150 Points
 
 ---
 
@@ -294,6 +294,16 @@ Convention activations
 Brand campaigns
 
 Legendary quests should feel genuinely unique.
+
+Ideal reward:
+
+500 XP
+
+300 Points
+
+Legendary is a reward tier, not a stored difficulty: the database `difficulty`
+enum is easy | medium | hard. The canonical tier values live in
+`src/lib/app/rewards.ts`.
 
 ---
 

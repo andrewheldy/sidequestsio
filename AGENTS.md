@@ -137,8 +137,9 @@ See `ENGINEERING_STANDARDS.md` and `TECHNICAL_ARCHITECTURE.md` for the full text
 **Reality caveats — verify, don't assume:**
 - TypeScript runs **non-strict** (`tsconfig.app.json`: `strict: false`) — a passing typecheck is
   weaker than strict-mode would be.
-- There is **no automated test suite**. CI (`.github/workflows/ci.yml`) runs install + typecheck +
-  build only. Verify changes by running the affected flow, not by trusting tests that don't exist.
+- The automated test suite is **minimal**: `npm test` (Node's built-in runner via `tsx`, files in
+  `tests/`) covers reward tiers only. CI (`.github/workflows/ci.yml`) runs install + typecheck +
+  tests + build. Verify changes by running the affected flow, not by trusting tests that don't exist.
 - **Lint may not be clean** repo-wide — keep the files you touch clean; don't scope-creep a lint sweep.
 - The repo is organized **by type** (`src/components`, `src/pages`, `src/lib`, `src/hooks`), **not**
   the `features/` layout the spec docs describe. **Match the existing structure**; don't restructure.
@@ -284,7 +285,7 @@ A session is successful when:
 
 - **Package manager:** `npm` (matches `README.md` and CI). A `bun.lockb` also exists, but npm is
   canonical for this repo.
-- **Commands:** `npm run dev` · `npm run build` · `npm run lint` ·
+- **Commands:** `npm run dev` · `npm run build` · `npm run lint` · `npm test` ·
   `npx tsc -p tsconfig.app.json --noEmit` (typecheck) · `npm run smoke:supabase` ·
   `npm run import:quests -- <csv>`
 - **Stack:** Vite + React 18 + TypeScript · React Router v6 · TanStack Query v5 · Tailwind + shadcn/ui ·
