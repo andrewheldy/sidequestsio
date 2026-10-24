@@ -132,6 +132,11 @@ Each quest card includes:
 
 ## Quest Discovery
 
+Location-based discovery (Manual / Explore / Adventure modes, nearby ranking,
+optional background nearby alerts, and GPS presence checks) is specified in
+[LOCATION_DISCOVERY.md](LOCATION_DISCOVERY.md) (2026-10-24). Location is always
+optional; proximity never completes a quest or earns XP/Points.
+
 Users can browse by:
 
 - Nearby
@@ -309,6 +314,12 @@ XP is earned by completing quests.
 XP cannot be spent.
 
 Suggested rewards:
+
+> **Unreconciled (2026-10-24):** the location build specification records a newer
+> decision of Hard = 300 XP / 150 Points and Legendary = 500 XP / 300 Points, which
+> conflicts with the values below, and the `difficulty` enum has no `legendary`.
+> Nothing was rebalanced; quests keep their stored rewards. The product owner should
+> confirm one set here. See LOCATION_DISCOVERY.md §1.
 
 Easy
 

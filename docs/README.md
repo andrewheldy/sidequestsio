@@ -14,6 +14,7 @@ Read the documents relevant to the task, not the entire repository. Update the e
 | MVP requirements | [Product Specification](product/PRODUCT_SPEC.md) |
 | Quest quality and structure | [Quest Design Guide](product/QUEST_DESIGN_GUIDE.md) |
 | Product decisions | [Product Decision Log](product/PRODUCT_DECISION_LOG.md) |
+| Location, discovery & Adventure Mode | [Location Discovery](product/LOCATION_DISCOVERY.md) |
 | Standing decisions | [Decisions](DECISIONS.md) |
 
 ## Design: distinct scopes, not competing redesign prompts
