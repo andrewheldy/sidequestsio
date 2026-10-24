@@ -286,7 +286,7 @@ Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. T
 ## Update 2026-10-24 — Location discovery (code only, not deployed or applied)
 
 - Branch `feat/location-discovery` adds mobile location discovery and authored migrations
-  `0023`–`0025`. **None are applied to production**; the live ledger is unchanged.
+  `0023`–`0026` (0026: `legendary` difficulty; Hard tier 300 XP / 150 Points). **None are applied to production**; the live ledger is unchanged.
 - Once 0025 is applied, `complete_quest()` requires a server-verified GPS presence check for
   `gps` quests (all 10 live quests are QR, so nobody is affected) and anon can no longer
   execute it.

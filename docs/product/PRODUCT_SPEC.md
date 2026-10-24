@@ -315,27 +315,24 @@ XP cannot be spent.
 
 Suggested rewards:
 
-> **Unreconciled (2026-10-24):** the location build specification records a newer
-> decision of Hard = 300 XP / 150 Points and Legendary = 500 XP / 300 Points, which
-> conflicts with the values below, and the `difficulty` enum has no `legendary`.
-> Nothing was rebalanced; quests keep their stored rewards. The product owner should
-> confirm one set here. See LOCATION_DISCOVERY.md §1.
-
 Easy
 
-50 XP
+50 XP / 25 Points
 
 Medium
 
-150 XP
+150 XP / 75 Points
 
 Hard
 
-400 XP
+300 XP / 150 Points
 
 Legendary
 
-1000+ XP
+500 XP / 300 Points (special activations only)
+
+Rewards are stored per quest; these are the curation defaults (decision 2026-10-24,
+`supabase/migrations/0026_legendary_difficulty.sql`).
 
 ---
 

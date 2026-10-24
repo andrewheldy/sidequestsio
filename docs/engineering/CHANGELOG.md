@@ -41,7 +41,7 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   | `npm run mobile:test` | Passed: 11 suites, 71 tests |
   | `npm run mobile:doctor` | Passed 20/20 (baseline `main`: 19/20) |
   | `npm run mobile:export` | Passed; iOS and Android Hermes bundles |
-  | `npm run db:test` | Passed: 25 migration files applied; 7 SQL test files (≈195 checks) incl. two-session dblink concurrency |
+  | `npm run db:test` | Passed: 26 migration files applied; 8 SQL test files (≈200 checks) incl. two-session dblink concurrency |
   | `npx tsc -p tsconfig.app.json --noEmit` / `npm run build` | Passed (existing chunk-size warnings) |
 
   Local query plan on 20k synthetic venues + 2k override quests used both GiST indexes;
@@ -49,7 +49,10 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
 - **Not done / blocked:** no Supabase apply, no native compile, no device or field test,
   no store submission, no policy publication (draft text in the spec §7), no mobile
   sign-in (Adventure and GPS check-in show "Sign in required"), purge jobs unscheduled.
-  Reward-value conflict (Hard 300 vs 400 XP; no `legendary` enum) surfaced, not changed.
+- **Reward tiers (owner decision, same day):** Hard 300 XP / 150 Points; `legendary` added at
+  500 / 300 (`0026_legendary_difficulty.sql`, not applied). Only Hard quests on the exact old
+  400 / 200 tier move; earned rewards are untouched. Types, both importers' validators and the
+  partner quest form accept `legendary`. SQL test `70_reward_tiers` covers it.
 
 ## 2026-10-20 — Consumer mobile foundation (code only)
 

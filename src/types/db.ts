@@ -35,7 +35,8 @@ export type QuestCategory =
   | "fitness"
   | "hidden_gem";
 
-export type Difficulty = "easy" | "medium" | "hard";
+/** Reward tiers (XP / Points): easy 50/25, medium 150/75, hard 300/150, legendary 500/300 (0026). */
+export type Difficulty = "easy" | "medium" | "hard" | "legendary";
 
 export type VerificationType =
   | "qr"
