@@ -17,6 +17,7 @@ import {
   Waves,
   type LucideIcon,
 } from 'lucide-react';
+import type { QuestWithContext } from '@/types/db';
 
 /**
  * Shared onboarding data + helpers.
@@ -140,82 +141,45 @@ export function clearGuestOnboarding(): void {
   }
 }
 
-export interface GeneratedQuest {
-  title: string;
-  reward: string;
-  xp: number;
-  distance: string;
-  time: string;
-  category: string;
+/** Quest categories (db enum) each onboarding vibe points at. */
+const CATEGORIES_BY_VIBE: Record<string, string[]> = {
+  foodie: ['food'],
+  nightlife: ['nightlife'],
+  wellness: ['fitness'],
+  culture: ['culture', 'art'],
+  outdoor: ['outdoors'],
+  community: ['culture'],
+  'hidden-gems': ['hidden_gem'],
+};
+
+export interface FirstQuestPick {
+  quest: QuestWithContext;
+  /** False when nothing matched the picks and this is just the first active quest. */
+  matched: boolean;
 }
 
 /**
- * Builds a playful, deterministic "first quest" preview from the user's
- * selections. Pure mock data — no backend required.
+ * Picks a real, active quest for the "first quest" step: the one that best fits
+ * the chosen vibes (category) and neighborhood (venue name/address). Falls back
+ * to the first active quest so the step never shows an invented one.
  */
-export function buildFirstQuest(selections: OnboardingSelections): GeneratedQuest {
-  const neighborhood =
-    NEIGHBORHOODS.find((n) => n.id === selections.neighborhood)?.label ?? 'Miami';
-  const primaryVibe = selections.vibes[0] ?? 'hidden-gems';
+export function pickFirstQuest(
+  quests: QuestWithContext[],
+  selections: OnboardingSelections,
+): FirstQuestPick | null {
+  if (quests.length === 0) return null;
+  const hood = NEIGHBORHOODS.find((n) => n.id === selections.neighborhood)?.label.toLowerCase();
+  const wanted = new Set(selections.vibes.flatMap((v) => CATEGORIES_BY_VIBE[v] ?? []));
 
-  const byVibe: Record<string, GeneratedQuest> = {
-    foodie: {
-      title: `${neighborhood} Taco & Cafecito Crawl`,
-      reward: 'Points',
-      xp: 120,
-      distance: '0.7 miles',
-      time: '25 minutes',
-      category: 'Foodie',
-    },
-    nightlife: {
-      title: `${neighborhood} After-Dark Soundwalk`,
-      reward: 'Points',
-      xp: 150,
-      distance: '0.9 miles',
-      time: '30 minutes',
-      category: 'Nightlife',
-    },
-    wellness: {
-      title: `${neighborhood} Sunrise Reset`,
-      reward: 'Points',
-      xp: 100,
-      distance: '0.5 miles',
-      time: '20 minutes',
-      category: 'Wellness',
-    },
-    culture: {
-      title: `${neighborhood} Mural & Gallery Hunt`,
-      reward: 'Points',
-      xp: 130,
-      distance: '0.8 miles',
-      time: '35 minutes',
-      category: 'Culture',
-    },
-    outdoor: {
-      title: `${neighborhood} Bayfront Loop`,
-      reward: 'Points',
-      xp: 110,
-      distance: '1.2 miles',
-      time: '30 minutes',
-      category: 'Outdoor',
-    },
-    community: {
-      title: `${neighborhood} Local Legends Quest`,
-      reward: 'Points',
-      xp: 90,
-      distance: '0.6 miles',
-      time: '25 minutes',
-      category: 'Community',
-    },
-    'hidden-gems': {
-      title: `Hidden ${neighborhood} Coffee Crawl`,
-      reward: 'Points',
-      xp: 100,
-      distance: '0.6 miles',
-      time: '20 minutes',
-      category: 'Hidden Gems',
-    },
-  };
-
-  return byVibe[primaryVibe] ?? byVibe['hidden-gems'];
+  let best = quests[0];
+  let bestScore = 0;
+  for (const q of quests) {
+    const where = `${q.venue?.neighborhood ?? ''} ${q.venue?.name ?? ''} ${q.venue?.address ?? ''}`.toLowerCase();
+    const score = (wanted.has(q.category) ? 3 : 0) + (hood && where.includes(hood) ? 2 : 0);
+    if (score > bestScore) {
+      best = q;
+      bestScore = score;
+    }
+  }
+  return { quest: best, matched: bestScore > 0 };
 }
