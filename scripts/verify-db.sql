@@ -193,6 +193,33 @@ with checks (ord, check_name, pass, details) as (
              and prosrc like '%scan_required%'),
     null
 
+  -- ── 0023–0025 location, nudges, GPS presence ────────────────────────────
+  union all
+  select 27, '0023: venues.geog + GiST index; discover_nearby runs as invoker',
+    exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'venues' and column_name = 'geog')
+      and to_regclass('public.idx_venues_geog') is not null
+      and exists (select 1 from pg_proc where pronamespace = 'public'::regnamespace
+                   and proname = 'discover_nearby' and not prosecdef),
+    (select count(*)::text || ' active venues with coordinates but no valid geog'
+       from public.venues v
+      where v.status = 'active' and v.latitude is not null
+        and to_jsonb(v) ->> 'geog' is null)
+  union all
+  select 28, '0024: nudge_claims has no client access (details: nudge_delivery flag)',
+    case when to_regclass('public.nudge_claims') is null then false
+         else not has_table_privilege('authenticated', 'public.nudge_claims', 'SELECT')
+              and not has_table_privilege('anon', 'public.nudge_claims', 'SELECT') end,
+    case when to_regclass('public.app_feature_flags') is null then null
+         else (select 'nudge_delivery=' || coalesce(
+                 (select (to_jsonb(f) ->> 'enabled') from public.app_feature_flags f
+                   where to_jsonb(f) ->> 'key' = 'nudge_delivery'), 'missing')) end
+  union all
+  select 29, '0025: complete_quest requires a server presence check for GPS quests',
+    exists (select 1 from pg_proc where pronamespace = 'public'::regnamespace and proname = 'complete_quest'
+             and prosrc like '%presence_required%'),
+    null
+
   -- ── content readiness (informational; passes after T-CONTENT-1) ─────────
   union all
   select 17, 'content: quests with Fable content authored',

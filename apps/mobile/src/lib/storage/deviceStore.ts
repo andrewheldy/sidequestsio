@@ -31,8 +31,9 @@ export type GeofenceBundle = {
   version: string;
   expiresAt: string;
   deliveryEnabled: boolean;
-  coverage: { areaId: string | null; label: string | null };
-  refreshRegion: RegionPlan | null;
+  /** Null when no public area centroid is close enough to anchor a refresh region. */
+  coverage: { areaId: string; label: string } | null;
+  refreshRegion: Omit<RegionPlan, 'questIds'> | null;
   regions: RegionPlan[];
   candidates: NudgeCandidate[];
 };

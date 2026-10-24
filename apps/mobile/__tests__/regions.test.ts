@@ -10,7 +10,7 @@ function bundle(regionCount: number): GeofenceBundle {
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     deliveryEnabled: true,
     coverage: { areaId: 'wynwood', label: 'Wynwood' },
-    refreshRegion: { id: 'wynwood', latitude: 25.8, longitude: -80.2, radiusM: 2000, questIds: [] },
+    refreshRegion: { id: 'wynwood', latitude: 25.8, longitude: -80.2, radiusM: 2000 },
     regions,
     candidates: regions.map((r, i) => ({ questId: `q${i}`, regionId: r.id, title: `Quest ${i}`, category: 'art', xpReward: 50, pointsReward: 25, estimatedMinutes: 15, venueId: `${i}` })),
   };

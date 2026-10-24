@@ -126,7 +126,8 @@ p_radius_m int, p_categories quest_category[], p_max_minutes int, p_limit int, p
 - `p_source`: `device` | `area` | `map`. `area` requires `p_area_id` (origin from
   `discovery_areas`); `device`/`map` require finite lat/lng.
 - Errors: `invalid_origin`, `invalid_source`, `invalid_radius`, `invalid_limit`, `invalid_cursor`,
-  `unknown_area`.
+  `unknown_area`, `invalid_request` (`p_max_minutes` outside 1–600).
+- Guests never read feedback or completions; personalization only with an authenticated caller.
 - Returns `{ok, serverTime, origin:{source, areaId, label}, items: QuestCard[], nextCursor}`.
 - Eligibility: active quest in its date window; active venue (when it has one); valid effective
   location within radius; not hidden/muted by the caller; completion and repeat cooldown respected.
@@ -151,12 +152,17 @@ Reason codes: `nearby` (≤ 1 km), `matches_<category>_interest`, `fits_<n>_minu
 refreshRegion:{id, latitude, longitude, radiusM}, regions:[{id, latitude, longitude, radiusM,
 questIds}], candidates:[{questId, regionId, title, category, xpReward, pointsReward,
 estimatedMinutes, venueId}]}`. ≤ 15 regions; colocated quests share a region
-(`v:<venue_id>`, or `q:<quest_id>` for an override location). Candidates are `nudge_eligible`,
+(`v:<venue_id>`, or `q:<quest_id>` for an override location), chosen within 10 km. The refresh
+region sits on the nearest `discovery_areas` centroid (radius 2–5 km, sized to contain the device;
+`refreshRegion` and `coverage` are null when no area is within 4.5 km). The bundle echoes neither
+the origin nor distances. Candidates are `nudge_eligible`,
 not sponsored, with known duration, and known hours or an explicit event window.
 
 **`claim_nudge(p_installation_id uuid, p_idempotency_key text, p_quest_id uuid, p_region_id text,
 p_catalog_version text, p_policy_version text)`** — `security definer`, authenticated only.
-Per-user advisory lock; idempotent on `(user, idempotency_key)`. Denial reasons:
+Per-user advisory lock; idempotent on `(user, idempotency_key)` — a replay re-checks the delivery
+flag, consent and pause first, so a pause made after the first claim turns it into a deny. Only
+allowed claims are stored. Malformed input returns `{ok:false, error:'invalid_request'}`. Denial reasons:
 `auth_required, invalid_request, delivery_disabled, consent_missing, paused, timezone_unknown,
 quiet_hours, cap_reached, min_gap, quest_suppressed, venue_suppressed, not_eligible,
 availability_unknown, closed, invalid_candidate`. Allow returns
@@ -165,13 +171,21 @@ deny returns `{ok:true, allow:false, reason}`. A claim is never attendance.
 
 **`record_nudge_result(p_claim_id uuid, p_outcome text)`** — definer, own claims only. Outcomes:
 `scheduled`, `schedule_failed` (from `reserved`), `opened` (from `scheduled`). Cannot touch rewards.
+Errors: `auth_required`, `invalid_request`, `not_found` (also for another user's claim),
+`invalid_transition`.
 
 **`record_consent(p_purpose consent_type, p_granted bool, p_policy_version text,
 p_installation_id uuid, p_source text)`** — definer, authenticated; appends one event.
 
-**`create_presence_challenge(p_quest_id uuid)`** → `{ok, challengeId, expiresAt}` (2 min).
+**`create_presence_challenge(p_quest_id uuid)`** → `{ok, challengeId, expiresAt}` (2 min). Errors:
+`auth_required`, `not_found`, `quest_inactive`, `not_gps_quest`, `location_unavailable`,
+`rate_limited` (10 per 10 minutes).
 **`verify_gps_presence(p_challenge_id uuid, p_latitude, p_longitude, p_accuracy_m,
 p_captured_at timestamptz)`** → `{ok, outcome: inside|outside|uncertain, reason, checkId}`.
+Reasons: `ok`, `outside_radius`, `ambiguous`, `stale_sample`, `low_accuracy`, `invalid_sample`;
+consumed, expired, foreign or unknown challenges return `challenge_invalid`. `complete_quest` on a
+GPS quest without a fresh unused `inside` check returns `presence_required`; anon can no longer
+execute `complete_quest` (the web only calls it signed in).
 Rule: inside if `distance + accuracy ≤ radius`; outside if `distance − accuracy > radius`;
 otherwise uncertain. Stale/low-accuracy/invalid samples are `uncertain`; replayed or expired
 challenges are rejected. Uncertain offers retry, QR or staff verification — never an automatic
@@ -222,7 +236,15 @@ stays aggregate (suppress cohorts under 10); a geofence transition is never "ver
 
 Recorded per run in `docs/engineering/CHANGELOG.md`. Unit/UI tests use mocked native modules and
 mocked network; local DB tests run on Postgres 16 + PostGIS 3.4 with a test-only Supabase shim
-(`supabase/tests/`). **None of this proves device, OS-delivery, battery, or production behavior.**
+(`supabase/tests/`, `npm run db:test`, also a CI job). **None of this proves device, OS-delivery,
+battery, or production behavior.**
+
+`venue_open_state` returns `unknown` when today's intervals don't make the venue open and
+yesterday's hours are missing (a late-night spill can't be ruled out). Purge functions
+(`purge_nudge_records`, `purge_presence_records`) exist but nothing schedules them yet — the owner
+must add a `pg_cron` job (daily) after applying 0024/0025.
+
+Known gap outside this scope: `staff_approval` verification still trusts the client.
 
 ## 9. Release gates (all open)
 
