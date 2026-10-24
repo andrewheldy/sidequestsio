@@ -23,6 +23,15 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   location for `gps` quests, and 32 images need an attribution display.
 - Quest browser cards without an image now show the branded fallback instead
   of collapsing and losing their category/XP badges.
+- Added `supabase/migrations/0024_gps_geofence.sql` (**authored, not
+  applied**): `complete_quest()` now checks gps quests server-side — the
+  player's position must be within `quests.geofence_radius_m` (default 150 m)
+  of the venue, accuracy ≤ 100 m, GPS error forgiven up to 50 m; new errors
+  `location_required`, `location_inaccurate`, `outside_geofence`. The position
+  is never stored. The quest page requests one fix on Complete for gps quests;
+  LocalRepository applies the same rules (`src/lib/app/geofence.ts`, tested).
+  `import:crm` maps `geofence_radius_m`. Deploy order: apply 0024, then the
+  client.
 
 ## 2026-10-20 — Consumer mobile foundation (code only)
 

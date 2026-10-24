@@ -337,6 +337,14 @@ export class SupabaseRepository implements Repository {
       // Sent only with an instance, which only exists once 0017 is applied, so
       // the call still matches the 4-argument function before then.
       ...(input.instanceId ? { p_instance_id: input.instanceId } : {}),
+      // Sent only for gps quests (0024), for the same reason.
+      ...(input.location
+        ? {
+            p_latitude: input.location.latitude,
+            p_longitude: input.location.longitude,
+            p_accuracy_m: input.location.accuracy,
+          }
+        : {}),
     });
     if (error) throw error;
     return data as CompleteQuestResult;

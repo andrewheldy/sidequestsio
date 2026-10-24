@@ -57,3 +57,6 @@ Product-owner direction: Easy 50 XP / 25 Points, Medium 150 / 75, Hard 300 / 150
 **2026-10-24 — Self-guided (no-QR) quests stay draft until location is verified server-side.**
 Independent public-place quests (Miami Essentials) belong to one editorial house partner (`type = other`, `pending`) — never an implied venue partnership — and get no QR codes. Because `complete_quest()` accepts `verification_type = gps` without a location check, the importer refuses gps quests unless they are imported as draft/paused. See `data/generated/miami-essentials/validation_report.md`.
 
+**2026-10-24 — GPS quests are verified by a server-side geofence.**
+`complete_quest()` (0024) requires the player's position within the quest's `geofence_radius_m` of its venue (default 150 m, GPS error forgiven up to 50 m, fixes worse than 100 m refused) and never stores the position. This is a presence check, not tamper-proof proof: the browser supplies the coordinates. It is the accepted bar for self-guided starter quests; funded or high-value rewards still need QR/NFC or staff verification.
+

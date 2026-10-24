@@ -14,7 +14,7 @@ planning doc and the 20-quest expansion. Dataset: `miami-essentials.csv`
 |---|---|
 | Quest concepts processed | 40 |
 | Seeded (staging, as `draft`) | 34 |
-| Ready for publication | **0** |
+| Ready for publication | **0** (verification now implemented, not yet deployed — see §2) |
 | Blocked (verification dependency) | 35 (34 seeded + Haulover, excluded: no sourceable coordinate) |
 | Templates (need a concrete location; not seeded) | 5 — Ventanita Victory, Pastelito Passport, Hidden in Plain Sight, Same Place Two Stories, Miami Soundtrack |
 | Content readiness | 40 `needs_validation` (site check, hours, duplicate-pin decision, or single-source coordinate outstanding — see `blockers`) |
@@ -28,14 +28,18 @@ event-dependent (SoundScape WALLCAST) · 5 templates.
 
 ## 2. Why nothing is publishable yet
 
-1. **Verification (blocks all 35).** These quests need self-guided photo +
-   location evidence. The live completion RPC `complete_quest()` treats
-   `verification_type = 'gps'` as verified with **no location check**
-   (reproduced on staging: a completion succeeded with no location at all).
-   QR is not an option — no venue has authorized a sticker. The importer now
-   refuses `gps` quests unless imported as draft/paused. The quest page's
-   existing GPS hint ("Location is only used to verify") overstates what the
-   server does.
+1. **Verification (blocks all 35 until deployed).** These quests need
+   self-guided location evidence; QR is not an option (no venue has authorized
+   a sticker). The live `complete_quest()` treats `verification_type = 'gps'`
+   as verified with **no location check** (reproduced on staging). **Fixed in
+   this branch** by `supabase/migrations/0024_gps_geofence.sql` plus the
+   client: the player's position must be within the quest's
+   `geofence_radius_m` of the venue (default 150 m; GPS error forgiven up to
+   50 m; fixes worse than 100 m refused); the position is never stored.
+   Verified on staging (§3). It is a presence check, not tamper-proof proof —
+   a modified client can send the venue's coordinates. Until 0024 is applied
+   and the client deployed, keep these quests draft; the importer still
+   refuses `gps` quests unless draft/paused.
 2. **Image attribution (32 of 39 images).** 22 CC BY (2.0 ×13, 3.0 ×4,
    4.0 ×5) and 10 CC BY-SA (3.0 ×2, 4.0 ×8) require visible credit; the app
    has no image-credit display. Public domain ×4 and
@@ -63,6 +67,8 @@ event-dependent (SoundScape WALLCAST) · 5 templates.
 | Pre-existing data (partners, venues, quests, qr_codes, completions, ledger, profiles) | md5 checksums identical to baseline after all four runs |
 | Seeded rows | 1 partner (`other`, `pending`), 34 venues, 34 draft quests, **0 QR codes**; rewards 19×50/25, 11×150/75, 4×300/150 |
 | Draft seeded quest completion attempt | `quest_inactive` — nothing awarded |
+| `0024` geofence (staging, applied ×2) | no position → `location_required`; accuracy > 100 m → `location_inaccurate`; 1 km / 111 m (±10 m) away → `outside_geofence` + failed attempt; 111 m (±50 m) → ok; venue without coordinates → `verification_failed`; QR still `scan_required`; venue_code wrong/right unchanged; coordinates found in no table; grants preserved |
+| Geofence client parity | `npm test` (geofence rules, TS distance = SQL distance); LocalRepository path in Chromium: same results; denied permission → no request sent |
 | Generated `verify.sql` | counts match; only gap: Wynwood hero |
 | Coordinate spot check (8 landmarks vs independent references) | ≤ 263 m except Shark Valley (dataset correctly uses the tower, 7 mi down the loop) and South Pointe (pier vs park) |
 | Render QA — real build, Playwright, seeded rows injected (QA copy set `active`), Storage URLs served from `hero/` | see §4 |
@@ -108,10 +114,11 @@ seed does not add one.
 
 ## 6. Production deployment (requires explicit approval)
 
-1. Decide the blockers in §2: a server-side location check in
-   `complete_quest()` for `gps` quests (or another supported verification),
-   an image-credit display, and the duplicate-pin merges.
-2. Back up the database. Apply `supabase/migrations/0023_quest_media_bucket.sql`.
+1. Decide the remaining blockers in §2: an image-credit display and the
+   duplicate-pin merges.
+2. Back up the database. Apply `supabase/migrations/0023_quest_media_bucket.sql`
+   and `0024_gps_geofence.sql`, then deploy the web client (it sends the
+   position for gps quests). The import SQL aborts if 0024 is missing.
 3. Upload `hero/*.webp` to bucket `quest-media` under `miami-essentials/`
    (dashboard or CLI, service role — never a `VITE_*` key).
 4. `npm run import:crm -- data/generated/miami-essentials/miami-essentials.csv --status draft --no-qr --emit-sql out/miami-essentials.sql`

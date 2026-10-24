@@ -195,6 +195,8 @@ export interface Quest {
   estimated_time?: string | null;
   /** NULL = complete once, ever. N = may be completed again N days after the last completion. */
   repeat_cooldown_days?: number | null;
+  /** gps quests: completion radius in metres around the venue (NULL = 150; 0024). */
+  geofence_radius_m?: number | null;
   /** Optional business/host links (quests.links JSONB, 0012). */
   links?: QuestLinks | null;
 }

@@ -195,6 +195,8 @@ const MAPPING: Record<string, ColumnSpec> = {
   verification_type:   { target: { table: "quests", column: "verification_type" }, validate: "verification_type" },
   proof_method:        { target: { table: "quests", column: "proof_method" }, validate: "proof_method" },
   social_share_prompt: { target: { table: "quests", column: "social_share_prompt" } },
+  // gps quests: metres around the venue (0024; blank = 150 m server default).
+  geofence_radius_m:   { target: { table: "quests", column: "geofence_radius_m" }, validate: "int" },
 
   // ── quests.links jsonb (canonical shape, docs/QUEST_CONTENT_IMPORT.md) ──
   website_url:        { target: { links: "website_url" }, validate: "url" },
@@ -211,7 +213,7 @@ const MAPPING: Record<string, ColumnSpec> = {
     [
       "concept_number", "source_doc", "narrative", "shelf", "collections", "quest_kind", "cost_class",
       "access_requirements", "restriction_flags", "completion_message", "community_prompt",
-      "evidence_supports", "coordinate_source", "geofence_radius_m", "geofence_note",
+      "evidence_supports", "coordinate_source", "geofence_note",
       "publication_status", "content_readiness", "blockers", "overlaps_existing",
     ].map((col): [string, ColumnSpec] => [col, { target: { ignored: "editorial metadata — no app-facing column" } }]),
   ),
@@ -454,7 +456,7 @@ function buildRowPlan(
     }
   }
   if (get("verification_type") === "gps" && questStatus === "active") {
-    errors.push(`row ${rowNo}: verification_type gps is not checked server-side by complete_quest() — import gps quests with --status draft`);
+    errors.push(`row ${rowNo}: verification_type gps needs migration 0024 (server geofence) and the matching client live — import gps quests with --status draft and publish once both are deployed`);
   }
 
   // Launch-quality nudges (non-blocking).
@@ -535,6 +537,19 @@ function emitImportSql(
     raise exception 'venues profile columns missing — apply supabase/migrations/0014_venue_business_profile.sql first';
   end if;
 end $$;`,
+    ...(rows.some((r) => "geofence_radius_m" in r.quest.values)
+      ? [
+          "-- Prerequisite guard: quests.geofence_radius_m (migration 0024).",
+          `do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'quests' and column_name = 'geofence_radius_m'
+  ) then
+    raise exception 'quests.geofence_radius_m missing — apply supabase/migrations/0024_gps_geofence.sql first';
+  end if;
+end $$;`,
+        ]
+      : []),
     `-- ── partners (${partners.length}) ──`,
     ...partners.map((p) => upsertSql("partners", p)),
     `-- ── venues (${venues.length}) ──`,

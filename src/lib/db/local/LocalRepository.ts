@@ -54,6 +54,7 @@ import { loadDb, mutate, DbSnapshot } from "./store";
 import { nanoid, shortCode } from "@/lib/app/id";
 import { levelForXp } from "@/lib/app/leveling";
 import { rewardForTier } from "@/lib/app/rewards";
+import { checkGeofence } from "@/lib/app/geofence";
 import { detectDevice, getReferrer } from "@/lib/app/device";
 
 const NOTE_MAX = 280;
@@ -527,6 +528,35 @@ export class LocalRepository implements Repository {
         return { ok: false, error: "quest_inactive" as const };
       if (quest.end_date && today > quest.end_date)
         return { ok: false, error: "quest_expired" as const };
+
+      // GPS quests: the position must be inside the venue geofence (mirrors 0024).
+      if (quest.verification_type === "gps") {
+        const venue = db.venues.find((v) => v.id === quest.venue_id);
+        if (!venue || venue.latitude == null || venue.longitude == null) {
+          return { ok: false, error: "verification_failed" as const };
+        }
+        const fence = checkGeofence(
+          input.location,
+          { latitude: venue.latitude, longitude: venue.longitude },
+          quest.geofence_radius_m,
+        );
+        if ("error" in fence) {
+          if (fence.error === "outside_geofence") {
+            const attempt = db.attempts.find(
+              (a) =>
+                a.user_id === input.userId &&
+                a.quest_id === input.questId &&
+                a.status === "in_progress",
+            );
+            if (attempt) {
+              attempt.status = "failed";
+              attempt.failure_reason = "outside_geofence";
+              attempt.verification_method = input.verificationMethod;
+            }
+          }
+          return fence;
+        }
+      }
 
       // Verification.
       const verified = verify(quest, input);
@@ -1176,9 +1206,8 @@ function verify(quest: Quest, input: CompleteQuestInput): boolean {
         input.venueCode.trim().toUpperCase() ===
           quest.verification_secret.toUpperCase()
       );
-    // QR / NFC / GPS / staff: in the MVP the act of reaching the verified
-    // completion call (post-scan, with location consent for GPS) is sufficient.
-    // Production tightens these with signed tokens / geofence checks server-side.
+    // QR / NFC are checked against the scan in completeQuest; GPS against the
+    // venue geofence there too (mirrors 0018 / 0024). Staff approval: MVP pass.
     case "qr":
     case "nfc":
     case "gps":

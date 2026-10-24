@@ -46,6 +46,7 @@ import type {
   Venue,
   VerificationType,
 } from "@/types/db";
+import type { GeoPosition } from "@/lib/app/geofence";
 
 // ---------------------------------------------------------------------------
 // Input / result shapes
@@ -91,6 +92,8 @@ export interface CompleteQuestInput {
   sourceScanId?: string | null;
   /** The generated instance being completed; fixes the rewards paid. */
   instanceId?: string | null;
+  /** gps quests: the player's position, checked against the geofence and never stored. */
+  location?: GeoPosition | null;
 }
 
 export type CompleteQuestError =
@@ -101,7 +104,10 @@ export type CompleteQuestError =
   | "scan_required"
   | "quest_inactive"
   | "quest_expired"
-  | "verification_failed";
+  | "verification_failed"
+  | "location_required"
+  | "location_inaccurate"
+  | "outside_geofence";
 
 export interface CompleteQuestResult {
   ok: boolean;
@@ -113,6 +119,9 @@ export interface CompleteQuestResult {
   leveledUp?: boolean;
   /** Set with `cooldown`: when the quest can be done again. */
   availableAt?: string;
+  /** Set with `outside_geofence`: how far the player was, and the allowed radius. */
+  distanceM?: number;
+  radiusM?: number;
 }
 
 /**
