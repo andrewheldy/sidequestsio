@@ -51,3 +51,9 @@ Product-owner decision that supersedes PD-1 (docs/engineering/PRODUCTION_SPRINT_
 - Admins see every partner. A partner login sees only its own partner, enforced by `owns_partner()` in `partner_insights()` (0021).
 - Analytics only: the old partner pages for quests, rewards and QR codes stay unmounted, and quest content stays curated by SideQuests.
 
+**2026-10-24 — Standard reward tiers; Legendary is a reward tier, not a stored difficulty.**
+Product-owner direction: Easy 50 XP / 25 Points, Medium 150 / 75, Hard 300 / 150, Legendary 500 / 300, defined once in `src/lib/app/rewards.ts`. Quests keep their own stored rewards, so changing a tier never rewrites existing quests or history. The database `difficulty` enum stays easy | medium | hard until a Legendary quest actually exists.
+
+**2026-10-24 — Self-guided (no-QR) quests stay draft until location is verified server-side.**
+Independent public-place quests (Miami Essentials) belong to one editorial house partner (`type = other`, `pending`) — never an implied venue partnership — and get no QR codes. Because `complete_quest()` accepts `verification_type = gps` without a location check, the importer refuses gps quests unless they are imported as draft/paused. See `data/generated/miami-essentials/validation_report.md`.
+

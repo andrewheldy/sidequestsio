@@ -2,6 +2,28 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-24 — Miami Essentials seed + reward tiers (code/data only; production unchanged)
+
+- Reward tiers now live in `src/lib/app/rewards.ts`: Easy 50 XP / 25 Points,
+  Medium 150 / 75, Hard 300 / 150, Legendary 500 / 300 (Hard and Legendary
+  superseded 400/200 and 1000+/500+). Partner quest form and LocalRepository
+  defaults read it. Stored quest rewards, completions and ledger rows are not
+  rewritten. First automated tests: `npm test` (`tests/`, node:test via tsx),
+  run in CI.
+- `import:crm` gains editorial-batch options (`partner_type`,
+  `verification_type`, `proof_method`, `social_share_prompt`, `--no-qr`,
+  pending partners for non-active batches, gps refused unless draft, off-tier
+  warnings, read-only `<out>.preflight.sql`). Existing CRM output unchanged.
+- Added `supabase/migrations/0023_quest_media_bucket.sql` (public-read
+  `quest-media` bucket, service-role writes). **Authored, not applied.**
+- Added the Miami Essentials dataset (40 concepts, 34 importable as draft),
+  39 licensed hero images with provenance, and a validation/QA report:
+  `data/generated/miami-essentials/`. Seeded and QA'd on an isolated local
+  Postgres only. No quest is publishable: `complete_quest()` does not check
+  location for `gps` quests, and 32 images need an attribution display.
+- Quest browser cards without an image now show the branded fallback instead
+  of collapsing and losing their category/XP badges.
+
 ## 2026-10-20 — Consumer mobile foundation (code only)
 
 - Added `apps/mobile`: Expo SDK 58 / React Native 0.88 / React 19.3 / strict
