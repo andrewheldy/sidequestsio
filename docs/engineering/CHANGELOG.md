@@ -9,19 +9,33 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   read via RLS; no client write grants) and authenticated SECURITY DEFINER RPCs
   `request_account_deletion()` (idempotent, per-user advisory lock, `process_by` = +30 days)
   and `cancel_account_deletion()`; both audit-logged. Nothing is deleted by this migration.
-- Processing is specified, not implemented: a service-role Edge Function
-  (`process-account-deletions`) that removes `proofs/<uid>/` and `avatars/<uid>/` objects,
-  deletes `public.users` (cascading game data; live `public.users` has no FK to
-  `auth.users`), calls `auth.admin.deleteUser`, marks the request completed, and sends the
-  confirmation email. Plan and cascade map are in the migration header.
+- Processing: `supabase/functions/process-account-deletions` (**not deployed**), service-role
+  only via `withSupabase({ auth: 'secret' })`. Per pending request, idempotently: capture the
+  email for the confirmation, run `process_account_deletion_data()` (0024, service_role-only
+  RPC: partner owners are flagged `manual_review_reason = 'owns_partner'` before anything is
+  deleted; otherwise community notes, profile and `public.users` are deleted in one
+  transaction), remove `proofs/<uid>/` and `avatars/<uid>/`, `auth.admin.deleteUser`, mark
+  completed. Failures stay pending with `attempts`/`last_error` and are retried next run.
+  No email provider is configured: support sends the §5 confirmation from completed rows'
+  `notify_email`, then clears it. Deploy/schedule/support queries are in `index.ts`.
+- Verification: 6 Deno tests (`process.test.ts`) pass when run under Node 24 with a
+  `Deno.test` shim against an in-memory fake client — Deno itself is not installed, so
+  `deno check`/`deno test` and any run against real Auth/Storage/Postgres are pending. ESLint
+  clean under the website config. The SQL has not been executed anywhere.
 - Mobile: Settings → Delete account now records the request in-app, shows the pending
   status and deadline, and allows cancelling (policy §6). The account stays usable until
   processed. If the server lacks 0024 (PGRST202/PGRST205/42P01) the screen falls back to the
   truthful emailed request. 199/199 mocked tests; SQL not executed anywhere (no
   non-production database available).
-- Follow-ups before claiming in-app deletion: apply 0024 (after backup), build and schedule
-  the Edge Function, then bump `docs/legal/Delete-Account.md` (§1 currently says the in-app
-  option is "planned") per `docs/legal/README.md`.
+- Follow-ups before claiming in-app deletion: renumber 0023/0024 against `main` (collision,
+  see below), apply 0024 (after backup) to a non-production project first, `deno test`,
+  deploy with `--no-verify-jwt` and schedule, then bump `docs/legal/Delete-Account.md` (§1
+  still says the in-app option is "planned") per `docs/legal/README.md`.
+- **Migration number collision (unresolved):** `main` (PR #54) added `0023_location_discovery`,
+  `0024_adventure_nudges`, `0025_gps_presence`, `0026_legendary_difficulty`. This branch's
+  `0023_progress_role_integrity` (already applied to production) and
+  `0024_account_deletion_requests` (not applied) must be renumbered when the branch is
+  rebased onto `main`; the next free number on `main` is 0027.
 
 ## 2026-10-21 — Consumer mobile MVP (code only, branch `feat/mobile-mvp`)
 

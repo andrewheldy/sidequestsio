@@ -13,7 +13,7 @@ in-app deletion request. Rewards shows real balances and available rewards read-
 
 Deliberately excluded: reward redemption (no partner fulfilment flow; 0 live
 rewards), photo/proof capture, non-QR verification types, avatar upload, and
-deletion *processing* (needs a service-role job — see "Release blockers").
+deletion *processing* until its Edge Function is deployed (see "Release blockers").
 
 ## Package layout and compatibility
 
@@ -191,8 +191,9 @@ Navigate to a quest with `{ pathname: '/quests/[questId]', params: { questId } }
 
 - In-app account deletion: the app records a request through `request_account_deletion()`
   (migration 0024, **not yet applied**; until then it falls back to a prefilled email).
-  Requests are only processed once the service-role Edge Function described in 0024 exists
-  and runs, and `docs/legal/Delete-Account.md` must be updated when it ships.
+  Requests are processed by the service-role Edge Function
+  `supabase/functions/process-account-deletions` (written, not deployed or scheduled), and
+  `docs/legal/Delete-Account.md` must be updated when it ships.
 - No live-backend, simulator, or device verification has been run (see verification record).
 
 ## Verification record

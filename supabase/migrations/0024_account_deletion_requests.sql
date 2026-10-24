@@ -4,8 +4,9 @@
 -- only way to ask today is an email to support. App stores require deletion to
 -- be initiable in-app. This migration adds the authenticated REQUEST step; the
 -- irreversible PROCESSING step needs the service role (auth.users + Storage)
--- and is specified below as a server-only Edge Function. It is NOT implemented
--- here, and nothing in this migration deletes data.
+-- and runs in the server-only Edge Function described below; this migration
+-- only adds its transactional data step (service_role only). Applying it
+-- deletes nothing.
 --
 -- Policy mapping (Delete-Account.md v1.0.1):
 --   §1 identity: the request is made with the user's own authenticated session
@@ -28,31 +29,25 @@
 -- Idempotent; non-destructive; one transaction. Apply after a backup.
 --
 -- ---------------------------------------------------------------------------
--- PROCESSING PLAN (Edge Function `process-account-deletions`, service role,
--- run by an admin or a daily schedule; never callable by clients)
+-- PROCESSING (supabase/functions/process-account-deletions, service role only)
 -- ---------------------------------------------------------------------------
--- For each request with status = 'pending' (oldest first), in this order:
---   a. Read auth.users.email for the confirmation email BEFORE deleting.
---   b. Storage: remove every object under `proofs/<user_id>/` and
---      `avatars/<user_id>/` with the Storage API (SQL cannot remove the files).
---   c. SQL, one transaction:
---        delete from public.community_notes where user_id = :uid;   -- explicit (also cascades)
---        delete from public.users where id = :uid;
---          -- cascades: user_profiles, privacy_preferences, quest_attempts,
---          -- quest_completions, quest_instances, points_ledger, reward_redemptions,
---          -- leaderboard_snapshots, consent_events, note_reports (reporter);
---          -- set null: scan_events.user_id, analytics_events.user_id,
---          -- audit_logs.actor_id, partners.owner_user_id, note_reports.reviewed_by
---        update public.account_deletion_requests
---           set status = 'completed', completed_at = now() where id = :request_id;
---   d. auth.admin.deleteUser(:uid) — cascades public.profiles (0001_profiles FK).
---      (Live public.users has no FK to auth.users, hence the explicit delete in c.)
---   e. Send the confirmation email (§5) to the address from (a).
---   On any failure leave the request 'pending' and retry next run; steps are
---   idempotent. Partner owners: if the user owns an active partner, stop and
---   flag for manual handling instead of orphaning the partner.
--- Retention (§3/§4): anonymised analytics (scan_events/analytics_events with
--- user_id set null) and audit rows with actor set null remain.
+-- The Edge Function handles each pending request (oldest first), idempotently:
+--   1. Capture auth.users.email into notify_email (for the §5 confirmation).
+--   2. process_account_deletion_data() below, one transaction: if the user owns
+--      any partner, flag manual_review_reason = 'owns_partner' and stop (a
+--      person decides what happens to the partner); otherwise delete
+--      community_notes, profiles and public.users (cascading user_profiles,
+--      privacy_preferences, quest_attempts/completions/instances, points_ledger,
+--      reward_redemptions, leaderboard_snapshots, consent_events, note_reports;
+--      setting user_id null on scan_events, analytics_events, audit_logs).
+--      Live public.users has no FK to auth.users, hence the explicit deletes.
+--   3. Remove Storage objects under proofs/<uid>/ and avatars/<uid>/.
+--   4. auth.admin.deleteUser(uid) (already-gone counts as done).
+--   5. status = 'completed'. The confirmation email is then sent by support
+--      (no email provider is configured): completed rows keep notify_email
+--      until confirmation_sent_at is set, and the address is then cleared.
+-- Any failure leaves the request pending with attempts/last_error updated; the
+-- next run retries from wherever it stopped.
 -- ---------------------------------------------------------------------------
 
 begin;
@@ -67,6 +62,16 @@ create table if not exists public.account_deletion_requests (
   cancelled_at  timestamptz,
   completed_at  timestamptz
 );
+
+-- Processing bookkeeping, written only by the service-role Edge Function / RPC.
+alter table public.account_deletion_requests add column if not exists data_deleted_at      timestamptz;
+alter table public.account_deletion_requests add column if not exists manual_review_reason text;
+alter table public.account_deletion_requests add column if not exists attempts             integer not null default 0;
+alter table public.account_deletion_requests add column if not exists last_attempt_at      timestamptz;
+alter table public.account_deletion_requests add column if not exists last_error           text;
+-- Held only between processing and the confirmation email (§5), then cleared.
+alter table public.account_deletion_requests add column if not exists notify_email         text;
+alter table public.account_deletion_requests add column if not exists confirmation_sent_at timestamptz;
 
 alter table public.account_deletion_requests drop constraint if exists account_deletion_requests_status_check;
 alter table public.account_deletion_requests add constraint account_deletion_requests_status_check
@@ -87,6 +92,7 @@ create policy account_deletion_self_read on public.account_deletion_requests for
 
 revoke all on public.account_deletion_requests from public, anon, authenticated;
 grant select on public.account_deletion_requests to authenticated;
+grant select, update on public.account_deletion_requests to service_role;
 
 -- Returns {ok:true, request:{...}} or {ok:false, error:'not_authenticated'}.
 create or replace function public.request_account_deletion() returns jsonb
@@ -127,6 +133,50 @@ begin
   return jsonb_build_object('ok', true, 'request', to_jsonb(r));
 end $$;
 
+-- Server-only step 2 of processing (see header). Returns
+-- {ok:true, outcome:'data_deleted'|'manual_review'|'not_pending', user_id?, status?}
+-- or {ok:false, error:'not_found'}. Safe to call repeatedly for the same request.
+create or replace function public.process_account_deletion_data(p_request_id uuid) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare r account_deletion_requests;
+begin
+  select * into r from account_deletion_requests where id = p_request_id for update;
+  if not found then return jsonb_build_object('ok', false, 'error', 'not_found'); end if;
+  if r.status <> 'pending' then
+    return jsonb_build_object('ok', true, 'outcome', 'not_pending', 'status', r.status);
+  end if;
+  if r.manual_review_reason is not null then
+    return jsonb_build_object('ok', true, 'outcome', 'manual_review', 'user_id', r.user_id);
+  end if;
+
+  -- Deleting a partner owner would orphan the partner's venues, quests and
+  -- codes (owner_user_id is set null). A person must decide: flag and stop
+  -- before anything is deleted.
+  if exists (select 1 from partners where owner_user_id = r.user_id) then
+    update account_deletion_requests
+       set manual_review_reason = 'owns_partner', last_attempt_at = now()
+     where id = r.id;
+    insert into audit_logs (actor_id, action, entity_type, entity_id)
+    values (null, 'account.deletion_manual_review', 'account_deletion_request', r.id::text);
+    return jsonb_build_object('ok', true, 'outcome', 'manual_review', 'user_id', r.user_id);
+  end if;
+
+  delete from community_notes where user_id = r.user_id;
+  delete from profiles where user_id = r.user_id;
+  delete from users where id = r.user_id;
+
+  update account_deletion_requests
+     set data_deleted_at = coalesce(data_deleted_at, now())
+   where id = r.id;
+  insert into audit_logs (actor_id, action, entity_type, entity_id)
+  values (null, 'account.deletion_data_deleted', 'account_deletion_request', r.id::text);
+
+  return jsonb_build_object('ok', true, 'outcome', 'data_deleted', 'user_id', r.user_id);
+end $$;
+
+revoke execute on function public.process_account_deletion_data(uuid) from public, anon, authenticated;
+grant execute on function public.process_account_deletion_data(uuid) to service_role;
+
 revoke execute on function public.request_account_deletion() from public, anon;
 revoke execute on function public.cancel_account_deletion() from public, anon;
 grant execute on function public.request_account_deletion() to authenticated;
@@ -139,10 +189,12 @@ commit;
 --   select has_table_privilege('authenticated', 'public.account_deletion_requests', 'SELECT');  -- true
 --   select has_function_privilege('anon', 'public.request_account_deletion()', 'EXECUTE');      -- false
 --   select has_function_privilege('authenticated', 'public.request_account_deletion()', 'EXECUTE'); -- true
+--   select has_function_privilege('authenticated', 'public.process_account_deletion_data(uuid)', 'EXECUTE'); -- false
 --   As a test user: request twice -> same id; cancel -> status cancelled; cancel again -> not_pending.
 --
 -- Rollback (only while no requests need keeping):
 --   begin;
+--   drop function if exists public.process_account_deletion_data(uuid);
 --   drop function if exists public.cancel_account_deletion();
 --   drop function if exists public.request_account_deletion();
 --   drop table if exists public.account_deletion_requests;
