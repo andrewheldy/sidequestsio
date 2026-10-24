@@ -66,7 +66,9 @@ jobs:
 
   database:
     name: Database migrations & SQL tests
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04, which has no postgresql-16 package,
+    # and run-local.sh expects the Postgres 16 binaries.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
