@@ -14,7 +14,7 @@ planning doc and the 20-quest expansion. Dataset: `miami-essentials.csv`
 |---|---|
 | Quest concepts processed | 40 |
 | Seeded (staging, as `draft`) | 34 |
-| Ready for publication | **0** (verification now implemented, not yet deployed — see §2) |
+| Ready for publication | **0** — GPS presence is live server-side (0025, applied 2026-10-24); the web client and photo credits ship with PR #53; duplicate pins still need an editorial call (§2) |
 | Blocked (verification dependency) | 35 (34 seeded + Haulover, excluded: no sourceable coordinate) |
 | Templates (need a concrete location; not seeded) | 5 — Ventanita Victory, Pastelito Passport, Hidden in Plain Sight, Same Place Two Stories, Miami Soundtrack |
 | Content readiness | 40 `needs_validation` (site check, hours, duplicate-pin decision, or single-source coordinate outstanding — see `blockers`) |
@@ -28,21 +28,22 @@ event-dependent (SoundScape WALLCAST) · 5 templates.
 
 ## 2. Why nothing is publishable yet
 
-1. **Verification (blocks all 35 until deployed).** These quests need
+1. **Verification — server live, web client in PR #53.** These quests need
    self-guided location evidence; QR is not an option (no venue has authorized
-   a sticker). The live `complete_quest()` treats `verification_type = 'gps'`
-   as verified with **no location check** (reproduced on staging). **Fixed in
-   this branch** by `supabase/migrations/0024_gps_geofence.sql` plus the
-   client: the player's position must be within the quest's
-   `geofence_radius_m` of the venue (default 150 m; GPS error forgiven up to
-   50 m; fixes worse than 100 m refused); the position is never stored.
-   Verified on staging (§3). It is a presence check, not tamper-proof proof —
-   a modified client can send the venue's coordinates. Until 0024 is applied
-   and the client deployed, keep these quests draft; the importer still
-   refuses `gps` quests unless draft/paused.
-2. **Image attribution — resolved by 0025 + the client (deploy pending).**
+   a sticker). `0025_gps_presence.sql` (applied to production 2026-10-24)
+   makes `complete_quest()` require a server-computed `inside` presence check
+   (challenge → one fresh sample → `verify_gps_presence`; inside only if the
+   whole accuracy circle is within `verification_radius_m`, default 100 m,
+   range 75–150; fixes worse than 50 m or older than 30 s are `uncertain`).
+   PR #53 wires the web quest page to that flow (previously only the mobile
+   app was). It is a presence heuristic, not tamper-proof proof.
+   **Content consequence:** 17 area quests (e.g. Wynwood corridor, Art Deco
+   district, Lifeguard towers, Oleta) span 200–1200 m but verify within 150 m
+   of one anchor point — each needs a named check-in spot in its copy
+   (`blockers` column).
+2. **Image attribution — resolved by 0028 + the client (deploy pending).**
    22 CC BY (2.0 ×13, 3.0 ×4, 4.0 ×5) and 10 CC BY-SA (3.0 ×2, 4.0 ×8)
-   require visible credit. `quests.image_attribution` (migration 0025) holds
+   require visible credit. `quests.image_attribution` (migration 0028) holds
    creator, source link, license + link and "cropped"; the quest page hero
    shows it with links, Explore cards with links, and the quest browser and
    public /quests cards as plain text (each card is a single link to the
@@ -65,16 +66,16 @@ event-dependent (SoundScape WALLCAST) · 5 templates.
 | `npm test` — reward tiers (all four) + dataset uses the standard tier for every row | 5/5 pass; mutation (Hard → 400/200) caught |
 | Typecheck · eslint (touched files) · `npm run build` | pass |
 | Existing CRM import SQL after importer changes | byte-identical |
-| All 23 migrations, documented order, local Postgres 16 + Supabase stubs | applied; `0023` re-run idempotent |
+| `npm run db:test` after merging `main` (Postgres 16 + PostGIS, test-only shim) | 28 migration files applied, incl. this branch's `0027` / `0028`; all 8 SQL test files pass (201 checks, incl. idempotency, grants, presence, reward tiers) |
 | Importer dry run | 34 eligible · 6 skipped · 0 errors |
 | Preflight (first run) | 69 inserts · 0 updates · 3 venue-name conflicts (above) |
 | Seed ×2 without images, ×2 with images | 34 quests exactly once; 2nd-pass preflight 69 updates · 0 inserts |
 | Pre-existing data (partners, venues, quests, qr_codes, completions, ledger, profiles) | md5 checksums identical to baseline after all four runs |
 | Seeded rows | 1 partner (`other`, `pending`), 34 venues, 34 draft quests, **0 QR codes**; rewards 19×50/25, 11×150/75, 4×300/150 |
 | Draft seeded quest completion attempt | `quest_inactive` — nothing awarded |
-| `0024` geofence (staging, applied ×2) | no position → `location_required`; accuracy > 100 m → `location_inaccurate`; 1 km / 111 m (±10 m) away → `outside_geofence` + failed attempt; 111 m (±50 m) → ok; venue without coordinates → `verification_failed`; QR still `scan_required`; venue_code wrong/right unchanged; coordinates found in no table; grants preserved |
-| Image credit (0025 + client) | 0025 applied ×2 on staging; seed ×2 → 29 credited / 33 heroes (the 4 without are public domain); existing rows untouched. Render QA (mobile): CC BY-SA hero shows "Photo: creator / Wikimedia Commons, CC BY-SA 4.0, cropped" linking source and license; public-domain and image-less quests show none; 29 credits on quest-browser cards, Explore cards (linked) and /quests; no nested links; no page errors |
-| Geofence client parity | `npm test` (geofence rules, TS distance = SQL distance); LocalRepository path in Chromium: same results; denied permission → no request sent |
+| Web GPS presence vs `0025` (main's migration path, `authenticated` role, the web client's exact named arguments) | no check → `presence_required`; 1 km away → `outside`; 2-min-old fix → `stale_sample`; fresh fix at the venue → `inside` → `complete_quest(p_presence_check_id)` ok, 50 XP / 25 Points; reused challenge → `challenge_invalid`; coordinates found in no table |
+| Image credit (0028 + client) | 0028 applied ×2 on staging; seed ×2 → 29 credited / 33 heroes (the 4 without are public domain); existing rows untouched. Render QA (mobile): CC BY-SA hero shows "Photo: creator / Wikimedia Commons, CC BY-SA 4.0, cropped" linking source and license; public-domain and image-less quests show none; 29 credits on quest-browser cards, Explore cards (linked) and /quests; no nested links; no page errors |
+| Presence client parity | `npm test` (presence rules mirror `verify_gps_presence`, TS distance = SQL distance); LocalRepository in Chromium: no check → `presence_required`, at venue → inside → completes, 1 km → outside + message, sample never stored; browser fix carries a fresh capture time; denied permission → "allow location access" message |
 | Generated `verify.sql` | counts match; only gap: Wynwood hero |
 | Coordinate spot check (8 landmarks vs independent references) | ≤ 263 m except Shark Valley (dataset correctly uses the tower, 7 mi down the loop) and South Pointe (pier vs park) |
 | Render QA — real build, Playwright, seeded rows injected (QA copy set `active`), Storage URLs served from `hero/` | see §4 |
@@ -121,10 +122,11 @@ seed does not add one.
 ## 6. Production deployment (requires explicit approval)
 
 1. Decide the remaining blocker in §2: the duplicate-pin merges.
-2. Back up the database. Apply `supabase/migrations/0023_quest_media_bucket.sql`,
-   `0024_gps_geofence.sql` and `0025_quest_image_attribution.sql`, then deploy
-   the web client (it sends the position for gps quests and renders photo
-   credits). The import SQL aborts if 0024 or 0025 is missing.
+2. Back up the database. `0023`–`0026` are already applied (2026-10-24).
+   Apply `supabase/migrations/0027_quest_media_bucket.sql` and
+   `0028_quest_image_attribution.sql`, then deploy the web client (presence
+   flow for gps quests, photo credits). The import SQL aborts if 0023 or 0028
+   is missing.
 3. Upload `hero/*.webp` to bucket `quest-media` under `miami-essentials/`
    (dashboard or CLI, service role — never a `VITE_*` key).
 4. `npm run import:crm -- data/generated/miami-essentials/miami-essentials.csv --status draft --no-qr --emit-sql out/miami-essentials.sql`

@@ -346,3 +346,30 @@ Users should not get the same quest twice in a row. Rotating curated objectives 
 Implementation: `supabase/migrations/0017_quest_frameworks.sql`; authoring guide in `docs/product/QUEST_DESIGN_GUIDE.md` ("Quest Frameworks").
 
 ---
+
+---
+
+# Reward Tiers (2026-10-24)
+
+## Decision
+
+Product-owner decision. Default quest rewards (XP / Points) are:
+
+- Easy — 50 / 25
+- Medium — 150 / 75
+- Hard — 300 / 150 (was 400 / 200)
+- Legendary — 500 / 300 (new; special activations only, was "1000+ XP")
+
+`legendary` is added to the `difficulty` enum (`0026_legendary_difficulty.sql`).
+
+## Reasoning
+
+Keeps the top tiers proportionate to the 5–30 minute quests SideQuests curates, so a single
+quest does not outweigh many smaller ones in progression or the Points economy.
+
+## Consequences
+
+- Rewards stay per-quest data; there is no reward calculator.
+- 0026 moves only Hard quests still on the exact old 400 / 200 default. Hand-tuned rewards,
+  quest-framework overrides, past completions and ledger entries are unchanged.
+

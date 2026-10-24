@@ -6,14 +6,12 @@
  * awards them), so changing a tier here never rewrites existing quests or
  * historical completions. These values are the defaults for newly authored
  * quests and the check the content importer warns against.
- *
- * `legendary` is a reward tier, not a stored difficulty: the database
- * `difficulty` enum is easy | medium | hard (see docs/DECISIONS.md, 2026-10-24).
+ * (0026_legendary_difficulty.sql moved stored Hard quests from 400/200 to 300/150.)
  */
 
 import type { Difficulty } from "@/types/db";
 
-export type RewardTier = Difficulty | "legendary";
+export type RewardTier = Difficulty;
 
 export interface TierReward {
   xp: number;

@@ -1,10 +1,12 @@
 # SideQuests consumer mobile foundation
 
 One Expo Router + React Native + strict TypeScript app for iOS and Android.
-This task stops at the navigation foundation. No authentication, data integration,
-maps, camera, QR, completion, points, redemption, or database changes are included.
-Future integration must use the existing Supabase backend, with server-enforced
-authorization; no second backend is introduced here.
+It has the navigation foundation plus location discovery and the (flag-off)
+Adventure nearby-alert pipeline described in
+[`docs/product/LOCATION_DISCOVERY.md`](../../docs/product/LOCATION_DISCOVERY.md).
+There is still no mobile authentication, camera/QR, completion, points or
+redemption UI. All data comes from the existing Supabase backend through RPCs,
+with server-enforced authorization; no second backend is introduced.
 
 ## Package layout and compatibility
 
@@ -63,6 +65,13 @@ CI installs from both frozen lockfiles and runs web typecheck/build plus mobile
 typecheck, navigation tests, Expo Doctor, and iOS/Android JS exports. It does not
 start EAS or compile/sign native binaries. Web ESLint ignores mobile; the existing
 web lint baseline is recorded separately below.
+
+Jest discovers both `__tests__/**/*.test.ts` (pure logic: capability gate,
+quiet hours/DST, region budget and event de-duplication, nudge pipeline, ranking
+variety, distance/availability copy, RPC client) and `*.test.tsx` (screens).
+Native modules (`expo-location`, `expo-notifications`, `expo-task-manager`,
+`react-native-maps`, AsyncStorage) are mocked in `jest.setup.ts`, so these tests
+say nothing about permissions dialogs, geofence delivery or battery on devices.
 
 The Jest integration suite renders the actual filesystem routes using
 `expo-router/testing-library`, not a mocked navigation callback. It checks initial
@@ -127,8 +136,8 @@ cp apps/mobile/.env.example apps/mobile/.env.local
 | `APP_VARIANT` | `development` by default, or `staging`; `production` is rejected in this foundation |
 | `MOBILE_IOS_BUNDLE_IDENTIFIER` | Approved iOS ID for the selected variant, required only for native iOS builds |
 | `MOBILE_ANDROID_APPLICATION_ID` | Approved Android ID for the selected variant, required only for native Android builds |
-| `EXPO_PUBLIC_SUPABASE_URL` | Placeholder for future existing-backend integration; currently unused |
-| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Placeholder for a browser-safe publishable/anon key; currently unused |
+| `EXPO_PUBLIC_SUPABASE_URL` | Existing backend URL (non-production project) for discovery RPCs |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser-safe publishable/anon key only |
 
 Development and staging must use distinct approved identifiers, URL schemes, and
 the existing backend's designated non-production configuration. To run staging,
@@ -153,12 +162,26 @@ should be run for this foundation.
 | `src/app/quests/[questId].tsx` | Quest detail; `useLocalSearchParams<{ questId: string }>()` receives the ID |
 | `src/components/PlaceholderScreen.tsx` | Simple accessible text, scrolling, safe-area container |
 | `__tests__/navigation.test.tsx` | Existing-route regression tests to extend with future screens |
+| `index.ts` | Entry: registers the geofence task at module scope, then loads `expo-router/entry` |
+| `src/app/(tabs)/index.tsx` | Explore: area / Near me / map-area origins, filters, list and map, Adventure status |
+| `src/app/settings/location.tsx` | Mode choice, Adventure disclosure and permission steps, pause, alert cap |
+| `src/lib/location/`, `discovery/`, `adventure/`, `presence/` | Location adapter, discovery RPCs and ranking, nudge pipeline, GPS check-in |
+| `src/lib/auth/session.ts` | Session seam; returns no session until mobile sign-in exists |
+
+Location-related environment and build inputs (see `.env.example`):
+`EXPO_PUBLIC_FEATURE_NEARBY`, `EXPO_PUBLIC_FEATURE_ADVENTURE` (off by default),
+`MOBILE_BACKGROUND_LOCATION=1` (adds Android `ACCESS_BACKGROUND_LOCATION` and the
+iOS "Always" purpose string; omit for a foreground-only artifact), and
+`MOBILE_ANDROID_GOOGLE_MAPS_API_KEY` (Android map; list-only without it). The
+Android location foreground service and iOS background modes are deliberately not
+declared; region monitoring does not need them.
 
 Navigate to detail with the Router object form:
 `{ pathname: '/quests/[questId]', params: { questId } }`. Preserve IDs as strings.
-No mobile quest data contract or repository has been added yet. Inspect the existing
-`src/types/db.ts`, `src/lib/db/repository.ts`, and Supabase migrations when integration
-is authorized; do not import web UI or browser/localStorage repositories into native.
+The mobile quest data contract is the safe `QuestCard` DTO in
+`src/lib/discovery/types.ts`, returned by the `discover_nearby` / `get_quest_card`
+RPCs; it intentionally excludes verification secrets. Do not import web UI or
+browser/localStorage repositories into native.
 
 ## Verification record
 

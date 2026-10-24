@@ -46,7 +46,7 @@ import type {
   Venue,
   VerificationType,
 } from "@/types/db";
-import type { GeoPosition } from "@/lib/app/geofence";
+import type { GeoPosition, PresenceResult } from "@/lib/app/presence";
 
 // ---------------------------------------------------------------------------
 // Input / result shapes
@@ -92,8 +92,8 @@ export interface CompleteQuestInput {
   sourceScanId?: string | null;
   /** The generated instance being completed; fixes the rewards paid. */
   instanceId?: string | null;
-  /** gps quests: the player's position, checked against the geofence and never stored. */
-  location?: GeoPosition | null;
+  /** gps quests: an 'inside' result from checkPresence() (0025). */
+  presenceCheckId?: string | null;
 }
 
 export type CompleteQuestError =
@@ -105,9 +105,7 @@ export type CompleteQuestError =
   | "quest_inactive"
   | "quest_expired"
   | "verification_failed"
-  | "location_required"
-  | "location_inaccurate"
-  | "outside_geofence";
+  | "presence_required";
 
 export interface CompleteQuestResult {
   ok: boolean;
@@ -119,9 +117,6 @@ export interface CompleteQuestResult {
   leveledUp?: boolean;
   /** Set with `cooldown`: when the quest can be done again. */
   availableAt?: string;
-  /** Set with `outside_geofence`: how far the player was, and the allowed radius. */
-  distanceM?: number;
-  radiusM?: number;
 }
 
 /**
@@ -235,6 +230,11 @@ export interface Repository {
   hasCompleted(userId: string, questId: string): Promise<boolean>;
   /** Generates (or returns the open) objective for this user's visit. */
   getQuestOffer(userId: string, questId: string): Promise<QuestOffer>;
+  /**
+   * GPS quests: challenge → one fresh sample from `locate` → server verdict
+   * (0025). The sample is compared and discarded; only the outcome is kept.
+   */
+  checkPresence(userId: string, questId: string, locate: () => Promise<GeoPosition | null>): Promise<PresenceResult>;
   completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult>;
   listCompletions(userId: string): Promise<QuestCompletion[]>;
 

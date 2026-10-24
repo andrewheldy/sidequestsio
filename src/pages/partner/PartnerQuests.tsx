@@ -147,7 +147,7 @@ function CreateQuestForm({
       <Textarea placeholder="Description" value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} />
       <div className="grid grid-cols-2 gap-2">
         <Select label="Category" value={form.category} options={CATEGORIES} onChange={(v) => set("category", v)} />
-        <Select label="Difficulty" value={form.difficulty} options={["easy", "medium", "hard"]} onChange={(v) => setDifficulty(v as Difficulty)} />
+        <Select label="Difficulty" value={form.difficulty} options={["easy", "medium", "hard", "legendary"]} onChange={(v) => setDifficulty(v as Difficulty)} />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <NumberField label="XP reward" value={form.xp_reward} onChange={(v) => set("xp_reward", v)} />

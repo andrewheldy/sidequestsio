@@ -55,6 +55,7 @@ import type {
 } from "../repository";
 import type { AnalyticsSummary, PartnerInsights, PartnerInsightsInput } from "../types";
 import { detectDevice, getReferrer } from "@/lib/app/device";
+import type { GeoPosition, PresenceResult } from "@/lib/app/presence";
 
 export class SupabaseRepository implements Repository {
   constructor(private readonly sb: SupabaseClient) {}
@@ -328,6 +329,32 @@ export class SupabaseRepository implements Repository {
     // Inactive/expired/not found: show the static quest; completeQuest reports why.
     return { status: "available", instance: null };
   }
+  async checkPresence(
+    _userId: string, // the server uses auth.uid()
+    questId: string,
+    locate: () => Promise<GeoPosition | null>,
+  ): Promise<PresenceResult> {
+    // The challenge must exist before the sample is taken (0025 rejects older samples).
+    const challenge = await this.sb.rpc("create_presence_challenge", { p_quest_id: questId });
+    if (challenge.error) throw challenge.error;
+    const c = challenge.data as { ok: boolean; error?: string; challengeId?: string };
+    if (!c.ok || !c.challengeId) return { ok: false, error: c.error ?? "unavailable" };
+
+    const sample = await locate();
+    if (!sample) return { ok: false, error: "location_unavailable" };
+
+    const verified = await this.sb.rpc("verify_gps_presence", {
+      p_challenge_id: c.challengeId,
+      p_latitude: sample.latitude,
+      p_longitude: sample.longitude,
+      p_accuracy_m: sample.accuracy,
+      p_captured_at: new Date(sample.capturedAt).toISOString(),
+    });
+    if (verified.error) throw verified.error;
+    const v = verified.data as { ok: boolean; error?: string } & Partial<PresenceResult & { ok: true }>;
+    if (!v.ok || !("checkId" in v)) return { ok: false, error: v.error ?? "unavailable" };
+    return { ok: true, outcome: v.outcome, reason: v.reason, checkId: v.checkId };
+  }
   async completeQuest(input: CompleteQuestInput): Promise<CompleteQuestResult> {
     const { data, error } = await this.sb.rpc("complete_quest", {
       p_quest_id: input.questId,
@@ -337,14 +364,8 @@ export class SupabaseRepository implements Repository {
       // Sent only with an instance, which only exists once 0017 is applied, so
       // the call still matches the 4-argument function before then.
       ...(input.instanceId ? { p_instance_id: input.instanceId } : {}),
-      // Sent only for gps quests (0024), for the same reason.
-      ...(input.location
-        ? {
-            p_latitude: input.location.latitude,
-            p_longitude: input.location.longitude,
-            p_accuracy_m: input.location.accuracy,
-          }
-        : {}),
+      // Sent only for gps quests, so the call also matches pre-0025 functions.
+      ...(input.presenceCheckId ? { p_presence_check_id: input.presenceCheckId } : {}),
     });
     if (error) throw error;
     return data as CompleteQuestResult;

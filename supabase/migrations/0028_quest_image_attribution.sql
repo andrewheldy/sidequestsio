@@ -1,4 +1,4 @@
--- 0025_quest_image_attribution.sql — credit for licensed quest hero photos
+-- 0028_quest_image_attribution.sql — credit for licensed quest hero photos
 --
 -- WHY (2026-10-24): Miami Essentials heroes are Wikimedia Commons photos;
 -- 32 of 39 are CC BY / CC BY-SA, which require visible credit (creator,

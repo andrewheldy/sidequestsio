@@ -46,7 +46,7 @@ import {
   VenueInfoCard,
   type PrimaryCtaState,
 } from "@/components/app/quest-detail";
-import { requestPosition } from "@/lib/app/geofence";
+import { presenceMessage, requestPosition } from "@/lib/app/presence";
 import type { CompleteQuestResult } from "@/lib/db/repository";
 import type { ProofMethod, QuestInstance } from "@/types/db";
 
@@ -63,8 +63,7 @@ const COMPLETE_ERRORS: Record<string, string> = {
   quest_inactive: "This quest isn't active right now.",
   quest_expired: "This quest has expired.",
   not_found: "Quest not found.",
-  location_required: "Allow location access so we can check you're at the quest spot, then try again.",
-  location_inaccurate: "Your location isn't precise enough yet. Step outside or wait a moment, then try again.",
+  presence_required: "We need to confirm you're at the quest spot. Tap Complete again while you're there.",
 };
 
 /**
@@ -297,17 +296,22 @@ export default function QuestDetail() {
 
     setBusy(true);
     try {
-      // gps quests: one fresh fix, checked on the server and never stored.
-      const location = quest.verification_type === "gps" ? await requestPosition() : null;
-      if (quest.verification_type === "gps" && !location) {
-        trackQuestEvent("quest_primary_action_failed", ctx, {
-          ...detail,
-          props: { reason: "location_unavailable" },
-        });
-        toast.error(COMPLETE_ERRORS.location_required);
-        return;
-      }
       const repo = await getRepository();
+      // gps quests: server-computed presence first (0025). One fresh fix is
+      // compared on the server and discarded; only 'inside' can complete.
+      let presenceCheckId: string | null = null;
+      if (quest.verification_type === "gps") {
+        const presence = await repo.checkPresence(user.id, quest.id, () => requestPosition());
+        if (!("checkId" in presence) || presence.outcome !== "inside") {
+          trackQuestEvent("quest_primary_action_failed", ctx, {
+            ...detail,
+            props: { reason: "checkId" in presence ? `presence_${presence.outcome}` : presence.error },
+          });
+          toast.error(presenceMessage(presence));
+          return;
+        }
+        presenceCheckId = presence.checkId;
+      }
       await repo.startQuest(user.id, quest.id);
       const res = await repo.completeQuest({
         userId: user.id,
@@ -316,7 +320,7 @@ export default function QuestDetail() {
         venueCode: needsCode ? venueCode : undefined,
         sourceScanId: scanId,
         instanceId: instance?.id ?? null,
-        location,
+        presenceCheckId,
       });
 
       if (!res.ok) {
@@ -327,13 +331,11 @@ export default function QuestDetail() {
         const message =
           res.error === "cooldown"
             ? `You can do a new version of this quest on ${formatUnlockDate(res.availableAt)}.`
-            : res.error === "outside_geofence"
-              ? `You're about ${res.distanceM} m from the quest spot. Get within ${res.radiusM} m and try again.`
-              : res.error === "verification_failed"
-                ? needsCode
-                  ? "That venue code didn't match. Ask staff and try again."
-                  : "Verification failed. Please try again."
-                : COMPLETE_ERRORS[res.error ?? ""] ?? "Could not complete quest.";
+            : res.error === "verification_failed"
+              ? needsCode
+                ? "That venue code didn't match. Ask staff and try again."
+                : "Verification failed. Please try again."
+              : COMPLETE_ERRORS[res.error ?? ""] ?? "Could not complete quest.";
         toast.error(message);
         if (res.error === "scan_required") {
           setScanVerified(false);

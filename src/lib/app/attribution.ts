@@ -1,5 +1,5 @@
 /**
- * Credit for a licensed quest photo (quests.image_attribution, 0025).
+ * Credit for a licensed quest photo (quests.image_attribution, 0028).
  *
  * CC BY / BY-SA require, at the point of use: the creator, a link to the
  * source, the license name with a link, and whether the photo was changed.

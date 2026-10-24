@@ -1,4 +1,4 @@
--- 0023_quest_media_bucket.sql — public bucket for curated quest hero images
+-- 0027_quest_media_bucket.sql — public bucket for curated quest hero images
 --
 -- WHY (2026-10-24): quest hero images (quests.image_url) have no Storage home.
 -- `avatars` is per-user and `proofs` holds player submissions (personal data),

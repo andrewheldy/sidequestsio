@@ -80,7 +80,7 @@ function parseCsv(text: string): string[][] {
 // --- CSV column contract --------------------------------------------------------
 
 const CATEGORIES = ["art", "food", "outdoors", "culture", "nightlife", "shopping", "fitness", "hidden_gem"];
-const DIFFICULTIES = ["easy", "medium", "hard"];
+const DIFFICULTIES = ["easy", "medium", "hard", "legendary"];
 const REVIEW_SOURCES = ["google", "yelp", "other"];
 const SOCIAL_SOURCES = ["linktree", "linkme", "other"];
 

@@ -127,17 +127,15 @@ Self-guided quests at public places (first use: Miami Essentials,
 - **`--no-qr`:** creates no `qr_codes` rows (no venue has authorized a sticker).
 - **Non-active batches** (`--status draft|paused`) insert partners as
   `pending`, never `active`.
-- **`verification_type = gps` is refused unless `--status` is draft/paused.**
-  The server-side geofence lives in migration `0024_gps_geofence.sql` plus the
-  client that sends the position; the importer cannot tell whether both are
-  live, so gps quests are published by hand after deploy.
 - **Photo credit** (`image_creator`, `image_source_name`, `image_source_url`,
   `image_license`, `image_license_url`, `image_modified`) → `quests.image_attribution`
-  (0025). Required and complete for CC BY / BY-SA photos (else the row fails);
-  ignored for public domain / CC0. The emitted SQL aborts if 0025 is missing.
-- **`geofence_radius_m`** (optional, metres, 25–5000) sets a gps quest's
-  completion radius around its venue (blank = 150 m). Needs 0024; the emitted
-  SQL aborts if the column is missing.
+  (0028). Required and complete for CC BY / BY-SA photos (else the row fails);
+  ignored for public domain / CC0. The emitted SQL aborts if 0028 is missing.
+- **`verification_radius_m`** (optional, integer 75–150, blank = 100 m) sets a
+  gps quest's presence radius around its venue (0023's
+  `quests_verification_radius_range`; checked by `verify_gps_presence`, 0025).
+  The emitted SQL aborts if 0023 is missing. GPS quests complete on the web via
+  0025's presence check — see `docs/DECISIONS.md`.
 - **Reward tiers:** rows whose XP/Points differ from the difficulty's standard
   tier (`src/lib/app/rewards.ts`) get a non-blocking warning.
 - Editorial metadata columns (readiness, blockers, cost, collections, …) are

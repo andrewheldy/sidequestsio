@@ -12,6 +12,7 @@
     "test": "tsx --test tests/*.test.ts",
     "preview": "vite preview",
     "smoke:supabase": "tsx scripts/smoke-supabase.ts",
+    "db:test": "supabase/tests/run-local.sh",
     "import:quests": "tsx scripts/import-quest-content.ts",
     "import:crm": "tsx scripts/import-crm.ts",
     "assets:candidates": "tsx scripts/generate-asset-candidates.ts",

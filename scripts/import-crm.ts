@@ -134,7 +134,7 @@ function slugify(s: string): string {
 type Validator =
   | "url" | "int" | "latitude" | "longitude" | "category" | "difficulty"
   | "price_range" | "state" | "zip" | "email" | "phone"
-  | "partner_type" | "verification_type" | "proof_method";
+  | "partner_type" | "verification_type" | "proof_method" | "radius";
 
 interface ColumnSpec {
   target:
@@ -195,7 +195,7 @@ const MAPPING: Record<string, ColumnSpec> = {
   verification_type:   { target: { table: "quests", column: "verification_type" }, validate: "verification_type" },
   proof_method:        { target: { table: "quests", column: "proof_method" }, validate: "proof_method" },
   social_share_prompt: { target: { table: "quests", column: "social_share_prompt" } },
-  // Hero photo credit → quests.image_attribution (0025), built in buildRowPlan
+  // Hero photo credit → quests.image_attribution (0028), built in buildRowPlan
   // for CC BY / BY-SA photos only (public domain / CC0 need no credit).
   image_creator:     { target: "insert_only" },
   image_source_name: { target: "insert_only" },
@@ -203,8 +203,8 @@ const MAPPING: Record<string, ColumnSpec> = {
   image_license:     { target: "insert_only" },
   image_license_url: { target: "insert_only", validate: "url" },
   image_modified:    { target: "insert_only" },
-  // gps quests: metres around the venue (0024; blank = 150 m server default).
-  geofence_radius_m:   { target: { table: "quests", column: "geofence_radius_m" }, validate: "int" },
+  // gps quests: presence radius around the venue, 75–150 m (0023/0025; blank = 100 m).
+  verification_radius_m: { target: { table: "quests", column: "verification_radius_m" }, validate: "radius" },
 
   // ── quests.links jsonb (canonical shape, docs/QUEST_CONTENT_IMPORT.md) ──
   website_url:        { target: { links: "website_url" }, validate: "url" },
@@ -221,14 +221,14 @@ const MAPPING: Record<string, ColumnSpec> = {
     [
       "concept_number", "source_doc", "narrative", "shelf", "collections", "quest_kind", "cost_class",
       "access_requirements", "restriction_flags", "completion_message", "community_prompt",
-      "evidence_supports", "coordinate_source", "geofence_note",
+      "evidence_supports", "coordinate_source", "geofence_radius_m", "geofence_note",
       "publication_status", "content_readiness", "blockers", "overlaps_existing",
     ].map((col): [string, ColumnSpec] => [col, { target: { ignored: "editorial metadata — no app-facing column" } }]),
   ),
 };
 
 const CATEGORIES = ["art", "food", "outdoors", "culture", "nightlife", "shopping", "fitness", "hidden_gem"];
-const DIFFICULTIES = ["easy", "medium", "hard"];
+const DIFFICULTIES = ["easy", "medium", "hard", "legendary"];
 const PARTNER_TYPES = ["venue", "brand", "event", "nonprofit", "other"];
 const VERIFICATION_TYPES = ["qr", "nfc", "gps", "venue_code", "staff_approval"];
 const PROOF_METHODS = ["camera", "photo", "staff_phrase", "breadcrumb", "qr", "manual"];
@@ -361,6 +361,12 @@ function validateValue(
     case "phone":
       if (!/^\+?[\d\s().-]{7,}$/.test(v)) warnings.push(`phone "${v}" does not look like a phone number — stored as-is`);
       return true;
+    case "radius":
+      if (!/^\d+$/.test(v) || Number(v) < 75 || Number(v) > 150) {
+        errors.push(`row ${rowNo}: ${col} "${v}" must be an integer from 75 to 150 (quests_verification_radius_range)`);
+        return false;
+      }
+      return true;
     case "partner_type":
     case "verification_type":
     case "proof_method": {
@@ -436,7 +442,7 @@ function buildRowPlan(
       continue;
     }
     const { table, column } = t;
-    const numeric = spec.validate === "int" || spec.validate === "latitude" || spec.validate === "longitude";
+    const numeric = ["int", "latitude", "longitude", "radius"].includes(spec.validate ?? "");
     const value = numeric ? Number(v) : v;
     if (table === "partners" && column !== "name") partner.values[column] = value;
     else if (table === "venues" && column !== "name") venue.values[column] = value;
@@ -454,7 +460,7 @@ function buildRowPlan(
   if (links.reviews_url) links.reviews_source = inferReviewSource(links.reviews_url);
   if (links.socials_url) links.socials_source = inferSocialSource(links.socials_url);
 
-  // Hero photo credit (0025): required, and complete, for CC BY / BY-SA photos.
+  // Hero photo credit (0028): required, and complete, for CC BY / BY-SA photos.
   const license = get("image_license");
   if (/^CC BY/i.test(license)) {
     const credit = {
@@ -481,9 +487,6 @@ function buildRowPlan(
     if ((xp && Number(xp) !== tier.xp) || (points && Number(points) !== tier.points)) {
       warnings.push(`rewards ${xp || "∅"} XP / ${points || "∅"} Points differ from the ${get("difficulty")} tier (${tier.xp} / ${tier.points})`);
     }
-  }
-  if (get("verification_type") === "gps" && questStatus === "active") {
-    errors.push(`row ${rowNo}: verification_type gps needs migration 0024 (server geofence) and the matching client live — import gps quests with --status draft and publish once both are deployed`);
   }
 
   // Launch-quality nudges (non-blocking).
@@ -567,26 +570,26 @@ function emitImportSql(
 end $$;`,
     ...(rows.some((r) => "image_attribution" in r.quest.values)
       ? [
-          "-- Prerequisite guard: quests.image_attribution (migration 0025).",
+          "-- Prerequisite guard: quests.image_attribution (migration 0028).",
           `do $$ begin
   if not exists (
     select 1 from information_schema.columns
     where table_schema = 'public' and table_name = 'quests' and column_name = 'image_attribution'
   ) then
-    raise exception 'quests.image_attribution missing — apply supabase/migrations/0025_quest_image_attribution.sql first';
+    raise exception 'quests.image_attribution missing — apply supabase/migrations/0028_quest_image_attribution.sql first';
   end if;
 end $$;`,
         ]
       : []),
-    ...(rows.some((r) => "geofence_radius_m" in r.quest.values)
+    ...(rows.some((r) => "verification_radius_m" in r.quest.values)
       ? [
-          "-- Prerequisite guard: quests.geofence_radius_m (migration 0024).",
+          "-- Prerequisite guard: quests.verification_radius_m (migration 0023).",
           `do $$ begin
   if not exists (
     select 1 from information_schema.columns
-    where table_schema = 'public' and table_name = 'quests' and column_name = 'geofence_radius_m'
+    where table_schema = 'public' and table_name = 'quests' and column_name = 'verification_radius_m'
   ) then
-    raise exception 'quests.geofence_radius_m missing — apply supabase/migrations/0024_gps_geofence.sql first';
+    raise exception 'quests.verification_radius_m missing — apply supabase/migrations/0023_location_discovery.sql first';
   end if;
 end $$;`,
         ]

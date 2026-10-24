@@ -301,9 +301,7 @@ Ideal reward:
 
 300 Points
 
-Legendary is a reward tier, not a stored difficulty: the database `difficulty`
-enum is easy | medium | hard. The canonical tier values live in
-`src/lib/app/rewards.ts`.
+The canonical tier values live in `src/lib/app/rewards.ts`.
 
 ---
 
