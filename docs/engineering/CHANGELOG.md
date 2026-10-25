@@ -2,6 +2,23 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-25 — Mobile: expo-router upgraded to 58.0.26 (test fix, no app change)
+
+- The merge pinned `expo-router` to 58.0.24 (and excluded it from Expo Doctor) because 11
+  onboarding route tests failed on 58.0.25+. Root cause was in the test, not the router:
+  `flows.test.tsx` used an async expectation inside `waitFor`. With fake timers RNTL's
+  `waitFor` advances the clock inside `act(() => jest.advanceTimersByTimeAsync(50))`, and an
+  async expectation lets `waitFor` resolve while that `act` is still open. The open `act`
+  outlived the test, closed out of order during the next one and left React's act depth at
+  1, so later `act()` scopes in the file never flushed (the "overlapping act() calls"
+  warnings). Router 58.0.25 added a 32 ms timer in `BottomTabView`, which widened that
+  window enough to hit it.
+- Fix: the expectation reads the mocked AsyncStorage synchronously. `expo-router` is back on
+  `~58.0.26` and the `expo.install.exclude` entry is gone.
+- Verified from a clean `npm ci`: typecheck, 28 suites / 266 tests (twice), Expo Doctor
+  20/20 with no exclusions, iOS + Android export. The overlapping-act warnings no longer
+  appear in `flows.test.tsx`.
+
 ## 2026-10-24 — Mobile MVP merged with main; migrations renumbered 0029/0030
 
 - `feat/mobile-mvp` (PR #55, which superseded #56–#59) merged with `main` after location
