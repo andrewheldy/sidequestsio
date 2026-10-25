@@ -246,7 +246,7 @@ What the policy commits to, and what enforces it:
 | Commitment | Enforced by |
 | --- | --- |
 | Device coordinates are never stored | RPCs use request coordinates in memory only (§5); `deviceStore.ts` holds none |
-| GPS check-in results and nudge claims deleted after 30 days | `purge_presence_records()` / `purge_nudge_records()`, scheduled daily by **0031** (authored, **not yet applied**) |
+| GPS check-in results and nudge claims deleted after 30 days | `purge_presence_records()` / `purge_nudge_records()`, run daily on production by `pg_cron` (§8) |
 | Web "Location for verification" toggle controls GPS check-in | `src/pages/QuestDetail.tsx` checks `privacy_preferences.location_consent` before requesting a fix and asks in context when it is off |
 | Consent choices are recorded | Web Settings/Profile append `consent_events` per change (`src/lib/app/consent.ts`); mobile records grants with the disclosure version when Adventure is turned on |
 | Proximity is never a visit | `complete_quest` accepts only an `inside` presence check; partner analytics have no nudge or presence data |
@@ -266,14 +266,13 @@ mocked network; local DB tests run on Postgres 16 + PostGIS 3.4 with a test-only
 battery, or production behavior.**
 
 `venue_open_state` returns `unknown` when today's intervals don't make the venue open and
-yesterday's hours are missing (a late-night spill can't be ruled out). Purge functions
-(`purge_nudge_records`, `purge_presence_records`) are scheduled daily by
-`0031_schedule_location_purges.sql`, which the owner must apply (the Privacy Policy's 30-day
-retention depends on it).
+yesterday's hours are missing (a late-night spill can't be ruled out). Purge functions run daily
+on production via `pg_cron` (scheduled 2026-10-25): `purge-nudge-records` at 08:15 UTC and
+`purge-presence-records` at 08:20 UTC.
 
 Known gap outside this scope: `staff_approval` verification still trusts the client.
 
-## 9. Release gates (gates 1, 3 and 4 partly done; the rest open)
+## 9. Release gates (gate 4 done; gates 1 and 3 partly done; the rest open)
 
 1. ~~Owner applies 0023–0025.~~ Applied to **production** on 2026-10-25 (object-existence check
    passed). Still open: `scripts/verify-db.sql` and a query-plan check on the real catalog, and a
@@ -283,8 +282,8 @@ Known gap outside this scope: `staff_approval` verification still trusts the cli
    `location_catalog_issues()` is empty for nudge-eligible quests.
 3. ~~Mobile sign-in exists.~~ Done in code (2026-10-24, mobile MVP merge): Supabase Auth feeds
    `src/lib/auth/session.ts`. Still unverified against a live project or on a device (gates 1, 6).
-4. ~~Updated Privacy policy published; consent copy matches it.~~ Privacy Policy 1.1.0 published
-   2026-10-25 (§7). Still open: apply 0031 so the stated 30-day retention runs.
+4. ~~Updated Privacy policy published; consent copy matches it.~~ Done: Privacy Policy 1.1.0,
+   2026-10-25 (§7). The 30-day purges it states already run daily (§8).
 5. Approved native IDs, signing, Google Maps key (Android map) and Expo project.
 6. Physical-device evidence: iPhone, Pixel-class, Samsung-class — permissions, geofence delivery,
    notification routing (cold/warm), pause/sign-out cleanup, reboot/force-stop, battery baseline
@@ -295,9 +294,9 @@ Known gap outside this scope: `staff_approval` verification still trusts the cli
 ## 10. Next prerequisite
 
 Finish gate 1 on production: run `scripts/verify-db.sql`, check the `discover_nearby` query plan
-on the real catalog, and smoke-test the discovery and presence RPCs. Apply 0031 so the purges
-run daily (§7, §8). Then gate 2: curators fill location data until `location_catalog_issues()` is
-empty for nudge-eligible quests. Flags stay off until then.
+on the real catalog, and smoke-test the discovery and presence RPCs. Then gate 2: curators fill
+location data until `location_catalog_issues()` is empty for nudge-eligible quests. Flags stay
+off until then. (The purge jobs are already scheduled; see §8.)
 
 ## 11. Out of scope for v1
 

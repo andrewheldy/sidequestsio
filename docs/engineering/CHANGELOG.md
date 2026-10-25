@@ -15,14 +15,23 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   (shared `src/lib/app/consent.ts`); before, Settings changes left no consent record.
 - Mobile: Adventure disclosure wording and version (`adventure-2026-10-25`) aligned with the
   policy; the Permissions card mentions GPS check-in and nearby alerts.
-- `supabase/migrations/0031_schedule_location_purges.sql` (authored, **not applied**): schedules
-  the 30-day presence and nudge purges with pg_cron. Until it is applied, the policy's 30-day
-  retention is not enforced.
-- `LOCATION_DISCOVERY.md` §7–§10 updated (gate 4 partly done).
+- The policy's 30-day retention relies on the `purge-presence-records` / `purge-nudge-records`
+  `pg_cron` jobs already live on production (entry below).
+- `LOCATION_DISCOVERY.md` §7 and §9 updated (gate 4 done).
 - Verified: web typecheck, `npm test`, lint on touched files, build; `/privacy` and `/terms`
   rendered in Chromium at 390 px (anchor, tables, no horizontal scroll); mobile typecheck and full
-  Jest suite (266 tests). Not checked: the GPS consent prompt against a live project, 0031 on any
-  database (no local Postgres here).
+  Jest suite (266 tests). Not checked: the GPS consent prompt against a live project.
+
+## 2026-10-25 — Production: account-deletion function and purge jobs live
+
+- Enabled `pg_cron` and `pg_net`. Deployed Edge Function `process-account-deletions` (v1).
+  Checked live: secret key 200, no/publishable/anon key 401, a 0-request test run succeeded.
+- Scheduled with `pg_cron`: `purge-nudge-records` 08:15 UTC, `purge-presence-records` 08:20 UTC,
+  `process-account-deletions` 09:00 UTC (limit 25). Owner stored `project_url` / `secret_key` in
+  Vault.
+- Not yet exercised: an actual deletion against production. `Delete-Account.md` left at 1.0.1
+  ("in-app option planned"); still accurate, since only the unreleased mobile app has the option.
+  Details: `SYSTEM_STATE.md` (Update 2026-10-25, later).
 
 ## 2026-10-25 — Production: migrations 0021–0030 applied
 
