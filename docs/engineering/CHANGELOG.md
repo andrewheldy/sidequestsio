@@ -2,6 +2,14 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-25 — Production: migrations 0021–0030 applied
+
+- Owner applied 0021–0028 and 0030 in the SQL editor, and re-ran 0029 (the former 0023, already
+  live; no-op). An owner-run read-only check confirmed every migration's marker object. Details
+  and what is still open: `SYSTEM_STATE.md` (Update 2026-10-25).
+- `LOCATION_DISCOVERY.md` gate 1 updated: applied directly to production; verify-db, the query
+  plan and live RPC smoke tests remain before any flag is turned on.
+
 ## 2026-10-25 — Mobile: dark styling for the location screens; location doc brought current
 
 - `src/components/theme.ts` (used by `/nearby`, `settings/location` and

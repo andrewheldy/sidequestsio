@@ -10,6 +10,11 @@ now exists and feeds the session seam, so Adventure and GPS check-in see the sig
 The MVP's Explore and quest detail are the primary screens. Location-ranked discovery moved to
 `/nearby`, off by default until 0023 is applied. See the code map (§6) and release gates (§9).
 
+**Update (2026-10-25, later):** the owner applied 0023–0028 and 0030 **directly to production**
+(no non-production project first) and confirmed each migration's objects exist with a read-only
+check. `scripts/verify-db.sql`, the query plan on the real catalog and live RPC behavior have
+not been checked yet (gate 1). All flags remain off.
+
 This is the authoritative document for location-based discovery, background proximity nudges
 ("Adventure"), and GPS presence verification. It condenses the 2026-10-23 build specification
 (v1.0) and records how it was reconciled with the repository. Thresholds below are product
@@ -257,10 +262,12 @@ must add a `pg_cron` job (daily) after applying 0024/0025.
 
 Known gap outside this scope: `staff_approval` verification still trusts the client.
 
-## 9. Release gates (open except gate 3, done in code)
+## 9. Release gates (gates 1 and 3 partly done; the rest open)
 
-1. Owner reviews and applies 0023–0025 to a non-production project; `scripts/verify-db.sql` and
-   the local suite pass there; query plan checked on the real catalog.
+1. ~~Owner applies 0023–0025.~~ Applied to **production** on 2026-10-25 (object-existence check
+   passed). Still open: `scripts/verify-db.sql` and a query-plan check on the real catalog, and a
+   live smoke test of `discover_nearby` / `get_quest_card` / the presence RPCs before any flag is
+   turned on.
 2. Curators fill coordinates, timezone, structured hours, duration and nudge eligibility;
    `location_catalog_issues()` is empty for nudge-eligible quests.
 3. ~~Mobile sign-in exists.~~ Done in code (2026-10-24, mobile MVP merge): Supabase Auth feeds
@@ -275,10 +282,11 @@ Known gap outside this scope: `staff_approval` verification still trusts the cli
 
 ## 10. Next prerequisite
 
-Gate 1: the owner applies 0023–0025 to a non-production project and verifies them there. Until
-then `/nearby` stays flagged off, and GPS check-in and Adventure fail safely ("isn't available
-right now") rather than awarding anything. Mobile sign-in (previously this section) is done in
-code; see gate 3.
+Finish gate 1 on production: run `scripts/verify-db.sql`, check the `discover_nearby` query plan
+on the real catalog, and smoke-test the discovery and presence RPCs. Then gate 2: curators fill
+location data until `location_catalog_issues()` is empty for nudge-eligible quests. Also schedule
+`purge_nudge_records()` and `purge_presence_records()` daily with `pg_cron` (§8). Flags stay off
+until then.
 
 ## 11. Out of scope for v1
 
