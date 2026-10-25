@@ -2,6 +2,17 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-25 — Production: account-deletion function and purge jobs live
+
+- Enabled `pg_cron` and `pg_net`. Deployed Edge Function `process-account-deletions` (v1).
+  Checked live: secret key 200, no/publishable/anon key 401, a 0-request test run succeeded.
+- Scheduled with `pg_cron`: `purge-nudge-records` 08:15 UTC, `purge-presence-records` 08:20 UTC,
+  `process-account-deletions` 09:00 UTC (limit 25). Owner stored `project_url` / `secret_key` in
+  Vault.
+- Not yet exercised: an actual deletion against production. `Delete-Account.md` left at 1.0.1
+  ("in-app option planned"); still accurate, since only the unreleased mobile app has the option.
+  Details: `SYSTEM_STATE.md` (Update 2026-10-25, later).
+
 ## 2026-10-25 — Production: migrations 0021–0030 applied
 
 - Owner applied 0021–0028 and 0030 in the SQL editor, and re-ran 0029 (the former 0023, already

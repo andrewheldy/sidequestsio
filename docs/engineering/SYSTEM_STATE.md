@@ -326,3 +326,35 @@ Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. T
   `purge_presence_records()` not scheduled; `process-account-deletions` Edge Function not
   deployed, so in-app deletion requests are recorded but not processed; nearby/Adventure flags
   off.
+
+---
+
+## Update 2026-10-25 (later) — Account-deletion processing and purge jobs live
+
+All verified by agent queries against project `wvedvngtuzsttpavmgjw` (Supabase connector).
+
+- **Extensions enabled:** `pg_cron` 1.6.4 (schema `pg_catalog`) and `pg_net` 0.20.3 (schema
+  `extensions`).
+- **Edge Function `process-account-deletions` deployed** (v1, `verify_jwt = false` by design; the
+  function itself accepts only the project secret key). Deployed files are `index.ts` and
+  `process.ts` as on `main`.
+  - Auth checked live: secret key → 200; no key, publishable key and legacy anon key → 401.
+  - Test run with 0 pending requests → `{"examined":0,...}`. **The delete path itself (app data,
+    Storage, auth user) has not yet run against production.**
+- **Vault:** owner added `project_url` and `secret_key` (values not read by the agent; the key was
+  checked as non-empty).
+- **`pg_cron` jobs** (all active):
+
+  | Job | Schedule (UTC) | Runs |
+  |---|---|---|
+  | `purge-nudge-records` | `15 8 * * *` | `select public.purge_nudge_records()` |
+  | `purge-presence-records` | `20 8 * * *` | `select public.purge_presence_records()` |
+  | `process-account-deletions` | `0 9 * * *` | `net.http_post` to the function with the Vault URL + secret key, `{"limit": 25}` |
+
+  Both purges were also run once by hand (0 rows eligible).
+- **Supersedes the "Still open" list above** for purge scheduling and the deletion function.
+  Still open: `scripts/verify-db.sql`; ledger reconciliation; confirmation emails for completed
+  deletions are sent by hand (no email provider; queries in the function header); partner owners
+  are flagged for manual review, not deleted; `docs/legal/Delete-Account.md` still says in-app
+  deletion is "planned", which stays accurate until the mobile app ships (the website has no
+  in-app option); nearby/Adventure flags off.

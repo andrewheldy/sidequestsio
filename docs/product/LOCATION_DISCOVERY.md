@@ -256,9 +256,9 @@ mocked network; local DB tests run on Postgres 16 + PostGIS 3.4 with a test-only
 battery, or production behavior.**
 
 `venue_open_state` returns `unknown` when today's intervals don't make the venue open and
-yesterday's hours are missing (a late-night spill can't be ruled out). Purge functions
-(`purge_nudge_records`, `purge_presence_records`) exist but nothing schedules them yet — the owner
-must add a `pg_cron` job (daily) after applying 0024/0025.
+yesterday's hours are missing (a late-night spill can't be ruled out). Purge functions run daily
+on production via `pg_cron` (scheduled 2026-10-25): `purge-nudge-records` at 08:15 UTC and
+`purge-presence-records` at 08:20 UTC.
 
 Known gap outside this scope: `staff_approval` verification still trusts the client.
 
@@ -284,9 +284,8 @@ Known gap outside this scope: `staff_approval` verification still trusts the cli
 
 Finish gate 1 on production: run `scripts/verify-db.sql`, check the `discover_nearby` query plan
 on the real catalog, and smoke-test the discovery and presence RPCs. Then gate 2: curators fill
-location data until `location_catalog_issues()` is empty for nudge-eligible quests. Also schedule
-`purge_nudge_records()` and `purge_presence_records()` daily with `pg_cron` (§8). Flags stay off
-until then.
+location data until `location_catalog_issues()` is empty for nudge-eligible quests. Flags stay
+off until then. (The purge jobs are already scheduled; see §8.)
 
 ## 11. Out of scope for v1
 
