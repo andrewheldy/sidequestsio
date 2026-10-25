@@ -40,16 +40,20 @@ For the full engineering process behind versioning, rendering, and consent track
 
 | Document | Version | Effective Date | Summary of Changes |
 |---|---|---|---|
+| Privacy Policy | 1.1.0 | October 25, 2026 | Minor: new Location Data section — each location feature (map location, Explore near me, GPS check-in, optional nearby alerts), what is kept (GPS check-in results and alert records for 30 days; never coordinates), what stays on the device, and how to turn each feature off. Adds Apple/Google as mobile platform providers and the 30-day retention. |
 | Privacy Policy | 1.0.1 | July 7, 2026 | Patch: contact emails consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Privacy Policy | 1.0.0 | July 7, 2026 | Initial publication. |
+| Terms of Service | 1.1.0 | October 25, 2026 | Minor: location features and nearby alerts are optional, approximate, and never complete a quest; don't respond to alerts while driving. |
 | Terms of Service | 1.0.1 | July 7, 2026 | Patch: contact emails consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Terms of Service | 1.0.0 | July 7, 2026 | Initial publication. |
 | Community Guidelines | 1.0.1 | July 7, 2026 | Patch: contact email consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Community Guidelines | 1.0.0 | July 7, 2026 | Initial publication. |
 | Cookie Policy | 1.0.1 | July 7, 2026 | Patch: contact email consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Cookie Policy | 1.0.0 | July 7, 2026 | Initial publication. |
+| Delete Account | 1.1.0 | October 25, 2026 | Minor: lists location-related records and consent records among the data deleted, and explains on-device app data. |
 | Delete Account | 1.0.1 | July 7, 2026 | Patch: contact email consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Delete Account | 1.0.0 | July 7, 2026 | Initial publication. |
+| Partner Terms & Conditions | 1.1.0 | October 25, 2026 | Minor: partner analytics never include player locations, GPS check-in results, or nearby-alert activity, which are never reported as foot traffic. |
 | Partner Terms & Conditions | 1.0.1 | July 7, 2026 | Patch: contact email consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Partner Terms & Conditions | 1.0.0 | July 7, 2026 | Initial publication. |
 

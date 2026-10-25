@@ -1,8 +1,8 @@
 # Terms of Service
 
-**Version:** 1.0.1
-**Effective Date:** July 7, 2026
-**Last Updated:** July 7, 2026
+**Version:** 1.1.0
+**Effective Date:** October 25, 2026
+**Last Updated:** October 25, 2026
 
 These Terms of Service ("Terms") govern your access to and use of SideQuests (the "Service"),
 operated by SideQuests.io. By creating an account, scanning a QR code, or otherwise using the
@@ -78,6 +78,13 @@ traffic and pedestrian laws.
 
 Quest descriptions, hours, pricing, and availability are informational and may change without
 notice — always verify directly with the venue if something is time-sensitive.
+
+**Location features and nearby alerts are optional and informational.** Distances, "near you"
+sorting, and nearby alerts are approximate and depend on your device. An alert is not an
+invitation to go somewhere right now: don't use the app or respond to alerts while driving or in
+any situation where it isn't safe. Entering an area or receiving an alert never completes a quest
+or earns XP or Points. How location is used, and how to turn each feature off, is described in our
+[Privacy Policy](/privacy).
 
 ## 5. Partner Venues
 

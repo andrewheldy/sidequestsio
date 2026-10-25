@@ -14,7 +14,7 @@ import { getCurrent, requestBackground, requestForeground } from '../../lib/loca
 import type { DesiredMode } from '../../lib/storage/deviceStore';
 
 export const ADVENTURE_DISCLOSURE =
-  'SideQuests uses your location in the background to notice when you are near eligible quests and send optional nearby alerts, even when you are not using the app. We use proximity checks rather than saving a route history. We keep a minimal record of which alerts were sent, for up to 30 days, to enforce alert limits and troubleshoot. You can pause this in Settings at any time.';
+  'SideQuests uses your location in the background to notice when you are near eligible quests and send optional nearby alerts, even when you are not using the app. We use proximity checks rather than saving a route history. We keep a minimal record of which quest alerts were sent and when, for 30 days, to enforce alert limits and troubleshoot. You can pause this in Settings at any time.';
 
 const MODES: { mode: DesiredMode; title: string; body: string }[] = [
   { mode: 'manual', title: 'Choose an area', body: 'Browse by neighborhood. No device location is used.' },

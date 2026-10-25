@@ -1,8 +1,8 @@
 # Partner Terms & Conditions
 
-**Version:** 1.0.1
-**Effective Date:** July 7, 2026
-**Last Updated:** July 7, 2026
+**Version:** 1.1.0
+**Effective Date:** October 25, 2026
+**Last Updated:** October 25, 2026
 
 These Partner Terms & Conditions ("Partner Terms") govern the relationship between SideQuests.io
 ("SideQuests," "we," "us") and any business, venue, or organization ("Partner," "you") that
@@ -81,6 +81,10 @@ for example, scan counts, completion counts, and reward redemptions over time. T
 aggregated and does not include information that would let you identify an individual player
 without their separate consent (for example, through a completed transaction at your venue). You
 may not attempt to re-identify individual players from analytics we provide.
+
+Analytics never include players' locations, GPS check-in results, or nearby-alert activity. A
+player entering an area near your venue or receiving a nearby alert is not a visit, scan, or
+completion and is never reported as foot traffic.
 
 ## 8. Marketing and Promotional Rights
 
