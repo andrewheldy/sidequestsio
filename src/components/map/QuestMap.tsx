@@ -309,8 +309,10 @@ const QuestMap = ({
 
   return (
     <div className="relative overflow-hidden rounded-2xl" style={{ height }}>
-      {/* Mapbox canvas */}
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* Mapbox canvas. mapbox-gl.css sets .mapboxgl-map { position: relative },
+          overriding `absolute`, so inset-0 alone collapses it to 0 px tall and
+          the canvas and markers are clipped. h-full/w-full size it either way. */}
+      <div ref={containerRef} className="absolute inset-0 h-full w-full" />
 
       {/* Location button — top right, clear of attribution */}
       <div className="absolute right-3 top-3 z-10">

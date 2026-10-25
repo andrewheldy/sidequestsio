@@ -62,3 +62,6 @@ Self-guided quests at public places (Miami Essentials) belong to one editorial p
 
 **2026-10-24 — Licensed quest photos are credited where they appear.**
 A hero photo whose license requires attribution (CC BY / BY-SA) stores its credit in `quests.image_attribution` (`0028_quest_image_attribution.sql`) and every consumer surface that shows the photo shows the credit: linked (creator → source page, license → license deed) where the surface allows links, plain text inside cards that are a single link. Incomplete credit is never rendered half-way and is refused at import.
+
+**2026-10-25 — The app bottom nav has four tabs: Rewards, Quests, Map, You.**
+Product-owner request superseding the 2026-09-28 three-tab rule. Quests (`/app/quests`, the quest list) sits left of Map; the quest list and quest pages highlight Quests, while the map, Explore, Community Notes and check-in stay under Map. Still no camera/scan tab.

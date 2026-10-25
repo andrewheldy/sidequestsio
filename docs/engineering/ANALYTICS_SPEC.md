@@ -363,7 +363,7 @@ No precise user location is collected. The venue is the geography.
 | `quest_optional_action_viewed` / `_clicked` | Explore & Share impression / outbound click |
 | `quest_optional_action_completed` | **reserved** — only a verified completion may emit it; none exists yet |
 | `venue_card_viewed`, `venue_website_clicked` | venue card |
-| `nav_rewards_clicked`, `nav_map_clicked`, `nav_profile_clicked` | bottom nav (all pages) |
+| `nav_rewards_clicked`, `nav_quests_clicked`, `nav_map_clicked`, `nav_profile_clicked` | bottom nav (all pages) |
 
 Impressions and page-level events are de-duplicated per page view. A click is never a completion.
 

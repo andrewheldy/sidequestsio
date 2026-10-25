@@ -2,6 +2,18 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-25 — Quest map renders; Quests tab in the bottom nav
+
+- **Map fix:** `QuestMap`'s container was `absolute inset-0`, but `mapbox-gl.css`
+  (`.mapboxgl-map { position: relative }`) overrode `absolute`, collapsing it to
+  0 px tall — tiles and all markers loaded but were clipped, so the map looked
+  blank. The container now also has `h-full w-full`. Verified on production by
+  applying the same classes: map 649 px tall, all 17 active-quest markers in
+  view.
+- **Bottom nav:** four tabs — Rewards, Quests, Map, You (supersedes the
+  2026-09-28 three-tab decision). Quests opens `/app/quests`; the quest list
+  and quest pages highlight Quests. New analytics event `nav_quests_clicked`.
+
 ## 2026-10-25 — Legal: location data and controls documented (Privacy 1.1.0); consent recording fixed
 
 - `docs/legal/`: Privacy Policy 1.1.0 adds § Location Data (each feature, what is kept, on-device
