@@ -5,6 +5,11 @@ locally only. **Not applied to any Supabase project, not natively compiled, not 
 not store-reviewed.** Background (Adventure) flags are off by default and must stay off until the
 release gates in §9 pass.
 
+**Update (2026-10-25):** the location work is merged with the mobile MVP (#62). Mobile sign-in
+now exists and feeds the session seam, so Adventure and GPS check-in see the signed-in user.
+The MVP's Explore and quest detail are the primary screens. Location-ranked discovery moved to
+`/nearby`, off by default until 0023 is applied. See the code map (§6) and release gates (§9).
+
 This is the authoritative document for location-based discovery, background proximity nudges
 ("Adventure"), and GPS presence verification. It condenses the 2026-10-23 build specification
 (v1.0) and records how it was reconciled with the repository. Thresholds below are product
@@ -28,6 +33,9 @@ Proximity helps discovery; it never establishes completion or earns XP/Points.
 | Duration / hours | `quests.estimated_time` and `venues.hours` are display strings | Not parsed. 0023 adds `estimated_minutes`, `venues.opening_hours` (structured) and `venues.timezone`; unknown ⇒ "Hours not confirmed" |
 | Interests | `profiles.interests` (onboarding vibes: foodie, nightlife, wellness, culture, outdoor, community, hidden-gems) | Reused; mapped to `quest_category` in SQL |
 | Saves | Web saves are client-only (no table) | 0023 `quest_feedback` stores save/hide/mute/fewer server-side; web saves are not migrated |
+
+The rows above record what Phase 0 found. Since then the mobile MVP added Supabase Auth, data
+access and maps, and it was merged with this work on 2026-10-24; the code map in §6 is current.
 | Consent | `consent_type` = analytics/marketing/location; `location` means one-time verification (Privacy Policy 1.0.1) | New purposes added; `location` keeps its meaning. No silent migration |
 | GPS verification | `complete_quest()` treats `gps` as verified with no check (SYSTEM_STATE blocker 10) | 0025 requires a server-computed, challenge-bound `inside` presence check for GPS quests |
 | Difficulty / rewards | Enum `easy|medium|hard`, no `legendary`; docs said Hard 400 / Legendary 1000+ XP | **Resolved 2026-10-24 by the owner:** Hard 300 XP / 150 Points, Legendary 500 / 300 added (0026). Discovery still displays each quest's stored `xp_reward`/`points_reward`; no reward calculator |
@@ -195,19 +203,22 @@ penalty or a widening radius. GPS alone is not fraud-proof.
 
 | Path | Responsibility |
 | --- | --- |
-| `index.ts` | Entry: imports background task definitions before `expo-router/entry` |
-| `src/lib/config.ts` | Supabase URL/key and feature flags from `EXPO_PUBLIC_*` |
+| `index.ts` | Entry: wires the session seam, then imports background task definitions, before `expo-router/entry` |
+| `src/lib/config.ts` | `getConfig()`: feature flags from `EXPO_PUBLIC_*`, and the Supabase URL/key through the MVP's `resolveBackend` (refuses the production project) |
 | `src/lib/api/rpc.ts` | Minimal PostgREST RPC client with abort/timeout; never logs bodies |
-| `src/lib/auth/session.ts` | Access-token seam; returns null until mobile auth exists |
+| `src/lib/auth/session.ts` | Access-token seam that discovery, GPS check-in and Adventure read |
+| `src/lib/auth/supabaseSession.ts` | Feeds that seam from the app's Supabase Auth client (signed-in user and token; changes on sign-in/out) |
 | `src/lib/location/` | Application location types, sample-quality rules, `expo-location` adapter |
 | `src/lib/discovery/` | Safe DTO types, RPC calls, variety re-rank, distance/availability copy, Miami areas |
 | `src/lib/adventure/` | Capability gate, quiet hours, region selection, nudge pipeline, geofence task, notifications, cleanup |
 | `src/lib/storage/deviceStore.ts` | Persisted per-installation settings (mode, pause, installation id, bundle, region state) — never device coordinates |
-| `src/app/(tabs)/index.tsx` | Explore: area selector, Near me, list/map, radius/category/duration filters, Adventure status |
+| `src/app/nearby.tsx` | Location-ranked discovery: area selector, Near me, list/map, radius/category/duration filters, Adventure status. Opened from the MVP's Explore tab only when `EXPO_PUBLIC_FEATURE_NEARBY=on` |
 | `src/app/settings/location.tsx` | Location & nearby-alert settings, pause, explicit disclosure flow |
-| `src/app/quests/[questId].tsx` | Safe quest card with fresh server state; unavailable state with alternatives |
+| `src/features/discovery/QuestDetailScreen.tsx` | The MVP quest detail (`/quests/[questId]`, also the target of nearby alerts). GPS quests get "Check in with GPS", which reports presence only and never completes or awards |
+| `src/components/theme.ts` | Role colors for the screens above, mapped onto the app's dark palette (`src/theme/tokens.ts`) |
 
-Flags: `EXPO_PUBLIC_FEATURE_NEARBY` (foreground discovery, default on),
+Flags: `EXPO_PUBLIC_FEATURE_NEARBY` (location-ranked discovery at `/nearby`, default **off**: it
+needs 0023's `discover_nearby` / `get_quest_card`),
 `EXPO_PUBLIC_FEATURE_ADVENTURE` (UI + registration, default off), and build-time
 `MOBILE_BACKGROUND_LOCATION=1` (adds the background permission to the native artifact; omitted ⇒
 foreground-only build). Server `app_feature_flags.nudge_delivery` is the emergency stop for claims.
@@ -246,13 +257,14 @@ must add a `pg_cron` job (daily) after applying 0024/0025.
 
 Known gap outside this scope: `staff_approval` verification still trusts the client.
 
-## 9. Release gates (all open)
+## 9. Release gates (open except gate 3, done in code)
 
 1. Owner reviews and applies 0023–0025 to a non-production project; `scripts/verify-db.sql` and
    the local suite pass there; query plan checked on the real catalog.
 2. Curators fill coordinates, timezone, structured hours, duration and nudge eligibility;
    `location_catalog_issues()` is empty for nudge-eligible quests.
-3. Mobile sign-in exists (Adventure and GPS proof depend on it).
+3. ~~Mobile sign-in exists.~~ Done in code (2026-10-24, mobile MVP merge): Supabase Auth feeds
+   `src/lib/auth/session.ts`. Still unverified against a live project or on a device (gates 1, 6).
 4. Updated Privacy/Cookie policy published; consent copy matches it.
 5. Approved native IDs, signing, Google Maps key (Android map) and Expo project.
 6. Physical-device evidence: iPhone, Pixel-class, Samsung-class — permissions, geofence delivery,
@@ -263,9 +275,10 @@ Known gap outside this scope: `staff_approval` verification still trusts the cli
 
 ## 10. Next prerequisite
 
-Mobile authentication on the existing Supabase Auth (with the signup consent capture already used
-by the web), wired into `src/lib/auth/session.ts`. Until then Adventure and GPS proof correctly
-show "Sign in required".
+Gate 1: the owner applies 0023–0025 to a non-production project and verifies them there. Until
+then `/nearby` stays flagged off, and GPS check-in and Adventure fail safely ("isn't available
+right now") rather than awarding anything. Mobile sign-in (previously this section) is done in
+code; see gate 3.
 
 ## 11. Out of scope for v1
 

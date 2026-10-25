@@ -54,7 +54,7 @@ export function QuestCardView({ quest, units, distanceContext }: Props) {
 }
 
 const styles = StyleSheet.create({
-  card: { padding: 16, gap: 6, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+  card: { padding: 16, gap: 6, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.subtle },
   sponsored: { alignSelf: 'flex-start', fontSize: 12, fontWeight: '600', color: colors.text, borderWidth: 1, borderColor: colors.border, borderRadius: 4, paddingHorizontal: 6 },
   title: { fontSize: 18, fontWeight: '600', color: colors.ink },
   meta: { fontSize: 14, color: colors.text },
