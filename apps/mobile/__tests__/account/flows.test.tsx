@@ -13,6 +13,18 @@ let db: FakeDb;
 const start = (session = null as ReturnType<typeof makeSession> | null) => backend.reset(session, dbHandler(db));
 const open = (url: string) => renderRouter('./src/app', { initialUrl: url });
 const draftOf = async () => JSON.parse((await AsyncStorage.getItem(storageKeys.onboardingDraft)) ?? 'null');
+/**
+ * Synchronous read of the mocked AsyncStorage, for use inside waitFor. An async
+ * expectation lets waitFor resolve while its act(advanceTimersByTimeAsync) is
+ * still open; that act then outlives the test and stops later act() scopes in
+ * this file from flushing.
+ */
+const draftNow = () =>
+  JSON.parse(
+    (AsyncStorage as unknown as { __INTERNAL_MOCK_STORAGE__: Record<string, string> }).__INTERNAL_MOCK_STORAGE__[
+      storageKeys.onboardingDraft
+    ] ?? 'null',
+  );
 
 beforeEach(async () => {
   jest.restoreAllMocks();
@@ -355,7 +367,7 @@ describe('onboarding', () => {
     await press('Foodie');
     await press('Continue');
     expect(await screen.findByText('What kind of explorer are you?')).toBeVisible();
-    await waitFor(async () => expect((await draftOf())?.step).toBe(3));
+    await waitFor(() => expect(draftNow()?.step).toBe(3));
     expect(await draftOf()).toMatchObject({ ownerUserId: null, step: 3, selections: { vibes: ['foodie'] } });
   });
 
