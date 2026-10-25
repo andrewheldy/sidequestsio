@@ -206,10 +206,12 @@ Navigate to a quest with `{ pathname: '/quests/[questId]', params: { questId } }
 ## Release blockers
 
 - In-app account deletion: the app records a request through `request_account_deletion()`
-  (migration 0030, **not yet applied**; until then it falls back to a prefilled email).
-  Requests are processed by the service-role Edge Function
-  `supabase/functions/process-account-deletions` (written, not deployed or scheduled), and
-  `docs/legal/Delete-Account.md` must be updated when it ships.
+  (migration 0030, applied to production 2026-10-25; on a backend without it the app falls back
+  to a prefilled email). Requests are processed by the service-role Edge Function
+  `supabase/functions/process-account-deletions`, deployed and scheduled daily (09:00 UTC) on
+  2026-10-25. `docs/legal/Delete-Account.md` still says the in-app option is "planned"; update it
+  through the `docs/legal/README.md` process when this app ships (the website has no in-app
+  deletion).
 - No live-backend, simulator, or device verification has been run (see verification record).
 
 ## Verification record
