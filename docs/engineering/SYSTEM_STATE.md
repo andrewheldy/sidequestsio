@@ -302,3 +302,27 @@ Applied to production (`wvedvngtuzsttpavmgjw`) through the Supabase connector. T
   execute it.
 - See `docs/product/LOCATION_DISCOVERY.md` §9 for the release gates.
 
+---
+
+## Update 2026-10-25 — Migrations 0021–0030 applied to production
+
+- **Applied by the owner** in the Supabase SQL editor, one file per run: `0021_partner_insights`,
+  `0022_safe_copy`, `0023_location_discovery`, `0024_adventure_nudges`, `0025_gps_presence`,
+  `0026_legendary_difficulty`, `0027_quest_media_bucket`, `0028_quest_image_attribution`,
+  `0030_account_deletion_requests`.
+- `0029_progress_role_integrity` was also run. It is the former `0023_progress_role_integrity`
+  (applied 2026-10-21) under its new number; it is revoke/grant only and no other migration
+  touches `users` / `user_profiles` grants, so re-running it changed nothing.
+- **Evidence:** an owner-run read-only check returned `true` for every migration's marker
+  object (`partner_insights()`, no active rewards, `discovery_areas`, `nudge_settings`,
+  `presence_checks`, `legendary` difficulty, `quest-media` bucket, `quests.image_attribution`,
+  `users.role` not self-updatable while `display_name` is, `account_deletion_requests`).
+  Not verified by an agent: the Supabase connector in that session could not reach this project.
+- **Consequences now live:** `complete_quest()` requires a server presence check for `gps`
+  quests (all live quests are QR) and anon can no longer execute it; Hard tier is 300 XP / 150
+  Points for quests on the exact old 400/200 tier; Partner Insights should load.
+- **Still open:** `scripts/verify-db.sql` not run; live migration ledger not reconciled (it has
+  drifted before; record 0029 as the former 0023); `purge_nudge_records()` /
+  `purge_presence_records()` not scheduled; `process-account-deletions` Edge Function not
+  deployed, so in-app deletion requests are recorded but not processed; nearby/Adventure flags
+  off.
