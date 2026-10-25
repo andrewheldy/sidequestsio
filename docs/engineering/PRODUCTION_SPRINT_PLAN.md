@@ -617,3 +617,44 @@ The four territories share almost no files; the only ordered edges are (a) DB-be
 ## Appendix B — Open [V] items (tracked in §1 Unknowns and LC-6/14/15/16)
 
 Mapbox allowlist · Supabase Auth settings (confirmation, providers, Site URL/redirects) · Vercel env values (proven only by smoke) · auto-deploy behavior · marketing `/quests` link targets · role-guard plumbing for admin mount.
+
+---
+
+## Appendix C — Mobile MVP execution ledger (started 2026-10-21)
+
+Branch `feat/mobile-mvp` from `main` `9bc4245` (mobile foundation, PR #50). Graph and
+contracts: root owns shared contracts/primitives/config/manifests/navigation tests;
+workers own feature routes under `apps/mobile/src/app` and `apps/mobile/src/features/*`.
+Reconcile this table against `git log` and worktrees before launching more work.
+
+| Node | Scope | Owner | Status | Commit | Evidence |
+|---|---|---|---|---|---|
+| A | Baseline inspection | root | done | `9bc4245` | typecheck pass; 4/4 nav tests (first cold run timed out at 5 s — pre-existing flake); doctor 17/20 (2 network-only, 1 SDK patch drift — pre-existing) |
+| B | Shared contracts, client, primitives | root | done | `ad7a18a`, `ca2cac2` | typecheck pass; 20/20 jest (mocked); iOS+Android JS export pass; doctor unchanged 17/20 |
+| C | Explore + Quest Detail | worker (Sonnet, medium, worktree) | accepted | `1034a96` (merged `9b12b9e`) | worker: tsc pass, 43 jest, export pass; root re-ran after merge; nav suite rebased `65c9769` |
+| D | Auth + Onboarding | worker (Sonnet, medium, worktree) | accepted | `890b879` (merged `a0b6c02`) | worker: tsc pass, 69 jest (account+foundation), export pass; root review: scope, consent payload, no starter XP, draft ownership, callback param allowlist |
+| J1 | Integrate C+D | root | done | `a4824f5` | tsc pass; 99/99 jest (11 suites, mocked) incl. cross-feature journey; iOS+Android JS export pass. Not run on simulator/device or live backend |
+| E | Profile + Settings | worker (Sonnet, medium, worktree) | accepted | `ac9eff4` (merged `df65040`) | worker: tsc pass, 132 jest, export pass; root review: editable-field allowlist, own-user writes, partial privacy upserts, append-only consent, `is_public` only, truthful mailto deletion; root re-ran 184 jest after merge |
+| F | Quest completion + Rewards | worker (Sonnet, medium, worktree) | accepted | `726afa5` (merged `a8562e9`; root fix `28cad6e` scan time from `scan_events.timestamp`) | worker: tsc pass, 153 jest, export pass; root review: QR-only, exact RPC params, single-flight, server-confirmed awards, no Redeem, CTA-only edit to detail; root re-ran tsc/153 jest/export after merge |
+| J2 | Integrate E+F | root | done | `bea8997` | tsc pass; 185/185 jest (17 suites, mocked) incl. completion→profile→sign-out journey; iOS+Android JS export pass; web `tsc -p tsconfig.app.json` + `npm run build` pass (no web files changed). iOS `LSApplicationQueriesSchemes: mailto` added. Not run on simulator/device or live backend |
+| G | Independent review | reviewer (Opus, read-only) | done | reviewed `bea8997` | 0 blocker/high; 2 medium + 5 low, reproductions in throwaway jest; confirmed cache clearing, single-flight completion, no fabricated progress |
+| H | Repairs, final checks, handoff | root | done | `015bc94` (repairs; final checks on it) | 6 findings fixed with regression tests; 1 design-fidelity note deferred; final: mobile tsc pass, 191/191 jest, export pass, doctor = baseline, web tsc/build pass |
+
+Environment facts (2026-10-21): no approved non-production Supabase project exists (the
+only project is production `wvedvngtuzsttpavmgjw`, which the mobile app refuses), and this
+machine has no Xcode simulator, Android SDK, Docker or Supabase CLI. Live-backend
+integration, native compilation and simulator/device checks are therefore **pending**,
+not passed.
+
+Live facts (read-only MCP catalog query, 2026-10-21, project `wvedvngtuzsttpavmgjw`):
+`authenticated` can UPDATE `users.role` and `user_profiles.points_balance_cache` (privilege
+escalation + self-minted Points — fix authored as `0023_progress_role_integrity.sql`, not
+applied); `record_code_scan` and `generate_quest_instance` exist and `complete_quest` has the
+5-argument 0017/0018 signature; anon can SELECT quests/venues/partners; 9 active quests, all
+`qr`; 0 active rewards and 0 redemptions; `proofs` bucket exists.
+
+**2026-10-21 update:** `0023_progress_role_integrity.sql` (now `0029_progress_role_integrity.sql`, renumbered 2026-10-24) was applied by the owner and
+re-verified via read-only MCP: self-update of `users.role` and `user_profiles` balance/XP/level
+is now denied; only `users (display_name, avatar_url, last_active_at)` and
+`user_profiles (home_city)` remain self-updatable. 9 users, none admin; all balances match the
+ledger. See CHANGELOG 2026-10-21.

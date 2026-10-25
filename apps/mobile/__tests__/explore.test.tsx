@@ -21,6 +21,7 @@ beforeEach(async () => {
   bodies.length = 0;
   process.env.EXPO_PUBLIC_SUPABASE_URL = 'https://project.example.co';
   process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'publishable';
+  process.env.EXPO_PUBLIC_FEATURE_NEARBY = 'on';
   respond = (body) => ({
     ok: true,
     serverTime: '2026-10-24T15:00:00Z',
@@ -39,11 +40,12 @@ beforeEach(async () => {
 afterEach(() => {
   delete process.env.EXPO_PUBLIC_SUPABASE_URL;
   delete process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  delete process.env.EXPO_PUBLIC_FEATURE_NEARBY;
 });
 
-describe('Explore discovery', () => {
+describe('Nearby discovery (/nearby)', () => {
   it('starts in Manual: area results, no device location, no permission prompt', async () => {
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/nearby' });
     expect(await screen.findByText('Wynwood Mural Hunt')).toBeVisible();
     expect(screen.getByText('Around Wynwood')).toBeVisible();
     expect(screen.getByText('Fits in about 15 minutes')).toBeVisible();
@@ -53,7 +55,7 @@ describe('Explore discovery', () => {
   });
 
   it('explains before asking, and a refusal keeps manual discovery working', async () => {
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/nearby' });
     await screen.findByText('Wynwood Mural Hunt');
     await fireEvent.press(screen.getByRole('button', { name: /Near me/ }));
     expect(screen.getByText(/Your location isn’t saved/)).toBeVisible();
@@ -64,7 +66,7 @@ describe('Explore discovery', () => {
   });
 
   it('changes area and radius through explicit selections', async () => {
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/nearby' });
     await screen.findByText('Wynwood Mural Hunt');
     await fireEvent.press(screen.getByRole('button', { name: 'Brickell' }));
     expect(await screen.findByText('Around Brickell')).toBeVisible();
@@ -76,7 +78,7 @@ describe('Explore discovery', () => {
     mockedLocation.getLastKnownPositionAsync.mockResolvedValue({ coords: { latitude: 25.79, longitude: -80.19, accuracy: 25 }, timestamp: Date.now() } as never);
     await AsyncStorage.setItem('sq.device.v1', JSON.stringify({ installationId: 'i', desiredMode: 'explore', adventurePaused: false, selectedAreaId: null, radiusKm: 3 }));
 
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/nearby' });
     expect(await screen.findByText('Near you')).toBeVisible();
     expect(bodies.find((b) => b.p_source === 'device')).toMatchObject({ p_origin_lat: 25.79, p_origin_lng: -80.19 });
 
@@ -86,13 +88,14 @@ describe('Explore discovery', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Search this area' }));
     expect(await screen.findByText('Search this map area')).toBeVisible();
     expect(bodies.at(-1)).toMatchObject({ p_source: 'map', p_origin_lat: 25.76 });
-    mockedLocation.getForegroundPermissionsAsync.mockReset();
-    mockedLocation.getLastKnownPositionAsync.mockReset();
+    // Back to the setup defaults (mockReset would leave undefined for the Explore tab underneath).
+    mockedLocation.getForegroundPermissionsAsync.mockResolvedValue({ status: 'undetermined', granted: false, canAskAgain: true } as never);
+    mockedLocation.getLastKnownPositionAsync.mockResolvedValue(null as never);
   });
 
   it('offers an explicit radius expansion when empty instead of showing distant quests', async () => {
     respond = (body) => ({ ok: true, serverTime: '', origin: { source: body.p_source, areaId: 'wynwood', label: 'Wynwood' }, items: [], nextCursor: null });
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/nearby' });
     expect(await screen.findByText(/No quests within/)).toBeVisible();
     await fireEvent.press(screen.getByRole('button', { name: /Search within/ }));
     expect(bodies.at(-1)).toMatchObject({ p_radius_m: 5000 });
@@ -102,7 +105,7 @@ describe('Explore discovery', () => {
     global.fetch = jest.fn(async () => {
       throw new Error('offline');
     }) as unknown as typeof fetch;
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/nearby' });
     expect(await screen.findByText(/couldn’t load quests/)).toBeVisible();
     expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
   });

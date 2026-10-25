@@ -1,7 +1,7 @@
-// Mobile sign-in is not built yet (docs/product/LOCATION_DISCOVERY.md §10).
-// Everything that needs a signed-in user asks this seam, so wiring the existing
-// Supabase Auth later is one change. Until then there is never a session, and
-// Adventure / GPS check-in show "Sign in required".
+// The session seam for discovery, GPS check-in and Adventure. Everything that
+// needs a signed-in user asks here; ./supabaseSession.ts wires it to Supabase
+// Auth. With no backend configured there is never a session, and Adventure /
+// GPS check-in show "Sign in required".
 export type Session = { userId: string; accessToken: string };
 
 type Provider = () => Promise<Session | null>;

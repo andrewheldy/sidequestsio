@@ -1,12 +1,25 @@
-# SideQuests consumer mobile foundation
+# SideQuests consumer mobile app (MVP)
 
-One Expo Router + React Native + strict TypeScript app for iOS and Android.
-It has the navigation foundation plus location discovery and the (flag-off)
-Adventure nearby-alert pipeline described in
-[`docs/product/LOCATION_DISCOVERY.md`](../../docs/product/LOCATION_DISCOVERY.md).
-There is still no mobile authentication, camera/QR, completion, points or
-redemption UI. All data comes from the existing Supabase backend through RPCs,
-with server-enforced authorization; no second backend is introduced.
+One Expo Router + React Native + strict TypeScript app for iOS and Android, talking
+directly to the existing Supabase backend (no second backend). Navigation is
+Rewards / Explore / Profile; Settings, auth, onboarding, quest detail and quest
+completion are stack routes.
+
+Implemented journey: guest Explore (list/map, filters, optional "Near me") → quest
+detail → sign in / create account (email + password, verification, recovery) →
+onboarding when needed → back to the intended quest → QR quest completion confirmed by
+the server → progress and history in Profile → profile/privacy settings, sign out,
+in-app deletion request. Rewards shows real balances and available rewards read-only.
+
+Location discovery and the Adventure nearby-alert pipeline from
+[`docs/product/LOCATION_DISCOVERY.md`](../../docs/product/LOCATION_DISCOVERY.md) are
+included but **off by default** (`EXPO_PUBLIC_FEATURE_NEARBY`, `EXPO_PUBLIC_FEATURE_ADVENTURE`):
+they need migrations 0023–0025, which are not applied to production. GPS quests get a
+"Check in with GPS" button on quest detail (server-computed presence, 0025).
+
+Deliberately excluded: reward redemption (no partner fulfilment flow; 0 live
+rewards), photo/proof capture, non-QR verification types, avatar upload, and
+deletion *processing* until its Edge Function is deployed (see "Release blockers").
 
 ## Package layout and compatibility
 
@@ -66,18 +79,15 @@ typecheck, navigation tests, Expo Doctor, and iOS/Android JS exports. It does no
 start EAS or compile/sign native binaries. Web ESLint ignores mobile; the existing
 web lint baseline is recorded separately below.
 
-Jest discovers both `__tests__/**/*.test.ts` (pure logic: capability gate,
-quiet hours/DST, region budget and event de-duplication, nudge pipeline, ranking
-variety, distance/availability copy, RPC client) and `*.test.tsx` (screens).
-Native modules (`expo-location`, `expo-notifications`, `expo-task-manager`,
-`react-native-maps`, AsyncStorage) are mocked in `jest.setup.ts`, so these tests
-say nothing about permissions dialogs, geofence delivery or battery on devices.
-
-The Jest integration suite renders the actual filesystem routes using
-`expo-router/testing-library`, not a mocked navigation callback. It checks initial
-Explore selection, tab order and switching, sample quest parameter delivery and
-back navigation, direct quest links, and hiding the sample link outside development.
-Native views are mocked by jest-expo; these tests do not prove device behavior.
+The Jest suites render the actual filesystem routes with `expo-router/testing-library`
+against an in-memory fake Supabase client (`__tests__/support`): navigation/tab order,
+discovery, auth/onboarding/return flows, profile/settings writes and account
+isolation, and the QR completion state machine, plus cross-feature journeys. Native
+modules (camera, maps, location, secure store) are mocked; these tests do not prove
+device behaviour or live-backend behaviour. Pure logic suites cover the location
+work too (capability gate, quiet hours/DST, region budget, nudge pipeline, ranking,
+RPC client); `expo-notifications` and `expo-task-manager` are mocked as well, so they
+say nothing about permission dialogs, geofence delivery or battery on devices.
 
 ## Local development builds
 
@@ -124,7 +134,7 @@ iOS simulator builds do not require physical-device signing.
 
 ## Environments and client values
 
-The foundation runs without a `.env` file. If local native configuration is needed:
+Without a `.env.local` the app runs but shows a "Backend not configured" state (no demo data). To configure:
 
 ```sh
 cp apps/mobile/.env.example apps/mobile/.env.local
@@ -136,8 +146,12 @@ cp apps/mobile/.env.example apps/mobile/.env.local
 | `APP_VARIANT` | `development` by default, or `staging`; `production` is rejected in this foundation |
 | `MOBILE_IOS_BUNDLE_IDENTIFIER` | Approved iOS ID for the selected variant, required only for native iOS builds |
 | `MOBILE_ANDROID_APPLICATION_ID` | Approved Android ID for the selected variant, required only for native Android builds |
-| `EXPO_PUBLIC_SUPABASE_URL` | Existing backend URL (non-production project) for discovery RPCs |
-| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser-safe publishable/anon key only |
+| `EXPO_PUBLIC_SUPABASE_URL` | Approved non-production project URL; production ref is refused |
+| `EXPO_PUBLIC_WEB_ORIGIN` | Website origin for policy links and accepted scan host (default `https://miamisidequests.io`) |
+| `MOBILE_ANDROID_GOOGLE_MAPS_API_KEY` | Optional Android map key; without it Android is list-only |
+| `EXPO_PUBLIC_FEATURE_NEARBY` / `EXPO_PUBLIC_FEATURE_ADVENTURE` | `on` enables location discovery / Adventure (needs migrations 0023–0025); off otherwise |
+| `MOBILE_BACKGROUND_LOCATION` | `1` adds background location for Adventure; omit for a foreground-only build |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable/anon key for that project (never service-role) |
 
 Development and staging must use distinct approved identifiers, URL schemes, and
 the existing backend's designated non-production configuration. To run staging,
@@ -152,39 +166,56 @@ passwords, signing credentials, or other privileged secrets in them. None are
 needed here. Configuration contains placeholders only; no migrations or imports
 should be run for this foundation.
 
-## Next implementation entry points
+## Code map and contracts
 
-| File/interface | Responsibility |
+| Path | Owner / responsibility |
 | --- | --- |
-| `src/app/_layout.tsx` | Root native stack; anchors direct quest links to the tab group |
-| `src/app/(tabs)/_layout.tsx` | Rewards / Explore / Profile tab ordering, initial Explore selection |
-| `src/app/(tabs)/index.tsx` | Explore placeholder and the development-only sample link |
-| `src/app/quests/[questId].tsx` | Quest detail; `useLocalSearchParams<{ questId: string }>()` receives the ID |
-| `src/components/PlaceholderScreen.tsx` | Simple accessible text, scrolling, safe-area container |
-| `__tests__/navigation.test.tsx` | Existing-route regression tests to extend with future screens |
-| `index.ts` | Entry: registers the geofence task at module scope, then loads `expo-router/entry` |
-| `src/app/(tabs)/index.tsx` | Explore: area / Near me / map-area origins, filters, list and map, Adventure status |
+| `src/lib/config.ts` | One config path; refuses missing config and the production project ref |
+| `src/lib/supabase.ts`, `secureSessionStorage.ts` | Single PKCE client; session in Keychain/Keystore (chunked) |
+| `src/lib/appStorage.ts` | Non-secret local state; account-scoped keys cleared on signout/switch |
+| `src/lib/navigation/returnTo.ts` | Validated return targets (`quest:<id>`, `tab:<name>`), pending return with TTL |
+| `src/lib/api/{quests,progress}.ts` | Shared reads; `user_profiles` is the only XP/Points source |
+| `src/session/*` | Auth/profile state machine (`unconfigured · restoring · guest · loading_profile · needs_onboarding · ready · error`), `accountGate` |
+| `src/components/ui`, `src/theme/tokens.ts` | Primitives and dark tokens (brand semantic palette + reference accent) |
+| `src/features/discovery` | Explore, map, quest detail |
+| `src/features/account`, `src/features/onboarding` | Auth screens, deep-link callback, post-auth routing, onboarding draft/save |
+| `src/features/profile` | Profile, settings, edit profile, deletion request |
+| `src/features/quest-loop`, `src/features/rewards` | QR scan → `record_code_scan` → `complete_quest`; rewards tab |
+| `src/app/nearby.tsx` | Location-ranked discovery (area / Near me / map area, radius and time filters); behind `EXPO_PUBLIC_FEATURE_NEARBY` |
 | `src/app/settings/location.tsx` | Mode choice, Adventure disclosure and permission steps, pause, alert cap |
 | `src/lib/location/`, `discovery/`, `adventure/`, `presence/` | Location adapter, discovery RPCs and ranking, nudge pipeline, GPS check-in |
-| `src/lib/auth/session.ts` | Session seam; returns no session until mobile sign-in exists |
+| `src/lib/auth/session.ts`, `supabaseSession.ts` | Session seam for the location modules, fed by the Supabase Auth client |
+| `index.ts` | Entry: wires the session seam and registers the geofence task at module scope, then loads `expo-router/entry` |
+| `__tests__/` | Jest (mocked Supabase + native modules); `support/` holds the fake client and native mocks |
 
-Location-related environment and build inputs (see `.env.example`):
-`EXPO_PUBLIC_FEATURE_NEARBY`, `EXPO_PUBLIC_FEATURE_ADVENTURE` (off by default),
-`MOBILE_BACKGROUND_LOCATION=1` (adds Android `ACCESS_BACKGROUND_LOCATION` and the
-iOS "Always" purpose string; omit for a foreground-only artifact), and
-`MOBILE_ANDROID_GOOGLE_MAPS_API_KEY` (Android map; list-only without it). The
-Android location foreground service and iOS background modes are deliberately not
-declared; region monitoring does not need them.
+Navigate to a quest with `{ pathname: '/quests/[questId]', params: { questId } }`; ids stay strings.
 
-Navigate to detail with the Router object form:
-`{ pathname: '/quests/[questId]', params: { questId } }`. Preserve IDs as strings.
-The mobile quest data contract is the safe `QuestCard` DTO in
-`src/lib/discovery/types.ts`, returned by the `discover_nearby` / `get_quest_card`
-RPCs; it intentionally excludes verification secrets. Do not import web UI or
-browser/localStorage repositories into native.
+## Backend setup required for real use
+
+1. An approved **non-production** Supabase project with the repo migrations applied
+   (`scripts/verify-db.sql` afterwards). The app refuses `wvedvngtuzsttpavmgjw`.
+2. Auth → URL configuration → Redirect URLs: `sidequests-development://auth/callback**`
+   (and `sidequests-staging://auth/callback**` for staging). Without it, email links fall
+   back to the website and users sign in afterwards. Links must be opened on the
+   requesting device (PKCE).
+3. `apps/mobile/.env.local`: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+   optional `EXPO_PUBLIC_WEB_ORIGIN`, `MOBILE_ANDROID_GOOGLE_MAPS_API_KEY`.
+4. Synthetic test data in that project: an active QR quest with a venue and a printed
+   `/scan/<code>` code from `create_qr_code`.
+
+## Release blockers
+
+- In-app account deletion: the app records a request through `request_account_deletion()`
+  (migration 0030, **not yet applied**; until then it falls back to a prefilled email).
+  Requests are processed by the service-role Edge Function
+  `supabase/functions/process-account-deletions` (written, not deployed or scheduled), and
+  `docs/legal/Delete-Account.md` must be updated when it ships.
+- No live-backend, simulator, or device verification has been run (see verification record).
 
 ## Verification record
 
-See the foundation entry in `docs/engineering/CHANGELOG.md` for the completed-run
-results and outstanding native/device checks. Re-run the commands above after
+See the 2026-10-20 (foundation) and 2026-10-21 (MVP) entries in
+`docs/engineering/CHANGELOG.md` for command results and outstanding native/device
+checks, and the execution ledger in `docs/engineering/PRODUCTION_SPRINT_PLAN.md`
+Appendix C. Re-run the commands above after
 future changes; a JS export is not a successful native compilation.

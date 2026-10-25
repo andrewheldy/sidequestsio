@@ -2,6 +2,27 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-24 — Mobile MVP merged with main; migrations renumbered 0029/0030
+
+- `feat/mobile-mvp` (PR #55, which superseded #56–#59) merged with `main` after location
+  discovery (#54). The MVP app is the base: its Explore and quest detail stay the primary
+  screens because they work against the current production schema.
+- From `main`: location-ranked discovery moved from the Explore tab to `/nearby`, reachable
+  from Explore only when `EXPO_PUBLIC_FEATURE_NEARBY=on` (now **off by default**: it needs
+  0023 `discover_nearby`/`get_quest_card`, not applied to production). The Adventure pipeline
+  stays behind `EXPO_PUBLIC_FEATURE_ADVENTURE`. `settings/location` is linked from Settings.
+  GPS quests get "Check in with GPS" on the MVP quest detail (needs 0025).
+- `src/lib/auth/session.ts` (the location modules' session seam) is now fed by the Supabase
+  Auth client (`src/lib/auth/supabaseSession.ts`, imported first from `index.ts` so the
+  geofence task sees it too). `getConfig()` reads the backend through `resolveBackend`, so
+  the production project is refused for discovery RPCs as well.
+- **Migrations renumbered** (resolves the collision noted below): MVP
+  `0023_progress_role_integrity` → `0029_progress_role_integrity` (already applied to
+  production on 2026-10-21 under its old name; revoke/grant only, so re-running is a no-op),
+  and `0024_account_deletion_requests` → `0030_account_deletion_requests` (not applied).
+  When recording the live ledger, note that 0029 is the former 0023. Main's 0023–0028 keep
+  their numbers.
+
 ## 2026-10-24 — Location, Discovery & Adventure Mode (code + authored migrations; nothing applied)
 
 - Authoritative spec, Phase 0 gap map, contracts and release gates:
@@ -83,6 +104,102 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   39 licensed hero images with provenance (29 of 33 seeded heroes credited;
   4 public domain) and a validation/QA report: `data/generated/miami-essentials/`.
 - Quest browser cards without an image show the branded fallback.
+
+## 2026-10-21 — In-app account deletion requests (authored, not applied)
+
+- `supabase/migrations/0024_account_deletion_requests.sql` (**not applied**): table
+  `account_deletion_requests` (one pending request per user; no email/profile data; own-row
+  read via RLS; no client write grants) and authenticated SECURITY DEFINER RPCs
+  `request_account_deletion()` (idempotent, per-user advisory lock, `process_by` = +30 days)
+  and `cancel_account_deletion()`; both audit-logged. Nothing is deleted by this migration.
+- Processing: `supabase/functions/process-account-deletions` (**not deployed**), service-role
+  only via `withSupabase({ auth: 'secret' })`. Per pending request, idempotently: capture the
+  email for the confirmation, run `process_account_deletion_data()` (0024, service_role-only
+  RPC: partner owners are flagged `manual_review_reason = 'owns_partner'` before anything is
+  deleted; otherwise community notes, profile and `public.users` are deleted in one
+  transaction), remove `proofs/<uid>/` and `avatars/<uid>/`, `auth.admin.deleteUser`, mark
+  completed. Failures stay pending with `attempts`/`last_error` and are retried next run.
+  No email provider is configured: support sends the §5 confirmation from completed rows'
+  `notify_email`, then clears it. Deploy/schedule/support queries are in `index.ts`.
+- Verification: 6 Deno tests (`process.test.ts`) pass when run under Node 24 with a
+  `Deno.test` shim against an in-memory fake client — Deno itself is not installed, so
+  `deno check`/`deno test` and any run against real Auth/Storage/Postgres are pending. ESLint
+  clean under the website config. The SQL has not been executed anywhere.
+- Mobile: Settings → Delete account now records the request in-app, shows the pending
+  status and deadline, and allows cancelling (policy §6). The account stays usable until
+  processed. If the server lacks 0024 (PGRST202/PGRST205/42P01) the screen falls back to the
+  truthful emailed request. 199/199 mocked tests; SQL not executed anywhere (no
+  non-production database available).
+- Follow-ups before claiming in-app deletion: renumber 0023/0024 against `main` (collision,
+  see below), apply 0024 (after backup) to a non-production project first, `deno test`,
+  deploy with `--no-verify-jwt` and schedule, then bump `docs/legal/Delete-Account.md` (§1
+  still says the in-app option is "planned") per `docs/legal/README.md`.
+- **Migration number collision (unresolved):** `main` (PR #54) added `0023_location_discovery`,
+  `0024_adventure_nudges`, `0025_gps_presence`, `0026_legendary_difficulty`. This branch's
+  `0023_progress_role_integrity` (already applied to production) and
+  `0024_account_deletion_requests` (not applied) must be renumbered when the branch is
+  rebased onto `main`; the next free number on `main` is 0027.
+
+## 2026-10-21 — Consumer mobile MVP (code only, branch `feat/mobile-mvp`)
+
+- Built on the mobile foundation (`9bc4245`) through an execution graph with
+  worktree-isolated workers; ledger in `PRODUCTION_SPRINT_PLAN.md` Appendix C.
+- **Shared base:** single Supabase client (PKCE; session in Keychain/Keystore, chunked);
+  config refuses missing backends and the production project ref; session/profile state
+  machine with cache + private-storage clearing on account change; validated return
+  targets; account gate; dark tokens and primitives; Jest fake Supabase client.
+- **Discovery:** Explore (real active quests, category/neighbourhood filters, list/map,
+  "Near me" asks for location only on tap, distance only when known) and Quest Detail
+  (record-driven sections, https-only links, directions, share; no favourites/reviews).
+- **Account:** email/password sign-in/up with the website's consent semantics (terms
+  required, marketing optional and unchecked, version stamps 1.0.0), verification resend,
+  recovery, deep-link callback with param allowlist; onboarding adapted from the web with
+  real first-quest suggestions; saves only onboarding columns (no starter XP/streak).
+- **Profile/Settings:** progress and history from `user_profiles`/`quest_completions`
+  ("unavailable", never fabricated zeroes); profile edit; `is_public`, completed-quests,
+  leaderboard and marketing (+ `consent_events`) with rollback; permissions help;
+  policy links; sign out; deletion is a truthful email request (no in-app deletion).
+- **Quest loop:** QR-only. In-app scan accepts only `https://<web origin>/scan/<code>`
+  (never opened) → `record_code_scan` → `complete_quest(source_scan_id)`; single-flight,
+  no auto-retry, status re-check after network failure, pending vs confirmed states,
+  2-hour stored scan scoped to the user. Rewards tab is read-only (no redemption).
+- **Review (node G, independent):** no blockers/high; 2 medium + 4 low fixed in `015bc94`
+  with regression tests (recovery link vs existing session, recovery vs pending quest
+  return, device-clock cooldown, production-ref normalisation, malformed ids, Android
+  mailto). Remaining low: Explore defaults to list rather than the reference's map-led
+  layout; detail uses stacked sections instead of tabs.
+- **Validation (macOS, Node 24.19.0, final `015bc94`):**
+
+  | Command | Result |
+  | --- | --- |
+  | `npm run mobile:typecheck` | Passed |
+  | `npm run mobile:test` | Passed, 18 suites / 191 tests — mocked Supabase and native modules |
+  | `npm run mobile:export` | Passed, iOS + Android Hermes bundles (not native compilation) |
+  | `npm run mobile:doctor` | 17/20, identical to baseline: 2 checks need exp.host / RN Directory (sandbox network), 1 pre-existing SDK patch drift |
+  | `npx tsc -p tsconfig.app.json --noEmit`, `npm run build` (web) | Passed; no website files changed |
+  | Live backend, native compilation, simulator/emulator, physical device | **Not run** — no approved non-production Supabase project; no Xcode simulator / Android SDK on the build machine |
+
+## 2026-10-21 — Production: column-scoped self-update grants (0023 applied)
+
+- **Problem (live-verified via read-only MCP before the fix):** `authenticated` held
+  table-wide UPDATE on `public.users` and `public.user_profiles`, limited only by
+  self-row RLS. Any signed-in user could set their own `users.role = 'admin'`
+  (`is_admin()` trusts that column) or raise their own `points_balance_cache` / `xp` /
+  `level`, which `redeem_reward()` spends against.
+- **Fix:** `supabase/migrations/0023_progress_role_integrity.sql` replaces table-wide
+  UPDATE with column grants on `users (display_name, avatar_url, last_active_at)` and
+  `user_profiles (home_city)`. RLS policies are unchanged; SECURITY DEFINER writers
+  (signup trigger, `complete_quest`, `redeem_reward`, `adjust_points`) are unaffected.
+  No client code wrote these tables directly.
+- **Applied** by the owner in the Supabase SQL editor on 2026-10-21 (after backup).
+- **Verified (read-only MCP, project `wvedvngtuzsttpavmgjw`, 2026-10-21):** `authenticated`
+  can no longer update `users.role`, `users.account_status`, `user_profiles.points_balance_cache`,
+  `xp` or `level`; table-wide UPDATE is false for `authenticated` and `anon` on both tables;
+  the four granted columns are updatable; SELECT is unchanged.
+- **Exposure check (aggregates only, no personal data):** 9 users, all `role = 'user'`
+  (no admin accounts exist); all 9 `user_profiles` balances and XP match the
+  `points_ledger` sums. No evidence the hole was used.
+- **Renumbered 2026-10-24:** this migration is now `0029_progress_role_integrity.sql`.
 
 ## 2026-10-20 — Consumer mobile foundation (code only)
 
