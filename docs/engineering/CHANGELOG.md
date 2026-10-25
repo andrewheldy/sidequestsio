@@ -2,6 +2,22 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-25 — Mobile: dark styling for the location screens; location doc brought current
+
+- `src/components/theme.ts` (used by `/nearby`, `settings/location` and
+  `components/discovery`) now maps its role colors onto the app's dark palette in
+  `src/theme/tokens.ts`, so those screens match the rest of the app. Quest cards on `/nearby`
+  sit on the raised surface color like the MVP's cards. Text pairings checked against WCAG AA
+  (lowest: link on panel 4.82:1); unselected chip outlines use the app's `borderStrong`
+  (2.14:1, same as elsewhere in the app).
+- `docs/product/LOCATION_DISCOVERY.md`: status update for the MVP merge; code map points at
+  `/nearby`, the MVP quest detail and `supabaseSession.ts`; `EXPO_PUBLIC_FEATURE_NEARBY` is
+  documented as default off; release gate 3 (mobile sign-in) marked done in code; §10's next
+  prerequisite is now applying 0023–0025 to a non-production project. The Phase 0 gap map is
+  left as the dated record it is, with a pointer to the current state.
+- Verified: mobile typecheck, full Jest suite, Expo Doctor, export. Not checked on a device or
+  simulator.
+
 ## 2026-10-25 — Mobile: expo-router upgraded to 58.0.26 (test fix, no app change)
 
 - The merge pinned `expo-router` to 58.0.24 (and excluded it from Expo Doctor) because 11
