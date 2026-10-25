@@ -1,8 +1,8 @@
 # Delete Account
 
-**Version:** 1.0.1
-**Effective Date:** July 7, 2026
-**Last Updated:** July 7, 2026
+**Version:** 1.1.0
+**Effective Date:** October 25, 2026
+**Last Updated:** October 25, 2026
 
 You can delete your SideQuests account and associated personal data at any time. This page
 explains exactly how, what gets removed, what may remain, and how long it takes.
@@ -37,7 +37,14 @@ Once your request is processed, we permanently delete:
 - Your quest history, XP, Points balance, and Adventure Log.
 - Photos and videos you uploaded as quest-completion proof.
 - Your Community Notes.
-- Your privacy and marketing preferences.
+- Your privacy and marketing preferences, and your consent records.
+- Your location-related records: GPS check-in results, nearby-alert records and settings, each
+  device's nearby-alert setting, and quests you saved or hid. (We never store your device's
+  coordinates, so there are none to delete.)
+
+Data the mobile app keeps on your device (your location mode, chosen area, and nearby-alert data)
+is not on our servers: signing out clears the nearby-alert data, and uninstalling the app removes
+all of it.
 
 ## 3. What May Remain
 

@@ -232,21 +232,31 @@ Pause/sign-out ordering: the persisted local gate flips **first**, then regions 
 pending nudges cancelled, cached candidates cleared, and the server preference updated. Every
 geofence callback re-reads the gate before and after the network claim.
 
-## 7. Privacy (draft policy change — not yet published)
+## 7. Privacy (published: Privacy Policy 1.1.0, 2026-10-25)
 
-The live Privacy Policy (1.0.1) describes location only as a one-time verification input. Before
-any build with Adventure enabled ships, publish a new policy version through the
-`docs/legal/README.md` process. Draft disclosure, to be checked against the shipped behavior:
+`docs/legal/Privacy-Policy.md` § Location Data is the user-facing description of every location
+feature, what is stored and how to turn it off; Terms, Partner Terms and Delete Account were
+updated with it (`Legal-Version-History.md`). The in-app Adventure disclosure
+(`apps/mobile/src/app/settings/location.tsx`, version `adventure-2026-10-25` in `config.ts`) and
+the OS permission strings in `app.config.ts` match it. Change the policy, the disclosure and its
+version together.
 
-> SideQuests uses your location in the background to notice when you are near eligible quests and
-> send optional nearby alerts, even when you are not using the app. We use proximity checks rather
-> than saving a route history. We keep a minimal record of which quest alerts were sent, for up to
-> 30 days, to enforce alert limits and troubleshoot. You can pause this in Settings at any time.
+What the policy commits to, and what enforces it:
 
-Also required: foreground discovery (coordinates used per request, not stored), GPS presence
-(outcome only), separate notification and promotional consent, Apple privacy labels, Google Data
-Safety, and the Play background-location declaration with a real demo video. Partner reporting
-stays aggregate (suppress cohorts under 10); a geofence transition is never "verified foot traffic".
+| Commitment | Enforced by |
+| --- | --- |
+| Device coordinates are never stored | RPCs use request coordinates in memory only (§5); `deviceStore.ts` holds none |
+| GPS check-in results and nudge claims deleted after 30 days | `purge_presence_records()` / `purge_nudge_records()`, run daily on production by `pg_cron` (§8) |
+| Web "Location for verification" toggle controls GPS check-in | `src/pages/QuestDetail.tsx` checks `privacy_preferences.location_consent` before requesting a fix and asks in context when it is off |
+| Consent choices are recorded | Web Settings/Profile append `consent_events` per change (`src/lib/app/consent.ts`); mobile records grants with the disclosure version when Adventure is turned on |
+| Proximity is never a visit | `complete_quest` accepts only an `inside` presence check; partner analytics have no nudge or presence data |
+
+Known gaps: turning Adventure off or pausing it is recorded per device in `nudge_installations`,
+not as a withdrawal in `consent_events` (an account-wide withdrawal would wrongly stop other
+devices; `claim_nudge` denies on the installation state). Still required before any build with
+Adventure ships: Apple privacy labels, Google Data Safety, and the Play background-location
+declaration with a real demo video. Partner reporting stays aggregate (0021 suppresses cohorts of
+1–4 visitors); a geofence transition is never "verified foot traffic".
 
 ## 8. Verification (what ran)
 
@@ -262,7 +272,7 @@ on production via `pg_cron` (scheduled 2026-10-25): `purge-nudge-records` at 08:
 
 Known gap outside this scope: `staff_approval` verification still trusts the client.
 
-## 9. Release gates (gates 1 and 3 partly done; the rest open)
+## 9. Release gates (gate 4 done; gates 1 and 3 partly done; the rest open)
 
 1. ~~Owner applies 0023–0025.~~ Applied to **production** on 2026-10-25 (object-existence check
    passed). Still open: `scripts/verify-db.sql` and a query-plan check on the real catalog, and a
@@ -272,7 +282,8 @@ Known gap outside this scope: `staff_approval` verification still trusts the cli
    `location_catalog_issues()` is empty for nudge-eligible quests.
 3. ~~Mobile sign-in exists.~~ Done in code (2026-10-24, mobile MVP merge): Supabase Auth feeds
    `src/lib/auth/session.ts`. Still unverified against a live project or on a device (gates 1, 6).
-4. Updated Privacy/Cookie policy published; consent copy matches it.
+4. ~~Updated Privacy policy published; consent copy matches it.~~ Done: Privacy Policy 1.1.0,
+   2026-10-25 (§7). The 30-day purges it states already run daily (§8).
 5. Approved native IDs, signing, Google Maps key (Android map) and Expo project.
 6. Physical-device evidence: iPhone, Pixel-class, Samsung-class — permissions, geofence delivery,
    notification routing (cold/warm), pause/sign-out cleanup, reboot/force-stop, battery baseline

@@ -118,5 +118,9 @@ export function getConfig(): AppConfig {
   };
 }
 
-/** Version of the in-app Adventure disclosure the consent records refer to. */
-export const ADVENTURE_DISCLOSURE_VERSION = 'adventure-2026-10-24-draft';
+/**
+ * Version of the in-app Adventure disclosure the consent records refer to.
+ * The disclosure matches Privacy Policy 1.1.0 (docs/legal/Privacy-Policy.md § Location Data);
+ * change both together. claim_nudge() rejects versions longer than 32 characters.
+ */
+export const ADVENTURE_DISCLOSURE_VERSION = 'adventure-2026-10-25';

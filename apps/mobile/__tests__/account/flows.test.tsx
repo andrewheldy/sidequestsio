@@ -86,7 +86,7 @@ describe('sign-up through onboarding to the intended quest', () => {
       email: 'ana@example.test',
       password: 'hunter22',
       options: {
-        data: { display_name: 'Ana', terms_version: '1.0.0', privacy_version: '1.0.0', marketing_opt_in: false },
+        data: { display_name: 'Ana', terms_version: '1.1.0', privacy_version: '1.1.0', marketing_opt_in: false },
         emailRedirectTo: expect.stringContaining('/auth/callback'),
       },
     });
@@ -136,7 +136,7 @@ describe('sign-up through onboarding to the intended quest', () => {
     await press('Create account');
     await waitFor(() => expect(fake.client.auth.signUp).toHaveBeenCalled());
     const [arg] = (fake.client.auth.signUp as jest.Mock).mock.calls[0];
-    expect(arg.options.data).toEqual({ terms_version: '1.0.0', privacy_version: '1.0.0', marketing_opt_in: true });
+    expect(arg.options.data).toEqual({ terms_version: '1.1.0', privacy_version: '1.1.0', marketing_opt_in: true });
   });
 
   it('maps an existing account to a sign-in hint and keeps the pending return clean', async () => {

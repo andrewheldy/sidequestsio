@@ -47,6 +47,7 @@ import {
   type PrimaryCtaState,
 } from "@/components/app/quest-detail";
 import { presenceMessage, requestPosition } from "@/lib/app/presence";
+import { savePrivacyChoices } from "@/lib/app/consent";
 import type { CompleteQuestResult } from "@/lib/db/repository";
 import type { ProofMethod, QuestInstance } from "@/types/db";
 
@@ -282,6 +283,17 @@ export default function QuestDetail() {
     setShowCompletionSheet(true);
   };
 
+  const allowGpsCheckIn = async () => {
+    if (!user) return;
+    try {
+      await savePrivacyChoices(await getRepository(), user.id, { location_consent: true }, "gps_check_in");
+      qc.invalidateQueries({ queryKey: ["privacy", user.id] });
+      toast.success("Location for verification is on. Tap the button again to check in.");
+    } catch {
+      toast.error("Couldn't save that setting. Please try again.");
+    }
+  };
+
   const handleComplete = async () => {
     if (isDemoMode) {
       toast.info("Demo mode — saving disabled for now.");
@@ -301,6 +313,16 @@ export default function QuestDetail() {
       // compared on the server and discarded; only 'inside' can complete.
       let presenceCheckId: string | null = null;
       if (quest.verification_type === "gps") {
+        // The Settings toggle "Location for verification" gates the request;
+        // ask in context instead of failing when it is off.
+        if (!(await repo.getPrivacy(user.id)).location_consent) {
+          toast("Allow location for this check-in?", {
+            description:
+              "We compare one location reading with the venue, then discard it. Only the result is kept. You can turn this off in Settings.",
+            action: { label: "Allow", onClick: () => void allowGpsCheckIn() },
+          });
+          return;
+        }
         const presence = await repo.checkPresence(user.id, quest.id, () => requestPosition());
         if (!("checkId" in presence) || presence.outcome !== "inside") {
           trackQuestEvent("quest_primary_action_failed", ctx, {

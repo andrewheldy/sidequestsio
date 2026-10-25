@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { getRepository } from "@/lib/db";
 import { levelProgress } from "@/lib/app/leveling";
+import { savePrivacyChoices } from "@/lib/app/consent";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
 import { isDemoMode } from "@/lib/demo";
@@ -56,18 +57,7 @@ export default function Profile() {
       return;
     }
     if (!user) return;
-    const repo = await getRepository();
-    await repo.updatePrivacy(user.id, patch);
-    for (const [k, v] of Object.entries(patch)) {
-      if (k.endsWith("_consent") && typeof v === "boolean") {
-        await repo.recordConsent({
-          userId: user.id,
-          consentType: k.replace("_consent", "") as never,
-          granted: v,
-          source: "profile_settings",
-        });
-      }
-    }
+    await savePrivacyChoices(await getRepository(), user.id, patch, "profile_settings");
     qc.invalidateQueries({ queryKey: ["privacy", user.id] });
     toast.success("Privacy settings updated");
   };

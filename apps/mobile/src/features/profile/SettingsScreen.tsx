@@ -167,7 +167,7 @@ function Settings({ account }: { account: ReadyAccount }) {
 
       <Card title="Permissions">
         <Text variant="small" muted>
-          SideQuests asks for your location only when you use Near me, and for the camera only when you scan a quest code.
+          SideQuests asks for your location only when you use Near me or check in with GPS (or in the background, if you turn on nearby alerts), and for the camera only when you scan a quest code.
           Allowing or denying either never changes your email or privacy choices. You can change them in your device settings.
         </Text>
         <Button label="Location & camera permissions" variant="secondary" icon="settings-outline" onPress={() => void Linking.openSettings()} />

@@ -1,15 +1,15 @@
 # Privacy Policy
 
-**Version:** 1.0.1
-**Effective Date:** July 7, 2026
-**Last Updated:** July 7, 2026
+**Version:** 1.1.0
+**Effective Date:** October 25, 2026
+**Last Updated:** October 25, 2026
 
 SideQuests ("SideQuests," "we," "our," or "us") operates a mobile-first platform that turns
 real-world exploration into a game: you discover quests at partner venues, verify your visit,
 complete a short objective, capture the moment, and earn XP and Points. This Privacy Policy
 explains what information we collect when you use SideQuests, why we collect it, how it's used
-and shared, and the choices you have. It applies to the SideQuests website and app
-(collectively, the "Service").
+and shared, and the choices you have. It applies to the SideQuests website and the SideQuests mobile
+app (collectively, the "Service").
 
 If you don't agree with this Policy, please don't use the Service. If you have questions, contact
 us at [support@miamisidequests.io](mailto:support@miamisidequests.io).
@@ -55,18 +55,14 @@ pick up where you left off.
 or video you upload is stored in our media storage and associated with your account and the
 relevant quest completion.
 
-**Location permissions.** Some quests use your device's GPS to verify you're physically at a
-venue. We only request location access at the moment it's needed for verification — see
-[Section 3 of our Cookie Policy](/cookies) and the Location Data callout below for exactly what
-is (and isn't) stored.
-
-> **Location data is never stored beyond a single verification check.** When GPS verification is
-> used, your coordinates are sent to our server for that one check and are not written to our
-> database — only the resulting `verified` / `not verified` outcome is stored.
+**Location information.** Location features are optional, and we never store your device's
+coordinates. What each feature uses, what we keep, and how to turn it off are described in
+[Location Data](#location-data) below.
 
 **QR scan history.** When you scan a venue's QR code, we record a scan event (which quest, which
 venue, and a timestamp) so we can verify quest attempts and give partner venues aggregate,
-privacy-safe traffic analytics.
+privacy-safe traffic analytics. Like a quest completion, a scan record shows that you were at that
+venue at that time.
 
 **Device and browser information.** Standard technical information sent by your browser or device
 — browser type, operating system, device type (mobile/tablet/desktop), and screen size — is
@@ -82,6 +78,50 @@ the quest it's attached to.
 **Communications.** If you contact us (e.g., support, partnership inquiries), we keep a record of
 that correspondence so we can respond and follow up.
 
+### Location Data
+
+You can use SideQuests without sharing your device's location: browse quests by neighborhood or
+on the map, and complete quests verified by QR code, venue code, or staff. We **never** sell
+location information, share it for advertising, or keep a history of where you go. Some features
+below exist only in the mobile app, and nearby alerts may not be enabled in every version of it.
+
+| Feature | Where | When your location is used | What we keep |
+|---|---|---|---|
+| **Choose an area** | App | Never — you pick a neighborhood. | Your chosen area, on your device only. |
+| **Show my location** on the map | Website | Only when you tap the location button. | Nothing. Your position stays in your browser to center the map and show distances. |
+| **Explore near me** | App | While the app is open, after you allow location access. | Nothing. Your coordinates are sent with each search to sort quests by distance and are not written to our database. |
+| **GPS check-in** | Website and app | Only when you tap to check in at a quest that uses GPS verification. | The result (inside, outside, or uncertain, with a reason such as "low accuracy"), which quest, and when — for 30 days. Never your coordinates or their accuracy. |
+| **Nearby alerts** ("Adventure") | App | In the background, only after you turn it on, sign in, and allow "Always" location and notifications. | A record of each alert we approved: which quest, its venue area, when, and whether the alert was scheduled or opened — for 30 days. Never your coordinates or route. |
+
+**How GPS check-in works.** When you tap to check in, your device takes one fresh location reading.
+Our server compares it with the quest's location and immediately discards it, keeping only the
+result. Only an "inside" result can complete a GPS quest; an uncertain result lets you retry or use
+another verification method.
+
+**How nearby alerts work.** When you turn on nearby alerts, your device sends its current location
+once so we can choose up to 15 nearby quest areas (these are public venue locations); the
+coordinates are used for that request and not saved. Your phone's operating system then watches for
+you entering one of those areas — SideQuests does not receive your location continuously. When you
+enter an area, the app asks our server whether an alert is allowed, so the alert record shows that
+you were near that quest at that time. Alerts are limited: at most 2 a day (you can lower this to 1
+or 0), at least 3 hours apart, never between 9 PM and 10 AM in your time zone, and not for the same
+quest twice in a week. Alerts are created on your device; we don't use a push-notification service
+for them.
+
+**Proximity never counts as a visit.** Entering an area, receiving an alert, or opening one never
+completes a quest, never earns XP or Points, and is never reported to partner venues as a visit.
+
+**Stored on your device.** The mobile app keeps your location mode, chosen area, alert pause
+setting, a random installation ID, the list of nearby quest areas, whether you are inside each, and
+which quests recently triggered an alert. It does not store your coordinates. Signing out clears the
+nearby-alert data; uninstalling the app removes all of it.
+
+**Settings and consent records.** We store your nearby-alert preferences (daily limit, quiet hours,
+time zone, pause) and each device's on/off and pause setting, so a pause on one device is honored
+by our server. When you change a location, analytics, or marketing choice in website Settings, or
+turn on nearby alerts in the app, we record what you chose, when, and — for nearby alerts — which
+version of the disclosure you saw.
+
 ## 2. How We Use Your Information
 
 We use the information described above to:
@@ -89,6 +129,8 @@ We use the information described above to:
 - Create and maintain your account and authenticate you securely.
 - Operate the core quest loop: discovery, QR/GPS verification, quest completion, XP and Points
   awards, and your Adventure Log.
+- If you choose, sort quests by distance from you and send nearby alerts, as described in
+  [Location Data](#location-data).
 - Display Community Notes and moderate them for safety and quality.
 - Generate aggregate, privacy-safe analytics for partner venues (e.g., "this venue had 120 scans
   last week") — never analytics tied to an identifiable individual outside SideQuests.
@@ -131,7 +173,8 @@ to any of them, and we only share what's needed for them to provide their servic
 | Provider | What it does | Their privacy policy |
 |---|---|---|
 | **Supabase** | Database, authentication, and file storage — effectively our entire backend. | [supabase.com/privacy](https://supabase.com/privacy) |
-| **Mapbox** | Renders the interactive quest map. Your device's map viewport may be sent to Mapbox to load map tiles. | [mapbox.com/legal/privacy](https://www.mapbox.com/legal/privacy) |
+| **Mapbox** | Renders the interactive quest map on the website. Your map viewport is sent to Mapbox to load map tiles — including the area around you if you center the map on your location. | [mapbox.com/legal/privacy](https://www.mapbox.com/legal/privacy) |
+| **Apple / Google** | Your phone's operating system provides location, geofencing, and notifications to the mobile app. The app's map uses Apple Maps on iOS and, where enabled, Google Maps on Android, which load map tiles for the area shown. | [apple.com/legal/privacy](https://www.apple.com/legal/privacy/) · [policies.google.com/privacy](https://policies.google.com/privacy) |
 | **Vercel** | Hosts the SideQuests website and app. Standard infrastructure access logs (including IP address) are generated as part of serving requests. | [vercel.com/legal/privacy-policy](https://vercel.com/legal/privacy-policy) |
 
 We do not currently use a dedicated marketing/CRM vendor, a payment processor, or a third-party
@@ -140,12 +183,13 @@ it's integrated — we won't add data-sharing relationships silently.
 
 ## 7. How We Share Information
 
-**We do not sell your personal data.** We will never sell or share your precise location data
+**We do not sell your personal data.** We will never sell or share your location information
 with anyone for advertising purposes.
 
 We share **aggregated, anonymized** analytics with partner venues — for example, total scans or
 completions for their quest over a period. This data cannot reasonably be linked back to an
-individual user.
+individual user. Partners never receive your location, GPS check-in results, or nearby-alert
+records.
 
 We may disclose information if required by law, subpoena, or court order, or where necessary to
 protect the safety of our users, partners, or the integrity of the Service (for example,
@@ -159,7 +203,9 @@ comparable protections.
 
 Your account and profile data is retained for as long as your account is active. Scan events and
 aggregate analytics derived from them are retained for up to 24 months to support partner
-reporting. Community Notes are retained until you delete them or your account. When you delete
+reporting. GPS check-in results and nearby-alert records are deleted after 30 days. Your device's
+coordinates are never stored. Location settings and consent records are kept while your account is
+active. Community Notes are retained until you delete them or your account. When you delete
 your account, we remove your personal data as described in our
 [Delete Account policy](/delete-account), generally within 30 days.
 
@@ -195,8 +241,17 @@ these rights, we make the following available to every SideQuests user:
   data not editable in-app, email [support@miamisidequests.io](mailto:support@miamisidequests.io).
 - **Control visibility** — toggle your profile's public visibility, leaderboard visibility, and
   what's shown on your public profile from Settings.
-- **Manage consent** — adjust analytics, marketing, and location consent anytime from Settings or
+- **Manage consent** — adjust analytics, marketing, and location consent anytime from Settings;
+  browser analytics and marketing cookies are controlled in
   [Cookie Preferences](/cookie-preferences).
+- **Control location** — every location feature can be turned off without losing access to the
+  rest of the Service:
+  - **Website:** "Location for verification" in Settings turns GPS check-in on or off (we ask
+    before turning it on). Your browser's site permission controls all location access.
+  - **App:** Settings → Location & nearby alerts lets you choose an area instead of using your
+    location, use your location only while the app is open, or turn nearby alerts on, pause them,
+    or limit them to 1 or 0 a day. Your phone's location and notification permissions control
+    all access, and signing out stops nearby alerts on that device.
 - **Delete** — request full account deletion at any time; see [Section 13](#13-data-deletion).
 
 ## 13. Data Deletion

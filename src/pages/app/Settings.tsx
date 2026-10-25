@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRepository } from "@/lib/db";
+import { savePrivacyChoices } from "@/lib/app/consent";
 import type { PrivacyPreferences } from "@/types/db";
 import { toast } from "sonner";
 import { isDemoMode } from "@/lib/demo";
@@ -101,8 +102,7 @@ export default function Settings() {
       return;
     }
     if (!user) return;
-    const repo = await getRepository();
-    await repo.updatePrivacy(user.id, patch);
+    await savePrivacyChoices(await getRepository(), user.id, patch, "settings");
     qc.invalidateQueries({ queryKey: ["privacy", user.id] });
     toast.success("Privacy settings updated");
   };

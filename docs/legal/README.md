@@ -84,8 +84,8 @@ actively agree to, and that agreement is recorded in the database with a version
 works like this:
 
 1. `src/lib/legal.ts` exports `CURRENT_TERMS_VERSION` and `CURRENT_PRIVACY_VERSION` — plain string
-   constants (currently both `"1.0.0"`; the documents themselves have since moved to `1.0.1` for a
-   contact-email patch — see below for why these constants weren't bumped along with them).
+   constants (currently both `"1.1.0"`, matching the documents). The mobile app keeps the same
+   constants in `apps/mobile/src/lib/legal.ts`; bump both files together.
 2. At signup, `src/pages/Auth.tsx` requires the user to check "I agree to the Terms of Service and
    Privacy Policy" before submitting. `src/contexts/AuthContext.tsx`'s `signUp()` passes those two
    constants (plus the optional marketing opt-in) into `supabase.auth.signUp()`'s `options.data`

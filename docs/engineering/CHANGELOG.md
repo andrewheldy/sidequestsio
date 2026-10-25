@@ -2,6 +2,26 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-25 — Legal: location data and controls documented (Privacy 1.1.0); consent recording fixed
+
+- `docs/legal/`: Privacy Policy 1.1.0 adds § Location Data (each feature, what is kept, on-device
+  data, controls); Terms, Partner Terms and Delete Account → 1.1.0; `Legal-Version-History.md`
+  rows added. `CURRENT_TERMS_VERSION` / `CURRENT_PRIVACY_VERSION` bumped to `1.1.0` on web
+  (`src/lib/legal.ts`) and mobile (`apps/mobile/src/lib/legal.ts`). Existing users are not
+  re-prompted (README step 5); Adventure has its own just-in-time consent.
+- Web: the "Location for verification" toggle now gates GPS check-in (it was stored but never
+  read). When it is off, quest completion asks in context and turning it on records consent.
+- Web: Settings privacy toggles now append `consent_events` like the Profile toggles already did
+  (shared `src/lib/app/consent.ts`); before, Settings changes left no consent record.
+- Mobile: Adventure disclosure wording and version (`adventure-2026-10-25`) aligned with the
+  policy; the Permissions card mentions GPS check-in and nearby alerts.
+- The policy's 30-day retention relies on the `purge-presence-records` / `purge-nudge-records`
+  `pg_cron` jobs already live on production (entry below).
+- `LOCATION_DISCOVERY.md` §7 and §9 updated (gate 4 done).
+- Verified: web typecheck, `npm test`, lint on touched files, build; `/privacy` and `/terms`
+  rendered in Chromium at 390 px (anchor, tables, no horizontal scroll); mobile typecheck and full
+  Jest suite (266 tests). Not checked: the GPS consent prompt against a live project.
+
 ## 2026-10-25 — Production: account-deletion function and purge jobs live
 
 - Enabled `pg_cron` and `pg_net`. Deployed Edge Function `process-account-deletions` (v1).
