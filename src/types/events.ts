@@ -40,6 +40,7 @@ export type AppEventName =
   | "reward_earned"                   // XP/points credited by the server
   // --- Navigation ---------------------------------------------------------
   | "nav_rewards_clicked"
+  | "nav_quests_clicked"
   | "nav_map_clicked"
   | "nav_profile_clicked"
   // --- Other surfaces -----------------------------------------------------
