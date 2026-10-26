@@ -2,6 +2,15 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-26 — Readiness brief leftovers removed
+
+- The `/readiness` page was removed in `53be631`, but its standalone Netlify build remained and
+  no longer built. Removed `standalone/readiness/`, `vite.readiness.config.ts`, the
+  `build:readiness` script, `scripts/{package,verify,axe}-readiness.*`, the readiness exports
+  in `output/` (Netlify zip, PDF, PPTX, verification screenshots), `docs/design/readiness/`
+  and the readiness section of `docs/DESIGN_INTELLIGENCE.md`. All remain in git history.
+  `framer-motion` stays: `src/components/iiipoints/` still uses it.
+
 ## 2026-10-25 — Quest map renders; Quests tab in the bottom nav
 
 - **Map fix:** `QuestMap`'s container was `absolute inset-0`, but `mapbox-gl.css`
