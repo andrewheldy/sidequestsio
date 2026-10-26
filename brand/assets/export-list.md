@@ -22,7 +22,7 @@
 ## Browser and application
 
 Browser and app icons are not exported by hand. `node scripts/generate-brand-assets.mjs`
-renders them from `logos/app-icon.svg`, `logos/app-icon-maskable.svg` and
+renders them from `logos/app-icon.svg`, `logos/app-icon-maskable.svg`, `logos/favicon.svg` and
 `logos/mask-icon.svg` straight into `public/`:
 
 - `public/favicon.ico` (16/32/48)
