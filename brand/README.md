@@ -1,6 +1,6 @@
 # sidequests brand asset library
 
-Production system for the approved “Unexpected” direction: a doorway into hidden real-world experiences. The doorway, path, and spark are a single narrative mark. The system is intentionally restrained so real places and people remain the hero.
+Production system for the approved ivory-and-gold doorway and playful lowercase wordmark. The smooth winding path and guiding star keep the original exploration story; the lettering blends rounded shapes with a restrained hand-drawn character. The approved reference is `logos/source/approved-logo.png`.
 
 ## Quick start
 
@@ -13,7 +13,7 @@ Production system for the approved “Unexpected” direction: a doorway into hi
 
 ## Folder map
 
-- `logos/` — custom vector wordmark, primary lockups, compact marks, monochrome, reverse, outlined, and embossed versions.
+- `logos/` — traced vector wordmark, SVG lockups with embedded transparent ivory/gold artwork, compact vector silhouettes, and app icons.
 - `icons/` — 27 product icons on a unified 24 px construction grid.
 - `typography/` — font recommendations, responsive scale, and CSS type utilities.
 - `colors/` — machine-readable HEX/RGB/HSL data and CSS primitives/semantic aliases.
@@ -45,23 +45,19 @@ The clear-space unit is the width of the spark. Keep at least 2 units around the
 
 ## Screen lockup
 
-`logo-horizontal.svg` fixes the mark at about 15% of the lockup's width. At the 148 px minimum above that leaves the mark roughly 23 px tall — below the 32 px this same table sets as `icon.svg`'s minimum. The two rows disagree, and on screen the smaller one wins: the mark loses its switchbacks and reads as a smudge.
+Product screens compose `logos/icon.svg` and `logos/wordmark.svg` at separate sizes through `src/components/brand/Logo.tsx`. The default mark uses a Midnight Navy tile so the ivory artwork stays visible on light backgrounds. The reverse mark is transparent, with ivory lettering for dark surfaces. The wordmark is tightly cropped vector artwork, with its approved letter shapes preserved rather than substituted with a font.
 
-Product screens therefore compose the lockup from `icon.svg` and `wordmark.svg` at separate sizes, rather than scaling the fixed one. Sizes live in `src/components/brand/Logo.tsx`:
-
-| Step | Mark | Wordmark | Mark ink | Use |
+| Step | Mark box | Wordmark height | Gap | Use |
 |---|--:|--:|--:|---|
-| `sm` | 33 px | 24 px | ~28 px | App chrome, which shares a 320 px header with other controls |
-| `md` | 38 px | 28 px | ~32 px | Site header, auth |
-| `lg` | 46 px | 34 px | ~39 px | Footer, branded screens |
+| `sm` | 33 px | 20 px | 8 px | Narrow app chrome |
+| `md` | 38 px | 24 px | 8 px | Site header and auth |
+| `lg` | 46 px | 30 px | 10 px | Footer and branded screens |
 
-Heights are the `<img>` box; both files carry padding inside their viewBox, so the ink is shorter. The wordmark holds at 0.74× the mark's box, which leaves the mark's wall ~11% heavier than the wordmark's stroke — the cost of giving the mark its own scale. Matching the weights exactly would mean a ~205 px lockup, which is the width this arrangement exists to avoid.
-
-The artwork is untouched: this is an arrangement of the existing mark and wordmark files, not a redraw. Clear space is unchanged — 2 spark widths, which is ~14 px at `md`. `logo-horizontal.svg` remains the signature for marketing, print, and export.
+The symbol remains separate from the lettering so both stay readable on 320 px screens. Explicit image dimensions reserve space before the assets load. `logo-horizontal.svg` remains the portable combined lockup for marketing and exports.
 
 ## Wordmark status
 
-`logos/wordmark.svg` and `logos/logo-horizontal.svg` contain custom vector geometry rather than live font text. The rounded terminals, open `e`, and angled `q` tail are intentional. Some secondary preview/template assets use Manrope text for portability; production brand signatures must use the vector wordmark file.
+`logos/wordmark.svg` and `logos/wordmark-reverse.svg` are vector outlines traced from the approved final concept. They use navy and ivory respectively. Photo exports draw the reverse artwork through `src/lib/brand.ts`; they must not typeset a substitute. Campaign templates also embed these outlines. Ordinary headings and body text continue to use the existing type system.
 
 ## Color implementation
 
@@ -77,13 +73,15 @@ Never communicate status by color alone. Text labels and icons remain required.
 
 ## Favicon and app installation
 
-`brand/logos/app-icon.svg` (rounded square), `app-icon-maskable.svg` (full-bleed, 80% safe zone) and `mask-icon.svg` (flat silhouette) are the only sources. Everything the site serves is generated from them:
+The sources are `logos/app-icon.svg` (detailed rounded square), `app-icon-maskable.svg` (full-bleed with the emblem inside the central safe circle), `favicon.svg` (simplified matching silhouette and gold star for 16–48 px), and `mask-icon.svg` (one-color silhouette for Safari pinned tabs).
 
 ```
-node scripts/generate-brand-assets.mjs
+npm run assets:brand
 ```
 
-That writes `favicon.ico`, `favicon.svg`, `favicon-16/32.png`, `apple-touch-icon.png`, `icon-192/512.png`, `icon-maskable-512.png`, `mask-icon.svg` and `og-image.png` into `public/`. Edit the SVG source and re-run — never hand-edit the rasters, or the set drifts apart again. `index.html` references the SVG favicon first with the ICO as fallback, and the theme color is `#0D1321`.
+This regenerates `favicon.ico`, `favicon.svg`, `favicon-16/32.png`, `apple-touch-icon.png`, `icon-192/512.png`, `icon-maskable-512.png`, `mask-icon.svg`, `og-image.png`, and the brand-kit PNG exports. The script serves assets over loopback HTTP and waits for images/fonts to decode; failed renders stop the export. Manrope and Inter Latin variable fonts and their licenses are bundled under `typography/fonts/` so exports do not require Google Fonts access. No npm dependencies were added.
+
+Update the SVG sources and regenerate instead of editing shipped PNGs individually. The current browser/manifest/social references carry `?v=2` to refresh previously cached brand assets; increment this on the next identity change. The theme color remains `#0D1321`.
 
 ## Social usage
 
@@ -110,4 +108,4 @@ That writes `favicon.ico`, `favicon.svg`, `favicon-16/32.png`, `apple-touch-icon
 
 The public brand name is always `sidequests`, lowercase. File names use kebab-case. Token names use semantic intent. Add new assets to this README rather than creating a parallel brand guide. Any change to the doorway geometry, wordmark, primary palette, or progression-color meanings requires brand owner approval and a version note in this file.
 
-Version: 1.0 production candidate · 2026-07-15
+Version: 2.0 · 2026-10-25 — Brand owner approved the generated ivory/gold emblem and blended playful wordmark in chat, then authorized site-wide implementation. Replaces the angular switchback and previous custom lettering. Artwork preparation retains the approved design; compact browser and pinned-tab icons use its vector silhouette. This entry records source changes, not a production deployment.

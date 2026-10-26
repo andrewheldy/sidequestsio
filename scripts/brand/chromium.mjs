@@ -107,6 +107,18 @@ export async function launchChromium({ binary = findChromium() } = {}) {
       await send('Page.navigate', { url }, sessionId);
       await loaded;
       await new Promise((r) => setTimeout(r, settleMs));
+      const checked = await send('Runtime.evaluate', {
+        expression: `(async () => {
+          await document.fonts.ready;
+          await Promise.all(Array.from(document.images, image => image.decode()));
+          return location.href;
+        })()`,
+        awaitPromise: true,
+        returnByValue: true,
+      }, sessionId);
+      if (checked.exceptionDetails || checked.result.value !== url) {
+        throw new Error(`Artwork page or images failed to load: ${url}`);
+      }
       const { data } = await send('Page.captureScreenshot', {
         format: 'png',
         captureBeyondViewport: false,

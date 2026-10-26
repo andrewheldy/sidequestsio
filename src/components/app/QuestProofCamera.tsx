@@ -44,6 +44,7 @@ import { cn } from '@/lib/utils';
 import { getRepository } from '@/lib/db';
 import { useAuth } from '@/contexts/AuthContext';
 import { track } from '@/lib/analytics/events';
+import { drawPhotoWordmark } from '@/lib/brand';
 import { isDemoMode } from '@/lib/demo';
 import { uploadQuestProof } from '@/lib/media';
 import { supabase } from '@/lib/supabase';
@@ -157,21 +158,15 @@ async function renderOverlay(
   ctx.fillStyle = botGrad;
   ctx.fillRect(0, H - botH, W, botH);
 
-  // -- Top-left: the wordmark. Lowercase is the brand's own spelling, and
-  // Manrope is the app's display face (Poppins was the old identity's).
-  const logoSize = Math.max(14, Math.round(W * 0.036));
-  ctx.font = `800 ${logoSize}px Manrope, system-ui, sans-serif`;
-  ctx.fillStyle = '#FFFFFF';
+  const brandRight = await drawPhotoWordmark(ctx, W);
   ctx.textBaseline = 'middle';
-  ctx.textAlign = 'left';
-  ctx.fillText('sidequests', 18, 34);
 
   // -- Top-right: quest title (truncated to fit)
   const titleSize = Math.max(12, Math.round(W * 0.030));
   ctx.font = `700 ${titleSize}px Manrope, system-ui, sans-serif`;
   ctx.fillStyle = 'rgba(255,255,255,0.90)';
   ctx.textAlign = 'right';
-  const maxTitleW = W - 160;
+  const maxTitleW = Math.max(0, W - brandRight - 36);
   let titleText = questTitle;
   while (ctx.measureText(titleText).width > maxTitleW && titleText.length > 4) {
     titleText = titleText.slice(0, -1);
