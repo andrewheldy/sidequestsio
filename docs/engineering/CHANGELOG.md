@@ -2,6 +2,35 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-26 — Readiness brief leftovers removed
+
+- The `/readiness` page was removed in `53be631`, but its standalone Netlify build remained and
+  no longer built. Removed `standalone/readiness/`, `vite.readiness.config.ts`, the
+  `build:readiness` script, `scripts/{package,verify,axe}-readiness.*`, the readiness exports
+  in `output/` (Netlify zip, PDF, PPTX, verification screenshots), `docs/design/readiness/`
+  and the readiness section of `docs/DESIGN_INTELLIGENCE.md`. All remain in git history.
+  `framer-motion` stays: `src/components/iiipoints/` still uses it.
+
+## 2026-10-25 — Approved logo refresh across the website
+
+- Replaced the angular doorway and previous lettering with the approved ivory/gold emblem,
+  flowing path, and playful custom wordmark. Updated the shared `Logo`/`LogoMark` sources,
+  export lockups, partner QR sign, and social/campaign templates; light surfaces use a navy
+  icon tile for contrast. Adjusted shared logo dimensions for tightly cropped lettering.
+- Photo overlays now draw the actual approved SVG lettering using a shared loader instead
+  of typesetting `sidequests` in Manrope; quest titles reserve space for the rendered mark.
+- Regenerated SVG/ICO/PNG favicons, Apple touch icon, regular/maskable install icons,
+  Safari pinned-tab silhouette, Open Graph preview, and brand-kit raster exports.
+  Versioned icon, manifest, and share-image references refresh cached artwork.
+- Added `npm run assets:brand`. Exporting uses loopback HTTP and bundled licensed fonts,
+  and checks image/font loading before capture, so unavailable remote fonts or blocked
+  file navigation cannot silently produce invalid artwork. No npm dependencies added.
+- Brand guide records owner approval and the new production sources. Website source update;
+  no production deployment performed.
+- Verified: typecheck, touched-file lint, 14 tests, production build, and asset regeneration.
+  Chromium checks covered six routes at 1440/390/320 px with no broken logo images,
+  horizontal overflow, or page errors; all ten icon/share-image requests returned 200,
+  and the photo-overlay wordmark rendered to an exportable canvas.
 ## 2026-10-26 — Quest map markers: no drift, no jumps, no hidden pins
 
 - Markers lagged and drifted while the map moved, and a tapped pin jumped to the
@@ -14,6 +43,7 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   tapped. Pins closer than one pin width on screen now merge into a count
   bubble (`src/lib/clusterPins.ts`, tested); tapping it zooms in until they
   separate (at street level it opens the first quest).
+
 
 ## 2026-10-25 — Quest map renders; Quests tab in the bottom nav
 

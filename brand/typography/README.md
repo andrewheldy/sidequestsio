@@ -6,7 +6,7 @@
 - **Secondary / reading:** Inter Variable, weights 400–700. Use for body copy, metadata, forms, and dense utility text.
 - **Numeric utility:** IBM Plex Mono 500–700, only for XP counters, Points balances, codes, and compact live stats.
 
-These are recommendations, not bundled font binaries. Self-host WOFF2 files with valid licenses or load them through the project’s approved font pipeline. Always set `font-display: swap` and preload only the primary roman variable file.
+Manrope and Inter Latin variable WOFF2 files are bundled in `fonts/` with their SIL Open Font Licenses for reproducible brand exports. The website continues to load its existing Google Fonts stylesheet. Use the approved font pipeline for app text, set `font-display: swap`, and preload only the primary roman variable file.
 
 ## Responsive scale
 
