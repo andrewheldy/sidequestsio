@@ -74,28 +74,6 @@ Nothing is synchronized. This project does not pull, install, submodule, or vend
 
 No project-owned link is recorded yet.
 
-## 9. Connected readiness brief
-
-The `/readiness` editorial brief was produced as an earlier, separately verified surface and remains
-part of this repository.
-
-| Field | Value |
-|---|---|
-| **Design Intelligence ref used** | `bf9b8b3b6997df3ab4d7958a9d1838d07c50470a` |
-| **Reviewed on** | 2026-08-12 |
-| **Product brief** | `docs/design/readiness/DESIGN_BRIEF.md` |
-| **Motion specifications** | `docs/design/readiness/motion/` |
-| **Verification report** | `docs/design/readiness/VERIFICATION.md` |
-
-The readiness brief uses `framer-motion` for explicitly requested below-the-fold scroll reveals.
-That exception is scoped to the readiness surface: it uses no scroll hijacking and provides a
-reduced-motion branch. The primary product rebuild continues to use native CSS and the existing
-IntersectionObserver enhancement described above.
-
-The readiness review used the registered Taste heuristic set as a review lens because the external
-`taste-skill` package was not installed in that environment. “Impeccable” was not present in the
-local registry or installed skill catalog, and no claim is made that it was used.
-
 ## Required workflow
 
 Read this record, the project brand, the pinned Design Intelligence contract and applicable entries, then `DESIGN_BRIEF.md`. Establish tokens before components, implement in the existing stack, and run the relevant accessibility, anti-slop, motion, and mobile reviews. Accepted and rejected decisions belong in the decision log; reusable cross-venture findings stage in `docs/design/REUSABLE_FINDINGS.md`.
