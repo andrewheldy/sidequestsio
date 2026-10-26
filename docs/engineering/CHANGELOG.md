@@ -31,6 +31,21 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   Chromium checks covered six routes at 1440/390/320 px with no broken logo images,
   horizontal overflow, or page errors; all ten icon/share-image requests returned 200,
   and the photo-overlay wordmark rendered to an exportable canvas.
+## 2026-10-26 — Check-in spots for the 17 Miami Essentials area quests
+
+- **Content:** each area quest (park, street, causeway, beach) now names its
+  check-in spot — the venue anchor its 150 m GPS presence radius is measured
+  from — at the start of its instructions (`action_prompt`), plus a short public
+  `location_label`. Oleta River's anchor moves from the park centroid to the
+  kayak ramp (OSM node 2728007023), 819 m away. The "check-in point" blockers
+  are cleared.
+- **Importer:** maps the CSV column `location_label` → `quests.location_label`
+  (migration 0023), with the 0023 preflight guard covering it.
+- **Production:** `data/generated/miami-essentials/sql/area-check-in-spots.sql`
+  (guarded: exactly 17 quests under the Miami Essentials partner) updates the
+  copy and labels, moves the Oleta venue, and publishes the 17 quests. It must be
+  run by the owner; tested locally on a full migration replay and is idempotent.
+
 
 ## 2026-10-25 — Quest map renders; Quests tab in the bottom nav
 

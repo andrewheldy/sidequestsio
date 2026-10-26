@@ -205,6 +205,8 @@ const MAPPING: Record<string, ColumnSpec> = {
   image_modified:    { target: "insert_only" },
   // gps quests: presence radius around the venue, 75–150 m (0023/0025; blank = 100 m).
   verification_radius_m: { target: { table: "quests", column: "verification_radius_m" }, validate: "radius" },
+  // Public short label for the check-in spot (0023; mobile quest card `locationLabel`).
+  location_label: { target: { table: "quests", column: "location_label" } },
 
   // ── quests.links jsonb (canonical shape, docs/QUEST_CONTENT_IMPORT.md) ──
   website_url:        { target: { links: "website_url" }, validate: "url" },
@@ -581,15 +583,15 @@ end $$;`,
 end $$;`,
         ]
       : []),
-    ...(rows.some((r) => "verification_radius_m" in r.quest.values)
+    ...(rows.some((r) => "verification_radius_m" in r.quest.values || "location_label" in r.quest.values)
       ? [
-          "-- Prerequisite guard: quests.verification_radius_m (migration 0023).",
+          "-- Prerequisite guard: quests.verification_radius_m / location_label (migration 0023).",
           `do $$ begin
-  if not exists (
-    select 1 from information_schema.columns
-    where table_schema = 'public' and table_name = 'quests' and column_name = 'verification_radius_m'
-  ) then
-    raise exception 'quests.verification_radius_m missing — apply supabase/migrations/0023_location_discovery.sql first';
+  if (
+    select count(*) from information_schema.columns
+    where table_schema = 'public' and table_name = 'quests' and column_name in ('verification_radius_m', 'location_label')
+  ) < 2 then
+    raise exception 'quests.verification_radius_m / location_label missing — apply supabase/migrations/0023_location_discovery.sql first';
   end if;
 end $$;`,
         ]
