@@ -45,6 +45,19 @@ All notable changes to the SideQuests.io project are recorded here. This log tra
   (guarded: exactly 17 quests under the Miami Essentials partner) updates the
   copy and labels, moves the Oleta venue, and publishes the 17 quests. It must be
   run by the owner; tested locally on a full migration replay and is idempotent.
+## 2026-10-26 — Quest map markers: no drift, no jumps, no hidden pins
+
+- Markers lagged and drifted while the map moved, and a tapped pin jumped to the
+  map's corner: Mapbox positions a marker with `transform: translate(...)` on its
+  root element, and that element also had `transition: transform` and a press
+  `scale(...)` that replaced the translate. The press effect now lives on an
+  inner element. Measured on a 120 px drag: production pins moved 106–131 px and
+  settled late; the fix moves all of them exactly 120 px.
+- 11 of 17 pins were covered by other pins at the default zoom and could not be
+  tapped. Pins closer than one pin width on screen now merge into a count
+  bubble (`src/lib/clusterPins.ts`, tested); tapping it zooms in until they
+  separate (at street level it opens the first quest).
+
 
 
 ## 2026-10-25 — Quest map renders; Quests tab in the bottom nav

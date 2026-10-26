@@ -101,3 +101,14 @@ export function calcDistance(
 function toRad(deg: number): number {
   return (deg * Math.PI) / 180;
 }
+
+/** Count bubble for a cluster of pins, in the marker palette. */
+export function buildClusterSvg(count: number): string {
+  const label = count > 99 ? '99+' : String(count);
+  return [
+    '<svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">',
+    `<circle cx="22" cy="22" r="19" fill="${MARKER_COLORS.base}" stroke="${MARKER_COLORS.outline}" stroke-width="2.5"/>`,
+    `<text x="22" y="22" text-anchor="middle" dominant-baseline="central" font-family="system-ui, sans-serif" font-size="15" font-weight="700" fill="${MARKER_COLORS.glyph}">${label}</text>`,
+    '</svg>',
+  ].join('');
+}
