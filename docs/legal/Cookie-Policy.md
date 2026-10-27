@@ -1,8 +1,8 @@
 # Cookie Policy
 
-**Version:** 1.0.1
-**Effective Date:** July 7, 2026
-**Last Updated:** July 7, 2026
+**Version:** 1.1.0
+**Effective Date:** October 27, 2026
+**Last Updated:** October 27, 2026
 
 This Cookie Policy explains how SideQuests uses cookies and similar technologies (like browser
 local storage), what categories exist, what's actually active today, and how you can control your
@@ -34,7 +34,7 @@ We organize cookies and local storage into four categories, matching what you'll
 | Category | Purpose | Can you disable it? |
 |---|---|---|
 | **Necessary** | Keeps you signed in, remembers your cookie choices, and lets core app functionality (like navigation) work. | No — required for the Service to function. |
-| **Analytics** | Would help us understand aggregate usage patterns (e.g., which pages are visited) to improve the product. | Yes — off by default. |
+| **Analytics** | Lets us record how SideQuests is used (e.g., which quest pages are viewed and which buttons are tapped) to improve the product and report quest performance to partner venues. See [Section 3](#3-whats-active-today). | Yes — off by default. |
 | **Marketing** | Would support marketing measurement (e.g., knowing an email campaign led to a visit). | Yes — off by default. |
 | **Preferences** | Would remember non-essential preferences (e.g., a dismissed tip or UI setting) beyond your language/session. | Yes — off by default. |
 
@@ -44,25 +44,37 @@ We organize cookies and local storage into four categories, matching what you'll
 
 ## 3. What's Active Today
 
-As of this Policy's effective date, **SideQuests uses only Necessary cookies and local storage**
-— your sign-in session, your language preference, and your saved Cookie Preferences choice itself.
-We do not currently run any analytics, marketing, or tracking technology, third-party or
-otherwise. The Analytics, Marketing, and Preferences categories above exist in our preference
-center so that if and when we introduce such a tool, it's already governed by a clear, opt-in
-consent system — not so we can use them today.
+**Necessary** — always on: your sign-in session, your language preference, and your saved Cookie
+Preferences choice itself.
+
+**Analytics** — active only if you turn it on. If you opt in, SideQuests sends usage events to our
+own database (hosted by Supabase), not to a third-party analytics provider. An event records what
+happened (for example, "quest page viewed" or "website link tapped"), when, the page path (without
+any query string), your device type and screen width, a random ID stored in your browser, and the
+quest, venue, or partner it relates to. If you're signed in, the event is also linked to your
+account. Events never include your location, email address, or anything you type. Details are in
+our [Privacy Policy](/privacy#4-analytics).
+
+Whether or not you opt in, the website also keeps a short list of recent events in your browser's
+local storage. It stays on your device and is never sent to us.
+
+**Marketing** and **Preferences** — not used today. These categories exist so that if we ever
+introduce such a tool, it is already governed by a clear, opt-in consent system.
 
 ## 4. Managing Your Preferences
 
 You'll see a cookie banner on your first visit to SideQuests, where you can Accept all, allow
 Necessary only, or customize your choices. You can change your mind anytime by visiting
 [Cookie Preferences](/cookie-preferences) — your choice is stored in your browser and applies to
-future visits on that device/browser.
+future visits on that device/browser. Turning Analytics off stops new events from being sent from
+that browser. Because the choice is per browser, set it on each browser or device you use.
 
 ## 5. Future Technologies
 
-If we introduce a new analytics or marketing technology in the future, it will fall under the
-Analytics or Marketing category above, will only initialize for users who have opted into that
-category, and this Policy will be updated to name the specific provider before it's integrated.
+If we introduce a new analytics or marketing technology in the future (for example, a
+third-party analytics provider), it will fall under the Analytics or Marketing category above,
+will only initialize for users who have opted into that category, and this Policy will be updated
+to name the specific provider before it's integrated.
 We will never silently add a tracking technology outside this framework.
 
 ## 6. Changes to This Policy

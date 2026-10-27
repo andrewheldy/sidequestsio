@@ -1,8 +1,8 @@
 # Privacy Policy
 
-**Version:** 1.1.0
-**Effective Date:** October 25, 2026
-**Last Updated:** October 25, 2026
+**Version:** 1.2.0
+**Effective Date:** October 27, 2026
+**Last Updated:** October 27, 2026
 
 SideQuests ("SideQuests," "we," "our," or "us") operates a mobile-first platform that turns
 real-world exploration into a game: you discover quests at partner venues, verify your visit,
@@ -64,6 +64,10 @@ venue, and a timestamp) so we can verify quest attempts and give partner venues 
 privacy-safe traffic analytics. Like a quest completion, a scan record shows that you were at that
 venue at that time.
 
+**Usage events (only if you opt in).** If you turn on Analytics in
+[Cookie Preferences](/cookie-preferences), the website records what you do in it, such as quest
+pages viewed and buttons tapped. See [Analytics](#4-analytics).
+
 **Device and browser information.** Standard technical information sent by your browser or device
 — browser type, operating system, device type (mobile/tablet/desktop), and screen size — is
 collected to keep the app working correctly across devices.
@@ -118,7 +122,7 @@ nearby-alert data; uninstalling the app removes all of it.
 
 **Settings and consent records.** We store your nearby-alert preferences (daily limit, quiet hours,
 time zone, pause) and each device's on/off and pause setting, so a pause on one device is honored
-by our server. When you change a location, analytics, or marketing choice in website Settings, or
+by our server. When you change a location or marketing choice in website Settings, or
 turn on nearby alerts in the app, we record what you chose, when, and — for nearby alerts — which
 version of the disclosure you saw.
 
@@ -143,18 +147,43 @@ We use the information described above to:
 ## 3. Cookies and Similar Technologies
 
 We use browser local storage and essential cookies to keep you signed in and to remember your
-cookie preferences. A small number of optional cookie/local-storage categories exist for future
-use (analytics, marketing, additional preferences) but are **not active today** unless you
-opt in through our [Cookie Preferences](/cookie-preferences) center. Full detail lives in our
+cookie preferences. Analytics is optional and off unless you turn it on in our
+[Cookie Preferences](/cookie-preferences) center (see [Analytics](#4-analytics)). The marketing
+and additional-preferences categories are not used today. Full detail lives in our
 [Cookie Policy](/cookies).
 
 ## 4. Analytics
 
-Today, SideQuests uses only privacy-safe, aggregate analytics derived from quest and scan events
-already described above — we do not currently run a third-party analytics or tracking service.
-If we introduce one in the future (for example, a product analytics provider), it will only
-initialize for users who have opted in via [Cookie Preferences](/cookie-preferences), and this
-Policy will be updated to name the provider before it goes live.
+**Off unless you opt in.** The website sends usage events only if you turn on **Analytics** in
+[Cookie Preferences](/cookie-preferences) (or choose "Accept all" in the cookie banner). That
+choice is stored in your browser, so it applies per browser and device, and turning it off stops
+new events from being sent. It is the only analytics control; there is no separate account
+setting. The mobile app does not send usage events.
+
+**What an event contains.** The event type (for example, quest page viewed, website link tapped,
+or quest completed), when it happened, the page path without any query string, your device type
+(mobile, tablet, or desktop) and screen width, a random ID stored in your browser and a
+per-visit session ID, and the quest, venue, partner, or button it relates to. For outbound links
+we record only the destination's domain. Events never include your location, email address,
+photos, or anything you type.
+
+**Linked to your account when you're signed in.** If you're signed in, our server adds your user
+ID to each event. If you aren't signed in, the event is tied only to the random browser ID.
+
+**Where it goes and how it's used.** Events are stored in our own database, hosted by Supabase.
+We do not use a third-party analytics or advertising service. We use events to improve the
+Service and to produce aggregate quest reports for partner venues (for example, how many people
+viewed a quest page or tapped through to the venue's website). Partners receive aggregate
+figures, not events tied to you.
+
+**On your device.** Whether or not you opt in, the website keeps a short list of recent events in
+your browser's local storage. It is never sent to us, and clearing your browser data removes it.
+
+**Retention.** Usage events are kept for up to 24 months, like scan events. If you delete your
+account, events are unlinked from your user ID (see [Delete Account](/delete-account)).
+
+If we introduce a third-party analytics provider in the future, it will only initialize for users
+who have opted in, and this Policy will be updated to name the provider before it goes live.
 
 ## 5. Communications and Marketing
 
@@ -178,7 +207,8 @@ to any of them, and we only share what's needed for them to provide their servic
 | **Vercel** | Hosts the SideQuests website and app. Standard infrastructure access logs (including IP address) are generated as part of serving requests. | [vercel.com/legal/privacy-policy](https://vercel.com/legal/privacy-policy) |
 
 We do not currently use a dedicated marketing/CRM vendor, a payment processor, or a third-party
-analytics provider. If that changes, this Policy will be updated to name the new provider before
+analytics provider (our own analytics are stored in Supabase; see [Analytics](#4-analytics)).
+If that changes, this Policy will be updated to name the new provider before
 it's integrated — we won't add data-sharing relationships silently.
 
 ## 7. How We Share Information
@@ -203,7 +233,8 @@ comparable protections.
 
 Your account and profile data is retained for as long as your account is active. Scan events and
 aggregate analytics derived from them are retained for up to 24 months to support partner
-reporting. GPS check-in results and nearby-alert records are deleted after 30 days. Your device's
+reporting; usage events (if you opted into analytics) are kept on the same basis. GPS check-in
+results and nearby-alert records are deleted after 30 days. Your device's
 coordinates are never stored. Location settings and consent records are kept while your account is
 active. Community Notes are retained until you delete them or your account. When you delete
 your account, we remove your personal data as described in our
@@ -241,9 +272,8 @@ these rights, we make the following available to every SideQuests user:
   data not editable in-app, email [support@miamisidequests.io](mailto:support@miamisidequests.io).
 - **Control visibility** — toggle your profile's public visibility, leaderboard visibility, and
   what's shown on your public profile from Settings.
-- **Manage consent** — adjust analytics, marketing, and location consent anytime from Settings;
-  browser analytics and marketing cookies are controlled in
-  [Cookie Preferences](/cookie-preferences).
+- **Manage consent** — adjust marketing and location consent anytime from Settings. Analytics
+  is controlled per browser in [Cookie Preferences](/cookie-preferences) (Settings links there).
 - **Control location** — every location feature can be turned off without losing access to the
   rest of the Service:
   - **Website:** "Location for verification" in Settings turns GPS check-in on or off (we ask
