@@ -361,17 +361,16 @@ All verified by agent queries against project `wvedvngtuzsttpavmgjw` (Supabase c
 
 ---
 
-## Update 2026-10-27 — 0031 authored: raw analytics events admin-only (pending)
+## Update 2026-10-27 — 0031 applied: raw analytics events admin-only
 
-- **`0031_analytics_events_admin_read.sql` is authored, not applied.** It replaces the 0020 read
+- **`0031_analytics_events_admin_read.sql` applied by the owner** (SQL editor, after a backup);
+  the owner reports the verification block at the end of the file passed. It replaces the 0020 read
   policy on `analytics_events` (`partner_id` owner **or** admin) with `is_admin()` only, so
   partner owners can no longer read raw event rows (`user_id`, `anonymous_id`, `session_id`,
-  `page_path`, `properties`) via `/rest/v1/analytics_events`. Until it is applied, the 0020 policy
-  is presumed live and partner owners can read their partner's raw rows.
+  `page_path`, `properties`) via `/rest/v1/analytics_events`.
 - The 2026-09-28 entry above says authenticated "cannot ... read it directly"; per 0020 that only
   held for non-owner, non-admin users. Left as written (dated snapshot).
 - Partner Insights is unaffected: `partner_insights()` (0021) is `SECURITY DEFINER` and does its
   own `owns_partner()` check. No app code reads the table directly.
-- **Not verified live:** the Supabase connector in this session could not reach project
-  `wvedvngtuzsttpavmgjw`, so the current policy, grants and `partner_insights` `prosecdef` were
-  not checked. Run the verification block at the end of 0031 after applying.
+- **Not verified by an agent:** the Supabase connector in this session could not reach project
+  `wvedvngtuzsttpavmgjw`; the evidence is the owner-run check only.
