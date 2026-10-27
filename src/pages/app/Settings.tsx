@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Loader2, RefreshCw } from "lucide-react";
+import { ArrowLeft, ChevronRight, Save, Loader2, RefreshCw } from "lucide-react";
 import AppHeader from "@/components/app/AppHeader";
 import { SectionHeader } from "@/components/app/ui";
 import { Input } from "@/components/ui/input";
@@ -245,12 +245,7 @@ export default function Settings() {
                   updatePrivacy({ leaderboard_visibility: v ? "public" : "private" })
                 }
               />
-              <PrivacyRow
-                label="Analytics"
-                desc="Share anonymous visit counts."
-                checked={privacy.analytics_consent}
-                onChange={(v) => updatePrivacy({ analytics_consent: v })}
-              />
+              <CookieAnalyticsRow />
               <PrivacyRow
                 label="Location for verification"
                 desc="Used only to verify GPS check-ins. Coordinates are never stored."
@@ -331,5 +326,22 @@ function PrivacyRow({
       </div>
       <Switch checked={checked} onCheckedChange={onChange} className="shrink-0" />
     </div>
+  );
+}
+
+function CookieAnalyticsRow() {
+  return (
+    <Link
+      to="/cookie-preferences"
+      className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-muted/40"
+    >
+      <div className="flex-1">
+        <p className="text-sm font-medium text-foreground">Analytics</p>
+        <p className="text-xs text-muted-foreground">
+          Off unless you opt in. Managed per browser in Cookie Preferences.
+        </p>
+      </div>
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+    </Link>
   );
 }

@@ -2,6 +2,24 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-27 — Legal docs reconciled with analytics and account deletion
+
+- **Analytics is live for opted-in visitors.** Production is built with
+  `VITE_ANALYTICS_SINK=supabase` (the Vercel variable exists; the live bundle has the check
+  compiled down to `supabaseConfigured()`). Privacy Policy 1.2.0 §4 and Cookie Policy 1.1.0 §3
+  now describe it: first-party events in Supabase, sent only after the Cookie Preferences
+  Analytics opt-in, linked to `user_id` when signed in, no location, 24 months, unlinked on
+  deletion. Cookie banner and Cookie Preferences copy updated to match.
+- **One analytics control.** The web Settings/Profile "Analytics — Share anonymous visit
+  counts" switch (`privacy_preferences.analytics_consent`) gated nothing. It is replaced by a
+  row linking to Cookie Preferences. The column is left in place and is still shown by the
+  unreleased mobile app.
+- **Delete Account 1.2.0** describes the mobile in-app request/cancel flow (Settings → Delete
+  account), the daily processing (usually within a day; partner owners reviewed by hand; all
+  within 30 days), and that scan/usage events are kept with `user_id` nulled. Email stays the
+  website route.
+- `CURRENT_PRIVACY_VERSION` → `1.2.0` (web and mobile). Terms unchanged.
+
 ## 2026-10-26 — Readiness brief leftovers removed
 
 - The `/readiness` page was removed in `53be631`, but its standalone Netlify build remained and

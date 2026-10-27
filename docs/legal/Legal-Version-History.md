@@ -40,6 +40,7 @@ For the full engineering process behind versioning, rendering, and consent track
 
 | Document | Version | Effective Date | Summary of Changes |
 |---|---|---|---|
+| Privacy Policy | 1.2.0 | October 27, 2026 | Minor: Analytics section now describes the live opt-in analytics — events stored in SideQuests' own Supabase database, sent only after opting into Analytics in Cookie Preferences (the only analytics control), linked to the user ID when signed in, never including location; 24-month retention, unlinked on account deletion. Removes the account-level analytics setting from Your Rights and Choices. |
 | Privacy Policy | 1.1.0 | October 25, 2026 | Minor: new Location Data section — each location feature (map location, Explore near me, GPS check-in, optional nearby alerts), what is kept (GPS check-in results and alert records for 30 days; never coordinates), what stays on the device, and how to turn each feature off. Adds Apple/Google as mobile platform providers and the 30-day retention. |
 | Privacy Policy | 1.0.1 | July 7, 2026 | Patch: contact emails consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Privacy Policy | 1.0.0 | July 7, 2026 | Initial publication. |
@@ -48,8 +49,10 @@ For the full engineering process behind versioning, rendering, and consent track
 | Terms of Service | 1.0.0 | July 7, 2026 | Initial publication. |
 | Community Guidelines | 1.0.1 | July 7, 2026 | Patch: contact email consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Community Guidelines | 1.0.0 | July 7, 2026 | Initial publication. |
+| Cookie Policy | 1.1.0 | October 27, 2026 | Minor: What's Active Today now states that the Analytics category is in use for visitors who opt in (first-party events stored in Supabase), and describes the on-device event list. Marketing and Preferences remain unused. |
 | Cookie Policy | 1.0.1 | July 7, 2026 | Patch: contact email consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Cookie Policy | 1.0.0 | July 7, 2026 | Initial publication. |
+| Delete Account | 1.2.0 | October 27, 2026 | Minor: in-app deletion and cancellation in the mobile app (Settings → Delete account); email remains the route for website users. In-app requests are processed daily (usually within a day); partner owners are reviewed by hand; all within 30 days. Scan and usage-event records are kept with the user ID removed. |
 | Delete Account | 1.1.0 | October 25, 2026 | Minor: lists location-related records and consent records among the data deleted, and explains on-device app data. |
 | Delete Account | 1.0.1 | July 7, 2026 | Patch: contact email consolidated to `support@miamisidequests.io`. No change in meaning. |
 | Delete Account | 1.0.0 | July 7, 2026 | Initial publication. |
