@@ -2,6 +2,19 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-27 — Raw analytics events restricted to admins (migration authored)
+
+- **Privacy fix:** `0020_analytics_events.sql` let partner owners read their partner's raw
+  `analytics_events` rows through PostgREST, including `user_id`, `anonymous_id`, `session_id`,
+  `page_path` and `properties`. That contradicts Privacy Policy §7 and Partner Terms §7
+  (aggregate-only partner analytics).
+- Added `supabase/migrations/0031_analytics_events_admin_read.sql`: the read policy is now
+  `using (public.is_admin())`; grants are unchanged (select to authenticated, no writes).
+  Idempotent, reverse SQL in the header.
+- Partner Insights keeps working: it reads through `partner_insights()` (0021, `SECURITY
+  DEFINER`, aggregate-only). No app code reads the table directly.
+- **Pending:** not applied. The owner applies it in the SQL editor after a backup.
+
 ## 2026-10-26 — Readiness brief leftovers removed
 
 - The `/readiness` page was removed in `53be631`, but its standalone Netlify build remained and
