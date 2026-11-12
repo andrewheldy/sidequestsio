@@ -2,6 +2,17 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-10-29 — Mobile: SDK 58 patch versions realigned (Expo Doctor)
+
+- Expo Doctor on a fresh `npm ci` of `main` failed 19/20: new SDK 58 patch releases were
+  published after the 2026-10-25 alignment, so 13 packages (`expo`, `expo-router`,
+  `react-native` 0.88.1, `jest-expo`, and other `expo-*` modules) were behind the bundled
+  compatibility map. CI on `main` was green before those releases.
+- Fix: `npx expo install --fix --npm` in `apps/mobile` (patch bumps only; no new packages, no
+  app code change).
+- Verified on Node 24 from a clean `npm ci`: typecheck, 28 suites / 266 tests, Expo Doctor
+  20/20, iOS + Android export. Not checked on an iOS simulator.
+
 ## 2026-10-27 — Raw analytics events restricted to admins
 
 - **Privacy fix:** `0020_analytics_events.sql` let partner owners read their partner's raw
