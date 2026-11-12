@@ -365,12 +365,11 @@ All verified by agent queries against project `wvedvngtuzsttpavmgjw` (Supabase c
   not decrypted). The live bundle at `https://miamisidequests.io` has the sink's guard compiled
   down to `supabaseConfigured()`, so the value is `supabase`: opted-in visitors' events are sent
   to `record_analytics_events`.
-- **Open:** `analytics_events` RLS (`0020`) lets partner owners select raw rows for their
-  `partner_id`, including `user_id`. The Privacy Policy promises partners aggregate data only;
-  the fix (an admin-only read policy; `partner_insights()` is SECURITY DEFINER) is not yet
-  authored.
+- `analytics_events` RLS (`0020`) let partner owners select raw rows for their `partner_id`,
+  including `user_id`, which the Privacy Policy rules out. Fixed by `0031` (next entry).
 - Supersedes the 2026-10-25 note that `Delete-Account.md` says in-app deletion is "planned":
   from 1.2.0 it describes the mobile in-app flow (the mobile app is still unreleased).
+
 ---
 
 ## Update 2026-10-27 — 0031 applied: raw analytics events admin-only
