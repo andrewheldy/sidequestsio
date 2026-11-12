@@ -42,7 +42,7 @@ export default function CookiePreferences() {
           />
           <PreferenceRow
             label="Analytics"
-            desc="Would help us understand aggregate usage patterns. Not active today — no analytics tool is currently integrated."
+            desc="Records which pages you view and what you tap, to improve SideQuests and report quest performance to partners. Linked to your account when signed in; never your location."
             checked={consent.analytics}
             onChange={(v) => updateConsent({ analytics: v })}
           />

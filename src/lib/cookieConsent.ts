@@ -2,11 +2,12 @@
  * Client-side cookie consent state (see docs/legal/Cookie-Policy.md). Stored
  * in localStorage only — this is separate from the account-level
  * privacy_preferences/consent_events tables used for signed-in data-use
- * consent (analytics/marketing/location), which cover a different concern.
+ * consent (marketing/location), which cover a different concern.
  *
- * `hasAnalyticsConsent()` / `hasMarketingConsent()` are the API future tools
- * (e.g. a product analytics SDK) should check before initializing. No such
- * tool is wired up today — see docs/legal/Cookie-Policy.md §3.
+ * `hasAnalyticsConsent()` is the only analytics control: it gates every remote
+ * sink in src/lib/analytics/events.ts (today the Supabase sink, when the build
+ * sets VITE_ANALYTICS_SINK=supabase). privacy_preferences.analytics_consent is
+ * not read by the website. `hasMarketingConsent()` has no consumer yet.
  */
 
 export interface CookieConsent {

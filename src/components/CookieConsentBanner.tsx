@@ -14,7 +14,7 @@ export function CookieConsentBanner() {
         <p className="flex items-start gap-2 text-sm text-muted-foreground">
           <Cookie className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
           <span>
-            We use necessary cookies to run sidequests. Read our{" "}
+            We use necessary cookies to run SideQuests and, only if you accept, analytics to improve it. Read our{" "}
             <Link to="/cookies" className="underline underline-offset-2 hover:text-foreground">
               Cookie Policy
             </Link>{" "}

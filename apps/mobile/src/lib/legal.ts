@@ -5,4 +5,4 @@
  * docs/legal/Terms-of-Service.md / Privacy-Policy.md. Bump all together.
  */
 export const CURRENT_TERMS_VERSION = '1.1.0';
-export const CURRENT_PRIVACY_VERSION = '1.1.0';
+export const CURRENT_PRIVACY_VERSION = '1.2.0';

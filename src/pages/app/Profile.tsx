@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { BarChart3, Bookmark, LogOut, Settings, Settings2, RefreshCw } from "lucide-react";
+import { BarChart3, Bookmark, ChevronRight, LogOut, Settings, Settings2, RefreshCw } from "lucide-react";
 import AppHeader from "@/components/app/AppHeader";
 import { StatTile, SectionHeader, Loading } from "@/components/app/ui";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -157,12 +157,7 @@ export default function Profile() {
                 update({ leaderboard_visibility: v ? "public" : "private" })
               }
             />
-            <Row
-              label="Analytics"
-              desc="Share anonymous visit counts."
-              checked={privacy.analytics_consent}
-              onChange={(v) => update({ analytics_consent: v })}
-            />
+            <CookieAnalyticsRow />
             <Row
               label="Location for verification"
               desc="Used only to verify GPS check-ins. Coordinates are never stored."
@@ -240,5 +235,22 @@ function Row({
       </div>
       <Switch checked={checked} onCheckedChange={onChange} className="shrink-0" />
     </div>
+  );
+}
+
+function CookieAnalyticsRow() {
+  return (
+    <Link
+      to="/cookie-preferences"
+      className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-muted/40"
+    >
+      <div className="flex-1">
+        <p className="text-sm font-medium text-foreground">Analytics</p>
+        <p className="text-xs text-muted-foreground">
+          Off unless you opt in. Managed per browser in Cookie Preferences.
+        </p>
+      </div>
+      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+    </Link>
   );
 }
