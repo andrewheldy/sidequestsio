@@ -2,7 +2,8 @@
 --
 -- Run after applying each migration batch (Supabase SQL editor, or via the
 -- read-only MCP). Returns one row per check with pass = true/false.
--- Expected: every row passes once migrations 0009–0013 and 0016–0018 are applied.
+-- Expected: every row passes once migrations 0009–0013, 0016–0018 and 0023–0025 are
+-- applied, except check 17 (content readiness), which is informational.
 -- This script mutates nothing.
 
 with checks (ord, check_name, pass, details) as (
@@ -12,12 +13,12 @@ with checks (ord, check_name, pass, details) as (
     has_table_privilege('anon', 'public.quests', 'SELECT'),
     'public discovery read'
   union all
-  select 2, '0009: anon can SELECT venues/partners/qr_codes/rewards',
+  -- qr_codes is deliberately not here: 0018 made it private (check 24).
+  select 2, '0009: anon can SELECT venues/partners/rewards',
     has_table_privilege('anon', 'public.venues', 'SELECT')
       and has_table_privilege('anon', 'public.partners', 'SELECT')
-      and has_table_privilege('anon', 'public.qr_codes', 'SELECT')
       and has_table_privilege('anon', 'public.rewards', 'SELECT'),
-    'QR resolution + rewards discovery'
+    'public discovery + rewards'
   union all
   select 3, '0009: anon can SELECT notes table + author view',
     has_table_privilege('anon', 'public.community_notes', 'SELECT')

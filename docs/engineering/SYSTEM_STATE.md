@@ -371,3 +371,18 @@ All verified by agent queries against project `wvedvngtuzsttpavmgjw` (Supabase c
   authored.
 - Supersedes the 2026-10-25 note that `Delete-Account.md` says in-app deletion is "planned":
   from 1.2.0 it describes the mobile in-app flow (the mobile app is still unreleased).
+---
+
+## Update 2026-10-27 — 0031 applied: raw analytics events admin-only
+
+- **`0031_analytics_events_admin_read.sql` applied by the owner** (SQL editor, after a backup);
+  the owner reports the verification block at the end of the file passed. It replaces the 0020 read
+  policy on `analytics_events` (`partner_id` owner **or** admin) with `is_admin()` only, so
+  partner owners can no longer read raw event rows (`user_id`, `anonymous_id`, `session_id`,
+  `page_path`, `properties`) via `/rest/v1/analytics_events`.
+- The 2026-09-28 entry above says authenticated "cannot ... read it directly"; per 0020 that only
+  held for non-owner, non-admin users. Left as written (dated snapshot).
+- Partner Insights is unaffected: `partner_insights()` (0021) is `SECURITY DEFINER` and does its
+  own `owns_partner()` check. No app code reads the table directly.
+- **Not verified by an agent:** the Supabase connector in this session could not reach project
+  `wvedvngtuzsttpavmgjw`; the evidence is the owner-run check only.
