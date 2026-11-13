@@ -64,7 +64,7 @@ export type AppEventName =
   | "capture_moment_share"
   | "capture_moment_download"
   | "capture_moment_click"
-  | "concept_interaction";  // demo interactions on pitch/concept pages (e.g. /iiipoints)
+  | "concept_interaction";  // interactions on pitch/concept pages (props.page: "iiipoints" | "vice")
 
 /** Common envelope attached to every emitted event. */
 export interface AppEventContext {

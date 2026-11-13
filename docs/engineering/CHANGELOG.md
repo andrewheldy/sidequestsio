@@ -2,6 +2,33 @@
 
 All notable changes to the SideQuests.io project are recorded here. This log tracks operational/infrastructure changes (environment, deployment, verification) alongside code changes; it is not a substitute for `git log`.
 
+## 2026-11-13 — `/vice`: unofficial brand-activation concept on the live quest engine
+
+- **New route `/vice`** ("VICE — THE CITY IS YOUR PLAYGROUND"): hero, mission briefing, five
+  starter missions, mission map, progression and a compact "powered by SideQuests" overview.
+  Lazy-loaded, styles scoped under `.vice`, `noindex` (meta + `vercel.json` header). It is an
+  independent concept: no brand has agreed to it, the disclosure is shown in the hero and footer,
+  and third-party marks appear only in that disclosure.
+- **Config-driven, no new quest engine and no migration.** `src/lib/campaigns/` holds the campaign
+  type, the VICE config and a pure resolver. A mission that names an *active* quest by title
+  (four point at Miami Essentials quests) links to `/quests/:id`, shows that quest's stored
+  rewards, and is "completed" only from a `quest_completions` record. Otherwise it is concept
+  content with a labelled demo preview that reads no location, saves nothing and credits no XP.
+- **Not verified against production:** whether those four Essentials quests are active live (the
+  database was not readable from the session). Until they are, every mission shows as Concept.
+- **Known gaps:** composite quests (The Miami Circuit) and question-based verification do not
+  exist in the engine, so both are demonstrations; rewards shown for concept missions are the
+  standard tiers and differ from the linked quests' stored tiers.
+- **`QuestMap`** gained three optional props (`selectedId`, `onSelect`, `renderPopup`); existing
+  callers are unchanged.
+- **Analytics:** reuses `concept_interaction` with `props.page = "vice"` (consent-gated like every
+  remote event; no coordinates or identifiers in props).
+- Artwork is original inline SVG/CSS; see `src/components/vice/ASSETS.md`.
+- Verified with typecheck, `npm test` (new `tests/campaign.test.ts`), build, and headless Chromium
+  at 320/390/768/1440px: no overflow or page errors, full demo play-through with and without
+  reduced motion, zero geolocation calls, and the live-quest path against the dev mock repository.
+  The Mapbox map itself was not rendered (no token in the session).
+
 ## 2026-10-29 — Mobile: SDK 58 patch versions realigned (Expo Doctor)
 
 - Expo Doctor on a fresh `npm ci` of `main` failed 19/20: new SDK 58 patch releases were

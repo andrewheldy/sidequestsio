@@ -50,6 +50,7 @@ import NotFound from "./pages/NotFound";
 
 // Concept/pitch microsite: lazy so its fonts, styles and code stay out of the main bundle.
 const IIIPoints = lazy(() => import("./pages/IIIPoints"));
+const Vice = lazy(() => import("./pages/Vice"));
 // Partner Insights: lazy so the charting library only loads for partners/admins.
 const PartnerInsights = lazy(() => import("./pages/partner/PartnerInsights"));
 
@@ -92,6 +93,14 @@ const App = () => (
                         element={
                           <Suspense fallback={<div className="min-h-screen" style={{ background: "#C9AEF4" }} />}>
                             <IIIPoints />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/vice"
+                        element={
+                          <Suspense fallback={<div className="min-h-screen" style={{ background: "#10152B" }} />}>
+                            <Vice />
                           </Suspense>
                         }
                       />

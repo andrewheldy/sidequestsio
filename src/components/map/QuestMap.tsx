@@ -10,7 +10,7 @@
  *   • Map CSS is imported here so it only loads with this lazy chunk
  */
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { Map as MapIcon, MapPin } from 'lucide-react';
 import { MAPBOX_TOKEN, buildClusterSvg, buildMarkerSvg } from '@/lib/mapbox';
@@ -35,6 +35,12 @@ export interface QuestMapProps {
   /** [lng, lat] initial center. Defaults to Miami Brickell. */
   initialCenter?: [number, number];
   initialZoom?: number;
+  /** Controlled selection: the pin with this id is highlighted and previewed. */
+  selectedId?: string | null;
+  /** Fires when a pin is tapped or the preview is closed (null). */
+  onSelect?: (quest: Quest | null) => void;
+  /** Replaces the default quest preview, e.g. for campaign missions that are not `/quests/:id` pages. */
+  renderPopup?: (quest: Quest, userCoords: { lat: number; lng: number } | null, onClose: () => void) => ReactNode;
 }
 
 const QuestMap = ({
@@ -42,6 +48,9 @@ const QuestMap = ({
   height = '380px',
   initialCenter = [-80.1918, 25.7617],
   initialZoom = 12,
+  selectedId,
+  onSelect,
+  renderPopup,
 }: QuestMapProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -56,6 +65,8 @@ const QuestMap = ({
   /** Current selection for marker rebuilds inside map event handlers. */
   const selectedRef = useRef<Quest | null>(null);
   selectedRef.current = selectedQuest;
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const { toast } = useToast();
@@ -185,6 +196,7 @@ const QuestMap = ({
 
     const selectQuest = (quest: Quest) => {
       setSelectedQuest(quest);
+      onSelectRef.current?.(quest);
       map.flyTo({
         center: [quest.lng, quest.lat],
         zoom: Math.max(map.getZoom(), 14),
@@ -269,6 +281,26 @@ const QuestMap = ({
       el.setAttribute('aria-pressed', String(quest.id === selectedQuest?.id));
     });
   }, [selectedQuest, quests, mapReady]);
+
+  // ── Controlled selection ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (selectedId === undefined || selectedId === (selectedRef.current?.id ?? null)) return;
+    const quest = quests.find((q) => q.id === selectedId) ?? null;
+    setSelectedQuest(quest);
+    if (quest && mapRef.current && mapReady) {
+      mapRef.current.flyTo({
+        center: [quest.lng, quest.lat],
+        zoom: Math.max(mapRef.current.getZoom(), 14),
+        duration: 500,
+        offset: [0, -60],
+      });
+    }
+  }, [selectedId, quests, mapReady]);
+
+  const closePopup = useCallback(() => {
+    setSelectedQuest(null);
+    onSelectRef.current?.(null);
+  }, []);
 
   // ── User location dot ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -393,13 +425,12 @@ const QuestMap = ({
       </div>
 
       {/* Quest preview — slide-up bottom sheet */}
-      {selectedQuest && (
-        <QuestMapPopup
-          quest={selectedQuest}
-          userCoords={userCoords}
-          onClose={() => setSelectedQuest(null)}
-        />
-      )}
+      {selectedQuest &&
+        (renderPopup ? (
+          renderPopup(selectedQuest, userCoords, closePopup)
+        ) : (
+          <QuestMapPopup quest={selectedQuest} userCoords={userCoords} onClose={closePopup} />
+        ))}
     </div>
   );
 };
